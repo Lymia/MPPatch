@@ -22,7 +22,7 @@
 
 package com.lymiahugs.civ5.mod2dlc
 
-import java.io.{PrintStream, FileOutputStream, File}
+import java.io._
 import scala.xml.XML
 import java.util.UUID
 import java.nio.file.Files
@@ -45,10 +45,16 @@ class RewriteCore(log_callback: String => Unit) {
 
   def readFile(file: File) =
     scala.io.Source.fromFile(file).mkString
-  def writeFile(file: File, data: String, source: String = "") = {
+  def writeFile(file: File, data: String, source: String = "") {
     log("Writing%s to %s", source, file.getCanonicalPath)
     assurePresence(file)
     new PrintStream(new FileOutputStream(file)).print(data)
+  }
+  def writeFileFromStream(file: File, source: String = "")(p: PrintWriter => Any) {
+    val out = new StringWriter()
+    val print = new PrintWriter(out)
+    p(print)
+    writeFile(file, out.getBuffer.toString, source)
   }
   def copy(source: File, target: File) = {
     log("Copying %s to %s", source.getCanonicalPath, target.getCanonicalPath)
@@ -71,23 +77,19 @@ class RewriteCore(log_callback: String => Unit) {
       // Read file list
       val files = modinfo \ "Files" \ "File"
       val importedFiles = files.filter(x => (x \ "@import").text == "1").map(x => x.text).toSet
-      val importedFilesCanonical = importedFiles.map(x => new File(modSource, x).getCanonicalPath)
 
       // Copy imported files
       for(file <- importedFiles)
         copy(new File(modSource, file), new File(target, file))
 
-      // Write Lua files
-      val luaFiles = sourceFiles.filter(_.getName.endsWith(".lua"))
-      val luaDir   = new File(target, "Lua")
-      luaDir.mkdirs()
-      val luaFilePrefix = "_mod2dlc_"+uuid_string+"_entrypoint_"
-      // we add a small stub to the top of all the Lua functions so it loads the right thing
-      // in includes.
-      for(luaFile <- luaFiles) if(!importedFiles.contains(luaFile.getCanonicalPath)){
-        val newName = luaFilePrefix+luaFile.getName
-        writeFile(new File(luaDir, newName), readFile(luaFile), " entry point")
-      }
+      // Parse entry points
+      val entryPoints =
+        (modinfo \ "EntryPoints" \ "EntryPoint") map { ep =>
+          ((ep \ "Name").text, (ep \ "Description").text, (ep \ "@type").text, (ep \ "@file").text)
+        }
+
+      // Parse database updates
+      // TODO Support UpdateUserData, ExecuteScript, SetDllPath
 
       // Write XML file
       val version = (modinfo \ "@version").text.toInt
@@ -114,7 +116,7 @@ class RewriteCore(log_callback: String => Unit) {
           </Description>
 
           <Gameplay>
-            <Directory>Gameplay</Directory>
+            <Directory>Mod2DLC</Directory>
           </Gameplay>
         </Civ5Pkg>
       writeFile(new File(target, modinfoFile.getName.replace(".modinfo", "")+".civ5pkg"),

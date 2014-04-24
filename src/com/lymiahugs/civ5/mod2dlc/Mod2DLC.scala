@@ -23,6 +23,7 @@
 package com.lymiahugs.civ5.mod2dlc
 
 import javax.swing._
+import java.io.StringReader
 
 object Mod2DLC {
   def main(args: Array[String]) {
