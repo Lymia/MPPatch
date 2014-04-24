@@ -35,7 +35,9 @@ function mod2dlc.discoverMods()
     for i, v in ipairs(packageIDs) do
         if not ContentManager.IsUpgrade(v) and ContentManager.IsActive(v, ContentType.GAMEPLAY) then
             local canonical = v:lower():gsub("-", "")
-            include("_mod2dlc_"..canonical.."_manifest")
+            -- We're putting these in UI/Mod2DLC since apparently, Civilization V is really really stupid, and
+            -- only checks the first 8 characters. (note: confirm)
+            include("Mod2DLC\\_mod2dlc_"..canonical.."_manifest.lua")
         end
     end
     for _, mod in pairs(mod_info) do
