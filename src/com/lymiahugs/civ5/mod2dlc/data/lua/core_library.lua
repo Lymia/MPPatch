@@ -25,8 +25,8 @@ local function executeSQL(sql)
 end
 
 local mod_info = {}
-function mod2dlc.registerMod(name, entryPoints, sqlUpdates)
-    mod_info[name] = {name=name, entryPoints=entryPoints, sqlUpdates=sqlUpdates}
+function mod2dlc.registerMod(id, name, entryPoints, actions)
+    mod_info[id] = {id=id, name=name, entryPoints=entryPoints, actions=actions}
 end
 
 function mod2dlc.discoverMods()
@@ -44,12 +44,20 @@ function mod2dlc.discoverMods()
         print(" - Discovered mod "..mod.name)
     end
 end
-function mod2dlc.runSqlUpdates()
-    print("Mod2Dlc: Preforming database updates.")
+
+function mod2dlc.runAction(action)
+    print("Mod2Dlc: Running action trigger "+action+".")
     for _, mod in pairs(mod_info) do
-        for _, sqlUpdate in ipairs(mod.sqlUpdates) do
-            print(" - Loading "..sqlUpdate.file.." from "..mod.name)
-            executeSQL(sqlUpdate.code)
+        local event = mod.actions[action]
+        if act then
+            for _, act in ipairs(event) do
+                if act.type == "UpdateDatabase" then
+                    print(" - Running database update "..act.source.." from mod "..mod.name)
+                    executeSQL(act.data)
+                else
+                    print(" - Unknown action type "..act.type.." in mod "..mod.name)
+                end
+            end
         end
     end
 end
@@ -67,6 +75,6 @@ function mod2dlc.initMods()
     end
     print("Mod2Dlc: Initializing Mods...")
     mod2dlc.discoverMods()
-    mod2dlc.runSqlUpdates()
+    mod2dlc.runAction("OnModActivated")
     executeSQL("create table Mod2Dlc_Marker(x INTEGER)")
 end

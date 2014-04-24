@@ -25,9 +25,10 @@ package com.lymiahugs.civ5.mod2dlc.data
 object LuaFrag {
   private def loadResource(s: String) =
     io.Source.fromInputStream(getClass.getResourceAsStream("/com/lymiahugs/civ5/mod2dlc/data/"+s), "UTF-8").mkString
-  def mod_datafile_header = loadResource("lua/mod_datafile_header.lua")
+  lazy val mod_datafile_header = loadResource("lua/mod_datafile_header.lua")
+  lazy val mod_datafile_footer = loadResource("lua/mod_datafile_footer.lua")
 
-  def core_ui_frontend = loadResource("lua/core_ui_frontend.lua")
-  def core_ui_contentswitch = loadResource("lua/core_ui_contentswitch.lua")
-  def core_library = loadResource("lua/core_library.lua")
+  lazy val core_ui_frontend = loadResource("lua/core_ui_frontend.lua")
+  lazy val core_ui_contentswitch = loadResource("lua/core_ui_contentswitch.lua")
+  lazy val core_library = loadResource("lua/core_library.lua")
 }

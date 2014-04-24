@@ -35,8 +35,8 @@ object ParseDatabaseUpdate {
     else "'"+data.replace("'", "''")+"'"
 
   def parseDatabaseNode(n: Node) =
-    n.child.filter(!_.label.startsWith("#")).map(x => x.label -> x.text) ++
-    n.attributes.map(x => x.key -> x.value.text)
+    n.child.filter(!_.label.startsWith("#")).map(x => x.label -> x.text.trim) ++
+    n.attributes.map(x => x.key -> x.value.text.trim)
   def parseIntoWhere(table: String, n: Node) = {
     val data = parseDatabaseNode(n)
     "where "+data.map(x => x._1+" = "+parseValues(table, x._1, x._2)).reduce(_ + " and " + _)

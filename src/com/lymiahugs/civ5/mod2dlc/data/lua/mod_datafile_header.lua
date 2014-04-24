@@ -13,5 +13,8 @@ do
     end
     local str_len = decode_u32(luaFile, 13)
     currentExecutingPath = luaFile:sub(17, 17+str_len)
+    currentExecutingPath = currentExecutingPath:gsub("UI\\Mod2DLC\\_mod2dlc_.*", "")
 end
+
+local entryPoints, actions = {}, {}
 

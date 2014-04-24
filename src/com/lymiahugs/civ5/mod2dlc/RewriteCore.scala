@@ -28,11 +28,12 @@ import java.util.UUID
 import java.nio.file.Files
 import com.lymiahugs.civ5.mod2dlc.data.LuaFrag
 import com.lymiahugs.civ5.drm.DLCKey
+import scala.collection.mutable
 
 class RewriteCore(log_callback: String => Unit) {
   def listFiles(file: File): Seq[File] =
     if(file.isFile) Seq(file)
-    else file.listFiles().flatMap(listFiles _)
+    else file.listFiles().flatMap(listFiles)
 
   def log(format: String, args: Any*) =
     log_callback(format.format(args: _*))
@@ -48,13 +49,18 @@ class RewriteCore(log_callback: String => Unit) {
   def writeFile(file: File, data: String, source: String = "") {
     log("Writing%s to %s", source, file.getCanonicalPath)
     assurePresence(file)
-    new PrintStream(new FileOutputStream(file)).print(data)
+    val s = new PrintWriter(new FileWriter(file))
+    s.print(data)
+    s.close()
   }
-  def writeFileFromStream(file: File, source: String = "")(p: PrintWriter => Any) {
+  def writeToString(p: PrintWriter => Any) = {
     val out = new StringWriter()
     val print = new PrintWriter(out)
     p(print)
-    writeFile(file, out.getBuffer.toString, source)
+    out.getBuffer.toString
+  }
+  def writeFileFromStream(file: File, source: String = "")(p: PrintWriter => Any) {
+    writeFile(file, writeToString(p), source)
   }
   def copy(source: File, target: File) = {
     log("Copying %s to %s", source.getCanonicalPath, target.getCanonicalPath)
@@ -62,6 +68,8 @@ class RewriteCore(log_callback: String => Unit) {
     Files.copy(source.toPath, target.toPath)
   }
 
+  def quoteLuaString(string: String) =
+    "[["+string.replace("]", "]]..\"]\"..[[")+"]]"
   def translateMod(modSource: File, target: File, assetDir: File) =
     try {
       if(!target.exists) target.mkdirs()
@@ -70,7 +78,9 @@ class RewriteCore(log_callback: String => Unit) {
       val modinfoFile = sourceFiles.find(_.getName.endsWith(".modinfo")).
         getOrElse(sys.error("No .modinfo found!"))
 
-      val modinfo = (XML.loadFile(modinfoFile) \ "ModInfo").head
+      val modinfo = XML.loadFile(modinfoFile)
+      val version = (modinfo \ "@version").text.toInt
+      val modName = (modinfo \ "Properties" \ "Name").text
       val uuid = UUID.fromString((modinfo \ "@id").text)
       val uuid_string = uuid.toString.filter(_!='-').toLowerCase
 
@@ -82,6 +92,50 @@ class RewriteCore(log_callback: String => Unit) {
       for(file <- importedFiles)
         copy(new File(modSource, file), new File(target, file))
 
+      // Write mod manifest
+      var unusedFiles = new mutable.TreeSet[String]
+      unusedFiles ++= (sourceFiles.map(_.getCanonicalPath).toSet --
+        importedFiles.map(x => new File(modSource, x).getCanonicalPath).toSet -
+        modinfoFile.getCanonicalPath)
+      writeFileFromStream(new File(target, "UI/Mod2DLC/_mod2dlc_"+uuid_string+"_manifest.lua")) { out =>
+        out.println(LuaFrag.mod_datafile_header)
+        out.println("--- BEGIN GENERATED CODE ---")
+        out.println("local name = "+quoteLuaString(modName))
+        out.println("local id = "+quoteLuaString(uuid.toString))
+        out.println()
+
+        // Parse and write Actions
+        for(action <- (modinfo \ "Actions").flatMap(_.child)) if(!action.label.startsWith("#")) {
+          val actionName = action.label
+
+          out.println("-- Actions for event "+actionName)
+          out.println("actions."+actionName+" = {")
+          for(act <- action.child) act.label match {
+            case "UpdateDatabase" =>
+              val fileName = act.text.trim
+              val file = new File(modSource, fileName)
+              val fileData =
+                if(fileName.endsWith(".sql")) readFile(file)
+                else writeToString(ParseDatabaseUpdate.parseDatabaseUpdate(XML.loadFile(file)))
+              log(if(!fileName.endsWith(".sql")) "Translated database update %s to SQL in action %s."
+                  else "Copied database update %s into action %s.",
+                file.getCanonicalPath, actionName)
+              out.printf("  {type=\"UpdateDatabase\", source=%s, data=\n-- Contents of file %s\n%s\n  },\n",
+                quoteLuaString(fileName), fileName, quoteLuaString(fileData))
+            case x if !x.startsWith("#") =>
+              // unknown action
+              log("Warning: Unknown action %s in trigger %s", act.label, actionName)
+              out.printf("  {type=%s, data=%s},\n", quoteLuaString(act.label), quoteLuaString(act.text))
+            case _ => // ignore
+          }
+          out.println("}")
+          out.println()
+        }
+
+        out.println("--- END GENERATED CODE ---")
+        out.println(LuaFrag.mod_datafile_footer)
+      }
+
       // Parse entry points
       val entryPoints =
         (modinfo \ "EntryPoints" \ "EntryPoint") map { ep =>
@@ -92,9 +146,6 @@ class RewriteCore(log_callback: String => Unit) {
       // TODO Support UpdateUserData, ExecuteScript, SetDllPath
 
       // Write XML file
-      val version = (modinfo \ "@version").text.toInt
-      val modName = (modinfo \ "Name").text
-
       def generated_civ5pkg =
         <Civ5Pkg>
           <UUID>{"{"+uuid+"}"}</UUID>
