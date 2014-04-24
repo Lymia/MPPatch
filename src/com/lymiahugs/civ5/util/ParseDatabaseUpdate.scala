@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.civ5.mod2dlc
+package com.lymiahugs.civ5.util
 
 import scala.xml._
 import java.io.PrintWriter

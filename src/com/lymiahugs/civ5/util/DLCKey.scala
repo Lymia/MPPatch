@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.civ5.drm
+package com.lymiahugs.civ5.util
 
 import java.util.UUID
 import java.security.MessageDigest

@@ -27,7 +27,7 @@ import scala.xml.XML
 import java.util.UUID
 import java.nio.file.Files
 import com.lymiahugs.civ5.mod2dlc.data.LuaFrag
-import com.lymiahugs.civ5.drm.DLCKey
+import com.lymiahugs.civ5.util.{ParseDatabaseUpdate, DLCKey}
 import scala.collection.mutable
 
 class RewriteCore(log_callback: String => Unit) {
