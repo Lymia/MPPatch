@@ -28,6 +28,7 @@ object LuaFrag {
   lazy val mod_datafile_header = loadResource("lua/mod_datafile_header.lua")
   lazy val mod_datafile_footer = loadResource("lua/mod_datafile_footer.lua")
 
+  lazy val core_entrypoint_hook = loadResource("lua/core_entrypoint_hook.lua")
   lazy val core_ui_frontend = loadResource("lua/core_ui_frontend.lua")
   lazy val core_ui_contentswitch = loadResource("lua/core_ui_contentswitch.lua")
   lazy val core_library = loadResource("lua/core_library.lua")
