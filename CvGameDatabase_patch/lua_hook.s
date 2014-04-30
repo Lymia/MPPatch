@@ -7,12 +7,15 @@ LuaTableHookCore:
     push eax
     push edi
     call lua_pushstring
+    add esp, 8
     push 0
     push edi
     call lua_pushinteger
+    add esp, 8
     push esi
     push edi
     call lua_rawset
+    add esp, 8
     ret
 LuaTableHook:
     pushad

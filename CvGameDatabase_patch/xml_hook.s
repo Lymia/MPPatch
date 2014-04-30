@@ -10,6 +10,7 @@ XMLParserHookCore:
         push eax
         mov ecx, esi
         call xml_check_label
+        add esp, 8
         test al, al
         je .next
         jmp .continue
@@ -20,6 +21,7 @@ XMLParserHookCore:
         push eax
         mov ecx, esi
         call xml_check_label
+        add esp, 8
         test al, al
         je .cancel
 
@@ -31,6 +33,7 @@ XMLParserHookCore:
         push ebx
         mov ecx, esi
         call xml_get_contents
+        add esp, 8
 
         pop ebx ; contents
         pop eax ; length
@@ -39,6 +42,7 @@ XMLParserHookCore:
         push ebx
         mov ecx, edi
         call Database_ExecuteMultiple
+        add esp, 8
         test al, al
         je .continue
 
@@ -46,6 +50,7 @@ XMLParserHookCore:
         push eax
         mov ecx, edi
         call Database_LogMessage
+        add esp, 4
 
         jmp .fail
     .continue:
