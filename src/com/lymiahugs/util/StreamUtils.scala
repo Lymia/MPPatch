@@ -20,23 +20,15 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.civ5.mod2dlc
+package com.lymiahugs.util
 
-import javax.swing._
-import java.io.StringReader
+import java.io.{StringWriter, PrintWriter}
 
-object Mod2DLC {
-  def main(args: Array[String]) {
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
-    data.Pathes.ensurePathsExist()
-    if(!data.Pathes.ensureSubdirectories()) {
-      JOptionPane.showMessageDialog(null,
-        """
-          |An expected subdirectory in either the game data directory or the user directory was not found.
-          |If you selected paths manually, please check your paths.
-          |Otherwise, try running the game first, if you haven't already.
-        """.stripMargin, "Mod2DLC", JOptionPane.ERROR_MESSAGE)
-      sys.error("subdirectory check failed")
-    }
+object StreamUtils {
+  def writeToString(p: PrintWriter => Any) = {
+    val out = new StringWriter()
+    val print = new PrintWriter(out)
+    p(print)
+    out.getBuffer.toString
   }
 }

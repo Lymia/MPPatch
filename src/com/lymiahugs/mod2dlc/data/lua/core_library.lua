@@ -25,10 +25,12 @@ local function executeSQL(sql)
 end
 
 local mod_info = {}
-function mod2dlc.registerMod(id, name, entryPoints, actions)
-    mod_info[id] = {id=id, name=name, entryPoints=entryPoints, actions=actions}
+function mod2dlc.registerMod(id, name, entryPoints, usesCvGameDatabasePatch)
+    mod_info[id] = {id=id, name=name, entryPoints=entryPoints, usesCvGameDatabasePatch=usesCvGameDatabasePatch}
 end
 
+DB.CollectMemoryUsage()
+local databasePatchInstalled = DB.GetMemoryUsage()._mod2dlc_marker
 function mod2dlc.discoverMods()
     print("Mod2DLC: Discovering mods")
     local packageIDs = ContentManager.GetAllPackageIDs()
@@ -36,28 +38,14 @@ function mod2dlc.discoverMods()
         if not ContentManager.IsUpgrade(v) and ContentManager.IsActive(v, ContentType.GAMEPLAY) then
             local canonical = v:lower():gsub("-", "")
             -- We're putting these in UI/Mod2DLC since apparently, Civilization V is really really stupid, and
-            -- only checks the first 8 characters. (note: confirm)
+            -- only checks the first 8 characters.
             include("Mod2DLC\\_mod2dlc_"..canonical.."_manifest.lua")
         end
     end
     for _, mod in pairs(mod_info) do
         print(" - Discovered mod "..mod.name)
-    end
-end
-
-function mod2dlc.runAction(action)
-    print("Mod2DLC: Running action trigger "+action+".")
-    for _, mod in pairs(mod_info) do
-        local event = mod.actions[action]
-        if act then
-            for _, act in ipairs(event) do
-                if act.type == "UpdateDatabase" then
-                    print(" - Running database update "..act.source.." from mod "..mod.name)
-                    executeSQL(act.data)
-                else
-                    print(" - Unknown action type "..act.type.." in mod "..mod.name)
-                end
-            end
+        if mod.usesCvGameDatabasePatch and not databasePatchInstalled then
+            print(" - WARNING: Mod requires CvGameDatabase patch which is not installed!!")
         end
     end
 end
@@ -79,7 +67,25 @@ function mod2dlc.callEntryPoints(entryPoint)
     end
 end
 
+
+function mod2dlc.checkInit()
+    local init = false
+    for _ in DB.Query("select * from sqlite_master where tbl_name = \"Mod2DLC_Marker\" and type = \"table\"") do
+        init = true
+    end
+    return init
+end
+function mod2dlc.initMods()
+    if mod2dlc.checkInit() then
+        return
+    end
+    print("Mod2DLC: Discovering Mods")
+    mod2dlc.discoverMods()
+    executeSQL("create table Mod2DLC_Marker(x INTEGER)")
+end
+
 function mod2dlc.installEntryPointHook()
+    mod2dlc.initMods()
     if not Modding.__mod2dlc_marker then
         local oldModding = Modding
         Modding = setmetatable({}, {
@@ -103,21 +109,4 @@ function mod2dlc.installEntryPointHook()
             end
         })
     end
-end
-
-function mod2dlc.checkInit()
-    local init = false
-    for _ in DB.Query("select * from sqlite_master where tbl_name = \"Mod2DLC_Marker\" and type = \"table\"") do
-        init = true
-    end
-    return init
-end
-function mod2dlc.initMods()
-    if mod2dlc.checkInit() then
-        return
-    end
-    print("Mod2DLC: Initializing Mods...")
-    mod2dlc.discoverMods()
-    mod2dlc.runAction("OnModActivated")
-    executeSQL("create table Mod2DLC_Marker(x INTEGER)")
 end

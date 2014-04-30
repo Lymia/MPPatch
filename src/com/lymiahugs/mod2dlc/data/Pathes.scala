@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.civ5.mod2dlc.data
+package com.lymiahugs.mod2dlc.data
 
 import java.io._
 

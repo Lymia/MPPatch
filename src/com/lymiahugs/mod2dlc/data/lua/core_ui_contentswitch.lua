@@ -18,7 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-include "mod2dlc"
+include "m2d_core"
 
 function OnShowHide(isHide, isInit)
     if isHide and not isInit then

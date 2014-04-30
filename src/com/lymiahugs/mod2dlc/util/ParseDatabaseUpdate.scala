@@ -20,10 +20,10 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.civ5.util
+package com.lymiahugs.mod2dlc.util
 
 import scala.xml._
-import java.io.PrintWriter
+import com.lymiahugs.util.StreamUtils
 
 object ParseDatabaseUpdate {
   // TODO: Figure out if XMLSerializer uses type information to decide whether to do this or not
@@ -45,7 +45,9 @@ object ParseDatabaseUpdate {
     val data = parseDatabaseNode(n)
     "set "+data.map(x => x._1+" = "+parseValues(table, x._1, x._2)).reduce(_ + ", " + _)
   }
-  def parseDatabaseUpdate(data: Elem)(out: PrintWriter) = {
+  def parseDatabaseUpdate(data: Elem, tableFilter: String => Boolean = _ => true): Seq[String] = {
+    // TODO Fix this massive hax and make this proper FP
+    val buffer = new scala.collection.mutable.ArrayBuffer[String]
     for(instruction <- data.child) {
       instruction.label match {
         case "Table" =>
@@ -57,35 +59,42 @@ object ParseDatabaseUpdate {
         case "DeleteMissingReferences" =>
           // TODO: Figure out WTF this is
           throw new NotImplementedError("wtf is this")
-        case table if !table.startsWith("#") =>
+        case table if !table.startsWith("#") && tableFilter(table) =>
           for(action <- instruction.child) action.label match {
             case "Row" | "Replace" | "InsertOrIgnore" | "InsertOrAbort" =>
-              out.print(action.label match {
-                case "Row" => "insert into "
-                case "Replace" => "insert or replace into "
-                case "InsertOrIgnore" => "insert or ignore into "
-                case "InsertOrAbort" => "insert or abort into "
-              })
-              out.print(table+" ")
+              buffer += StreamUtils.writeToString { out =>
+                out.print(action.label match {
+                  case "Row" => "insert into "
+                  case "Replace" => "insert or replace into "
+                  case "InsertOrIgnore" => "insert or ignore into "
+                  case "InsertOrAbort" => "insert or abort into "
+                })
+                out.print(table + " ")
 
-              val data = parseDatabaseNode(action)
-              out.print("("+data.map(_._1).reduce(_ + ", " + _)+") ")
-              out.print("values ("+data.map(x => parseValues(table, x._1, x._2)).reduce(_ + ", " + _)+");")
-              out.println()
+                val data = parseDatabaseNode(action)
+                out.print("(" + data.map(_._1).reduce(_ + ", " + _) + ") ")
+                out.print("values (" + data.map(x => parseValues(table, x._1, x._2)).reduce(_ + ", " + _) + ")")
+              }
             case "Update" =>
-              out.print("update "+table+" ")
-              out.print(parseIntoWhere(table, action \ "Where" head)+" ")
-              out.print(parseIntoSet  (table, action \ "Set" head))
-              out.println(";")
+              buffer += StreamUtils.writeToString { out =>
+                out.print("update " + table + " ")
+                out.print(parseIntoWhere(table, action \ "Where" head) + " ")
+                out.print(parseIntoSet(table, action \ "Set" head))
+              }
             case "Delete" =>
-              out.print("delete from "+table+" ")
-              out.print(parseIntoWhere(table, action \ "Where" head))
-              out.println(";")
-            case x => // ignore
+              buffer += StreamUtils.writeToString { out =>
+                out.print("delete from " + table + " ")
+                out.print(parseIntoWhere(table, action \ "Where" head))
+              }
+            case _ => //ignore
           }
-        case _ => // ignore
+        case _ => //ignore
       }
     }
-    out.flush()
+    buffer.toSeq
   }
+
+  // TODO Fix this ginormous hack into something less evil!!!
+  def parseScript(script: String) =
+    script.trim.split(";").map(_.trim).filter(!_.isEmpty).toSeq
 }
