@@ -29,8 +29,9 @@ function mod2dlc.registerMod(id, name, entryPoints, usesCvGameDatabasePatch)
     mod_info[id] = {id=id, name=name, entryPoints=entryPoints, usesCvGameDatabasePatch=usesCvGameDatabasePatch}
 end
 
-DB.CollectMemoryUsage()
-local databasePatchInstalled = DB.GetMemoryUsage()._mod2dlc_marker
+local databasePatch          = DB.GetMemoryUsage().__mod2dlc_patch
+local databasePatchVersion   = databasePatch and databasePatch.versioninfo.major
+local databasePatchMinCompat = databasePatch and databasePatch.versioninfo.mincompat
 function mod2dlc.discoverMods()
     print("Mod2DLC: Discovering mods")
     local packageIDs = ContentManager.GetAllPackageIDs()
@@ -44,8 +45,16 @@ function mod2dlc.discoverMods()
     end
     for _, mod in pairs(mod_info) do
         print(" - Discovered mod "..mod.name)
-        if mod.usesCvGameDatabasePatch and not databasePatchInstalled then
-            print(" - WARNING: Mod requires CvGameDatabase patch which is not installed!!")
+        if mod.usesCvGameDatabasePatch then
+            if not databasePatch then
+                print(" - WARNING: Mod requires CvGameDatabase patch which is not installed!!")
+            elseif mod.usesCvGameDatabasePatch < databasePatchVersion then
+                print(" - WARNING: Mod requires CvGameDatabase patch version "..mod.usesCvGameDatabasePatch..
+                      " (Installed: "..databasePatchVersion..")")
+            elseif databasePatchMinCompat < mod.databasePatchMinCompat then
+                print(" - WARNING: Current version of CvGameDatabasePatch is only backwards compatiable back to "..
+                        "version "..databasePatchMinCompat.." (Mod requested: "..mod.databasePatchMinCompat..")")
+            end
         end
     end
 end

@@ -84,12 +84,12 @@ object rewriteMod {
 
         if(fileName.endsWith(".sql")) {
           generateXML(<GameData>
-            <__MOD2DLC_IGNORE>
+            <__MOD2DLC_PATCH_IGNORE>
               <!-- This triggers an error for players who have an unmodded CvGameDatabase file -->
-              <Please_install_the_CvGameDatabaseWin32_patch_for_Mod2DLC>
-              </Please_install_the_CvGameDatabaseWin32_patch_for_Mod2DLC>
-            </__MOD2DLC_IGNORE>
-            <__MOD2DLC_RAWSQL>{readFile(file)}</__MOD2DLC_RAWSQL>
+              <Please_install_the_CvGameDatabase_patch_for_Mod2DLC>
+              </Please_install_the_CvGameDatabase_patch_for_Mod2DLC>
+            </__MOD2DLC_PATCH_IGNORE>
+            <__MOD2DLC_PATCH_RAWSQL>{readFile(file)}</__MOD2DLC_PATCH_RAWSQL>
           </GameData>, outputFile, " SQL data from "+file.getCanonicalFile)
           usesCvGameDatabasePatch = true
         } else copy(file, outputFile)
@@ -130,7 +130,7 @@ object rewriteMod {
 
         out.println("local name = "+quoteLuaString(modName))
         out.println("local id = "+quoteLuaString(uuid.toString))
-        out.println("local usesCvGameDatabasePatch = "+usesCvGameDatabasePatch)
+        out.println("local usesCvGameDatabasePatch = "+(if(usesCvGameDatabasePatch) "1" else "false"))
         out.println()
 
         out.println(entryPointData)
