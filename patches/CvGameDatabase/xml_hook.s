@@ -23,16 +23,19 @@ import_symbol xml_get_contents
 import_symbol Database_ExecuteMultiple
 import_symbol Database_LogMessage
 
-reserve_memory XMLParser_InitCheck_Flag, 4
+XMLParser_InitCheck_Flag: db 0
 XMLParser_InitCheck:
-        get_memory XMLParser_InitCheck_Flag
-        mov eax, [eax]
+        eip_rel XMLParser_InitCheck_Flag
+        mov ebx, eax
+        mov al, [ebx]
         test al, al
         jne .skipinit
 
         push_eip_rel PatchMarkerString
         mov ecx, edi
         call Database_LogMessage
+
+        mov byte [ebx], 1
     .skipinit:
         ret
 

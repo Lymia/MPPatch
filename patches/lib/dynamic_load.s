@@ -23,14 +23,14 @@ import_symbol GetProcAddress
 
 %macro load_library 2
     %ifndef %1_loaded
-        reserve_memory %%MemoryStore, 4
+        %%MemoryStore: dd 0
         %%DllName: db %2, 0
         %%InitFn:
             push_eip_rel %%DllName
             call LoadLibraryA
 
             mov ebx, eax
-            get_memory %%MemoryStore
+            eip_rel %%MemoryStore
             mov dword [eax], ebx
             ret
         add_init_command %%InitFn
@@ -42,10 +42,10 @@ import_symbol GetProcAddress
 
 %macro import_symbol_dynamic 3
     %ifndef %2_loaded
-        reserve_memory %%MemoryStore, 4
+        %%MemoryStore: dd 0
         %%SymbolName: db %3, 1
         %%InitFn:
-            get_memory %1
+            eip_rel %1
             mov ebx, [eax]
 
             push_eip_rel %%SymbolName
@@ -53,36 +53,14 @@ import_symbol GetProcAddress
             call GetProcAddress
             mov ebx, eax
 
-            get_memory %%MemoryStore
+            eip_rel %%MemoryStore
             mov dword [eax], ebx
 
             ret
         add_init_command %%InitFn
         %2:
-            get_memory %%MemoryStore
-            call [eax]
+            eip_rel %%MemoryStore
+            jmp [eax]
         %define %2_loaded
     %endif
 %endmacro
-
-; Bootstrap function to get functions the memory allocator uses
-MemoryBootstrap_LoadSyms_Library       : db "Kernel32.dll", 0
-MemoryBootstrap_LoadSyms_HeapAlloc     : db "HeapAlloc", 0
-MemoryBootstrap_LoadSyms_GetProcessHeap: db "GetProcessHeap", 0
-MemoryBootstrap_LoadSyms:
-    push_eip_rel MemoryBootstrap_LoadSyms_Library
-    call LoadLibraryA
-    mov ebx, eax
-
-    push_eip_rel MemoryBootstrap_LoadSyms_HeapAlloc
-    push ebx
-    call GetProcAddress
-    mov esi, eax
-
-    push_eip_rel MemoryBootstrap_LoadSyms_GetProcessHeap
-    push ebx
-    call GetProcAddress
-    mov edi, eax
-
-    ret
-

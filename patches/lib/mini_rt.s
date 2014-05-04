@@ -32,7 +32,6 @@ jmp __main
 
 marker "patch rt"
 %include "lib/utils.s"
-%include "lib/memory.s"
 %include "lib/dynamic_load.s"
 %include "lib/patch.s"
 
@@ -42,17 +41,12 @@ Patch_BodyFunctions
 marker "main"
 __main:
     push_all
-    call InitMemorySubsystem
     init_commands
     %ifdef USE_MAIN
         call main
     %endif
     pop_all
     ret
-
-; memory.s needs to run some stuff after everything is included because of some macro shenanigans
-marker "memory rt"
-memory_init
 
 ; just in case
 int3
