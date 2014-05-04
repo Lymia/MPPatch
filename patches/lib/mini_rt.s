@@ -19,12 +19,12 @@
 ; SOFTWARE.
 
 bits 32
-[section main vstart=segment_base_addr]
+org segment_base_addr
 __start:
 
 jmp __main
 
-%macro marker 1
+%macro marker 1+
     %ifdef DEBUG
         db "----- ", %1, " -----"
     %endif

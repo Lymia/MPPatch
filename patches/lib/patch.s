@@ -29,7 +29,7 @@ import_symbol_dynamic Kernel32, VirtualProtect, "VirtualProtect"
 
 ; Patch definition
 ; edi = lpAddress, esi = dwSize, ebp = patchSource
-patch_SetSegmentWritable:
+patch_rt:
         sub esp, 4
         mov ebx, esp
 
@@ -65,20 +65,19 @@ patch_SetSegmentWritable:
         add esp, 4 ; just ditch the protection value we set ourselves.
 
         ret
-%macro patch 2+
+%macro patch 2
+    marker "patch instr"
     %%patch_instr_start:
-        [section %%patch_section vstart=%1]
-        %2
-        [section main]
+        jmp %%patch_instr_start + ((%2 - __start) + segment_base_addr - %1)
     %%patch_instr_length: equ $ - %%patch_instr_start
 
     %%PatchFn:
         eip_rel %%patch_instr_start
         mov ebp, eax
-        eip_rel_long %1
+        eip_rel_offset %1
         mov edi, eax
         mov esi, %%patch_instr_length
 
-        jmp patch_SetSegmentWritable
+        jmp patch_rt
     add_patch_command %%PatchFn
 %endmacro

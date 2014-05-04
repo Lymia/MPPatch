@@ -30,7 +30,7 @@ eip_rel_rt:
     %%return_addr:
         add eax, %1 - %%return_addr
 %endmacro
-%macro eip_rel_long 1
+%macro eip_rel_offset 1
         call eip_rel_rt
     %%return_addr:
         add eax, 0 - (%%return_addr - __start) - (segment_base_addr - %1)
