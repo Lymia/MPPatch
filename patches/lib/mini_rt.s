@@ -19,7 +19,7 @@
 ; SOFTWARE.
 
 bits 32
-org segment_base_addr
+[section main vstart=segment_base_addr]
 __start:
 
 jmp __main
@@ -45,6 +45,7 @@ __main:
     %ifdef USE_MAIN
         call main
     %endif
+    patch_commands
     pop_all
     ret
 

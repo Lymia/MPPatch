@@ -21,45 +21,64 @@
 load_library Kernel32, "Kernel32.dll"
 import_symbol_dynamic Kernel32, VirtualProtect, "VirtualProtect"
 
-%macro patch 2+
-    %%patch_instr_start:
-        %2
-    %%patch_instr_length: equ $ - %%patch_instr_start
+; Patch list
+%define patch_commands nop
+%macro add_patch_command 1
+    %define patch_commands %[init_commands]; call %1
+%endmacro
 
-    %%PatchFn:
+; Patch definition
+; edi = lpAddress, esi = dwSize, ebp = patchSource
+patch_SetSegmentWritable:
         sub esp, 4
         mov ebx, esp
 
         push ebx
         push 0x40 ; PAGE_EXECUTE_READWRITE
-        push %%patch_instr_length
-        push_eip_rel %%patch_instr_start
+        push esi
+        push edi
         call VirtualProtect
 
         pop ebx
 
-        eip_rel %%patch_instr_start
-        mov esi, eax
+        push edi
+        push esi
 
-        eip_rel %1
-        mov edi, eax
-
-        mov ecx, %%patch_instr_length
+        mov ecx, esi
+        mov esi, ebp
 
         cld
         rep movsb
+
+        pop esi
+        pop edi
 
         sub esp, 4
         mov ecx, esp
 
         push ecx
         push ebx ; old page permissions
-        push %%patch_instr_length
-        push_eip_rel %%patch_instr_start
+        push esi
+        push edi
         call VirtualProtect
 
         add esp, 4 ; just ditch the protection value we set ourselves.
 
         ret
-    add_init_command %%PatchFn
+%macro patch 2+
+    %%patch_instr_start:
+        [section %%patch_section vstart=%1]
+        %2
+        [section main]
+    %%patch_instr_length: equ $ - %%patch_instr_start
+
+    %%PatchFn:
+        eip_rel %%patch_instr_start
+        mov ebp, eax
+        eip_rel_long %1
+        mov edi, eax
+        mov esi, %%patch_instr_length
+
+        jmp patch_SetSegmentWritable
+    add_patch_command %%PatchFn
 %endmacro
