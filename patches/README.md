@@ -1,9 +1,14 @@
-Mod2Dlc
-=======
+Mod2Dlc Patches
+===============
 
-Mod2Dlc is a project meant to try and allow mods to be used in Civilization V
-multiplayer by rewriting them so that the game treats them as official DLCs
-(which work perfectly in multiplayer.)
+This directory contains the various binary patches that Mod2Dlc makes. Though
+only one version of CvGameDatabase is patched for now, there's mechanisms in
+place already for patching different versions/etc.
 
-Currently there is no simple build system or script. This will eventually be
-fixed.
+There's a directory here, "binaries/" which is excluded-- I don't want to
+redistribute that, or put too many binaries in my git repo. If you want a copy
+of it, email <lymia@lymiahugs.com>. If you only care about the current version,
+just run collectVersions.sh
+
+If you have a cygwin environment, you can try getting make.sh to work, but,
+like the main program, there's currently no simple build system.
