@@ -32,6 +32,7 @@ end
 local databasePatch          = DB.GetMemoryUsage().__mod2dlc_patch
 local databasePatchVersion   = databasePatch and databasePatch.versioninfo.major
 local databasePatchMinCompat = databasePatch and databasePatch.versioninfo.mincompat
+mod2dlc.patch_api = databasePatch
 function mod2dlc.discoverMods()
     print("Mod2DLC: Discovering mods")
     local packageIDs = ContentManager.GetAllPackageIDs()
