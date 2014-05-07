@@ -9,8 +9,10 @@ patch_files() {
 
     mkdir out/$name
 
+    echo "Building patches for file $name."
     for filePath in binaries/${name}_*.dll
     do
+        echo " - Building patch for $filePath"
         if [ ! -f "$filePath" ]; then
             echo "Could not find $filePath"
             exit 1
@@ -22,12 +24,15 @@ patch_files() {
         fi
         mkdir out/$name/$checkSum
 
+        echo "   - Creating symbol dump"
         cp "$filePath" out/$name/$checkSum/${name}_orig_$checkSum.dll
         objdump -x out/$name/$checkSum/${name}_orig_$checkSum.dll |
             grep -A99999999 "Ordinal/Name Pointer" | grep -B99999999 -m 1 "^$" |
             tail -n +2 | sed "s/\s*\[[ 0-9]\+\] /proxy_symbol /g" > out/$name/$checkSum/${name}_symbols.s
 
+        echo "   - Compiling assembly"
         nasm -Ox -f win32 -o out/$name/$checkSum/as_$name.obj $name/versions/$checkSum/as_entry.s
+        echo "   - Compiling $fileName"
         i686-w64-mingw32-gcc -g -shared -O2 --std=gnu99 -o "out/$name/$checkSum/$fileName" \
             $name/versions/$checkSum/c_entry.c out/$name/$checkSum/as_$name.obj \
             -Wl,--enable-stdcall-fixup -Wl,-L,"$CIV5_PATH" $* \
