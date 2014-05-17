@@ -31,6 +31,7 @@ const char* patchMarkerString =
 int patchVersionMajor = 1;
 int patchVersionMinor = 1;
 int patchMinCompat = 1;
+int patchCoreMinCompat = 1;
 
 #include "lua_hook.c"
 #include "xml_hook.c"

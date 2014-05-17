@@ -52,6 +52,7 @@ static void luaTable_versioninfo(lua_State *L, int table) {
     pushInteger(L, table, "minor", patchVersionMinor);
 
     pushInteger(L, table, "mincompat", patchMinCompat);
+    pushInteger(L, table, "core_mincompat", patchCoreMinCompat);
 }
 static void luaTable_main(lua_State *L, int table) {
     createTable(L, table, "versioninfo", luaTable_versioninfo);
@@ -62,6 +63,11 @@ __stdcall void LuaTableHookCore(lua_State *L, int table) {
     createTable(L, table, "__mod2dlc_patch", luaTable_main);
 }
 
+extern void LuaTableHook();
+UnpatchData LuaTablePatch;
 __attribute__((constructor(500))) static void installLuaHook() {
-
+    LuaTablePatch = doPatch(lua_table_hook_offset, LuaTableHook);
+}
+__attribute__((destructor(500))) static void destroyLuaHook() {
+    unpatch(LuaTablePatch);
 }

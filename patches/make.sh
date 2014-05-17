@@ -1,5 +1,11 @@
 #!/bin/bash
 
+FLAGS=""
+if [ "$1" = "--debug" ]
+then
+    FLAGS="-DDEBUG"
+fi
+
 CIV5_PATH="/cygdrive/c/Program Files (x86)/Steam/steamapps/common/Sid Meier's Civilization V/"
 WIN_PATH="/cygdrive/c/Windows/SysWOW64"
 patch_files() {
@@ -22,19 +28,21 @@ patch_files() {
             echo "Unknown checksum $checkSum for file $filePath"
             exit 1
         fi
-        mkdir out/$name/$checkSum
+        
+        outDir="out/$name/$checkSum"
+        mkdir $outDir
 
         echo "   - Creating symbol dump"
-        cp "$filePath" out/$name/$checkSum/${name}_orig_$checkSum.dll
-        objdump -x out/$name/$checkSum/${name}_orig_$checkSum.dll |
+        cp "$filePath" $outDir/${name}_orig_$checkSum.dll
+        objdump -x $outDir/${name}_orig_$checkSum.dll |
             grep -A99999999 "Ordinal/Name Pointer" | grep -B99999999 -m 1 "^$" |
-            tail -n +2 | sed "s/\s*\[[ 0-9]\+\] /proxy_symbol /g" > out/$name/$checkSum/${name}_symbols.s
+            tail -n +2 | sed "s/\s*\[[ 0-9]\+\] /proxy_symbol /g" > $outDir/${name}_symbols.s
 
         echo "   - Compiling assembly"
-        nasm -Ox -f win32 -o out/$name/$checkSum/as_$name.obj $name/versions/$checkSum/as_entry.s
+        nasm $FLAGS -Ox -f win32 -o $outDir/as_$name.obj $name/versions/$checkSum/as_entry.s
         echo "   - Compiling $fileName"
-        i686-w64-mingw32-gcc -g -shared -O2 --std=gnu99 -o "out/$name/$checkSum/$fileName" \
-            $name/versions/$checkSum/c_entry.c out/$name/$checkSum/as_$name.obj \
+        i686-w64-mingw32-gcc $FLAGS -g -shared -O2 --std=gnu99 -o "$outDir/$fileName" \
+            $name/versions/$checkSum/c_entry.c $outDir/as_$name.obj \
             -Wl,--enable-stdcall-fixup -Wl,-L,"$CIV5_PATH" $* \
             -Wl,-Bstatic -lssp -fstack-protector -fstack-protector-all -D_FORTIFY_SOURCE=2 \
             --param ssp-buffer-size=4 -Wl,--dynamicbase,--nxcompat

@@ -93,16 +93,10 @@ extern _asm_resolveAddress@4
         push %1_name
         call _asm_resolveSymbol@4
         mov [%1_offset], eax
-        test eax, eax
-        je .fail
     %endmacro
     global _InitializeProxy
     _InitializeProxy:
-            %include %1
-            mov eax, 1
-            ret
-        .fail:
-            mov eax, 0
-            ret
+        %include %1
+        ret
     %unmacro proxy_symbol 1
 %endmacro

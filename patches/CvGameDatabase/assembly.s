@@ -37,11 +37,13 @@ _LuaTableHook:
 extern _XmlParserHookCore@12
 global _XmlParserHook
 _XmlParserHook:
+        sub esp, 4
+
         push_all
 
         XMLParserHook_LoadVariables
 
-        add esp, 4
+        sub esp, 4
         mov eax, esp
 
         push eax ; failure_value
@@ -52,10 +54,13 @@ _XmlParserHook:
         pop ebx
 
         test al, al
-        je .proceedExit
+        jz .proceedExit
+
+        mov [esp+4+4*8], ebx
 
         pop_all
-        mov al, bl
+
+        pop XMLParserHook_ContinueStatusRegister
 
         prepare_symbol XMLParserHook_ContinueSafeRegister, xml_parser_hook_continue
         XMLParserHook_ContinuePatchInstructions
@@ -63,6 +68,8 @@ _XmlParserHook:
 
     .proceedExit:
         pop_all
+
+        add esp, 4
 
         prepare_symbol XMLParserHook_SafeRegister, xml_parser_hook_return
         XMLParserHook_PatchInstructions

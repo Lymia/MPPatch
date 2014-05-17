@@ -15,15 +15,13 @@ collect() {
     do
         version=`basename $filePath`
         echo " - Version $version of $patch"
+
         cp "out/$patch/$version/$fileName" "patches/${patch}_patch_$version.dll"
         strip "patches/${patch}_patch_$version.dll"
-        echo "  <${patch}_$version file=\"patches/${patch}_patch_$version.dll\" cpname=\"${patch}_orig_$version.dll\"/>" >> patches/manifest.xml
+
+        checkSum=$(sha1sum -b "patches/${patch}_patch_$version.dll" | cut -f 1 -d ' ')
+        echo "$version ${patch}_patch_$version.dll ${patch}_orig_$version.dll" >> patches/${patch}_versions.mf
     done
 }
 
-echo "<?xml version="1.0" encoding="UTF-8"?>" >> patches/manifest.xml
-echo "<patches>"                              >> patches/manifest.xml
-
 collect CvGameDatabase "CvGameDatabaseWin32Final Release.dll"
-
-echo "</patches>"                             >> patches/manifest.xml

@@ -22,6 +22,21 @@
 
 #include <windows.h>
 #include <stdio.h>
+#include <time.h>
+
+// Debug logging
+#ifdef DEBUG
+    static FILE* debug_log_file;
+    #define debug_print(format, arg...) \
+        fprintf(debug_log_file, "[%lld] %s at %s:%u - " format "\n", \
+            (long long) time(NULL), __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg); \
+        fflush(debug_log_file);
+    __attribute__((constructor(150))) static void initDebugLogging() {
+        debug_log_file = fopen("Mod2DLC_" target_library_name "Patch_debug.log", "w");
+    }
+#else
+    #define debug_print(format, ...)
+#endif
 
 // Runtime for DLL proxying
 static HMODULE baseDll;
@@ -30,36 +45,94 @@ static bool checkFileExists(LPCTSTR szPath) {
   return (attrib != INVALID_FILE_ATTRIBUTES &&
          !(attrib & FILE_ATTRIBUTE_DIRECTORY));
 }
-extern bool InitializeProxy();
 static void fatalProxyFailure(const char* error) {
     char buffer[1024];
     snprintf(buffer, 1024, "Cannot proxy " target_library_name "!\n%s", error);
     FatalAppExit(0, buffer);
 }
-__attribute__((constructor(200))) static void initializeProxy() {
-    if(!checkFileExists(target_library))
-        fatalProxyFailure("Original .dll file not found.");
-    baseDll = LoadLibrary(target_library);
-    if(baseDll == NULL)
-        fatalProxyFailure("Could not load original .dll file.");
-    if(!InitializeProxy())
-        fatalProxyFailure("Failed to load symbol.");
-}
 static void* resolveSymbol(const char* symbol) {
-    return GetProcAddress(baseDll, symbol);
+    void* procAddress = GetProcAddress(baseDll, symbol);
+    if(!procAddress) {
+        char buffer[1024];
+        snprintf(buffer, 1024, "Failed to load symbol %s.", symbol);
+        fatalProxyFailure(buffer);
+    }
+
+    debug_print("Resolving symbol - %s = 0x%08x", symbol, procAddress);
+
+    return procAddress;
 }
 __stdcall void* asm_resolveSymbol(const char* symbol) {
     return resolveSymbol(symbol);
 }
 
+extern __stdcall void InitializeProxy();
+__attribute__((constructor(200))) static void initializeProxy() {
+    debug_print("Loading original " target_library_name);
+    char buffer[1024];
+    if(!checkFileExists(target_library))
+        fatalProxyFailure("Original .dll file not found.");
+    baseDll = LoadLibrary(target_library);
+    if(baseDll == NULL) {
+        snprintf(buffer, 1024, "Could not load original .dll file. (code: 0x%08x)", GetLastError());
+        fatalProxyFailure(buffer);
+    }
+    debug_print("Initializing symbol cache for proxying");
+    InitializeProxy();
+}
+__attribute__((destructor(200))) static void deinitializeProxy() {
+    debug_print("Unloading original " target_library_name);
+    FreeLibrary(baseDll);
+}
+
 // Look up relative addresses in the target .dll
 static void* constant_symbol_addr;
-static void* loadRelativeAddress(int address) {
-    return constant_symbol_addr + (address - constant_symbol_offset);
+static void* resolveAddress(int address) {
+    void* ptr = constant_symbol_addr + (address - constant_symbol_offset);
+    debug_print("Resolving symbol - 0x%08x => 0x%08x", address, ptr);
+    return ptr;
 }
 __stdcall void* asm_resolveAddress(int address) {
-    return loadRelativeAddress(address);
+    return resolveAddress(address);
 }
 __attribute__((constructor(201))) static void initializeConstantSymbol() {
+    debug_print("Loading constant symbol (to deal with ASLR/general .dll rebasing)");
     constant_symbol_addr = resolveSymbol(constant_symbol_name);
+}
+
+// Actual patch code!
+typedef struct UnpatchData {
+    void* offset;
+    char oldData[5];
+} UnpatchData_Struct;
+typedef UnpatchData_Struct* UnpatchData;
+static UnpatchData writeRelativeJmp(void* targetAddress, void* hookAddress) {
+    // Register the patch for unpatching
+    UnpatchData unpatch = malloc(sizeof(UnpatchData_Struct));
+    unpatch->offset = targetAddress;
+    memcpy(unpatch->oldData, targetAddress, 5);
+
+    // Actually generate the patch opcode.
+    int offsetDiff = (int) hookAddress - (int) targetAddress - 5;
+    *((char*)(targetAddress    )) = 0xe9; // jmp opcode
+    *((int *)(targetAddress + 1)) = offsetDiff;
+
+    debug_print("Patching - 0x%08x => 0x%08x (diff: 0x%08x)", targetAddress, hookAddress, offsetDiff);
+
+    return unpatch;
+}
+static UnpatchData doPatch(int address, void* hookAddress) {
+    void* targetAddress = resolveAddress(address);
+    DWORD protectFlags;
+    VirtualProtect(targetAddress, 5, PAGE_EXECUTE_READWRITE, &protectFlags);
+    UnpatchData unpatch = writeRelativeJmp(targetAddress, hookAddress);
+    VirtualProtect(targetAddress, 5, protectFlags, &protectFlags);
+    return unpatch;
+}
+static void unpatch(UnpatchData data) {
+    DWORD protectFlags;
+    VirtualProtect(data->offset, 5, PAGE_EXECUTE_READWRITE, &protectFlags);
+    memcpy(data->offset, data->oldData, 5);
+    VirtualProtect(data->offset, 5, protectFlags, &protectFlags);
+    free(data);
 }

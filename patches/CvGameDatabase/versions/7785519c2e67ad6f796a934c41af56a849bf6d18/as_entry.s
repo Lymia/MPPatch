@@ -27,10 +27,11 @@ lua_table_hook_return   : equ 0x1000B49E
 
 %macro XMLParserHook_LoadVariables 0
     mov edi, esi              ; this
-    lea esi, [esp+0x18+8*4+4] ; name_node
+    lea esi, [esp+0x10+8*4+8] ; name_node
     mov edi, [edi + 768]      ; connection
 %endmacro
 %define XMLParserHook_ContinueSafeRegister ecx
+%define XMLParserHook_ContinueStatusRegister eax
 %macro XMLParserHook_ContinuePatchInstructions 0
     ; Nothing here!
 %endmacro
