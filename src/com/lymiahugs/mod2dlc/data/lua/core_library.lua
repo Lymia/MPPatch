@@ -19,44 +19,43 @@
 -- SOFTWARE.
 
 mod2dlc = {}
-mod2dlc.version = {major=1, minor=0, mincompat=1}
-local versionString = mod2dlc.version.major .. "." .. mod2dlc.version.minor
+mod2dlc.version = {component="Mod2DLC Core", major=1, minor=0, mincompat=1}
 
-local function executeSQL(sql)
-    for _ in DB.Query(sql) do end
+local patch = DB.GetMemoryUsage().__mod2dlc_patch
+mod2dlc.patch_api = patch
+if not patch then
+    mod2dlc.disabled = true
+    -- We can't even reliably do a fatal error without the patch... Just disable the Lua hooks, and
+    -- hope for the best.
+    -- TODO: Automatically disable all Mod2DLC DLCs in this case. discoverMods + different registerMod?
+    print("ERROR: Mod2DLC requires the CvGameDatabase patch to installed to run correctly!")
+    return
 end
 
-local databasePatch              = DB.GetMemoryUsage().__mod2dlc_patch
-local databasePatchVersion       = databasePatch and databasePatch.versioninfo
-local databasePatchVersionString = databasePatch and
-        (databasePatchVersion.major .. "." .. databasePatchVersion.minor)
-mod2dlc.patch_api = databasePatch
-
-if databasePatch then
-    local minimumPatchVersion = 1
-    local luaVersionString = mod2dlc.lua_version.major .. "." .. mod2dlc.lua_version.minor
-    local databasePatchVersionString = databasePatch and
-            (databasePatch.versioninfo.major .. "." .. databasePatch.versioninfo.minor)
-
-    if mod2dlc.lua_version.major < databasePatchCoreMinCompat or minimumPatchVersion < databasePatchVersion then
-        print("WARNING: CvGameDatabase patch v"..databasePatchVersionString.." is not compatible with"
-            .." core v"..luaVersionString.."; things might break VERY badly!!")
+local function versionString(versioninfo)
+    return versioninfo.component .. " v" .. versioninfo.major .. "." .. versioninfo.minor
+end
+local function warnOnVersionError(versioninfo, requestSource, requested, action)
+    -- Put the "Stuff might break!" line here, because the only other action we'll ever do is patch.panic.
+    -- patch.panic is obviously something breaking. Stuff doesn't just "might" break..
+    action = action or function(s) print("WARNING: "..s.." Stuff might break!") end
+    if versioninfo.major < requested then
+        action(requestSource.." requested "..versioninfo.component.." v"..requested..".x"..
+                " or later, but "..versionString(versioninfo).." is installed.")
+    elseif requested < versioninfo.mincompat then
+        action(requestSource.." requested "..versioninfo.component.." v"..requested..".x"..
+                " or later, but "..versionString(versioninfo).." is only backwards compatiable"..
+                " only to v"..versioninfo.mincompat..".x or later.")
     end
 end
+
+warnOnVersionError(patch.version, "Mod2DLC Core", 1, patch.panic) -- aaaaaaa
 
 local mod_info = {}
-function mod2dlc.registerMod(mod2DlcCoreVersion, mod2DlcCoreReqVersion,
-                             id, name, entryPoints, usesCvGameDatabasePatch)
-    if mod2DlcCoreVersion > mod2dlc.version.mincompat then
-        print(" - WARNING: Mod2Dlc core v"..versionString.." is only backwards compatible back to"..
-                " v"..mod2dlc.version.mincompat..".x; Mod may not function correctly. (Mod requires:"..
-                " v"..mod2DlcCoreReqVersion..".x)")
-    elseif mod2DlcCoreReqVersion > mod2dlc.version.major then
-        print(" - WARNING: Mod requires Mod2Dlc core v"..mod2DlcCoreReqVersion".x or later to function"..
-                " correctly. (Installed: v"..versionString..")")
-    end
-
-    mod_info[id] = {id=id, name=name, entryPoints=entryPoints, usesCvGameDatabasePatch=usesCvGameDatabasePatch}
+function mod2dlc.registerMod(minVersion, id, name, entryPoints)
+    print(" - Discovered mod "..name)
+    warnOnVersionError(mod2dlc.version, "Mod "..name, minVersion)
+    mod_info[id] = {id=id, name=name, entryPoints=entryPoints}
 end
 
 function mod2dlc.discoverMods()
@@ -70,26 +69,10 @@ function mod2dlc.discoverMods()
             include("Mod2DLC\\_mod2dlc_"..canonical.."_manifest.lua")
         end
     end
-    for _, mod in pairs(mod_info) do
-        print(" - Discovered mod "..mod.name)
-        if mod.usesCvGameDatabasePatch then
-            if not databasePatch then
-                print("   - WARNING: Mod requires CvGameDatabase patch to function correctly,"..
-                        " but patch is not installed.")
-            elseif mod.usesCvGameDatabasePatch < databasePatchVersion.major then
-                print("   - WARNING: Mod requires CvGameDatabase patch v"..mod.usesCvGameDatabasePatch..".x"..
-                        " or later to function correctly (Installed: v"..databasePatchVersionString..")")
-            elseif databasePatchVersion.mincompat < mod.usesCvGameDatabasePatch then
-                print("   - WARNING: CvGameDatabase patch v"..usesCvGameDatabasePatch.." is only backwards"..
-                        " compatiable back to v"..databasePatchVersion.mincompat..".x; Mod may not"..
-                        " function correctly. (Mod requires: v"..mod.databasePatchMinCompat..".x)")
-            end
-        end
-    end
 end
 
 function mod2dlc.callEntryPoints(entryPoint)
-    print("Mod2DLC: Running entry point")
+    print("Mod2DLC: Running entry point "..entryPoint)
     g_uiAddins = g_uiAddins or {}
     for _, mod in pairs(mod_info) do
         local epList = mod.entryPoints[entryPoint]
@@ -106,7 +89,7 @@ function mod2dlc.callEntryPoints(entryPoint)
 end
 
 function mod2dlc.installEntryPointHook()
-    mod2dlc.initMods()
+    mod2dlc.discoverMods()
     if not Modding.__mod2dlc_marker then
         local oldModding = Modding
         Modding = setmetatable({}, {
@@ -129,5 +112,44 @@ function mod2dlc.installEntryPointHook()
                 end
             end
         })
+    end
+end
+
+local function decode_u32(string, i)
+    return string:byte(i+0) * 0x00000001 +
+            string:byte(i+1) * 0x00000100 +
+            string:byte(i+2) * 0x00010000 +
+            string:byte(i+3) * 0x01000000
+end
+function mod2dlc.getSourcePath(fn)
+    local luaFile = ("").dump(fn)
+    local luaFile_expectedHeader = "\27\76\117\97\81\0\1\4\4\4\8\0"
+    local luaFile_header = luaFile:sub(1, #luaFile_expectedHeader)
+    assert(luaFile_header == luaFile_expectedHeader, "Unexpected Lua bytecode format!")
+
+    local str_len = decode_u32(luaFile, 13)
+    return luaFile:sub(17, 17+str_len)
+end
+
+local hookTargets = {
+    InstanceManager   = {InGame=true, CityView=true},
+    GameplayUtilities = {LeaderHeadRoot=true},
+}
+local function clean_string(str)
+    -- TODO Figure out how junk is getting into my strings, and fix the root problem.
+    if str:find("\0") then
+        return str:sub(1, str:find("\0")-1)
+    else
+        return str
+    end
+end
+function mod2dlc.tryHook(sourceModule)
+    sourceModule = clean_string(sourceModule)
+    if hookTargets[sourceModule] then
+        local targetName = clean_string(patch.getCallerAtLevel(3):gsub(".*\\(.*)%.lua", "%1"))
+        if hookTargets[sourceModule][targetName] then
+            print("Mod2DLC: Hooking "..targetName.." through "..sourceModule)
+            mod2dlc.installEntryPointHook()
+        end
     end
 end

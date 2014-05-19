@@ -29,19 +29,10 @@ import com.lymiahugs.mod2dlc.data.LuaFrag
 
 object writeCoreMod {
   val patchList = Seq(
-    "UI/InGame/CityView/CityView.lua" ->
-      Seq("DLC/Expansion2/UI/InGame/CityView/CityView.lua",
-          "DLC/Expansion/UI/InGame/CityView/CityView.lua",
-          "UI/InGame/CityView/CityView.lua"),
-    "UI/InGame/InGame.lua" ->
-      Seq("DLC/Expansion2/UI/InGame/InGame.lua",
-          "DLC/Expansion/UI/InGame/InGame.lua",
-          "UI/InGame/InGame.lua"),
-    "UI/InGame/LeaderHead/LeaderHeadRoot.lua" ->
-      Seq("DLC/Expansion2/UI/InGame/LeaderHead/LeaderHeadRoot.lua",
-          "DLC/Expansion/UI/InGame/LeaderHead/LeaderHeadRoot.lua",
-          "UI/InGame/LeaderHead/LeaderHeadRoot.lua")
-  )
+    "UI/InstanceManager.lua" ->
+      Seq("UI/InstanceManager.lua"),
+    "Gameplay/Lua/GameplayUtilities.lua" ->
+      Seq("Gameplay/Lua/GameplayUtilities.lua"))
 
   val mod2dlc_uuid = UUID.fromString("3d2df716-2c91-454f-8a5d-c21cfded78f8")
   def apply(target: File, assetDir: File, languageFile: File)
@@ -52,7 +43,7 @@ object writeCoreMod {
 
       // TODO: Note if new expansions have been installed. Might be worth checking that for error detection.
 
-      writeFile(new File(target, "Gameplay/Lua/m2d_core.lua"), LuaFrag.core_library, " core library")
+      writeFile(new File(target, "Lua/m2d_core.lua"), LuaFrag.core_library, " core library")
       generateLanguageFile("Mod2DLC Core", "Mod2DLC Core",
         mod2dlc_uuid.toString.replace("-", "").toUpperCase, languageFile)
       generateXML(

@@ -138,20 +138,28 @@ object rewriteMod {
       // Write mod manifest
       writeFileFromStream(new File(target, "UI/Mod2DLC/_mod2dlc_"+uuid_string+"_manifest.lua"),
         " mod manifest") { out =>
-        out.println(LuaFrag.mod_datafile_header)
+        out.println(
+          """
+            |local currentExecutingPath = mod2dlc.getSourcePath(function() end):gsub("UI\\Mod2DLC\\_mod2dlc_.*", "")
+            |local entryPoints, actions = {}, {}
+            |
+          """.stripMargin)
         out.println("--- BEGIN GENERATED CODE ---")
 
         out.println("local name = "+quoteLuaString(modName))
         out.println("local id = "+quoteLuaString(uuid.toString))
         out.println("local usesCvGameDatabasePatch = "+(if(usesCvGameDatabasePatch) "1" else "false"))
         out.println("local mod2DlcCoreVersion = 1")
-        out.println("local mod2DlcCoreReqVersion = 1")
         out.println()
 
         out.println(entryPointData)
 
         out.println("--- END GENERATED CODE ---")
-        out.println(LuaFrag.mod_datafile_footer)
+        out.println(
+          """
+            |
+            |mod2dlc.registerMod(mod2DlcCoreVersion, id, name, entryPoints)
+          """.stripMargin)
       }
 
       //////////////////////////////
@@ -182,6 +190,8 @@ object rewriteMod {
       /////////////////////////
       // Generate DLC name file
       generateLanguageFile(modName, modName, uuid_string.toUpperCase, languageFile)
+
+      // TODO: Copy unused files so we don't lose readmes and stuff.
 
       /////////////////////////
       // Generate main manifest

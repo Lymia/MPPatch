@@ -53,17 +53,29 @@ static int luaHook_panic(lua_State *L) {
     snprintf(buffer, 1024, "Mod2DLC's Lua component encountered a critical error:\n%s", luaL_checkstring(L, 1));
     FatalAppExit(0, buffer);
 }
+static int luaHook_getCallerAtLevel(lua_State *L) {
+    int level = luaL_checkinteger(L, 1);
+    lua_Debug ar;
+    if(lua_getstack(L, level+1, &ar) && lua_getinfo(L, "nS", &ar)) {
+        lua_pushstring(L, ar.source);
+        lua_pushstring(L, ar.short_src);
+        if(ar.name) {
+            lua_pushstring(L, ar.name);
+            return 3;
+        } else return 2;
+    } else return 0;
+}
 static void luaTable_versioninfo(lua_State *L, int table) {
+    table_setString (L, table, "component", "Mod2DLC CvGameDatabase patch");
     table_setInteger(L, table, "major", patchVersionMajor);
     table_setInteger(L, table, "minor", patchVersionMinor);
-
     table_setInteger(L, table, "mincompat", patchMinCompat);
-    table_setInteger(L, table, "core_mincompat", patchCoreMinCompat);
 }
 static void luaTable_main(lua_State *L, int table) {
-    table_setTable(L, table, "versioninfo", luaTable_versioninfo);
-    table_setString(L, table, "creditstring", patchMarkerString);
+    table_setTable(L, table, "version", luaTable_versioninfo);
+    table_setString(L, table, "credits", patchMarkerString);
     table_setCFunction(L, table, "panic", luaHook_panic);
+    table_setCFunction(L, table, "getCallerAtLevel", luaHook_getCallerAtLevel);
 }
 
 __stdcall void LuaTableHookCore(lua_State *L, int table) {

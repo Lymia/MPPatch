@@ -47,7 +47,7 @@ package object Operations {
           <Row Tag={"TXT_KEY_"+uuid_string+"_NAME"}>
             <Text>{name}</Text>
           </Row>
-          <Row Tag={"TXT_KEY_"+uuid_string+"DESCRIPTION"}>
+          <Row Tag={"TXT_KEY_"+uuid_string+"_DESCRIPTION"}>
             <Text>{longName}</Text>
           </Row>
         </Language>.copy(label = "Language_"+language)
