@@ -52,4 +52,5 @@ patch_files() {
 rm -rf out
 mkdir out
 
-patch_files CvGameDatabase "CvGameDatabaseWin32Final Release.dll" -l lua51_Win32
+# TODO: Figure out how to get lua.h into the include path without including UNIX headers.
+patch_files CvGameDatabase "CvGameDatabaseWin32Final Release.dll" -l lua51_Win32 -I /usr/include/

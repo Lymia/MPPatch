@@ -20,23 +20,25 @@
     SOFTWARE.
 */
 
-extern __thiscall bool Database_ExecuteMultiple(void* this, const char* string, size_t length);
-extern __thiscall bool Database_LogMessage     (void* this, const char* string);
+// Declarations
+typedef struct class_DNameNode class_DNameNode;
+typedef struct class_Database class_Database;
 
-typedef __thiscall bool (*xml_checkLabelRaw_fn)(void* this, const char* string, size_t* tagSize);
-typedef __thiscall void (*xml_getContents_fn)  (void* this, char** string_out, size_t* length_out);
+extern __thiscall bool Database_ExecuteMultiple(class_Database* this, const char* string, size_t length);
+extern __thiscall bool Database_LogMessage     (class_Database* this, const char* string);
+
+typedef __thiscall bool (*xml_checkLabelRaw_fn)(class_DNameNode* this, const char* string, size_t* tagSize);
+typedef __thiscall void (*xml_getContents_fn)  (class_DNameNode* this, char** string_out, size_t* length_out);
 static xml_checkLabelRaw_fn xml_checkLabelRaw;
 static xml_getContents_fn   xml_getContents;
 
+// Main body
 bool xml_init = false;
 static bool xml_checkLabel(void* this, const char* string) {
     int length = strlen(string);
     return xml_checkLabelRaw(this, string, &length);
 }
-__stdcall bool XmlParserHookCore(void* xmlNode, void* connection, int* success) {
-    debug_print("xmlNode = 0x%08x, connection = 0x%08x, success = 0x%08x",
-        xmlNode, connection, success);
-
+__stdcall bool XmlParserHookCore(class_DNameNode* xmlNode, class_Database* connection, int* success) {
     *success = 1;
 
     if(!xml_init) {
@@ -53,10 +55,10 @@ __stdcall bool XmlParserHookCore(void* xmlNode, void* connection, int* success) 
 
         #ifdef DEBUG
             char* tmpString = malloc(length + 1);
-            memcpy(string, tmpString, length);
+            memcpy(tmpString, string, length);
             tmpString[length] = 0;
 
-            debug_print("Executing XML-encapsulated SQL:\n%s\n", tmpString);
+            debug_print("Executing XML-encapsulated SQL:\n%s", tmpString);
 
             free(tmpString);
         #endif
@@ -68,7 +70,6 @@ __stdcall bool XmlParserHookCore(void* xmlNode, void* connection, int* success) 
         }
         return true;
     } else {
-        debug_print("end of function");
         return false;
     }
 }
@@ -79,7 +80,7 @@ __attribute__((constructor(500))) static void installXmlHook() {
     xml_checkLabelRaw = (xml_checkLabelRaw_fn) resolveAddress(xml_check_label_offset);
     xml_getContents   = (xml_getContents_fn)   resolveAddress(xml_get_contents_offset);
 
-    XmlParserPatch = doPatch(xml_parser_hook_offset, XmlParserHook);
+    XmlParserPatch = doPatch(xml_parser_hook_offset, XmlParserHook, "XmlParserHook");
 }
 __attribute__((destructor(500))) static void destroyXmlHook() {
     unpatch(XmlParserPatch);

@@ -88,9 +88,7 @@ __attribute__((destructor(200))) static void deinitializeProxy() {
 // Look up relative addresses in the target .dll
 static void* constant_symbol_addr;
 static void* resolveAddress(int address) {
-    void* ptr = constant_symbol_addr + (address - constant_symbol_offset);
-    debug_print("Resolving symbol - 0x%08x => 0x%08x", address, ptr);
-    return ptr;
+    return constant_symbol_addr + (address - constant_symbol_offset);
 }
 __stdcall void* asm_resolveAddress(int address) {
     return resolveAddress(address);
@@ -106,7 +104,7 @@ typedef struct UnpatchData {
     char oldData[5];
 } UnpatchData_Struct;
 typedef UnpatchData_Struct* UnpatchData;
-static UnpatchData writeRelativeJmp(void* targetAddress, void* hookAddress) {
+static UnpatchData writeRelativeJmp(void* targetAddress, void* hookAddress, const char* reason) {
     // Register the patch for unpatching
     UnpatchData unpatch = malloc(sizeof(UnpatchData_Struct));
     unpatch->offset = targetAddress;
@@ -114,23 +112,27 @@ static UnpatchData writeRelativeJmp(void* targetAddress, void* hookAddress) {
 
     // Actually generate the patch opcode.
     int offsetDiff = (int) hookAddress - (int) targetAddress - 5;
+    debug_print("Writing JMP (%s) - 0x%08x => 0x%08x (diff: 0x%08x)",
+        reason, targetAddress, hookAddress, offsetDiff);
     *((char*)(targetAddress    )) = 0xe9; // jmp opcode
     *((int *)(targetAddress + 1)) = offsetDiff;
 
-    debug_print("Patching - 0x%08x => 0x%08x (diff: 0x%08x)", targetAddress, hookAddress, offsetDiff);
-
     return unpatch;
 }
-static UnpatchData doPatch(int address, void* hookAddress) {
+static UnpatchData doPatch(int address, void* hookAddress, const char* reason) {
     void* targetAddress = resolveAddress(address);
+    char reason_buf[256];
+    snprintf(reason_buf, 256, "patch: %s", reason);
+
     DWORD protectFlags;
     VirtualProtect(targetAddress, 5, PAGE_EXECUTE_READWRITE, &protectFlags);
-    UnpatchData unpatch = writeRelativeJmp(targetAddress, hookAddress);
+    UnpatchData unpatch = writeRelativeJmp(targetAddress, hookAddress, reason_buf);
     VirtualProtect(targetAddress, 5, protectFlags, &protectFlags);
     return unpatch;
 }
 static void unpatch(UnpatchData data) {
     DWORD protectFlags;
+    debug_print("Unpatching at 0x%08x", data->offset);
     VirtualProtect(data->offset, 5, PAGE_EXECUTE_READWRITE, &protectFlags);
     memcpy(data->offset, data->oldData, 5);
     VirtualProtect(data->offset, 5, protectFlags, &protectFlags);
