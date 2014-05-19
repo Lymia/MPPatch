@@ -27,6 +27,12 @@ import java.nio.file.Files
 import com.lymiahugs.util.StreamUtils
 
 class FileOperationLogger(log_callback: String => Unit) {
+  private def assurePresence(f: File) =
+    if(!f.exists) {
+      f.mkdirs()
+      f.delete()
+    }
+
   def log(format: String, args: Any*) =
     log_callback(format.format(args: _*))
 

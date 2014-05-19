@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.mod2dlc.operation
+package com.lymiahugs.mod2dlc.Operations
 
 import com.lymiahugs.mod2dlc.util._
 import java.io.File
-import scala.xml.{Node, XML}
+import scala.xml.{Comment, Node, XML}
 import java.util.UUID
 import scala.collection.mutable
 import com.lymiahugs.util.StreamUtils
@@ -36,7 +36,7 @@ object rewriteMod {
     logger.logException {
       import logger._
 
-      // Create target directory if it does not alredy exist
+      // Create target directory if it does not already exist
       if(!target.exists) target.mkdirs()
 
       ////////////////
@@ -53,6 +53,8 @@ object rewriteMod {
       // Read file list
       val files = modinfo \ "Files" \ "File"
       val importedFiles = files.filter(x => (x \ "@import").text == "1").map(x => x.text).toSet
+
+      // TODO: Add support for checking dependencies
 
       //////////////////////
       // Copy imported files
@@ -71,30 +73,41 @@ object rewriteMod {
 
       //////////////////////////
       // Parse and write Actions
-      val actions = (modinfo \ "Actions").flatMap(_.child).filter(!_.label.startsWith("#"))
       var usesCvGameDatabasePatch = false
-      val actionTags = (actions \ "OnModActivated" \ "UpdateDatabase").map { tag =>
+      val actionTags = (modinfo \ "Actions" \\ "UpdateDatabase").map { tag =>
         val fileName = tag.text.trim
         val file = new File(modSource, fileName)
         markFileUsed(file)
 
-        val outputFileName = "_mod2dlc_noimport_"+uuid_string+file.getName()+
+        val outputFileName = "_mod2dlc_"+uuid_string+"_noimport_"+file.getName()+
           (if(file.getName.endsWith(".xml")) "" else ".xml")
         val outputFile = new File(target, "XML/"+outputFileName)
 
         if(fileName.endsWith(".sql")) {
           generateXML(<GameData>
             <__MOD2DLC_PATCH_IGNORE>
-              <!-- This triggers an error for players who have an unmodded CvGameDatabase file -->
+              <!-- This (hopefully) triggers an error for players who have an unmodded CvGameDatabase file -->
               <Please_install_the_CvGameDatabase_patch_for_Mod2DLC>
               </Please_install_the_CvGameDatabase_patch_for_Mod2DLC>
             </__MOD2DLC_PATCH_IGNORE>
             <__MOD2DLC_PATCH_RAWSQL>{readFile(file)}</__MOD2DLC_PATCH_RAWSQL>
           </GameData>, outputFile, " SQL data from "+file.getCanonicalFile)
           usesCvGameDatabasePatch = true
-        } else copy(file, outputFile)
 
-        <GameData>{outputFileName}</GameData>
+          <GameData>{outputFileName}</GameData>
+        } else if (fileName.endsWith(".xml")) {
+          val xml = XML.loadFile(file) flatMap(_.child)
+          val nodes = xml.filter(!_.label.startsWith("Language_"))
+          if(nodes.filter(!_.label.startsWith("#")).length == 0) {
+            log(file.getCanonicalPath + " skipped (no non-language data found)")
+            Comment("File "+file.getName+" skipped: no non-language data found")
+          } else {
+            generateXML(<GameData>
+              {nodes}
+            </GameData>, outputFile, " XML database update")
+            <GameData>{outputFileName}</GameData>
+          }
+        } else sys.error("unrecgonized database update "+fileName)
       }
       // TODO: Add support for UpdateUserData and SetDLLPath, and wtf ExecuteScript is
 
@@ -131,6 +144,8 @@ object rewriteMod {
         out.println("local name = "+quoteLuaString(modName))
         out.println("local id = "+quoteLuaString(uuid.toString))
         out.println("local usesCvGameDatabasePatch = "+(if(usesCvGameDatabasePatch) "1" else "false"))
+        out.println("local mod2DlcCoreVersion = 1")
+        out.println("local mod2DlcCoreReqVersion = 1")
         out.println()
 
         out.println(entryPointData)
@@ -162,7 +177,7 @@ object rewriteMod {
             <tag>{x._2}</tag>.copy(label = x._1)
           )
         }
-      </GameData>, new File(target, "_mod2dlc_"+uuid_string+"_textdata.xml"), " string data")
+      </GameData>, new File(target, "XML/_mod2dlc_"+uuid_string+"_textdata.xml"), " string data")
 
       /////////////////////////
       // Generate DLC name file
@@ -194,6 +209,6 @@ object rewriteMod {
           <TextData>{"_mod2dlc_"+uuid_string+"_textdata.xml"}</TextData>
           {actionTags}
         </Gameplay>
-      </Civ5Package>, new File(target, modinfoFile.getName.replace(".modinfo", "")+".Civ5Pkg"), "Civ5Pkg File")
+      </Civ5Package>, new File(target, modinfoFile.getName.replace(".modinfo", "")+".Civ5Pkg"), " Civ5Pkg File")
     }
 }

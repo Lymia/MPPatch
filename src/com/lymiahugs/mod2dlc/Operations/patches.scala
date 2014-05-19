@@ -20,14 +20,20 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.mod2dlc.data
+package com.lymiahugs.mod2dlc.Operations
 
-object LuaFrag {
-  lazy val mod_datafile_header = loadResource("lua/mod_datafile_header.lua")
-  lazy val mod_datafile_footer = loadResource("lua/mod_datafile_footer.lua")
+import com.lymiahugs.mod2dlc.util.FileOperationLogger
+import java.io._
 
-  lazy val core_entrypoint_hook = loadResource("lua/core_entrypoint_hook.lua")
-  lazy val core_ui_legalscreen = loadResource("lua/core_ui_legalscreen.lua")
-  lazy val core_ui_contentswitch = loadResource("lua/core_ui_contentswitch.lua")
-  lazy val core_library = loadResource("lua/core_library.lua")
+object installPatches {
+  def apply(gameDirectory: File)(implicit logger: FileOperationLogger) =
+    logger.logException {
+
+    }
+}
+object uninstallPatches {
+  def apply(gameDirectory: File)(implicit logger: FileOperationLogger) =
+    logger.logException {
+
+    }
 }

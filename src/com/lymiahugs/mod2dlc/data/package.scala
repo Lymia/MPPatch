@@ -20,14 +20,15 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.mod2dlc.data
+package com.lymiahugs.mod2dlc
 
-object LuaFrag {
-  lazy val mod_datafile_header = loadResource("lua/mod_datafile_header.lua")
-  lazy val mod_datafile_footer = loadResource("lua/mod_datafile_footer.lua")
+import java.io.BufferedInputStream
 
-  lazy val core_entrypoint_hook = loadResource("lua/core_entrypoint_hook.lua")
-  lazy val core_ui_legalscreen = loadResource("lua/core_ui_legalscreen.lua")
-  lazy val core_ui_contentswitch = loadResource("lua/core_ui_contentswitch.lua")
-  lazy val core_library = loadResource("lua/core_library.lua")
+package object data {
+  private[data] def getResource(s: String) =
+    getClass.getResourceAsStream("/com/lymiahugs/mod2dlc/data/" +s)
+  private[data] def loadResource(s: String) =
+    io.Source.fromInputStream(getResource(s), "UTF-8").mkString
+  private[data] def loadBinaryResource(s: String) =
+    Stream.continually(getResource(s).read).takeWhile(_ != -1).map(_.toByte).toArray
 }

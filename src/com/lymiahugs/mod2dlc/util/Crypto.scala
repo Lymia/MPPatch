@@ -20,14 +20,16 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.mod2dlc.data
+package com.lymiahugs.mod2dlc.util
 
-object LuaFrag {
-  lazy val mod_datafile_header = loadResource("lua/mod_datafile_header.lua")
-  lazy val mod_datafile_footer = loadResource("lua/mod_datafile_footer.lua")
+import java.security.MessageDigest
 
-  lazy val core_entrypoint_hook = loadResource("lua/core_entrypoint_hook.lua")
-  lazy val core_ui_legalscreen = loadResource("lua/core_ui_legalscreen.lua")
-  lazy val core_ui_contentswitch = loadResource("lua/core_ui_contentswitch.lua")
-  lazy val core_library = loadResource("lua/core_library.lua")
+object Crypto {
+  def digest(algorithm: String, data: Seq[Byte]) = {
+    val md = MessageDigest.getInstance(algorithm)
+    val hash = md.digest(data.toArray)
+    hash.map(x => "%02x".format(x)).reduce(_ + _)
+  }
+  def md5(data: Seq[Byte]) = digest("MD5", data)
+  def sha1(data: Seq[Byte]) = digest("SHA1", data)
 }

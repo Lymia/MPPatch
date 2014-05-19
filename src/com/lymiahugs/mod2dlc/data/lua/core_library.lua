@@ -19,20 +19,46 @@
 -- SOFTWARE.
 
 mod2dlc = {}
+mod2dlc.version = {major=1, minor=0, mincompat=1}
+local versionString = mod2dlc.version.major .. "." .. mod2dlc.version.minor
 
 local function executeSQL(sql)
     for _ in DB.Query(sql) do end
 end
 
+local databasePatch              = DB.GetMemoryUsage().__mod2dlc_patch
+local databasePatchVersion       = databasePatch and databasePatch.versioninfo
+local databasePatchVersionString = databasePatch and
+        (databasePatchVersion.major .. "." .. databasePatchVersion.minor)
+mod2dlc.patch_api = databasePatch
+
+if databasePatch then
+    local minimumPatchVersion = 1
+    local luaVersionString = mod2dlc.lua_version.major .. "." .. mod2dlc.lua_version.minor
+    local databasePatchVersionString = databasePatch and
+            (databasePatch.versioninfo.major .. "." .. databasePatch.versioninfo.minor)
+
+    if mod2dlc.lua_version.major < databasePatchCoreMinCompat or minimumPatchVersion < databasePatchVersion then
+        print("WARNING: CvGameDatabase patch v"..databasePatchVersionString.." is not compatible with"
+            .." core v"..luaVersionString.."; things might break VERY badly!!")
+    end
+end
+
 local mod_info = {}
-function mod2dlc.registerMod(id, name, entryPoints, usesCvGameDatabasePatch)
+function mod2dlc.registerMod(mod2DlcCoreVersion, mod2DlcCoreReqVersion,
+                             id, name, entryPoints, usesCvGameDatabasePatch)
+    if mod2DlcCoreVersion > mod2dlc.version.mincompat then
+        print(" - WARNING: Mod2Dlc core v"..versionString.." is only backwards compatible back to"..
+                " v"..mod2dlc.version.mincompat..".x; Mod may not function correctly. (Mod requires:"..
+                " v"..mod2DlcCoreReqVersion..".x)")
+    elseif mod2DlcCoreReqVersion > mod2dlc.version.major then
+        print(" - WARNING: Mod requires Mod2Dlc core v"..mod2DlcCoreReqVersion".x or later to function"..
+                " correctly. (Installed: v"..versionString..")")
+    end
+
     mod_info[id] = {id=id, name=name, entryPoints=entryPoints, usesCvGameDatabasePatch=usesCvGameDatabasePatch}
 end
 
-local databasePatch          = DB.GetMemoryUsage().__mod2dlc_patch
-local databasePatchVersion   = databasePatch and databasePatch.versioninfo.major
-local databasePatchMinCompat = databasePatch and databasePatch.versioninfo.mincompat
-mod2dlc.patch_api = databasePatch
 function mod2dlc.discoverMods()
     print("Mod2DLC: Discovering mods")
     local packageIDs = ContentManager.GetAllPackageIDs()
@@ -48,13 +74,15 @@ function mod2dlc.discoverMods()
         print(" - Discovered mod "..mod.name)
         if mod.usesCvGameDatabasePatch then
             if not databasePatch then
-                print(" - WARNING: Mod requires CvGameDatabase patch which is not installed!!")
-            elseif mod.usesCvGameDatabasePatch < databasePatchVersion then
-                print(" - WARNING: Mod requires CvGameDatabase patch version "..mod.usesCvGameDatabasePatch..
-                      " (Installed: "..databasePatchVersion..")")
-            elseif databasePatchMinCompat < mod.databasePatchMinCompat then
-                print(" - WARNING: Current version of CvGameDatabasePatch is only backwards compatiable back to "..
-                        "version "..databasePatchMinCompat.." (Mod requested: "..mod.databasePatchMinCompat..")")
+                print("   - WARNING: Mod requires CvGameDatabase patch to function correctly,"..
+                        " but patch is not installed.")
+            elseif mod.usesCvGameDatabasePatch < databasePatchVersion.major then
+                print("   - WARNING: Mod requires CvGameDatabase patch v"..mod.usesCvGameDatabasePatch..".x"..
+                        " or later to function correctly (Installed: v"..databasePatchVersionString..")")
+            elseif databasePatchVersion.mincompat < mod.usesCvGameDatabasePatch then
+                print("   - WARNING: CvGameDatabase patch v"..usesCvGameDatabasePatch.." is only backwards"..
+                        " compatiable back to v"..databasePatchVersion.mincompat..".x; Mod may not"..
+                        " function correctly. (Mod requires: v"..mod.databasePatchMinCompat..".x)")
             end
         end
     end
@@ -75,23 +103,6 @@ function mod2dlc.callEntryPoints(entryPoint)
             end
         end
     end
-end
-
-
-function mod2dlc.checkInit()
-    local init = false
-    for _ in DB.Query("select * from sqlite_master where tbl_name = \"Mod2DLC_Marker\" and type = \"table\"") do
-        init = true
-    end
-    return init
-end
-function mod2dlc.initMods()
-    if mod2dlc.checkInit() then
-        return
-    end
-    print("Mod2DLC: Discovering Mods")
-    mod2dlc.discoverMods()
-    executeSQL("create table Mod2DLC_Marker(x INTEGER)")
 end
 
 function mod2dlc.installEntryPointHook()

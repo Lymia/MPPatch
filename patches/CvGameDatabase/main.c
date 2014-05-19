@@ -29,7 +29,7 @@ const char* patchMarkerString =
     "CvGameDatabase patch for Mod2DLC by Lymia Aluysia (lymia@lymiahugs.com). "
     "Website: https://github.com/Lymia/CivV_Mod2DLC";
 int patchVersionMajor = 1;
-int patchVersionMinor = 1;
+int patchVersionMinor = 0;
 int patchMinCompat = 1;
 int patchCoreMinCompat = 1;
 

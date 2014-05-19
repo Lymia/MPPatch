@@ -1,2 +1,2 @@
 
-mod2dlc.registerMod(id, name, entryPoints, usesCvGameDatabasePatch)
+mod2dlc.registerMod(mod2DlcCoreVersion, mod2DlcCoreReqVersion, id, name, entryPoints, usesCvGameDatabasePatch)

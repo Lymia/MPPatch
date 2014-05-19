@@ -20,14 +20,10 @@
  * SOFTWARE.
  */
 
-package com.lymiahugs.mod2dlc.operation
+package com.lymiahugs.mod2dlc.Operations
 
-import com.lymiahugs.mod2dlc.mod2dlc.RewriteCore
 import java.io.File
-import scala.xml.{Node, XML}
 import java.util.UUID
-import scala.collection.mutable
-import com.lymiahugs.util.StreamUtils
 import com.lymiahugs.mod2dlc.util.{FileOperationLogger, DLCKey, ParseDatabaseUpdate}
 import com.lymiahugs.mod2dlc.data.LuaFrag
 
@@ -35,27 +31,27 @@ object writeCoreMod {
   val patchList = Seq(
     "UI/InGame/CityView/CityView.lua" ->
       Seq("DLC/Expansion2/UI/InGame/CityView/CityView.lua",
-        "DLC/Expansion/UI/InGame/CityView/CityView.lua",
-        "UI/InGame/CityView/CityView.lua"),
+          "DLC/Expansion/UI/InGame/CityView/CityView.lua",
+          "UI/InGame/CityView/CityView.lua"),
     "UI/InGame/InGame.lua" ->
       Seq("DLC/Expansion2/UI/InGame/InGame.lua",
-        "DLC/Expansion/UI/InGame/InGame.lua",
-        "UI/InGame/InGame.lua"),
+          "DLC/Expansion/UI/InGame/InGame.lua",
+          "UI/InGame/InGame.lua"),
     "UI/InGame/LeaderHead/LeaderHeadRoot.lua" ->
       Seq("DLC/Expansion2/UI/InGame/LeaderHead/LeaderHeadRoot.lua",
-        "DLC/Expansion/UI/InGame/LeaderHead/LeaderHeadRoot.lua",
-        "UI/InGame/LeaderHead/LeaderHeadRoot.lua")
+          "DLC/Expansion/UI/InGame/LeaderHead/LeaderHeadRoot.lua",
+          "UI/InGame/LeaderHead/LeaderHeadRoot.lua")
   )
 
   val mod2dlc_uuid = UUID.fromString("3d2df716-2c91-454f-8a5d-c21cfded78f8")
-  def apply(modSource: File, target: File, assetDir: File, languageFile: File)
+  def apply(target: File, assetDir: File, languageFile: File)
            (implicit logger: FileOperationLogger) =
     logger.logException {
       import logger._
       if(!target.exists) target.mkdirs()
 
-      writeFile(new File(target, "UI/FrontEnd/LegalScreen.lua"), LuaFrag.core_ui_legalscreen, " LegalScreen hook")
-      writeFile(new File(target, "UI/FrontEnd/ContentSwitch.lua"), LuaFrag.core_ui_contentswitch, " ContentSwitch hook")
+      // TODO: Note if new expansions have been installed. Might be worth checking that for error detection.
+
       writeFile(new File(target, "Gameplay/Lua/m2d_core.lua"), LuaFrag.core_library, " core library")
       generateLanguageFile("Mod2DLC Core", "Mod2DLC Core",
         mod2dlc_uuid.toString.replace("-", "").toUpperCase, languageFile)

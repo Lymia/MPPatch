@@ -22,12 +22,18 @@
 
 package com.lymiahugs.mod2dlc.data
 
-object LuaFrag {
-  lazy val mod_datafile_header = loadResource("lua/mod_datafile_header.lua")
-  lazy val mod_datafile_footer = loadResource("lua/mod_datafile_footer.lua")
+case class Patch(patch: String, debugPatch: String, copyPath: String) {
+  def fileData(debug: Boolean) =
+    if(debug) loadBinaryResource("patches/"+debugPatch)
+    else loadBinaryResource("patches/"+patch)
+}
+case class PatchSet(name: String, origName: String, patches: Map[String, Patch])
+object Patches {
+  private def loadPatchSet(name: String) =
+    loadResource("patches/"+name+"_versions.mf").split("\n").filter(!_.isEmpty).map(_.split(" ") match {
+      case Array(version, sourcePath, debugPath, copyPath) => version -> Patch(sourcePath, debugPath, copyPath)
+    }).toMap
 
-  lazy val core_entrypoint_hook = loadResource("lua/core_entrypoint_hook.lua")
-  lazy val core_ui_legalscreen = loadResource("lua/core_ui_legalscreen.lua")
-  lazy val core_ui_contentswitch = loadResource("lua/core_ui_contentswitch.lua")
-  lazy val core_library = loadResource("lua/core_library.lua")
+  lazy val CvGameDatabase_versions =
+    PatchSet("CvGameDatabase", "CvGameDatabaseWin32Final Release.dll", loadPatchSet("CvGameDatabase"))
 }

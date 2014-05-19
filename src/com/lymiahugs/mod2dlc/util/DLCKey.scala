@@ -48,14 +48,9 @@ object DLCKey {
      encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
      encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
 
-  def md5(data: Seq[Byte]) = {
-    val md = MessageDigest.getInstance("MD5")
-    val hash = md.digest(data.toArray)
-    hash.map(x => "%02x".format(x)).reduce(_ + _)
-  }
   def encodeNumber(i: Int) =
     i.toString.getBytes("UTF-8").toSeq
   def key(u: UUID, sid: Seq[Int], version: Int, ownership: String) =
-    md5(interlaceData(encodeUUID(u) ++ sid.map(encodeNumber _).fold(Seq())(_ ++ _) ++
-                      encodeNumber(version) ++ ownership.getBytes("UTF-8")))
+    Crypto.md5(interlaceData(encodeUUID(u) ++ sid.map(encodeNumber _).fold(Seq())(_ ++ _) ++
+                             encodeNumber(version) ++ ownership.getBytes("UTF-8")))
 }
