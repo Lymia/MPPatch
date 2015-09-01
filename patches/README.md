@@ -7,8 +7,7 @@ place already for patching different versions/etc.
 
 There's a directory here, "binaries/" which is excluded-- I don't want to
 redistribute that, or put too many binaries in my git repo. If you want a copy
-of it, email <lymia@lymiahugs.com>. If you only care about the current version,
-just run collectVersions.sh
+of it, email <lymia@lymiahugs.com>.
 
 If you have a cygwin environment, you can try getting make.sh to work, but,
 like the main program, there's currently no simple build system.

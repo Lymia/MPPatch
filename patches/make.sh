@@ -6,8 +6,6 @@ then
     FLAGS="-DDEBUG"
 fi
 
-CIV5_PATH="/cygdrive/c/Program Files (x86)/Steam/steamapps/common/Sid Meier's Civilization V/"
-WIN_PATH="/cygdrive/c/Windows/SysWOW64"
 patch_files() {
     name=$1
     fileName=$2
@@ -43,8 +41,8 @@ patch_files() {
         echo "   - Compiling $fileName"
         i686-w64-mingw32-gcc $FLAGS -g -shared -O2 --std=gnu99 -o "$outDir/$fileName" \
             $name/versions/$checkSum/c_entry.c $outDir/as_$name.obj \
-            -Wl,--enable-stdcall-fixup -Wl,-L,"$CIV5_PATH" $* \
-            -Wl,-Bstatic -lssp -fstack-protector -fstack-protector-all -D_FORTIFY_SOURCE=2 \
+            -Wl,--enable-stdcall-fixup $* -Wl,-Bstatic \
+            -lssp -fstack-protector -fstack-protector-all -D_FORTIFY_SOURCE=2 \
             --param ssp-buffer-size=4 -Wl,--dynamicbase,--nxcompat
     done
 }
@@ -52,5 +50,4 @@ patch_files() {
 rm -rf out
 mkdir out
 
-# TODO: Figure out how to get lua.h into the include path without including UNIX headers.
-patch_files CvGameDatabase "CvGameDatabaseWin32Final Release.dll" -l lua51_Win32 -I /usr/include/
+patch_files CvGameDatabase "CvGameDatabaseWin32Final Release.dll" -Wl,-L,"binaries" -l lua51_Win32 -I /usr/include/lua5.1/
