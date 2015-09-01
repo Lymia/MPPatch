@@ -1,0 +1,2 @@
+XmlNode_GetValUtf8:__thiscall:void:class_XmlNode* this, char** string_out, size_t* length_out
+XmlNode_NameMatches:__thiscall:bool:class_XmlNode* this, const char* string, size_t* tagSize

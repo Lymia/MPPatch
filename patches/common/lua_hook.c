@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2014 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -20,10 +20,13 @@
     SOFTWARE.
 */
 
-#include <lua.h>
-#include <lauxlib.h>
+#include <stdio.h>
 #include <string.h>
-#include <windows.h>
+
+#include "c_rt.h"
+#include "c_defines.h"
+#include "extern_defines.h"
+#include "version.h"
 
 static void table_setTable(lua_State *L, int table, const char* name, void (*fn)(lua_State *L, int table)) {
     lua_pushstring(L, name);
@@ -51,7 +54,7 @@ static void table_setCFunction(lua_State *L, int table, const char* name, lua_CF
 static int luaHook_panic(lua_State *L) {
     char buffer[1024];
     snprintf(buffer, 1024, "Mod2DLC's Lua component encountered a critical error:\n%s", luaL_checkstring(L, 1));
-    FatalAppExit(0, buffer);
+    fatalError(buffer);
 }
 static int luaHook_getCallerAtLevel(lua_State *L) {
     int level = luaL_checkinteger(L, 1);
@@ -78,14 +81,15 @@ static void luaTable_main(lua_State *L, int table) {
     table_setCFunction(L, table, "getCallerAtLevel", luaHook_getCallerAtLevel);
 }
 
+extern __stdcall void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
 __stdcall void LuaTableHookCore(lua_State *L, int table) {
     table_setTable(L, table, "__mod2dlc_patch", luaTable_main);
 }
 
-extern void LuaTableHook();
+extern void LuaTableHook() __asm__("cif_LuaTableHook");
 UnpatchData LuaTablePatch;
 __attribute__((constructor(500))) static void installLuaHook() {
-    LuaTablePatch = doPatch(lua_table_hook_offset, LuaTableHook, "LuaTableHook");
+    LuaTablePatch = doPatch(LuaTableHook_offset, LuaTableHook, "LuaTableHook");
 }
 __attribute__((destructor(500))) static void destroyLuaHook() {
     unpatch(LuaTablePatch);

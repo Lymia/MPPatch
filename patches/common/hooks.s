@@ -1,4 +1,4 @@
-; Copyright (C) 2014 Lymia Aluysia <lymiahugs@gmail.com>
+; Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy of
 ; this software and associated documentation files (the "Software"), to deal in
@@ -18,25 +18,23 @@
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
 
-%include "lib/as_rt.s"
-
-extern _LuaTableHookCore@8
-global _LuaTableHook
-_LuaTableHook:
+extern cif_LuaTableHookCore
+global cif_LuaTableHook
+cif_LuaTableHook:
     push_all
     LuaTableHook_LoadVariables
     push esi ; table
     push edi ; lua_State
-    call _LuaTableHookCore@8
+    call cif_LuaTableHookCore
     pop_all
 
-    prepare_symbol LuaTableHook_SafeRegister, lua_table_hook_return
+    prepare_symbol LuaTableHook_SafeRegister, LuaTableHook_ReturnAddr
     LuaTableHook_PatchInstructions
     jmp LuaTableHook_SafeRegister
 
-extern _XmlParserHookCore@12
-global _XmlParserHook
-_XmlParserHook:
+extern cif_XmlParserHookCore
+global cif_XmlParserHook
+cif_XmlParserHook:
         sub esp, 4
 
         push_all
@@ -49,7 +47,7 @@ _XmlParserHook:
         push eax ; failure_value
         push edi ; connection
         push esi ; xml_node
-        call _XmlParserHookCore@12
+        call cif_XmlParserHookCore
 
         pop ebx
 
@@ -62,7 +60,7 @@ _XmlParserHook:
 
         pop XMLParserHook_ContinueStatusRegister
 
-        prepare_symbol XMLParserHook_ContinueSafeRegister, xml_parser_hook_continue
+        prepare_symbol XMLParserHook_ContinueSafeRegister, XMLParserHook_ContinueAddr
         XMLParserHook_ContinuePatchInstructions
         jmp XMLParserHook_ContinueSafeRegister
 
@@ -71,11 +69,7 @@ _XmlParserHook:
 
         add esp, 4
 
-        prepare_symbol XMLParserHook_SafeRegister, xml_parser_hook_return
+        prepare_symbol XMLParserHook_SafeRegister, XMLParserHook_ReturnAddr
         XMLParserHook_PatchInstructions
         jmp XMLParserHook_SafeRegister
 
-proxy_symbol_file symbolPath
-
-redefine_for_c _?ExecuteMultiple@Connection@Database@@QBE_NPBDH@Z, Database_ExecuteMultiple
-redefine_for_c _?LogMessage@Connection@Database@@QBEXPBD@Z       , Database_LogMessage

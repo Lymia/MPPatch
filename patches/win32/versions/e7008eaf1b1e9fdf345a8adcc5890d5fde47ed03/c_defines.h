@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2014 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -20,18 +20,17 @@
     SOFTWARE.
 */
 
-#include <windows.h>
-#include <stdbool.h>
+#ifndef C_DEFINES_H
+#define C_DEFINES_H
 
-#include "../lib/c_rt.c"
+#define XmlNode_NameMatches_offset 0x100084F0
+#define XmlNode_GetValUtf8_offset  0x100084D0
 
-const char* patchMarkerString =
-    "CvGameDatabase patch for Mod2DLC by Lymia Aluysia (lymia@lymiahugs.com). "
-    "Website: https://github.com/Lymia/CivV_Mod2DLC";
-int patchVersionMajor = 1;
-int patchVersionMinor = 0;
-int patchMinCompat = 1;
-int patchCoreMinCompat = 1;
+#define XmlParserHook_offset  0x100764A0
+#define LuaTableHook_offset   0x1000B499
 
-#include "lua_hook.c"
-#include "xml_hook.c"
+#define WIN32_REF_SYMBOL_NAME "??0BinaryIO@Database@@QAE@PBD@Z"
+#define WIN32_REF_SYMBOL_ADDR 0x100062D0
+
+#endif /* C_DEFINES_H */
+

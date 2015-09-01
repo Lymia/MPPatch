@@ -1,4 +1,4 @@
-; Copyright (C) 2014 Lymia Aluysia <lymiahugs@gmail.com>
+; Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy of
 ; this software and associated documentation files (the "Software"), to deal in
@@ -18,38 +18,35 @@
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
 
-; Return addresses
-xml_parser_hook_return  : equ 0x100764A5
-xml_parser_hook_continue: equ 0x1007652C
-lua_table_hook_return   : equ 0x1000B49E
+bits 32
+segment .data
+__data_start:
+segment .text
+__start:
 
-%define symbolPath "out/CvGameDatabase/e7008eaf1b1e9fdf345a8adcc5890d5fde47ed03/CvGameDatabase_symbols.s"
-
-%macro XMLParserHook_LoadVariables 0
-    mov edi, esi              ; this
-    lea esi, [esp+0x10+8*4+8] ; name_node
-    mov edi, [edi + 768]      ; connection
-%endmacro
-%define XMLParserHook_ContinueSafeRegister ecx
-%define XMLParserHook_ContinueStatusRegister eax
-%macro XMLParserHook_ContinuePatchInstructions 0
-    ; Nothing here!
-%endmacro
-%define XMLParserHook_SafeRegister ecx
-%macro XMLParserHook_PatchInstructions 0
-    lea edx, [esp+0x20-0x14]
-    push edx
+; Import convenience functions
+extern cif_resolveAddress
+%macro prepare_symbol 2
+    push 0
+    push_all
+    push %2
+    call cif_resolveAddress
+    mov dword [esp+4+8*4], eax
+    pop_all
+    pop %1
 %endmacro
 
-%macro LuaTableHook_LoadVariables 0
-    mov edi, esi ; Lua state
-    mov esi, ebx ; Lua table
+; Convenience functions for storing registers/etc
+%macro push_all 0
+    pushad
+    pushfd
 %endmacro
-%define LuaTableHook_SafeRegister ebx
-%macro LuaTableHook_PatchInstructions 0
-    add esp, 0x38
-    pop edi
-    pop esi
+%macro pop_all 0
+    popfd
+    popad
 %endmacro
 
-%include "CvGameDatabase/assembly.s"
+%include "as_defines.s"
+%include "platform.s"
+%include "hooks.s"
+

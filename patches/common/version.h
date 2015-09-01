@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2014 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -20,16 +20,17 @@
     SOFTWARE.
 */
 
-#define xml_check_label_offset  0x100084F0
-#define xml_get_contents_offset 0x100084D0
+#ifndef VERSION_H
+#define VERSION_H
 
-#define xml_parser_hook_offset  0x100764A0
-#define lua_table_hook_offset   0x1000B499
+#define patchMarkerString "CvGameDatabase patch for Mod2DLC by Lymia Aluysia (lymia@lymiahugs.com). " \
+                          "Website: https://github.com/Lymia/CivV_Mod2DLC"
 
-#define constant_symbol_name    "??0BinaryIO@Database@@QAE@PBD@Z"
-#define constant_symbol_offset  0x100062D0
+#define patchVersionMajor 1
+#define patchVersionMinor 0
 
-#define target_library "CvGameDatabase_orig_e7008eaf1b1e9fdf345a8adcc5890d5fde47ed03.dll"
-#define target_library_name "CvGameDatabase"
+#define patchMinCompat 1
+#define patchCoreMinCompat 1
 
-#include "../../main.c"
+#endif /* VERSION_H */
+

@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2014 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -20,25 +20,24 @@
     SOFTWARE.
 */
 
-// Declarations
-typedef struct class_DNameNode class_DNameNode;
-typedef struct class_Database class_Database;
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
 
-extern __thiscall bool Database_ExecuteMultiple(class_Database* this, const char* string, size_t length);
-extern __thiscall bool Database_LogMessage     (class_Database* this, const char* string);
+#include "c_rt.h"
+#include "c_defines.h"
+#include "extern_defines.h"
+#include "version.h"
 
-typedef __thiscall bool (*xml_checkLabelRaw_fn)(class_DNameNode* this, const char* string, size_t* tagSize);
-typedef __thiscall void (*xml_getContents_fn)  (class_DNameNode* this, char** string_out, size_t* length_out);
-static xml_checkLabelRaw_fn xml_checkLabelRaw;
-static xml_getContents_fn   xml_getContents;
+static bool checkXmlNodeTag(class_XmlNode* xmlNode, const char* name) {
+  size_t len = strlen(name);
+  return XmlNode_NameMatches(xmlNode, name, &len);  
+}
 
 // Main body
 bool xml_init = false;
-static bool xml_checkLabel(void* this, const char* string) {
-    int length = strlen(string);
-    return xml_checkLabelRaw(this, string, &length);
-}
-__stdcall bool XmlParserHookCore(class_DNameNode* xmlNode, class_Database* connection, int* success) {
+extern __stdcall bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) __asm__("cif_XmlParserHookCore");
+__stdcall bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) {
     *success = 1;
 
     if(!xml_init) {
@@ -46,12 +45,12 @@ __stdcall bool XmlParserHookCore(class_DNameNode* xmlNode, class_Database* conne
         xml_init = true;
     }
 
-    if(xml_checkLabel(xmlNode, "__MOD2DLC_PATCH_IGNORE")) {
+    if(checkXmlNodeTag(xmlNode, "__MOD2DLC_PATCH_IGNORE")) {
         return true;
-    } else if(xml_checkLabel(xmlNode, "__MOD2DLC_PATCH_RAWSQL")) {
+    } else if(checkXmlNodeTag(xmlNode, "__MOD2DLC_PATCH_RAWSQL")) {
         char* string;
         int   length;
-        xml_getContents(xmlNode, &string, &length);
+        XmlNode_GetValUtf8(xmlNode, &string, &length);
 
         #ifdef DEBUG
             char* tmpString = malloc(length + 1);
@@ -74,13 +73,10 @@ __stdcall bool XmlParserHookCore(class_DNameNode* xmlNode, class_Database* conne
     }
 }
 
-extern void XmlParserHook();
+extern void XmlParserHook() __asm__("cif_XmlParserHook");
 UnpatchData XmlParserPatch;
 __attribute__((constructor(500))) static void installXmlHook() {
-    xml_checkLabelRaw = (xml_checkLabelRaw_fn) resolveAddress(xml_check_label_offset);
-    xml_getContents   = (xml_getContents_fn)   resolveAddress(xml_get_contents_offset);
-
-    XmlParserPatch = doPatch(xml_parser_hook_offset, XmlParserHook, "XmlParserHook");
+    XmlParserPatch = doPatch(XmlParserHook_offset, XmlParserHook, "XmlParserHook");
 }
 __attribute__((destructor(500))) static void destroyXmlHook() {
     unpatch(XmlParserPatch);
