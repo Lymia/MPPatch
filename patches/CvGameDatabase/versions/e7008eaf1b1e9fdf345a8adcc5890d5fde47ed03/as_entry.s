@@ -23,7 +23,7 @@ xml_parser_hook_return  : equ 0x100764A5
 xml_parser_hook_continue: equ 0x1007652C
 lua_table_hook_return   : equ 0x1000B49E
 
-%define symbolPath "out/CvGameDatabase/7785519c2e67ad6f796a934c41af56a849bf6d18/CvGameDatabase_symbols.s"
+%define symbolPath "out/CvGameDatabase/e7008eaf1b1e9fdf345a8adcc5890d5fde47ed03/CvGameDatabase_symbols.s"
 
 %macro XMLParserHook_LoadVariables 0
     mov edi, esi              ; this

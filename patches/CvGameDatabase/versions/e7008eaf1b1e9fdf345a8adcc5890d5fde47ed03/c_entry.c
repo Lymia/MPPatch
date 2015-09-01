@@ -29,7 +29,7 @@
 #define constant_symbol_name    "??0BinaryIO@Database@@QAE@PBD@Z"
 #define constant_symbol_offset  0x100062D0
 
-#define target_library "CvGameDatabase_orig_7785519c2e67ad6f796a934c41af56a849bf6d18.dll"
+#define target_library "CvGameDatabase_orig_e7008eaf1b1e9fdf345a8adcc5890d5fde47ed03.dll"
 #define target_library_name "CvGameDatabase"
 
 #include "../../main.c"
