@@ -88,13 +88,13 @@ static void luaTable_main(lua_State *L, int table) {
     table_setCFunction(L, table, "getCallerAtLevel", luaHook_getCallerAtLevel);
 }
 
-extern __stdcall void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
-__stdcall void LuaTableHookCore(lua_State *L, int table) {
+extern __attribute__((stdcall)) void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
+__attribute__((stdcall)) void LuaTableHookCore(lua_State *L, int table) {
     table_setTable(L, table, "__mod2dlc_patch", luaTable_main);
 }
 
 extern void LuaTableHook() __asm__("cif_LuaTableHook");
-UnpatchData LuaTablePatch;
+UnpatchData* LuaTablePatch;
 __attribute__((constructor(500))) static void installLuaHook() {
     LuaTablePatch = doPatch(LuaTableHook_offset, LuaTableHook, "LuaTableHook");
 }

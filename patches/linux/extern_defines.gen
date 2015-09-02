@@ -1,0 +1,15 @@
+Database_ExecuteMultiple:__attribute__((cdecl)):bool:class_Database* this, const char* string, size_t length
+Database_LogMessage:__attribute__((cdecl)):bool:class_Database* this, const char* string
+XmlNode_GetValUtf8:__attribute__((cdecl)):void:class_XmlNode* this, char** string_out, size_t* length_out
+XmlNode_NameMatches:__attribute__((cdecl)):bool:class_XmlNode* this, const char* string, size_t* tagSize
+lua_gettop:__attribute__((cdecl)):int:lua_State* L
+lua_createtable:__attribute__((cdecl)):void:lua_State* L, int narr, int nrec
+lua_rawset:__attribute__((cdecl)):void:lua_State* L, int index
+luaL_checklstring:__attribute__((cdecl)):const char*:lua_State* L, int narg, size_t* len
+luaL_checkinteger:__attribute__((cdecl)):lua_Integer:lua_State* L, int narg
+lua_pushstring:__attribute__((cdecl)):void:lua_State* L, const char* s
+lua_pushinteger:__attribute__((cdecl)):void:lua_State* L, lua_Integer n
+lua_pushcclosure:__attribute__((cdecl)):void:lua_State* L, lua_CFunction fn, int n
+lua_getstack:__attribute__((cdecl)):int:lua_State* L, int level, lua_Debug* ar
+lua_getinfo:__attribute__((cdecl)):int:lua_State* L, const char* what, lua_Debug* ar
+

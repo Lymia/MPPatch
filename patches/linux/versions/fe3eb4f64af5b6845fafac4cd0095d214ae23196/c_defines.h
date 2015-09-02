@@ -20,31 +20,29 @@
     SOFTWARE.
 */
 
-#ifndef C_RT_H
-#define C_RT_H
+#ifndef C_DEFINES_H
+#define C_DEFINES_H
 
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-#include "platform.h"
+#define Database_ExecuteMultiple_offset 0x08B95426
+#define Database_LogMessage_offset      0x08B9564E
 
-#ifdef DEBUG
-    extern FILE* debug_log_file;
-    #define debug_print(format, arg...) \
-        fprintf(debug_log_file, "[%lld] %s at %s:%u - " format "\n", \
-            (long long) time(NULL), __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg); \
-        fflush(debug_log_file);
-#else
-    #define debug_print(format, ...)
-#endif
+#define XmlNode_NameMatches_offset      0x08C5786C
+#define XmlNode_GetValUtf8_offset       0x08C57834
 
-typedef struct UnpatchData {
-    void* offset;
-    char oldData[5];
-} UnpatchData;
+#define lua_gettop_offset               0x08ddbecc
+#define lua_pushinteger_offset          0x08ddc6da
+#define lua_pushstring_offset           0x08ddc759
+#define lua_pushcclosure_offset         0x08ddc822
+#define lua_createtable_offset          0x08ddca72
+#define lua_rawset_offset               0x08ddcc57
+#define lua_rawseti_offset              0x08ddccdb
+#define luaL_checklstring_offset        0x08ddd870
+#define luaL_checkinteger_offset        0x08dddbaa
+#define lua_getstack_offset             0x08ddea76
+#define lua_getinfo_offset              0x08ddec20
 
-UnpatchData* doPatch(int address, void* hookAddress, const char* reason);
-void unpatch(UnpatchData* data);
+#define XmlParserHook_offset            0x08B9C012
+#define LuaTableHook_offset             0x08B9AE76
 
-#endif /* C_RT_H */
+#endif /* C_DEFINES_H */
 

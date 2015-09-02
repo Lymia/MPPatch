@@ -47,11 +47,12 @@ static bool checkXmlNodeTag(class_XmlNode* xmlNode, const char* name) {
 
 // Main body
 bool xml_init = false;
-extern __stdcall bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) __asm__("cif_XmlParserHookCore");
-__stdcall bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) {
+extern __attribute__((stdcall)) bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) __asm__("cif_XmlParserHookCore");
+__attribute__((stdcall)) bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) {
     *success = 1;
 
     if(!xml_init) {
+        debug_print("Initialized XmlParserHook!");
         Database_LogMessage(connection, patchMarkerString);
         xml_init = true;
     }
@@ -85,7 +86,7 @@ __stdcall bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connect
 }
 
 extern void XmlParserHook() __asm__("cif_XmlParserHook");
-UnpatchData XmlParserPatch;
+UnpatchData* XmlParserPatch;
 __attribute__((constructor(500))) static void installXmlHook() {
     XmlParserPatch = doPatch(XmlParserHook_offset, XmlParserHook, "XmlParserHook");
 }

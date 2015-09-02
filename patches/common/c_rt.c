@@ -38,15 +38,15 @@
     #define debug_print(format, ...)
 #endif
 
-extern __stdcall void* asm_resolveAddress(int address) __asm__("cif_resolveAddress");
-__stdcall void* asm_resolveAddress(int address) {
+extern __attribute__((stdcall)) void* asm_resolveAddress(int address) __asm__("cif_resolveAddress");
+__attribute__((stdcall)) void* asm_resolveAddress(int address) {
     return resolveAddress(address);
 }
 
 // Actual patch code!
-static UnpatchData writeRelativeJmp(void* targetAddress, void* hookAddress, const char* reason) {
+static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, const char* reason) {
     // Register the patch for unpatching
-    UnpatchData unpatch = malloc(sizeof(UnpatchData_Struct));
+    UnpatchData* unpatch = malloc(sizeof(UnpatchData));
     unpatch->offset = targetAddress;
     memcpy(unpatch->oldData, targetAddress, 5);
 
@@ -59,18 +59,18 @@ static UnpatchData writeRelativeJmp(void* targetAddress, void* hookAddress, cons
 
     return unpatch;
 }
-UnpatchData doPatch(int address, void* hookAddress, const char* reason) {
+UnpatchData* doPatch(int address, void* hookAddress, const char* reason) {
     void* targetAddress = resolveAddress(address);
     char reason_buf[256];
     snprintf(reason_buf, 256, "patch: %s", reason);
 
     memory_oldProtect protectFlags;
     unprotectMemoryRegion(targetAddress, 5, &protectFlags);
-    UnpatchData unpatch = writeRelativeJmp(targetAddress, hookAddress, reason_buf);
+    UnpatchData* unpatch = writeRelativeJmp(targetAddress, hookAddress, reason_buf);
     protectMemoryRegion(targetAddress, 5, &protectFlags);
     return unpatch;
 }
-void unpatch(UnpatchData data) {
+void unpatch(UnpatchData* data) {
     memory_oldProtect protectFlags;
     debug_print("Unpatching at 0x%08x", data->offset);
     unprotectMemoryRegion(data->offset, 5, &protectFlags);

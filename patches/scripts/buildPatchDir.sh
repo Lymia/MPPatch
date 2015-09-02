@@ -29,18 +29,11 @@ collect() {
           cp "out_debug/$platform/$version/$fileName" "patches/$version/${version}_debug.$extension"
           strip "patches/$version/$version.$extension"
           echo "ORIGINAL $platform $version.$extension ${version}_debug.$extension" >> "patches/$version/version.mf"
-
-          checksum=$(sha1sum -b "patches/$version/$version.$extension" | cut -f 1 -d ' ')
-          mkdir -p patches/$checksum/
-          echo "PATCHED $platform $version RELEASE" >> patches/$checksum/version.mf
-
-          checksum=$(sha1sum -b "patches/$version/${version}_debug.$extension" | cut -f 1 -d ' ')
-          mkdir -p patches/$checksum/
-          echo "PATCHED $platform $version DEBUG" >> patches/$checksum/version.mf
         fi
     done
 }
 
 collect win32 "CvGameDatabaseWin32Final Release.dll" dll
+collect linux "mod2dlc_patch.so" so
 
 rm -rf out_debug out_release
