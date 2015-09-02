@@ -20,6 +20,13 @@
     SOFTWARE.
 */
 
+// This hooks Database::Scripting::Lua::lGetMemoryUsage, injecting tables into the table
+// loaded by DB.GetMemoryUsage(). This lets us add new functionality for Lua scripts while
+// Mod2DLC is installed, allowing us to do some things that would be otherwise impossible
+// in the Lua part of the runtime.
+//
+// Like throwing a fatal error. :|
+
 #include <stdio.h>
 #include <string.h>
 
