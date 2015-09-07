@@ -28,13 +28,15 @@
 #include <link.h>
 #include <unistd.h>
 
+#include <SDL.h>
+
 #include "c_rt.h"
 #include "c_defines.h"
 #include "platform.h"
 
 __attribute__((noreturn)) void fatalError(const char* message) {
-  // TODO Use SDL or something to show a message box.
-  puts(message);
+  fputs(message, stderr);
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Mod2DLC", message, 0);
   exit(1);
 }
 

@@ -24,11 +24,11 @@ collect() {
           version=`basename $filePath`
           echo " - Version $version for $platform"
 
-          mkdir -p patches/$version/
-          cp "out_release/$platform/$version/$fileName" "patches/$version/$version.$extension"
-          cp "out_debug/$platform/$version/$fileName" "patches/$version/${version}_debug.$extension"
-          strip "patches/$version/$version.$extension"
-          echo "ORIGINAL $platform $version.$extension ${version}_debug.$extension" >> "patches/$version/version.mf"
+          mkdir -p patches/$platform/$version/
+          cp "out_release/$platform/$version/$fileName" "patches/$platform/$version/$version.$extension"
+          cp "out_debug/$platform/$version/$fileName" "patches/$platform/$version/${version}_debug.$extension"
+          strip "patches/$platform/$version/$version.$extension"
+          echo "$platform $version.$extension ${version}_debug.$extension" >> "patches/$platform/$version/version.mf"
         fi
     done
 }

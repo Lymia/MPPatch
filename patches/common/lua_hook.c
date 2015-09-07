@@ -35,6 +35,8 @@
 #include "extern_defines.h"
 #include "version.h"
 
+#define LuaTableHook_REGINDEX "2c11892f-7ad1-4ea1-bc4e-770a86c387e6"
+
 static void table_setTable(lua_State *L, int table, const char* name, void (*fn)(lua_State *L, int table)) {
     lua_pushstring(L, name);
     lua_createtable(L, 0, 0);
@@ -60,20 +62,8 @@ static void table_setCFunction(lua_State *L, int table, const char* name, lua_CF
 
 static int luaHook_panic(lua_State *L) {
     char buffer[1024];
-    snprintf(buffer, 1024, "Mod2DLC's Lua component encountered a critical error:\n%s", luaL_checkstring(L, 1));
+    snprintf(buffer, 1024, "[Mod2DLC] Critical error in Lua code:\n%s", luaL_checkstring(L, 1));
     fatalError(buffer);
-}
-static int luaHook_getCallerAtLevel(lua_State *L) {
-    int level = luaL_checkinteger(L, 1);
-    lua_Debug ar;
-    if(lua_getstack(L, level+1, &ar) && lua_getinfo(L, "nS", &ar)) {
-        lua_pushstring(L, ar.source);
-        lua_pushstring(L, ar.short_src);
-        if(ar.name) {
-            lua_pushstring(L, ar.name);
-            return 3;
-        } else return 2;
-    } else return 0;
 }
 static void luaTable_versioninfo(lua_State *L, int table) {
     table_setString (L, table, "component", "Mod2DLC CvGameDatabase patch");
@@ -81,16 +71,37 @@ static void luaTable_versioninfo(lua_State *L, int table) {
     table_setInteger(L, table, "minor", patchVersionMinor);
     table_setInteger(L, table, "mincompat", patchMinCompat);
 }
-static void luaTable_main(lua_State *L, int table) {
+static void luaTable_pushSharedState(lua_State *L) {
+    lua_pushstring(L, LuaTableHook_REGINDEX);
+    lua_gettable(L, LUA_REGISTRYINDEX);
+    if(lua_isnil(L, lua_gettop(L))) {
+      lua_pop(L, 1);
+      lua_createtable(L, 0, 0);
+      int table = lua_gettop(L);
+
+      lua_pushstring(L, LuaTableHook_REGINDEX);
+      lua_pushvalue(L, table);
+      lua_settable(L, LUA_REGISTRYINDEX);
+    }
+}
+static int luaHook_loadMainLibrary(lua_State *L) {
+    lua_createtable(L, 0, 0);
+    int table = lua_gettop(L);
+
     table_setTable(L, table, "version", luaTable_versioninfo);
     table_setString(L, table, "credits", patchMarkerString);
     table_setCFunction(L, table, "panic", luaHook_panic);
-    table_setCFunction(L, table, "getCallerAtLevel", luaHook_getCallerAtLevel);
+
+    lua_pushstring(L, "shared");
+    luaTable_pushSharedState(L);
+    lua_rawset(L, table);
+
+    return 1;
 }
 
 extern __attribute__((stdcall)) void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
 __attribute__((stdcall)) void LuaTableHookCore(lua_State *L, int table) {
-    table_setTable(L, table, "__mod2dlc_patch", luaTable_main);
+    table_setCFunction(L, table, "__mod2dlc_load_patch", luaHook_loadMainLibrary);
 }
 
 extern void LuaTableHook() __asm__("cif_LuaTableHook");

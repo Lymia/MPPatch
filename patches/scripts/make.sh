@@ -51,6 +51,10 @@ do
     nasm $FLAGS -Ox -i $dirPath/ -i common/ -i linux/ -f elf -o $outDir/as.o common/as_entry.s
     echo "   - Compiling mod2dlc_patch.so"
     gcc -m32 $FLAGS -flto -g -shared -O2 --std=gnu99 -o "$outDir/mod2dlc_patch.so" \
+        -I /usr/include/SDL2/ ~/.steam/bin32/libSDL2-2.0.so.0 \
         -I common -I linux -I $dirPath common/*.c linux/*.c out/linux/extern_defines_gen.c $outDir/as.o \
         -ldl -fstack-protector -fstack-protector-all
 done
+
+
+

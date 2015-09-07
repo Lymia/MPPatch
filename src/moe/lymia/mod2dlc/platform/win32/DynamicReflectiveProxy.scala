@@ -1,31 +1,31 @@
 /*
- * Copyright (C) 2013-2014 Lymia Aluysia <lymiahugs@gmail.com>
+ * Copyright (c) 2015 Lymia Alusyia <lymia@lymiahugs.com>
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of
- * this software and associated documentation files (the "Software"), to deal in
- * the Software without restriction, including without limitation the rights to
- * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
-package com.lymiahugs.util.reflection
+package moe.lymia.mod2dlc.platform.win32
 
-import annotation.tailrec
-
-import scala.language.dynamics
 import java.lang.reflect.{Array => _, _}
+
+import scala.annotation.tailrec
+import scala.language.dynamics
 import scala.reflect._
 
 object DynamicReflectiveProxy {
@@ -72,7 +72,7 @@ class DynamicReflectiveProxy(obj: AnyRef) extends Dynamic {
     current.getDeclaredMethods.find(method =>
       method.getName == name &&
       (method.getParameterTypes.length == types.length) && (
-        (types.length == 0) ||
+        types.isEmpty ||
         (method.getParameterTypes zip types).map(x =>
           x._1.isAssignableFrom(x._2) || x._1 == wraps(x._2)).reduce(_ && _)
       )

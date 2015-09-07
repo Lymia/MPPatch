@@ -10,6 +10,8 @@ luaL_checkinteger:__attribute__((cdecl)):lua_Integer:lua_State* L, int narg
 lua_pushstring:__attribute__((cdecl)):void:lua_State* L, const char* s
 lua_pushinteger:__attribute__((cdecl)):void:lua_State* L, lua_Integer n
 lua_pushcclosure:__attribute__((cdecl)):void:lua_State* L, lua_CFunction fn, int n
-lua_getstack:__attribute__((cdecl)):int:lua_State* L, int level, lua_Debug* ar
-lua_getinfo:__attribute__((cdecl)):int:lua_State* L, const char* what, lua_Debug* ar
-
+lua_settop:__attribute__((cdecl)):void :lua_State* L, int index
+lua_pushvalue:__attribute__((cdecl)):void :lua_State* L, int index
+lua_gettable:__attribute__((cdecl)):void:lua_State* L, int index
+lua_settable:__attribute__((cdecl)):void:lua_State* L, int index
+lua_type:__attribute__((cdecl)):int:lua_State* L, int index

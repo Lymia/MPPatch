@@ -41,6 +41,14 @@ typedef struct lua_State lua_State;
 typedef ptrdiff_t lua_Integer;
 
 int lua_gettop (lua_State *L);
+void  lua_settop (lua_State *L, int index);
+void  lua_pushvalue (lua_State *L, int index);
+#define lua_pop(L,n)  lua_settop(L, -(n)-1)
+
+#define LUA_REGISTRYINDEX       (-10000)
+void lua_gettable (lua_State *L, int index);
+void lua_settable (lua_State *L, int index);
+
 void lua_createtable (lua_State *L, int narr, int nrec);
 void lua_rawset (lua_State *L, int index);
 
@@ -48,29 +56,15 @@ const char *luaL_checklstring (lua_State *L, int narg, size_t *len);
 #define luaL_checkstring(L,n)   (luaL_checklstring(L, (n), NULL))
 lua_Integer luaL_checkinteger (lua_State *L, int narg);
 
+int lua_type (lua_State *L, int idx);
+#define LUA_TNIL                0
+#define lua_isnil(L,n)          (lua_type(L, (n)) == LUA_TNIL)
+
 void lua_pushstring (lua_State *L, const char *s);
 void lua_pushinteger (lua_State *L, lua_Integer n);
 
 typedef int (*lua_CFunction) (lua_State *L);
 void lua_pushcclosure (lua_State *L, lua_CFunction fn, int n);
 #define lua_pushcfunction(L,f)  lua_pushcclosure(L,f,0)
-
-#define LUA_IDSIZE      60
-typedef struct lua_Debug {
-  int event;
-  const char *name;     /* (n) */
-  const char *namewhat; /* (n) `global', `local', `field', `method' */
-  const char *what;     /* (S) `Lua', `C', `main', `tail' */
-  const char *source;   /* (S) */
-  int currentline;      /* (l) */
-  int nups;             /* (u) number of upvalues */
-  int linedefined;      /* (S) */
-  int lastlinedefined;  /* (S) */
-  char short_src[LUA_IDSIZE]; /* (S) */
-  /* private part */
-  int i_ci;  /* active function */
-} lua_Debug;
-int lua_getstack (lua_State *L, int level, lua_Debug *ar);
-int lua_getinfo (lua_State *L, const char *what, lua_Debug *ar);
 
 #endif /* EXTERN_DEFINES_H */

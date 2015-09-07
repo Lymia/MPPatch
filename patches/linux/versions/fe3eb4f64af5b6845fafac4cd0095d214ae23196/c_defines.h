@@ -35,11 +35,13 @@
 #define lua_pushcclosure_offset         0x08ddc822
 #define lua_createtable_offset          0x08ddca72
 #define lua_rawset_offset               0x08ddcc57
-#define lua_rawseti_offset              0x08ddccdb
 #define luaL_checklstring_offset        0x08ddd870
 #define luaL_checkinteger_offset        0x08dddbaa
-#define lua_getstack_offset             0x08ddea76
-#define lua_getinfo_offset              0x08ddec20
+#define lua_settop_offset               0x08DDBEE0
+#define lua_pushvalue_offset            0x08DDC140
+#define lua_gettable_offset             0x08DDC920
+#define lua_settable_offset             0x08DDCB9A
+#define lua_type_offset                 0x08DDC179
 
 #define XmlParserHook_offset            0x08B9C012
 #define LuaTableHook_offset             0x08B9AE76

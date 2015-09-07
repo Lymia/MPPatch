@@ -1,135 +1,137 @@
-proxy_symbol ??0BinaryIO@Database@@QAE@PBD@Z
-proxy_symbol ??0Connection@Database@@QAE@PBDH@Z
-proxy_symbol ??0Connection@Database@@QAE@XZ
-proxy_symbol ??0Results@Database@@QAE@ABV01@@Z
-proxy_symbol ??0Results@Database@@QAE@PBD@Z
-proxy_symbol ??0ResultsCache@Database@@QAE@AAVConnection@1@@Z
-proxy_symbol ??0SingleResult@Database@@QAE@PBD@Z
-proxy_symbol ??0XMLSerializer@Database@@QAE@AAVConnection@1@@Z
-proxy_symbol ??1Connection@Database@@QAE@XZ
-proxy_symbol ??1Results@Database@@UAE@XZ
-proxy_symbol ??1ResultsCache@Database@@QAE@XZ
-proxy_symbol ??1XMLSerializer@Database@@QAE@XZ
-proxy_symbol ??2Connection@Database@@SAPAXI@Z
-proxy_symbol ??2Results@Database@@SAPAXI@Z
-proxy_symbol ??3Connection@Database@@SAXPAX@Z
-proxy_symbol ??3Results@Database@@SAXPAX@Z
-proxy_symbol ??5BinaryIO@Database@@QAE_NAAVConnection@1@@Z
-proxy_symbol ??6BinaryIO@Database@@QAE_NAAVConnection@1@@Z
-proxy_symbol ??_FResults@Database@@QAEXXZ
-proxy_symbol ??_FSingleResult@Database@@QAEXXZ
-proxy_symbol ?AddTableToPackageTagList@XMLSerializer@Database@@QAEXPBD@Z
-proxy_symbol ?Analyze@Connection@Database@@QBEXXZ
-proxy_symbol ?BeginDeferredTransaction@Connection@Database@@QAEXXZ
-proxy_symbol ?BeginExclusiveTransaction@Connection@Database@@QAEXXZ
-proxy_symbol ?BeginImmediateTransaction@Connection@Database@@QAEXXZ
-proxy_symbol ?BeginTransaction@Connection@Database@@QAEXXZ
-proxy_symbol ?Bind@Results@Database@@QAE_NHH@Z
-proxy_symbol ?Bind@Results@Database@@QAE_NHM@Z
-proxy_symbol ?Bind@Results@Database@@QAE_NHN@Z
-proxy_symbol ?Bind@Results@Database@@QAE_NHPBDH_N@Z
-proxy_symbol ?Bind@Results@Database@@QAE_NHPBD_N@Z
-proxy_symbol ?Bind@Results@Database@@QAE_NHPB_WH_N@Z
-proxy_symbol ?Bind@Results@Database@@QAE_NHPB_W_N@Z
-proxy_symbol ?Bind@Results@Database@@QAE_NH_J@Z
-proxy_symbol ?BindNULL@Results@Database@@QAE_NH@Z
-proxy_symbol ?CalculateMemoryStats@Connection@Database@@QAEPBDXZ
-proxy_symbol ?Clear@ResultsCache@Database@@QAEXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
-proxy_symbol ?Clear@ResultsCache@Database@@QAEXXZ
-proxy_symbol ?ClearCountCache@Connection@Database@@QAEXXZ
-proxy_symbol ?ClearPackageTagList@XMLSerializer@Database@@QAEXXZ
-proxy_symbol ?Close@Connection@Database@@QAEXXZ
-proxy_symbol ?ColumnCount@Results@Database@@QBEHXZ
-proxy_symbol ?ColumnName@Results@Database@@QAEPBDH@Z
-proxy_symbol ?ColumnPosition@Results@Database@@QAEHPBD@Z
-proxy_symbol ?ColumnType@Results@Database@@QAE?AW4ColumnTypes@2@H@Z
-proxy_symbol ?ColumnTypeName@Results@Database@@QAEPBDH@Z
-proxy_symbol ?CommitTransaction@Connection@Database@@QAEXXZ
-proxy_symbol ?Connection@ResultsCache@Database@@QAEAAV02@XZ
-proxy_symbol ?Count@Connection@Database@@QAEHPBD_N@Z
-proxy_symbol ?EndTransaction@Connection@Database@@QAEXXZ
-proxy_symbol ?ErrorCode@Connection@Database@@QBEHXZ
-proxy_symbol ?ErrorMessage@Connection@Database@@QBEPBDXZ
-proxy_symbol ?ErrorMessage@ResultsCache@Database@@QBEPBDXZ
-proxy_symbol ?ErrorMessage@XMLSerializer@Database@@QBEPBDXZ
-proxy_symbol ?Execute@Connection@Database@@QBE_NAAVResults@2@PBDH@Z
-proxy_symbol ?Execute@Connection@Database@@QBE_NPBDH@Z
-proxy_symbol ?Execute@Results@Database@@QAE_NXZ
-proxy_symbol ?ExecuteMultiple@Connection@Database@@QBE_NPBDH@Z
-proxy_symbol ?Get@ResultsCache@Database@@QAEPAVResults@2@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
-proxy_symbol ?GetBool@Results@Database@@QAE_NH@Z
-proxy_symbol ?GetBool@Results@Database@@QAE_NPBD@Z
-proxy_symbol ?GetColumns@Results@Database@@UBEPBDXZ
-proxy_symbol ?GetDouble@Results@Database@@QAENH@Z
-proxy_symbol ?GetDouble@Results@Database@@QAENPBD@Z
-proxy_symbol ?GetFloat@Results@Database@@QAEMH@Z
-proxy_symbol ?GetFloat@Results@Database@@QAEMPBD@Z
-proxy_symbol ?GetInt64@Results@Database@@QAE_JH@Z
-proxy_symbol ?GetInt64@Results@Database@@QAE_JPBD@Z
-proxy_symbol ?GetInt@Results@Database@@QAEHH@Z
-proxy_symbol ?GetInt@Results@Database@@QAEHPBD@Z
-proxy_symbol ?GetText16@Results@Database@@QAEPB_WH@Z
-proxy_symbol ?GetText16@Results@Database@@QAEPB_WPBD@Z
-proxy_symbol ?GetText@Results@Database@@QAEPBDH@Z
-proxy_symbol ?GetText@Results@Database@@QAEPBDPBD@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXHAAH@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXHAAM@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXHAAN@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXHAAPBD@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXHAAPB_W@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXHAA_J@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXHAA_N@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXPBDAAH@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXPBDAAM@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXPBDAAN@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXPBDAAPBD@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXPBDAAPB_W@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXPBDAA_J@Z
-proxy_symbol ?GetValue@Results@Database@@QAEXPBDAA_N@Z
-proxy_symbol ?HasColumn@Results@Database@@QAE_NPBD@Z
-proxy_symbol ?HashColumnPositions@Results@Database@@IAEXXZ
-proxy_symbol ?Load@BinaryIO@Database@@QAE_NAAVConnection@2@@Z
-proxy_symbol ?Load@XMLSerializer@Database@@QAE_NPB_W@Z
-proxy_symbol ?Load@XMLSerializer@Database@@QAE_NPB_WAAVResultsCache@2@@Z
-proxy_symbol ?LoadFromMemory@XMLSerializer@Database@@QAE_NPB_WPADI@Z
-proxy_symbol ?LoadFromMemory@XMLSerializer@Database@@QAE_NPB_WPADIAAVResultsCache@2@@Z
-proxy_symbol ?LogError@Connection@Database@@QBEXPBD@Z
-proxy_symbol ?LogMessage@Connection@Database@@QBEXPBD@Z
-proxy_symbol ?LogWarning@Connection@Database@@QBEXPBD@Z
-proxy_symbol ?Open@Connection@Database@@QAE_NPBDH@Z
-proxy_symbol ?Prepare@ResultsCache@Database@@QAEPAVResults@2@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PBDH@Z
-proxy_symbol ?PushDatabase@Lua@Scripting@Database@@SAXPAUlua_State@@AAVConnection@3@@Z
-proxy_symbol ?PushDatabaseQuery@Lua@Scripting@Database@@SAPAVResults@3@PAUlua_State@@PAVConnection@3@PBD@Z
-proxy_symbol ?PushDatabaseRow@Lua@Scripting@Database@@SAXPAUlua_State@@PAVResults@3@@Z
-proxy_symbol ?PushDatabaseTable@Lua@Scripting@Database@@SAXPAUlua_State@@AAVConnection@3@PBD@Z
-proxy_symbol ?Release@Results@Database@@QAEXXZ
-proxy_symbol ?RemoveTableFromPackageTagList@XMLSerializer@Database@@QAEXPBD@Z
-proxy_symbol ?Reset@Results@Database@@QAE_NXZ
-proxy_symbol ?RollbackToSavePoint@Connection@Database@@QAE_NPBD@Z
-proxy_symbol ?RollbackTransaction@Connection@Database@@QAEXXZ
-proxy_symbol ?Save@BinaryIO@Database@@QAE_NAAVConnection@2@@Z
-proxy_symbol ?SelectAll@Connection@Database@@QAE_NAAVResults@2@PBD@Z
-proxy_symbol ?SelectAt@Connection@Database@@QAE_NAAVResults@2@PBD11@Z
-proxy_symbol ?SelectAt@Connection@Database@@QAE_NAAVResults@2@PBD1H@Z
-proxy_symbol ?SelectAt@Connection@Database@@QAE_NAAVResults@2@PBD1N@Z
-proxy_symbol ?SelectAt@Connection@Database@@QAE_NAAVResults@2@PBDH@Z
-proxy_symbol ?SelectWhere@Connection@Database@@QAE_NAAVResults@2@PBD1@Z
-proxy_symbol ?SetBusyTimeout@Connection@Database@@QAE_NH@Z
-proxy_symbol ?SetColumns@Results@Database@@QAEXPBD@Z
-proxy_symbol ?SetLogger@Connection@Database@@QAEXPAVIDatabaseLogger@2@@Z
-proxy_symbol ?SetPackageTag@XMLSerializer@Database@@QAEXPBD@Z
-proxy_symbol ?SetSavePoint@Connection@Database@@QAE_NPBD@Z
-proxy_symbol ?SingleQuery@Results@Database@@QAEX_N@Z
-proxy_symbol ?SingleQuery@Results@Database@@QBE_NXZ
-proxy_symbol ?StatementCount@Connection@Database@@QBEHXZ
-proxy_symbol ?StatementSQL@Connection@Database@@QBEPBDH@Z
-proxy_symbol ?Step@Results@Database@@QAE_NXZ
-proxy_symbol ?TotalChanges@Connection@Database@@QBEHXZ
-proxy_symbol ?TryExecute@Results@Database@@QAE_NXZ
-proxy_symbol ?TryReset@Results@Database@@QAE_NXZ
-proxy_symbol ?UseTransactions@XMLSerializer@Database@@QAEX_N@Z
-proxy_symbol ?UseTransactions@XMLSerializer@Database@@QBE_NXZ
-proxy_symbol ?Vacuum@Connection@Database@@QBEXXZ
-proxy_symbol ?ValidateFKConstraints@Connection@Database@@QBE_N_N@Z
-proxy_symbol ?lCollectMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z
-proxy_symbol ?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z
+%macro proxy_symbols 1
+  %1 ??0BinaryIO@Database@@QAE@PBD@Z
+  %1 ??0Connection@Database@@QAE@PBDH@Z
+  %1 ??0Connection@Database@@QAE@XZ
+  %1 ??0Results@Database@@QAE@ABV01@@Z
+  %1 ??0Results@Database@@QAE@PBD@Z
+  %1 ??0ResultsCache@Database@@QAE@AAVConnection@1@@Z
+  %1 ??0SingleResult@Database@@QAE@PBD@Z
+  %1 ??0XMLSerializer@Database@@QAE@AAVConnection@1@@Z
+  %1 ??1Connection@Database@@QAE@XZ
+  %1 ??1Results@Database@@UAE@XZ
+  %1 ??1ResultsCache@Database@@QAE@XZ
+  %1 ??1XMLSerializer@Database@@QAE@XZ
+  %1 ??2Connection@Database@@SAPAXI@Z
+  %1 ??2Results@Database@@SAPAXI@Z
+  %1 ??3Connection@Database@@SAXPAX@Z
+  %1 ??3Results@Database@@SAXPAX@Z
+  %1 ??5BinaryIO@Database@@QAE_NAAVConnection@1@@Z
+  %1 ??6BinaryIO@Database@@QAE_NAAVConnection@1@@Z
+  %1 ??_FResults@Database@@QAEXXZ
+  %1 ??_FSingleResult@Database@@QAEXXZ
+  %1 ?AddTableToPackageTagList@XMLSerializer@Database@@QAEXPBD@Z
+  %1 ?Analyze@Connection@Database@@QBEXXZ
+  %1 ?BeginDeferredTransaction@Connection@Database@@QAEXXZ
+  %1 ?BeginExclusiveTransaction@Connection@Database@@QAEXXZ
+  %1 ?BeginImmediateTransaction@Connection@Database@@QAEXXZ
+  %1 ?BeginTransaction@Connection@Database@@QAEXXZ
+  %1 ?Bind@Results@Database@@QAE_NHH@Z
+  %1 ?Bind@Results@Database@@QAE_NHM@Z
+  %1 ?Bind@Results@Database@@QAE_NHN@Z
+  %1 ?Bind@Results@Database@@QAE_NHPBDH_N@Z
+  %1 ?Bind@Results@Database@@QAE_NHPBD_N@Z
+  %1 ?Bind@Results@Database@@QAE_NHPB_WH_N@Z
+  %1 ?Bind@Results@Database@@QAE_NHPB_W_N@Z
+  %1 ?Bind@Results@Database@@QAE_NH_J@Z
+  %1 ?BindNULL@Results@Database@@QAE_NH@Z
+  %1 ?CalculateMemoryStats@Connection@Database@@QAEPBDXZ
+  %1 ?Clear@ResultsCache@Database@@QAEXABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+  %1 ?Clear@ResultsCache@Database@@QAEXXZ
+  %1 ?ClearCountCache@Connection@Database@@QAEXXZ
+  %1 ?ClearPackageTagList@XMLSerializer@Database@@QAEXXZ
+  %1 ?Close@Connection@Database@@QAEXXZ
+  %1 ?ColumnCount@Results@Database@@QBEHXZ
+  %1 ?ColumnName@Results@Database@@QAEPBDH@Z
+  %1 ?ColumnPosition@Results@Database@@QAEHPBD@Z
+  %1 ?ColumnType@Results@Database@@QAE?AW4ColumnTypes@2@H@Z
+  %1 ?ColumnTypeName@Results@Database@@QAEPBDH@Z
+  %1 ?CommitTransaction@Connection@Database@@QAEXXZ
+  %1 ?Connection@ResultsCache@Database@@QAEAAV02@XZ
+  %1 ?Count@Connection@Database@@QAEHPBD_N@Z
+  %1 ?EndTransaction@Connection@Database@@QAEXXZ
+  %1 ?ErrorCode@Connection@Database@@QBEHXZ
+  %1 ?ErrorMessage@Connection@Database@@QBEPBDXZ
+  %1 ?ErrorMessage@ResultsCache@Database@@QBEPBDXZ
+  %1 ?ErrorMessage@XMLSerializer@Database@@QBEPBDXZ
+  %1 ?Execute@Connection@Database@@QBE_NAAVResults@2@PBDH@Z
+  %1 ?Execute@Connection@Database@@QBE_NPBDH@Z
+  %1 ?Execute@Results@Database@@QAE_NXZ
+  %1 ?ExecuteMultiple@Connection@Database@@QBE_NPBDH@Z
+  %1 ?Get@ResultsCache@Database@@QAEPAVResults@2@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z
+  %1 ?GetBool@Results@Database@@QAE_NH@Z
+  %1 ?GetBool@Results@Database@@QAE_NPBD@Z
+  %1 ?GetColumns@Results@Database@@UBEPBDXZ
+  %1 ?GetDouble@Results@Database@@QAENH@Z
+  %1 ?GetDouble@Results@Database@@QAENPBD@Z
+  %1 ?GetFloat@Results@Database@@QAEMH@Z
+  %1 ?GetFloat@Results@Database@@QAEMPBD@Z
+  %1 ?GetInt64@Results@Database@@QAE_JH@Z
+  %1 ?GetInt64@Results@Database@@QAE_JPBD@Z
+  %1 ?GetInt@Results@Database@@QAEHH@Z
+  %1 ?GetInt@Results@Database@@QAEHPBD@Z
+  %1 ?GetText16@Results@Database@@QAEPB_WH@Z
+  %1 ?GetText16@Results@Database@@QAEPB_WPBD@Z
+  %1 ?GetText@Results@Database@@QAEPBDH@Z
+  %1 ?GetText@Results@Database@@QAEPBDPBD@Z
+  %1 ?GetValue@Results@Database@@QAEXHAAH@Z
+  %1 ?GetValue@Results@Database@@QAEXHAAM@Z
+  %1 ?GetValue@Results@Database@@QAEXHAAN@Z
+  %1 ?GetValue@Results@Database@@QAEXHAAPBD@Z
+  %1 ?GetValue@Results@Database@@QAEXHAAPB_W@Z
+  %1 ?GetValue@Results@Database@@QAEXHAA_J@Z
+  %1 ?GetValue@Results@Database@@QAEXHAA_N@Z
+  %1 ?GetValue@Results@Database@@QAEXPBDAAH@Z
+  %1 ?GetValue@Results@Database@@QAEXPBDAAM@Z
+  %1 ?GetValue@Results@Database@@QAEXPBDAAN@Z
+  %1 ?GetValue@Results@Database@@QAEXPBDAAPBD@Z
+  %1 ?GetValue@Results@Database@@QAEXPBDAAPB_W@Z
+  %1 ?GetValue@Results@Database@@QAEXPBDAA_J@Z
+  %1 ?GetValue@Results@Database@@QAEXPBDAA_N@Z
+  %1 ?HasColumn@Results@Database@@QAE_NPBD@Z
+  %1 ?HashColumnPositions@Results@Database@@IAEXXZ
+  %1 ?Load@BinaryIO@Database@@QAE_NAAVConnection@2@@Z
+  %1 ?Load@XMLSerializer@Database@@QAE_NPB_W@Z
+  %1 ?Load@XMLSerializer@Database@@QAE_NPB_WAAVResultsCache@2@@Z
+  %1 ?LoadFromMemory@XMLSerializer@Database@@QAE_NPB_WPADI@Z
+  %1 ?LoadFromMemory@XMLSerializer@Database@@QAE_NPB_WPADIAAVResultsCache@2@@Z
+  %1 ?LogError@Connection@Database@@QBEXPBD@Z
+  %1 ?LogMessage@Connection@Database@@QBEXPBD@Z
+  %1 ?LogWarning@Connection@Database@@QBEXPBD@Z
+  %1 ?Open@Connection@Database@@QAE_NPBDH@Z
+  %1 ?Prepare@ResultsCache@Database@@QAEPAVResults@2@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@PBDH@Z
+  %1 ?PushDatabase@Lua@Scripting@Database@@SAXPAUlua_State@@AAVConnection@3@@Z
+  %1 ?PushDatabaseQuery@Lua@Scripting@Database@@SAPAVResults@3@PAUlua_State@@PAVConnection@3@PBD@Z
+  %1 ?PushDatabaseRow@Lua@Scripting@Database@@SAXPAUlua_State@@PAVResults@3@@Z
+  %1 ?PushDatabaseTable@Lua@Scripting@Database@@SAXPAUlua_State@@AAVConnection@3@PBD@Z
+  %1 ?Release@Results@Database@@QAEXXZ
+  %1 ?RemoveTableFromPackageTagList@XMLSerializer@Database@@QAEXPBD@Z
+  %1 ?Reset@Results@Database@@QAE_NXZ
+  %1 ?RollbackToSavePoint@Connection@Database@@QAE_NPBD@Z
+  %1 ?RollbackTransaction@Connection@Database@@QAEXXZ
+  %1 ?Save@BinaryIO@Database@@QAE_NAAVConnection@2@@Z
+  %1 ?SelectAll@Connection@Database@@QAE_NAAVResults@2@PBD@Z
+  %1 ?SelectAt@Connection@Database@@QAE_NAAVResults@2@PBD11@Z
+  %1 ?SelectAt@Connection@Database@@QAE_NAAVResults@2@PBD1H@Z
+  %1 ?SelectAt@Connection@Database@@QAE_NAAVResults@2@PBD1N@Z
+  %1 ?SelectAt@Connection@Database@@QAE_NAAVResults@2@PBDH@Z
+  %1 ?SelectWhere@Connection@Database@@QAE_NAAVResults@2@PBD1@Z
+  %1 ?SetBusyTimeout@Connection@Database@@QAE_NH@Z
+  %1 ?SetColumns@Results@Database@@QAEXPBD@Z
+  %1 ?SetLogger@Connection@Database@@QAEXPAVIDatabaseLogger@2@@Z
+  %1 ?SetPackageTag@XMLSerializer@Database@@QAEXPBD@Z
+  %1 ?SetSavePoint@Connection@Database@@QAE_NPBD@Z
+  %1 ?SingleQuery@Results@Database@@QAEX_N@Z
+  %1 ?SingleQuery@Results@Database@@QBE_NXZ
+  %1 ?StatementCount@Connection@Database@@QBEHXZ
+  %1 ?StatementSQL@Connection@Database@@QBEPBDH@Z
+  %1 ?Step@Results@Database@@QAE_NXZ
+  %1 ?TotalChanges@Connection@Database@@QBEHXZ
+  %1 ?TryExecute@Results@Database@@QAE_NXZ
+  %1 ?TryReset@Results@Database@@QAE_NXZ
+  %1 ?UseTransactions@XMLSerializer@Database@@QAEX_N@Z
+  %1 ?UseTransactions@XMLSerializer@Database@@QBE_NXZ
+  %1 ?Vacuum@Connection@Database@@QBEXXZ
+  %1 ?ValidateFKConstraints@Connection@Database@@QBE_N_N@Z
+  %1 ?lCollectMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z
+  %1 ?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z
+%endmacro

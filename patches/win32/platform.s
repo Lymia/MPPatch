@@ -20,7 +20,9 @@
 
 extern cif_resolveSymbol
 
-%macro proxy_symbol 1
+%include "symbols.s"
+
+%macro generate_variables 1
     %defstr proxy_symbol_name %1
     segment .data
         %1_offset: dd 0
@@ -32,19 +34,17 @@ extern cif_resolveSymbol
     _%1: jmp [%1_offset]
     export %1
 %endmacro
-%include "symbols.s"
-%unmacro proxy_symbol 1
+proxy_symbols generate_variables
 
-%macro proxy_symbol 1
+%macro init_variables 1
     push %1_name
     call cif_resolveSymbol
     mov [%1_offset], eax
 %endmacro
 global _InitializeProxy
 _InitializeProxy:
-    %include "symbols.s"
+    proxy_symbols init_variables
     ret
-%unmacro proxy_symbol 1
 
 %macro redefine_for_c 2
     global %2
