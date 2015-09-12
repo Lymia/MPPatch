@@ -29,8 +29,5 @@
 #define patchVersionMajor 1
 #define patchVersionMinor 0
 
-#define patchMinCompat 1
-#define patchCoreMinCompat 1
-
 #endif /* VERSION_H */
 

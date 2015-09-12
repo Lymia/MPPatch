@@ -22,9 +22,10 @@
 
 package moe.lymia.multiverse
 
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 import java.util.UUID
 
+import moe.lymia.multiverse.data.LuaCode
 import moe.lymia.multiverse.platform.Platform
 
 object DlcUUID {
@@ -34,16 +35,20 @@ object DlcUUID {
 }
 
 object BaseDLC {
-  def getFileFromExpansions(fileName: String, civBaseDirectory: Path, platform: Platform) = {
-
-  }
+  val patchList = Seq(
+    "InstanceManager.lua" -> "UI/InstanceManager.lua",
+    "GameplayUtilities.lua" -> "Gameplay/Lua/GameplayUtilities.lua")
   def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
-
+    val patchedFileList = (for((file, realPath) <- patchList) yield {
+      val targetPath = civBaseDirectory.resolve(platform.assetsPath).resolve(platform.mapFileName(realPath))
+      (file, LuaCode.core_entrypoint_hook + new String(Files.readAllBytes(targetPath), "UTF8"))
+    }).toMap
+    val fileList = (patchedFileList ++ LuaCode.core_library).mapValues(_.getBytes("UTF8").toSeq)
+    DLCData(DlcUUID.BASE_DLC_UUID, 1, 250,
+            "Multiverse - Base DLC", "Base DLC for Multiverse",
+            Nil, Nil, Nil, fileList, Nil,
+            None)
   }
-  val baseDLC = DLCData(DlcUUID.BASE_DLC_UUID, 1, 250,
-                       "Multiverse - Base DLC", "Base DLC for Multiverse",
-                        Nil, Nil, Nil, Map(), Nil,
-                        None)
 }
 
 object ModTranslator {

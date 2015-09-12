@@ -18,138 +18,53 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 -- SOFTWARE.
 
-mod2dlc = {}
-mod2dlc.version = {component="Mod2DLC Core", major=1, minor=0, mincompat=1}
+_mvmm = {}
+_mvmm.version = {major=1, minor=0 }
+local requestedPatchVersion = 1
 
-local patch = DB.GetMemoryUsage().__mod2dlc_patch
-mod2dlc.patch_api = patch
+local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70").__mvmm_load_patch
+if patch then patch = patch() end
+_mvmm.patch = patch
+
 if not patch then
-    mod2dlc.disabled = true
-    -- We can't even reliably do a fatal error without the patch... Just disable the Lua hooks, and
-    -- hope for the best.
-    -- TODO: Automatically disable all Mod2DLC DLCs in this case. discoverMods + different registerMod?
-    print("ERROR: Mod2DLC requires the CvGameDatabase patch to installed to run correctly!")
+    _mvmm = nil
+    print("Multiverse Mod Manager requires the CvGameDatabase patch to installed to function correctly!")
+    print("The core library will be disabled.  Most installed mods will not function correctly.")
+    -- TODO: Automatically disable all converted mods in this case. ... that or...
+    -- TODO: Deliberately exploit some Lua flaw to crash the game? Something that causes an instant segfault.
     return
 end
 
-local function versionString(versioninfo)
-    return versioninfo.component .. " v" .. versioninfo.major .. "." .. versioninfo.minor
+function _mvmm.panic(s)
+    print(s)
+    patch.panic(s)
 end
-local function warnOnVersionError(versioninfo, requestSource, requested, action)
-    -- Put the "Stuff might break!" line here, because the only other action we'll ever do is patch.panic.
-    -- patch.panic is obviously something breaking. Stuff doesn't just "might" break..
-    action = action or function(s) print("WARNING: "..s.." Stuff might break!") end
-    if versioninfo.major < requested then
-        action(requestSource.." requested "..versioninfo.component.." v"..requested..".x"..
-                " or later, but "..versionString(versioninfo).." is installed.")
-    elseif requested < versioninfo.mincompat then
-        action(requestSource.." requested "..versioninfo.component.." v"..requested..".x"..
-                " or later, but "..versionString(versioninfo).." is only backwards compatiable"..
-                " only to v"..versioninfo.mincompat..".x or later.")
+function _mvmm.versionString(versioninfo)
+    return "v" .. versioninfo.major .. "." .. versioninfo.minor
+end
+
+print("Loading Multiverse Mod Manager runtime "..versionString(_mvmm.version)..".")
+if patch.version.major ~= requestedPatchVersion then
+    panic("Wrong version of the Multiverse Mod Manager CvGameDatabase patch installed! "..
+          "(Expected v"..requestedPatchVersion..".x, found "..versionString(patch.version)..")")
+    return
+end
+if patch.debug then
+    print("Debug version of CvGameDatabase patch installed. This will create a logging file in addition to "..
+          "allowing access to Lua functions that are otherwise not accessible from Lua code.")
+end
+
+_mvmm.loadedModules = {}
+local function loadModule(name)
+    include("mvmm_"..name..".lua")
+    if not _mvmm.loadedModules[name] then
+        print("WARNING: Could not load module "..name..".")
     end
 end
 
-warnOnVersionError(patch.version, "Mod2DLC Core", 1, patch.panic) -- aaaaaaa
+loadModule("mods")
+loadModule("moddinghook")
 
-local mod_info = {}
-function mod2dlc.registerMod(minVersion, id, name, entryPoints)
-    print(" - Discovered mod "..name)
-    warnOnVersionError(mod2dlc.version, "Mod "..name, minVersion)
-    mod_info[id] = {id=id, name=name, entryPoints=entryPoints}
-end
-
-function mod2dlc.discoverMods()
-    print("Mod2DLC: Discovering mods")
-    local packageIDs = ContentManager.GetAllPackageIDs()
-    for i, v in ipairs(packageIDs) do
-        if not ContentManager.IsUpgrade(v) and ContentManager.IsActive(v, ContentType.GAMEPLAY) then
-            local canonical = v:lower():gsub("-", "")
-            -- We're putting these in UI/Mod2DLC since apparently, Civilization V is really really stupid, and
-            -- only checks the first 8 characters.
-            include("Mod2DLC\\_mod2dlc_"..canonical.."_manifest.lua")
-        end
-    end
-end
-
-function mod2dlc.callEntryPoints(entryPoint)
-    print("Mod2DLC: Running entry point "..entryPoint)
-    g_uiAddins = g_uiAddins or {}
-    for _, mod in pairs(mod_info) do
-        local epList = mod.entryPoints[entryPoint]
-        if epList then
-            for _, ep in ipairs(epList) do
-                print(" - Executing entry point "..ep.name.." from "..mod.name)
-                local addinPath = ep.path
-                local extension = Path.GetExtension(addinPath)
-                local path = string.sub(addinPath, 1, #addinPath - #extension)
-                table.insert(g_uiAddins, ContextPtr:LoadNewContext(path));
-            end
-        end
-    end
-end
-
-function mod2dlc.installEntryPointHook()
-    mod2dlc.discoverMods()
-    if not Modding.__mod2dlc_marker then
-        local oldModding = Modding
-        Modding = setmetatable({}, {
-            __index = function(_, k)
-                if k == "GetActivatedModEntryPoints" then
-                    return function(entryPoint, ...)
-                        local iter = oldModding.GetActivatedModEntryPoints(entryPoint, ...)
-                        return function(...)
-                            local rv = {iter(...)}
-                            if rv[1] == nil then
-                                mod2dlc.callEntryPoints(entryPoint)
-                            end
-                            return unpack(rv)
-                        end
-                    end
-                elseif k == "__mod2dlc_marker" then
-                    return true
-                else
-                    return oldModding[k]
-                end
-            end
-        })
-    end
-end
-
-local function decode_u32(string, i)
-    return string:byte(i+0) * 0x00000001 +
-            string:byte(i+1) * 0x00000100 +
-            string:byte(i+2) * 0x00010000 +
-            string:byte(i+3) * 0x01000000
-end
-function mod2dlc.getSourcePath(fn)
-    local luaFile = ("").dump(fn)
-    local luaFile_expectedHeader = "\27\76\117\97\81\0\1\4\4\4\8\0"
-    local luaFile_header = luaFile:sub(1, #luaFile_expectedHeader)
-    assert(luaFile_header == luaFile_expectedHeader, "Unexpected Lua bytecode format!")
-
-    local str_len = decode_u32(luaFile, 13)
-    return luaFile:sub(17, 17+str_len)
-end
-
-local hookTargets = {
-    InstanceManager   = {InGame=true, CityView=true},
-    GameplayUtilities = {LeaderHeadRoot=true},
-}
-local function clean_string(str)
-    -- TODO Figure out how junk is getting into my strings, and fix the root problem.
-    if str:find("\0") then
-        return str:sub(1, str:find("\0")-1)
-    else
-        return str
-    end
-end
-function mod2dlc.tryHook(sourceModule)
-    sourceModule = clean_string(sourceModule)
-    if hookTargets[sourceModule] then
-        local targetName = clean_string(patch.getCallerAtLevel(3):gsub(".*\\(.*)%.lua", "%1"))
-        if hookTargets[sourceModule][targetName] then
-            print("Mod2DLC: Hooking "..targetName.." through "..sourceModule)
-            mod2dlc.installEntryPointHook()
-        end
-    end
+function _mvmm.installHooks()
+    _mvmm.installModdingHook()
 end

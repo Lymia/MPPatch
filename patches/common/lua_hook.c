@@ -35,6 +35,7 @@
 #include "version.h"
 
 #define LuaTableHook_REGINDEX "2c11892f-7ad1-4ea1-bc4e-770a86c387e6"
+#define LuaTableHook_SENTINAL "216f0090-85dd-4061-8371-3d8ba2099a70"
 
 static void table_setTable(lua_State *L, int table, const char* name, void (*fn)(lua_State *L, int table)) {
     lua_pushstring(L, name);
@@ -65,22 +66,31 @@ static int luaHook_panic(lua_State *L) {
     fatalError(buffer);
 }
 static void luaTable_versioninfo(lua_State *L, int table) {
-    table_setString (L, table, "component", "Multiverse Mod Manager CvGameDatabase patch");
     table_setInteger(L, table, "major", patchVersionMajor);
     table_setInteger(L, table, "minor", patchVersionMinor);
-    table_setInteger(L, table, "mincompat", patchMinCompat);
 }
+#ifdef DEBUG
+    static void luaTable_debug(lua_State *L, int table) {
+        lua_pushstring(L, "globals");
+        lua_pushvalue(L, LUA_GLOBALSINDEX);
+        lua_rawset(L, table);
+
+        lua_pushstring(L, "registry");
+        lua_pushvalue(L, LUA_REGISTRYINDEX);
+        lua_rawset(L, table);
+    }
+#endif
 static void luaTable_pushSharedState(lua_State *L) {
     lua_pushstring(L, LuaTableHook_REGINDEX);
     lua_gettable(L, LUA_REGISTRYINDEX);
     if(lua_isnil(L, lua_gettop(L))) {
-      lua_pop(L, 1);
-      lua_createtable(L, 0, 0);
-      int table = lua_gettop(L);
+        lua_pop(L, 1);
+        lua_createtable(L, 0, 0);
+        int table = lua_gettop(L);
 
-      lua_pushstring(L, LuaTableHook_REGINDEX);
-      lua_pushvalue(L, table);
-      lua_settable(L, LUA_REGISTRYINDEX);
+        lua_pushstring(L, LuaTableHook_REGINDEX);
+        lua_pushvalue(L, table);
+        lua_settable(L, LUA_REGISTRYINDEX);
     }
 }
 static int luaHook_loadMainLibrary(lua_State *L) {
@@ -95,11 +105,16 @@ static int luaHook_loadMainLibrary(lua_State *L) {
     luaTable_pushSharedState(L);
     lua_rawset(L, table);
 
+    #ifdef DEBUG
+        table_setTable(L, table, "debug", luaTable_debug);
+    #endif
+
     return 1;
 }
 
 extern __attribute__((stdcall)) void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
 __attribute__((stdcall)) void LuaTableHookCore(lua_State *L, int table) {
+    // TODO: Check if the check value is passed to GetMemoryUsage before installing hook.
     table_setCFunction(L, table, "__mvmm_load_patch", luaHook_loadMainLibrary);
 }
 
