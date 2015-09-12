@@ -71,11 +71,11 @@ object ModDataReader {
   }
   private def readModActionList(modBasePath: Path, n: NodeSeq, p: Platform) = n.flatMap(_.child).collect {
     case <UpdateDatabase>{str}</UpdateDatabase> =>
-      ModUpdateDatabaseAction(loadScriptFile(new String(readFile(modBasePath, str.text, p))))
+      ModUpdateDatabaseAction(loadScriptFile(new String(readFile(modBasePath, str.text.trim, p))))
     case <UpdateUserData>{str}</UpdateUserData> =>
-      ModUpdateDatabaseAction(loadScriptFile(new String(readFile(modBasePath, str.text, p))))
+      ModUpdateDatabaseAction(loadScriptFile(new String(readFile(modBasePath, str.text.trim, p))))
     case <ExecuteScript> {str}</ExecuteScript>  =>
-      ModExecuteScriptAction (new String(readFile(modBasePath, str.text, p)))
+      ModExecuteScriptAction (new String(readFile(modBasePath, str.text.trim, p)))
   }
   private def readModReferenceList(n: NodeSeq) = n.flatMap(_.child).collect {
     case game @ <Game/> => ModGameVersion(getAttribute(game, "minversion"), getAttribute(game, "maxversion"))
@@ -136,7 +136,7 @@ object ModDataReader {
                 readModActionList(modBasePath, modData \ "Actions" \ "OnModActivated"     , platform),
                 readModActionList(modBasePath, modData \ "Actions" \ "OnCreateModUserData", platform),
                 (modData \ "Actions" \ "OnGetDLLPath" \ "SetDLLPath").headOption map { pathElem =>
-                  readFile(modBasePath, pathElem.text, platform)})
+                  readFile(modBasePath, pathElem.text.trim, platform)})
   def loadMod(modBasePath: Path, modData: Node, platform: Platform) =
     ModData(readModManifest(modData), readModGameplayFlags(modData), readModGameplay(modBasePath, modData, platform))
 }

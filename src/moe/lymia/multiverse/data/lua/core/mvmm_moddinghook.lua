@@ -22,6 +22,22 @@ _mvmm.loadedModules.moddinghook = true
 
 -- TODO: Completely rewrite this to hook Modding properly and not do this hackjob.
 
+local function iterConcat(iter1, iter2)
+    local iter = iter1
+    return function(state, current)
+        local result = {iter(state, current) }
+        if result[1] == nil then
+            if iter == iter1 then
+                iter = iter2
+                return iter(state, current)
+            else
+                return nil
+            end
+        end
+        return unpack(result)
+    end
+end
+
 function _mvmm.callEntryPoints(entryPoint)
     print("Multiverse Mod Manager: Running entry point "..entryPoint)
     g_uiAddins = g_uiAddins or {}

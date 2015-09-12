@@ -73,7 +73,9 @@ object DLCKey {
      encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
      encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
 
-  def encodeNumber(i: Int) = i.toString.getBytes("UTF-8").toSeq
-  def key(u: UUID, sid: Seq[Int], ptags: Seq[Int]) =
-    Crypto.md5_hex(interlaceData(encodeUUID(u) ++ sid.map(encodeNumber).fold(Seq())(_ ++ _) ++ ptags.reduce(_ ++ _)
+  def encodeNumber(i: Int) = i.toString.getBytes("UTF8").toSeq
+  def key(u: UUID, sid: Seq[Int], ptags: String*) = {
+    val data = sid.map(encodeNumber) ++ ptags.map(_.getBytes("UTF8").toSeq)
+    Crypto.md5_hex(interlaceData(encodeUUID(u) ++ data.fold(Seq())(_ ++ _)))
+  }
 }

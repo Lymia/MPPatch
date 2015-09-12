@@ -36,18 +36,16 @@ object DlcUUID {
 
 object BaseDLC {
   val patchList = Seq(
-    "InstanceManager.lua" -> "UI/InstanceManager.lua",
+    "InstanceManager.lua"   -> "UI/InstanceManager.lua",
     "GameplayUtilities.lua" -> "Gameplay/Lua/GameplayUtilities.lua")
   def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
     val patchedFileList = (for((file, realPath) <- patchList) yield {
       val targetPath = civBaseDirectory.resolve(platform.assetsPath).resolve(platform.mapFileName(realPath))
-      (file, LuaCode.core_entrypoint_hook + new String(Files.readAllBytes(targetPath), "UTF8"))
+      (file, LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath))
     }).toMap
-    val fileList = (patchedFileList ++ LuaCode.core_library).mapValues(_.getBytes("UTF8").toSeq)
     DLCData(DlcUUID.BASE_DLC_UUID, 1, 250,
             "Multiverse - Base DLC", "Base DLC for Multiverse",
-            Nil, Nil, Nil, fileList, Nil,
-            None)
+            Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library, Nil)
   }
 }
 
@@ -63,7 +61,6 @@ object ModTranslator {
     val translatedUUID = translateModUUID(modData)
     val fullDescription = modData.manifest.teaser+"\n\n-----\n\n"+modData.manifest.description
     DLCData(translatedUUID, modData.manifest.version, priority, modData.manifest.name, fullDescription,
-            ???, ???, ???, ???, ???,
-            Some(modData.manifest.authorship))
+            ???, ???, ???, ???, ???)
   }
 }

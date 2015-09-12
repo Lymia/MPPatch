@@ -30,10 +30,10 @@ case class Patch(platform: String, version: String, patch: String, debugPatch: S
 object Patch {
   def loadPatch(targetPlatform: String, versionName: String) =
     getResource("patches/"+targetPlatform+"/"+versionName+"/version.mf") match {
+      case null => None
       case version => Some {
         val Array(patch, debugPatch) = loadFromStream(version).trim.split(" +")
         Some(Patch(targetPlatform, versionName, patch, debugPatch))
       }
-      case _ => None
     }
 }

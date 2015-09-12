@@ -25,5 +25,5 @@ package moe.lymia.multiverse.data
 object LuaCode {
   lazy val core_entrypoint_hook = loadResource("lua/ep_hook.lua")
   lazy val core_library_files = Seq("mvmm_runtime.lua", "mvmm_mods.lua", "mvmm_moddinghook.lua")
-  lazy val core_library = core_library_files.map(x => x -> loadResource("lua/core/"+x)).toMap
+  lazy val core_library = core_library_files.map(x => x -> loadBinaryResource("lua/core/"+x)).toMap
 }
