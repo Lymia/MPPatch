@@ -20,13 +20,13 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc.Operations
+package moe.lymia.multiverse.Operations
 
 import java.io.File
 import java.util.UUID
 import com.lymiahugs.mod2dlc.util.FileOperationLogger
-import moe.lymia.mod2dlc.data.LuaCode
-import moe.lymia.mod2dlc.util.DLCKey
+import moe.lymia.multiverse.data.LuaCode
+import moe.lymia.multiverse.util.DLCKey
 
 object writeCoreMod {
   val patchList = Seq(

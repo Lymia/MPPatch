@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc.platform
+package moe.lymia.multiverse.platform
 
 import java.nio.file.Path
 
@@ -28,5 +28,6 @@ trait Platform {
   def defaultSystemPaths: Seq[Path]
   def defaultUserPaths  : Seq[Path]
 
+  def assetsPath: String
   def mapFileName(name: String): String = name
 }

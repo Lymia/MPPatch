@@ -36,7 +36,7 @@
 
 __attribute__((noreturn)) void fatalError(const char* message) {
   fputs(message, stderr);
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Mod2DLC", message, 0);
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Multiverse Mod Manager", message, 0);
   exit(1);
 }
 

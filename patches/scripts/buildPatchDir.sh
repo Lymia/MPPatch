@@ -34,6 +34,6 @@ collect() {
 }
 
 collect win32 "CvGameDatabaseWin32Final Release.dll" dll
-collect linux "mod2dlc_patch.so" so
+collect linux "mvmm_patch.so" so
 
 rm -rf out_debug out_release

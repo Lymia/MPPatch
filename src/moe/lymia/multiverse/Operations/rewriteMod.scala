@@ -20,12 +20,12 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc.Operations
+package moe.lymia.multiverse.Operations
 
 import com.lymiahugs.mod2dlc.util._
 import java.io.File
-import moe.lymia.mod2dlc.data.LuaCode
-import moe.lymia.mod2dlc.util.DLCKey
+import moe.lymia.multiverse.data.LuaCode
+import moe.lymia.multiverse.util.DLCKey
 
 import scala.xml.{Comment, Node, XML}
 import java.util.UUID

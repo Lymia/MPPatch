@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc
+package moe.lymia.multiverse
 
 import java.io.File
 import scala.xml.{PrettyPrinter, Node}

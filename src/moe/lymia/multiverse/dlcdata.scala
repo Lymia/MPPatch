@@ -20,19 +20,24 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc
+package moe.lymia.multiverse
 
-import java.io.InputStream
+import java.nio.file.Path
+import java.util.UUID
 
-package object data {
-  private[data] def getResource(s: String) =
-    getClass.getResourceAsStream("/com/lymiahugs/mod2dlc/data/" +s)
+import moe.lymia.multiverse.platform.Platform
 
-  private[data] def loadFromStream(s: InputStream) =
-    io.Source.fromInputStream(s, "UTF-8").mkString
-  private[data] def loadBinaryResourceFromStream(s: InputStream) =
-    Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
+import scala.xml.Node
 
-  private[data] def loadResource(s: String) = loadFromStream(getResource(s))
-  private[data] def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
+case class DLCUISkin(name: String, set: String, platform: String, skinSpecificDirectory: Map[String, Seq[Byte]])
+case class DLCInclude(event: String, fileData: Node)
+case class DLCData(id: UUID, version: Int, priority: Int, name: String, description: String,
+                   gameplayIncludes: Seq[DLCInclude], globalIncludes: Seq[DLCInclude], mapEntries: Seq[Seq[Byte]],
+                   importFileList: Map[String, Seq[Byte]], uiSkins: Seq[DLCUISkin],
+                   sourceModInfo: Option[ModAuthorshipInformation] = None)
+
+object DLCDataWriter {
+  def writeDLC(dlcBasePath: Path, dlcData: DLCData, platform: Platform) = {
+
+  }
 }

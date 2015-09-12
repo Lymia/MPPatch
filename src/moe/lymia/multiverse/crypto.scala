@@ -20,8 +20,9 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc
+package moe.lymia.multiverse
 
+import java.nio._
 import java.security.MessageDigest
 import java.util.UUID
 
@@ -29,10 +30,27 @@ object Crypto {
   def digest(algorithm: String, data: Seq[Byte]) = {
     val md = MessageDigest.getInstance(algorithm)
     val hash = md.digest(data.toArray)
-    hash.map(x => "%02x".format(x)).reduce(_ + _)
+    hash    
   }
+  def hexdigest(algorithm: String, data: Seq[Byte]) =
+    digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
+
+  def md5_hex(data: Seq[Byte]) = hexdigest("MD5", data)
+  def sha1_hex(data: Seq[Byte]) = hexdigest("SHA1", data)
+
   def md5(data: Seq[Byte]) = digest("MD5", data)
   def sha1(data: Seq[Byte]) = digest("SHA1", data)
+
+  private def makeUUID(data: Seq[Byte], version: Int) = {
+    val newData    = data.updated(6, ((data(6) & 0x0F) | (version << 4)).toByte)
+                         .updated(8, ((data(8) & 0x3F) | 0x80).toByte)
+    val buffer = ByteBuffer.wrap(newData.toArray).asLongBuffer()
+    new UUID(buffer.get(0), buffer.get(1))
+  }
+  def uuidToBytes(namespace: UUID) =
+    ByteBuffer.allocate(16).putLong(namespace.getMostSignificantBits).putLong(namespace.getLeastSignificantBits).array
+  def md5_uuid (namespace: UUID, data: Seq[Byte]) = makeUUID(md5 (uuidToBytes(namespace) ++ data), 3)
+  def sha1_uuid(namespace: UUID, data: Seq[Byte]) = makeUUID(sha1(uuidToBytes(namespace) ++ data), 5)
 }
 
 object DLCKey {
@@ -50,14 +68,12 @@ object DLCKey {
     Seq(i&0xFF, (i>>8)&0xFF)
   def encodeUUID(u: UUID) =
     (encodeLe32(((u.getMostSignificantBits >>32) & 0xFFFFFFFF).toInt) ++
-      encodeLe16(((u.getMostSignificantBits >>16) &     0xFFFF).toInt) ++
-      encodeLe16(((u.getMostSignificantBits >> 0) &     0xFFFF).toInt) ++
-      encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
-      encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
+     encodeLe16(((u.getMostSignificantBits >>16) &     0xFFFF).toInt) ++
+     encodeLe16(((u.getMostSignificantBits >> 0) &     0xFFFF).toInt) ++
+     encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
+     encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
 
-  def encodeNumber(i: Int) =
-    i.toString.getBytes("UTF-8").toSeq
-  def key(u: UUID, sid: Seq[Int], version: Int, ownership: String) =
-    Crypto.md5(interlaceData(encodeUUID(u) ++ sid.map(encodeNumber).fold(Seq())(_ ++ _) ++
-      encodeNumber(version) ++ ownership.getBytes("UTF-8")))
+  def encodeNumber(i: Int) = i.toString.getBytes("UTF-8").toSeq
+  def key(u: UUID, sid: Seq[Int], ptags: Seq[Int]) =
+    Crypto.md5_hex(interlaceData(encodeUUID(u) ++ sid.map(encodeNumber).fold(Seq())(_ ++ _) ++ ptags.reduce(_ ++ _)
 }

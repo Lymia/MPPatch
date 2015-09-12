@@ -20,9 +20,23 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc.data
+package moe.lymia.multiverse.platform
 
-object LuaCode {
-  lazy val core_entrypoint_hook = loadResource("lua/core_entrypoint_hook.lua")
-  lazy val core_library = loadResource("lua/core_library.lua")
+import java.util.Locale
+
+sealed trait PlatformType
+object PlatformType {
+  case object Win32  extends PlatformType
+  case object MacOSX extends PlatformType
+  case object Linux  extends PlatformType
+  case object Other  extends PlatformType
+  
+  lazy val currentPlatform = {
+    val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
+         if(os.contains("mac"   ) ||
+            os.contains("darwin")) MacOSX
+    else if(os.contains("win"   )) Win32
+    else if(os.contains("linux" )) Linux
+    else                           Other
+  }
 }

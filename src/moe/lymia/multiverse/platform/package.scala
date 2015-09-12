@@ -20,20 +20,19 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc.data
+package moe.lymia.multiverse
 
-case class Patch(platform: String, version: String, patch: String, debugPatch: String) {
-  def fileData(debug: Boolean) =
-    if(debug) loadBinaryResource("patches/"+platform+"/"+version+"/"+debugPatch)
-    else      loadBinaryResource("patches/"+platform+"/"+version+"/"+patch)
-}
-object Patch {
-  def loadPatch(targetPlatform: String, versionName: String) =
-    getResource("patches/"+targetPlatform+"/"+versionName+"/version.mf") match {
-      case version => Some {
-        val Array(patch, debugPatch) = loadFromStream(version).trim.split(" +")
-        Some(Patch(targetPlatform, versionName, patch, debugPatch))
-      }
-      case _ => None
-    }
+import java.io.File
+import java.nio.file.{Paths, Files, Path}
+
+import scala.collection.JavaConversions._
+
+package object platform {
+  // TODO: Parse this properly instead of this weirdness.
+  private[platform] val lineRegex = "\"[0-9]+\"\\s+\"(.*)\"".r
+  private[platform] def loadSteamLibraryFolders(p: Path) =
+    if(Files.exists(p))
+      (for(l <- Files.readAllLines(p.resolve("steamapps").resolve("libraryfolders.vdf")).map(_.trim);
+           m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)) :+ p
+    else Seq(p)
 }

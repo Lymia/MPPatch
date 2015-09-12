@@ -20,19 +20,19 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc
+package moe.lymia.multiverse
 
-import java.io.File
-import java.nio.file.{Paths, Files, Path}
+import java.io.InputStream
 
-import scala.collection.JavaConversions._
+package object data {
+  private[data] def getResource(s: String) =
+    getClass.getResourceAsStream("/moe/lymia/multiverse/data/" +s)
 
-package object platform {
-  // TODO: Parse this properly instead of this weirdness.
-  private[platform] val lineRegex = "\"[0-9]+\"\\s+\"(.*)\"".r
-  private[platform] def loadSteamLibraryFolders(p: Path) =
-    if(Files.exists(p))
-      (for(l <- Files.readAllLines(p.resolve("steamapps").resolve("libraryfolders.vdf")).map(_.trim);
-           m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)) :+ p
-    else Seq(p)
+  private[data] def loadFromStream(s: InputStream) =
+    io.Source.fromInputStream(s, "UTF-8").mkString
+  private[data] def loadBinaryResourceFromStream(s: InputStream) =
+    Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
+
+  private[data] def loadResource(s: String) = loadFromStream(getResource(s))
+  private[data] def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
 }

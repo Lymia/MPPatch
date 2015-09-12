@@ -20,23 +20,18 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc.platform
+package moe.lymia.multiverse.platform
 
+import java.nio.file.{Paths, Path}
 import java.util.Locale
 
-sealed trait PlatformType
-object PlatformType {
-  case object Win32  extends PlatformType
-  case object MacOSX extends PlatformType
-  case object Linux  extends PlatformType
-  case object Other  extends PlatformType
-  
-  lazy val currentPlatform = {
-    val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
-         if(os.contains("mac"   ) ||
-            os.contains("darwin")) MacOSX
-    else if(os.contains("win"   )) Win32
-    else if(os.contains("linux" )) Linux
-    else                           Other
-  }
+object LinuxPlatform extends Platform {
+  private val home = Paths.get(System.getProperty("user.home"))
+  def defaultSystemPaths: Seq[Path] =
+    loadSteamLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
+  def defaultUserPaths  : Seq[Path] =
+    Seq(home.resolve(".local/share/Aspyr/Sid Meier's Civilization 5"))
+
+  def assetsPath = "steamassets/assets"
+  override def mapFileName(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
 }

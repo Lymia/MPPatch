@@ -1,9 +1,9 @@
-Mod2Dlc Patches
-===============
+Multiverse Mod Manager Patches
+==============================
 
-This directory contains the various binary patches that Mod2Dlc uses to allow
-DLC files to use the functionality that mods need to run. To build the binary
-patches, run `scripts/updatePatchDir.sh` under a Linux system.
+This directory contains the various binary patches that Multiverse Mod Manager
+uses to allow DLC files to use the functionality that mods need to run. To
+build the binary patches, run `scripts/updatePatchDir.sh` under a Linux system.
 
 On Windows, the patch creates a proxy around the CvGameDatabase .dll file,
 containing both of the functions we patch.

@@ -1,5 +1,5 @@
 #!/bin/bash
 
 scripts/buildPatchDir.sh
-rm -rfv ../src/com/lymiahugs/mod2dlc/data/patches
-cp -rv patches ../src/com/lymiahugs/mod2dlc/data/patches
+rm -rfv ../src/moe/lymia/multiverse/data/patches
+cp -rv patches ../src/moe/lymia/multiverse/data/patches

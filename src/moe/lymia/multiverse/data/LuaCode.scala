@@ -20,5 +20,9 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc
+package moe.lymia.multiverse.data
 
+object LuaCode {
+  lazy val core_entrypoint_hook = loadResource("lua/ep_hook.lua")
+  lazy val core_library = loadResource("lua/core/mvmm_runtime.lua")
+}

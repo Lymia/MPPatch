@@ -23,8 +23,8 @@
 #ifndef VERSION_H
 #define VERSION_H
 
-#define patchMarkerString "CvGameDatabase patch for Mod2DLC by Lymia Aluysia (lymia@lymiahugs.com). " \
-                          "Website: https://github.com/Lymia/CivV_Mod2DLC"
+#define patchMarkerString "CvGameDatabase patch for Multiverse Mod Manager by Lymia Aluysia (lymia@lymiahugs.com). " \
+                          "Website: https://github.com/Lymia/MultiverseModManager"
 
 #define patchVersionMajor 1
 #define patchVersionMinor 0

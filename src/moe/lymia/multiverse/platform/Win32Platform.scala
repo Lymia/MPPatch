@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc.platform
+package moe.lymia.multiverse.platform
 
 import java.nio.file.{Files, Paths, Path}
 import javax.swing.JFileChooser
-import moe.lymia.mod2dlc.platform.win32.WindowsRegistry
+import moe.lymia.multiverse.platform.win32.WindowsRegistry
 
 object Win32Platform extends Platform {
   override def defaultSystemPaths: Seq[Path] =
@@ -38,4 +38,6 @@ object Win32Platform extends Platform {
     Seq(new JFileChooser().getFileSystemView.getDefaultDirectory.toPath.
       resolve("\"My Games\\\\Sid Meier's Civilization 5\"")) ++ regPath
   }
+
+  override def assetsPath = "Assets"
 }

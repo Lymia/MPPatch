@@ -20,17 +20,20 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mod2dlc.platform
+package moe.lymia.multiverse.data
 
-import java.nio.file.{Paths, Path}
-import java.util.Locale
-
-object LinuxPlatform extends Platform {
-  private val home = Paths.get(System.getProperty("user.home"))
-  def defaultSystemPaths: Seq[Path] =
-    loadSteamLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
-  def defaultUserPaths  : Seq[Path] =
-    Seq(home.resolve(".local/share/Aspyr/Sid Meier's Civilization 5"))
-
-  override def mapFileName(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
+case class Patch(platform: String, version: String, patch: String, debugPatch: String) {
+  def fileData(debug: Boolean) =
+    if(debug) loadBinaryResource("patches/"+platform+"/"+version+"/"+debugPatch)
+    else      loadBinaryResource("patches/"+platform+"/"+version+"/"+patch)
+}
+object Patch {
+  def loadPatch(targetPlatform: String, versionName: String) =
+    getResource("patches/"+targetPlatform+"/"+versionName+"/version.mf") match {
+      case version => Some {
+        val Array(patch, debugPatch) = loadFromStream(version).trim.split(" +")
+        Some(Patch(targetPlatform, versionName, patch, debugPatch))
+      }
+      case _ => None
+    }
 }
