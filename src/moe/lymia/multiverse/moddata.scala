@@ -63,7 +63,7 @@ object ModDataReader {
   private def getNodeText (node: Node, tag: String) = (node \ tag).text.trim
   private def readFlag    (node: Node, tag: String) = getNodeText(node, tag) == "1"
   private def readFile(modBasePath: Path, path: String, platform: Platform) =
-    Files.readAllBytes(modBasePath.resolve(platform.mapFileName(path)))
+    Files.readAllBytes(modBasePath.resolve(platform.mapPath(path)))
   private def loadScriptFile(string: String) = try {
     ModXmlSource(XML.loadString(string))
   } catch {
@@ -74,7 +74,7 @@ object ModDataReader {
       ModUpdateDatabaseAction(loadScriptFile(new String(readFile(modBasePath, str.text.trim, p))))
     case <UpdateUserData>{str}</UpdateUserData> =>
       ModUpdateDatabaseAction(loadScriptFile(new String(readFile(modBasePath, str.text.trim, p))))
-    case <ExecuteScript> {str}</ExecuteScript>  =>
+    case <ExecuteScript>{str}</ExecuteScript>   =>
       ModExecuteScriptAction (new String(readFile(modBasePath, str.text.trim, p)))
   }
   private def readModReferenceList(n: NodeSeq) = n.flatMap(_.child).collect {
@@ -88,7 +88,7 @@ object ModDataReader {
                        getAttribute(dlc, "minversion").toInt, getAttribute(dlc, "maxversion").toInt)
   }
   private def readModEntryPoints(n: NodeSeq) = n.flatMap(_.child).collect {
-    case ep @ <EntryPoint/> =>
+    case ep if ep.label == "EntryPoint" =>
       ModEntryPoint(getAttribute(ep, "type"), getNodeText(ep, "Name"), getNodeText(ep, "Description"),
                     getAttribute(ep, "file"))
   }

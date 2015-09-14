@@ -114,8 +114,9 @@ static int luaHook_loadMainLibrary(lua_State *L) {
 
 extern __attribute__((stdcall)) void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
 __attribute__((stdcall)) void LuaTableHookCore(lua_State *L, int table) {
-    // TODO: Check if the check value is passed to GetMemoryUsage before installing hook.
-    table_setCFunction(L, table, "__mvmm_load_patch", luaHook_loadMainLibrary);
+    if(lua_type(L, 1) == LUA_TSTRING && !strcmp(luaL_checkstring(L, 1), LuaTableHook_SENTINAL)) {
+        table_setCFunction(L, table, "__mvmm_load_patch", luaHook_loadMainLibrary);
+    }
 }
 
 extern void LuaTableHook() __asm__("cif_LuaTableHook");

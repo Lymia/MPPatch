@@ -56,7 +56,6 @@ function _mvmm.callEntryPoints(entryPoint)
 end
 
 function _mvmm.installModdingHook()
-    _mvmm.discoverMods()
     if not Modding.___mvmm_marker then
         local oldModding = Modding
         Modding = setmetatable({}, {

@@ -33,5 +33,5 @@ object LinuxPlatform extends Platform {
     Seq(home.resolve(".local/share/Aspyr/Sid Meier's Civilization 5"))
 
   def assetsPath = "steamassets/assets"
-  override def mapFileName(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
+  override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
 }

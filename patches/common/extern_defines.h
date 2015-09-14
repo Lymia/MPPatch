@@ -59,6 +59,7 @@ lua_Integer luaL_checkinteger (lua_State *L, int narg);
 
 int lua_type (lua_State *L, int idx);
 #define LUA_TNIL                0
+#define LUA_TSTRING             4
 #define lua_isnil(L,n)          (lua_type(L, (n)) == LUA_TNIL)
 
 void lua_pushstring (lua_State *L, const char *s);

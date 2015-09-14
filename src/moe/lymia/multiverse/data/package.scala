@@ -25,6 +25,8 @@ package moe.lymia.multiverse
 import java.io.InputStream
 
 package object data {
+  val languageList = Seq("en_US","fr_FR","de_DE","es_ES","it_IT","ru_RU","ja_JP","pl_PL","ko_KR","zh_Hant_HK")
+
   private[data] def getResource(s: String) =
     getClass.getResourceAsStream("/moe/lymia/multiverse/data/" +s)
 

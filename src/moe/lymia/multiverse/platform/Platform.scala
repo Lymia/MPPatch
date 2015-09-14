@@ -29,5 +29,5 @@ trait Platform {
   def defaultUserPaths  : Seq[Path]
 
   def assetsPath: String
-  def mapFileName(name: String): String = name
+  def mapPath(name: String): String = name
 }

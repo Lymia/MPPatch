@@ -38,8 +38,8 @@ LuaTableHook_ReturnAddr   : equ 0x08B9AE7B
 %endmacro
 
 %macro LuaTableHook_LoadVariables 0
-    mov edi, ebp ; Lua state
     mov esi, edi ; Lua table
+    mov edi, ebp ; Lua state
 %endmacro
 %define LuaTableHook_SafeRegister ebx
 %macro LuaTableHook_PatchInstructions 0

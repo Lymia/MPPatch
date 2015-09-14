@@ -27,31 +27,12 @@ if patch then patch = patch() end
 _mvmm.patch = patch
 
 if not patch then
-    _mvmm = nil
+    _mvmm.disabled = true
     print("Multiverse Mod Manager requires the CvGameDatabase patch to installed to function correctly!")
     print("The core library will be disabled.  Most installed mods will not function correctly.")
     -- TODO: Automatically disable all converted mods in this case. ... that or...
     -- TODO: Deliberately exploit some Lua flaw to crash the game? Something that causes an instant segfault.
     return
-end
-
-function _mvmm.panic(s)
-    print(s)
-    patch.panic(s)
-end
-function _mvmm.versionString(versioninfo)
-    return "v" .. versioninfo.major .. "." .. versioninfo.minor
-end
-
-print("Loading Multiverse Mod Manager runtime "..versionString(_mvmm.version)..".")
-if patch.version.major ~= requestedPatchVersion then
-    panic("Wrong version of the Multiverse Mod Manager CvGameDatabase patch installed! "..
-          "(Expected v"..requestedPatchVersion..".x, found "..versionString(patch.version)..")")
-    return
-end
-if patch.debug then
-    print("Debug version of CvGameDatabase patch installed. This will create a logging file in addition to "..
-          "allowing access to Lua functions that are otherwise not accessible from Lua code.")
 end
 
 _mvmm.loadedModules = {}
@@ -62,9 +43,29 @@ local function loadModule(name)
     end
 end
 
+loadModule("utils")
+
+if patch.version.major ~= requestedPatchVersion then
+    panic("Wrong version of the Multiverse Mod Manager CvGameDatabase patch installed! "..
+            "(Expected v"..requestedPatchVersion..".x, found ".._mvmm.versionString(patch.version)..")")
+    return
+end
+
+if not patch.shared.printedInit then
+    patch.shared.printedInit = true
+
+    print("Multiverse Mod Manager runtime ".._mvmm.versionString(_mvmm.version).." by Lymia (lymia@lymiahugs.com).")
+    print("Website: https://github.com/Lymia/MultiverseModManager")
+    if patch.debug then
+        print("[!!] Debug version of CvGameDatabase patch installed. This will create a logging file in addition to "..
+              "allowing access to Lua functions that are otherwise not accessible from Lua code.")
+    end
+end
+
 loadModule("mods")
 loadModule("moddinghook")
 
 function _mvmm.installHooks()
+    _mvmm.debugPrint("Hooking context!")
     _mvmm.installModdingHook()
 end
