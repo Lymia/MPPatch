@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.data
+package moe.lymia.multiverse.res
 
 case class Patch(platform: String, version: String, patch: String, debugPatch: String) {
   def fileData(debug: Boolean) =

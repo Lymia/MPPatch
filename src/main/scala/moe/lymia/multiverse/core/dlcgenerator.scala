@@ -20,13 +20,13 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.translator
+package moe.lymia.multiverse.core
 
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 import javax.xml.bind.DatatypeConverter
 
-import moe.lymia.multiverse.data.LuaCode
+import moe.lymia.multiverse.res.LuaCode
 import moe.lymia.multiverse.platform.Platform
 
 import scala.xml.{Elem, Node}

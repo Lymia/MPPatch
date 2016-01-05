@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.translator
+package moe.lymia.multiverse.core
 
 import java.nio.file.{Files, Path}
 import java.util.UUID

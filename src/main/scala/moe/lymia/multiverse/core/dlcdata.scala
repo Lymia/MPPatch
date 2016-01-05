@@ -20,12 +20,12 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.translator
+package moe.lymia.multiverse.core
 
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
-import moe.lymia.multiverse.data
+import moe.lymia.multiverse.res
 import moe.lymia.multiverse.platform.Platform
 
 import scala.xml.{Node, PrettyPrinter}
@@ -51,7 +51,7 @@ object DLCDataWriter {
                     (if(prettyPrint) xmlWriter.format(xml) else xml.toString)
     writeFile(path, xmlString.getBytes("UTF8"))
   }
-  private def languageValues(string: String) = data.languageList.map { x =>
+  private def languageValues(string: String) = res.languageList.map { x =>
     <Value language={x}>{string}</Value>
   }
   private def commonHeader(name: String, id: UUID, version: Int) =
@@ -130,7 +130,7 @@ object DLCDataWriter {
     val uuid_string = dlcData.id.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
     writeXML(languageFilePath, <GameData>
       {
-        data.languageList.flatMap( x =>
+        res.languageList.flatMap(x =>
           <NODE>
             <Row Tag={"TXT_KEY_"+uuid_string+"_NAME"}>
               <Text>{dlcData.id.toString.replace("-", "")+"_v"+dlcData.version}</Text>

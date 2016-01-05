@@ -20,21 +20,10 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse
+package moe.lymia.multiverse.res
 
-import java.io.InputStream
-
-package object data {
-  val languageList = Seq("en_US","fr_FR","de_DE","es_ES","it_IT","ru_RU","ja_JP","pl_PL","ko_KR","zh_Hant_HK")
-
-  private[data] def getResource(s: String) =
-    getClass.getResourceAsStream("/moe/lymia/multiverse/data/" +s)
-
-  private[data] def loadFromStream(s: InputStream) =
-    io.Source.fromInputStream(s, "UTF-8").mkString
-  private[data] def loadBinaryResourceFromStream(s: InputStream) =
-    Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
-
-  private[data] def loadResource(s: String) = loadFromStream(getResource(s))
-  private[data] def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
+object LuaCode {
+  lazy val core_entrypoint_hook = loadResource("lua/ep_hook.lua")
+  lazy val core_library_files = Seq("mvmm_runtime.lua", "mvmm_mods.lua", "mvmm_moddinghook.lua", "mvmm_utils.lua")
+  lazy val core_library = core_library_files.map(x => x -> loadBinaryResource("lua/core/"+x)).toMap
 }
