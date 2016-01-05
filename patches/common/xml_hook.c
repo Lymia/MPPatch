@@ -48,8 +48,8 @@ static bool checkXmlNodeTag(class_XmlNode* xmlNode, const char* name) {
 
 // Main body
 bool xml_init = false;
-extern HOOK_ATTR bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) __asm__("cif_XmlParserHookCore");
-HOOK_ATTR bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) {
+extern ASM_ENTRY bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) __asm__("cif_XmlParserHookCore");
+ASM_ENTRY bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) {
     *success = 1;
 
     if(!xml_init) {

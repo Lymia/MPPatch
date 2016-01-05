@@ -112,8 +112,8 @@ static int luaHook_loadMainLibrary(lua_State *L) {
     return 1;
 }
 
-extern HOOK_ATTR void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
-HOOK_ATTR void LuaTableHookCore(lua_State *L, int table) {
+extern ASM_ENTRY void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
+ASM_ENTRY void LuaTableHookCore(lua_State *L, int table) {
     if(lua_type(L, 1) == LUA_TSTRING && !strcmp(luaL_checkstring(L, 1), LuaTableHook_SENTINAL)) {
         table_setCFunction(L, table, "__mvmm_load_patch", luaHook_loadMainLibrary);
     }

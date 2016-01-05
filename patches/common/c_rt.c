@@ -38,8 +38,8 @@
     #define debug_print(format, ...)
 #endif
 
-extern __attribute__((stdcall)) void* asm_resolveAddress(int address) __asm__("cif_resolveAddress");
-__attribute__((stdcall)) void* asm_resolveAddress(int address) {
+extern ASM_ENTRY void* asm_resolveAddress(int address) __asm__("cif_resolveAddress");
+ASM_ENTRY void* asm_resolveAddress(int address) {
     return resolveAddress(address);
 }
 

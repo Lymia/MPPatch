@@ -38,7 +38,7 @@
     #define debug_print(format, ...)
 #endif
 
-#define HOOK_ATTR __attribute__((stdcall, force_align_arg_pointer))
+#define ASM_ENTRY __attribute__((stdcall, force_align_arg_pointer))
 
 typedef struct UnpatchData {
     void* offset;
