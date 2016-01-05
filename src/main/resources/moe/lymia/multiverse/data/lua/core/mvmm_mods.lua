@@ -21,20 +21,23 @@
 _mvmm.loadedModules.mods = true
 
 local mod_info
+local mod_count = 0
 function _mvmm.registerMod(coreVersion, id, modVersion, name, modData)
-    print(" - Discovered mod "..name.." v"..modVersion.." (uuid: "..id..")")
+    _mvmm.debugPrint(" - Discovered mod "..name.." v"..modVersion.." (uuid: "..id..")")
     if coreVersion ~= _mvmm.version.major then
-        print("   - WARNING: Mod expects v"..coreVersion..".x of the Multiverse Mod Manager runtime, but "..
-              _mvmm.versionString(_mvmm.version).." is currently installed. The mod may not function incorrectly.")
+        _mvmm.print(" - WARNING: Mod expects v"..coreVersion..".x of the Multiverse Mod Manager runtime, but "..
+                    _mvmm.versionString(_mvmm.version).." is currently installed. "..
+                    "The mod may function incorrectly.")
     end
     mod_info[id] = { id=id, name=name, modVersion = modVersion }
     for k, v in pairs(modData) do
         mod_info[id][k] = v
     end
+    mod_count = mod_count + 1
 end
 
 local function discoverMods()
-    print("Multiverse Mod Manager: Discovering mods")
+    _mvmm.print("Discovering mods...")
     local packageIDs = ContentManager.GetAllPackageIDs()
     for _, v in ipairs(packageIDs) do
         if not ContentManager.IsUpgrade(v) and ContentManager.IsActive(v, ContentType.GAMEPLAY) then
@@ -42,6 +45,7 @@ local function discoverMods()
             include("mvmm_modmanifest_"..canonical..".lua")
         end
     end
+    _mvmm.print("Discovered "..mod_count.." mods.")
 end
 
 function _mvmm.getMods()

@@ -54,8 +54,11 @@ function _mvmm.versionString(versioninfo)
     return "v" .. versioninfo.major .. "." .. versioninfo.minor
 end
 
+function _mvmm.print(s)
+    print("[Multiverse Mod Manager] "..s)
+end
 function _mvmm.debugPrint(s)
     if _mvmm.patch.debug then
-        print("[Multiverse Mod Manager] "..s)
+        _mvmm.print(s)
     end
 end

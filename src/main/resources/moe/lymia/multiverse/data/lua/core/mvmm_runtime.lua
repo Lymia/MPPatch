@@ -46,8 +46,8 @@ end
 loadModule("utils")
 
 if patch.version.major ~= requestedPatchVersion then
-    panic("Wrong version of the Multiverse Mod Manager CvGameDatabase patch installed! "..
-            "(Expected v"..requestedPatchVersion..".x, found ".._mvmm.versionString(patch.version)..")")
+    _mvmm.panic("Wrong version of the Multiverse Mod Manager CvGameDatabase patch installed! "..
+                "(Expected v"..requestedPatchVersion..".x, found ".._mvmm.versionString(patch.version)..")")
     return
 end
 

@@ -65,22 +65,12 @@ ASM_ENTRY bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connect
         int   length;
         XmlNode_GetValUtf8(xmlNode, &string, &length);
 
+        // TODO: Calculate base64 size more precisely. This is massive overkill.
         char* tmpString = malloc(length + 1);
         memset(tmpString, 0, length);
-
-        #ifdef DEBUG
-            memcpy(tmpString, string, length);
-            tmpString[length] = 0;
-
-            debug_print("Decoding encoded string:\n%s", tmpString);
-            memset(tmpString, 0, length);
-        #endif
-
         decodeBase64(string, tmpString, length, length);
 
-        #ifdef DEBUG
-            debug_print("Executing XML-encapsulated SQL:\n%s", tmpString);
-        #endif
+        debug_print("Executing XML-encapsulated SQL:\n%s", tmpString);
 
         if(!Database_ExecuteMultiple(connection, tmpString, strlen(tmpString))) {
             Database_LogMessage(connection,
