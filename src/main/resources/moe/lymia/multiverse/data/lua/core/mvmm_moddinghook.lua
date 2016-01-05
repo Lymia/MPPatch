@@ -79,9 +79,15 @@ function _mvmm.installModdingHook()
         end, nil, nil
     end
 
+    local function getTargetPath(prefix, path)
+        local truncatedPath = path:gsub(".*[/\\]([^/\\]*%.lua)$", "%1")
+        return prefix.."Files/"..truncatedPath
+    end
     local function GetEvaluatedFilePath(modId, modVersion, path)
-        if _mvmm.getMods()[modId] then
-            return { ModID = modId, modVersion = modVersion, Path = path, EvaluatedPath = path }
+        local modInfo = _mvmm.getMods()[modId]
+        if modInfo then
+            return { ModID = modId, modVersion = modVersion, Path = path,
+                     EvaluatedPath = getTargetPath(modInfo.assetPrefix, path) }
         else
             return oldModding.GetEvaluatedFilePath(modId, modVersion, path)
         end

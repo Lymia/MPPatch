@@ -41,10 +41,6 @@ end
 function _mvmm.getAssetPrefix(fn)
     return _mvmm.cleanSourcePath(_mvmm.getSourcePath(fn))
 end
-function _mvmm.getTargetPath(prefix, path)
-    local truncatedPath = path:gsub(".*[/\\]([^/\\]*%.lua)$", "%1")
-    return prefix.."Files/"..truncatedPath
-end
 
 function _mvmm.panic(s)
     print(s)

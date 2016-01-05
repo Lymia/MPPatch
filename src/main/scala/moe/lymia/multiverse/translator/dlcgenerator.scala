@@ -203,15 +203,17 @@ object ModTranslator {
           out.append("  {\n")
           out.append("    name        = "+quoteLuaString(name       )+",\n")
           out.append("    description = "+quoteLuaString(description)+",\n")
-          out.append("    path        = _mvmm.getTargetPath(assetPrefix, "+quoteLuaString(path       )+"),\n")
+          out.append("    path        = "+quoteLuaString(path       )+",\n")
           out.append("  },\n")
         }
         out.append("}\n")
       }
       out.append("\n")
       out.append("if _mvmm and not _mvmm.disabled then\n")
-      out.append("  _mvmm.registerMod(1, uuid, version, name, { properties = rawProperties, "+
-                                                               "entryPoints = entryPoints })\n")
+      out.append("  _mvmm.registerMod(1, uuid, version, name, " +
+                                     "{ properties = rawProperties,"+
+                                      " assetPrefix = assetPrefix,"+
+                                      " entryPoints = entryPoints })\n")
       out.append("end\n")
 
       Map("mvmm_modmanifest_"+translatedUUID.toString.replace("-", "")+".lua" -> out.toString().getBytes("UTF8"))
