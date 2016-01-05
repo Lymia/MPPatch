@@ -17,6 +17,7 @@ collect() {
     fileName=$2
     extension=$3
 
+    mkdir -p patches/$platform
     for filePath in out_release/$platform/*
     do
         if [ -d $filePath ]
@@ -24,10 +25,9 @@ collect() {
           version=`basename $filePath`
           echo " - Version $version for $platform"
 
-          mkdir -p patches/$platform/$version/
-          cp "out_release/$platform/$version/$fileName" "patches/$platform/$version/$version.$extension"
-          cp "out_debug/$platform/$version/$fileName" "patches/$platform/$version/${version}_debug.$extension"
-          echo "$platform $version.$extension ${version}_debug.$extension" >> "patches/$platform/$version/version.mf"
+          cp "out_release/$platform/$version/$fileName" "patches/$platform/$version.$extension"
+          cp "out_debug/$platform/$version/$fileName" "patches/$platform/${version}_debug.$extension"
+          echo "$version.$extension ${version}_debug.$extension" >> "patches/$platform/$version.files"
         fi
     done
 }

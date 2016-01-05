@@ -24,8 +24,8 @@ package moe.lymia.multiverse.res
 
 case class Patch(platform: String, version: String, patch: String, debugPatch: String) {
   def fileData(debug: Boolean) =
-    if(debug) loadBinaryResource("patches/"+platform+"/"+version+"/"+debugPatch)
-    else      loadBinaryResource("patches/"+platform+"/"+version+"/"+patch)
+    if(debug) loadBinaryResource("patches/"+platform+"/"+debugPatch)
+    else      loadBinaryResource("patches/"+platform+"/"+patch)
 }
 object Patch {
   def loadPatch(targetPlatform: String, versionName: String) =
@@ -33,7 +33,7 @@ object Patch {
       case null => None
       case version => Some {
         val Array(patch, debugPatch) = loadFromStream(version).trim.split(" +")
-        Some(Patch(targetPlatform, versionName, patch, debugPatch))
+        (targetPlatform, versionName, patch, debugPatch)
       }
     }
 }
