@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -68,8 +68,7 @@ __stdcall void* asm_resolveSymbol(const char* symbol) /*   */ {
     return resolveSymbol(symbol);
 }
 
-#define AS_STR(C) #C
-#define TARGET_LIBRARY_NAME "CvGameDatabase_orig_" AS_STR(CV_CHECKSUM) ".dll"
+#define TARGET_LIBRARY_NAME "CvGameDatabase_orig_" CV_CHECKSUM ".dll"
 extern __stdcall void InitializeProxy();
 __attribute__((constructor(200))) static void initializeProxy() {
     debug_print("Loading original CvGameDatabase");

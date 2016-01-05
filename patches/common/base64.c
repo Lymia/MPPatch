@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -20,17 +20,35 @@
     SOFTWARE.
 */
 
-#include "c_rt.h"
-#include "c_defines.h"
-#include "extern_defines.h"
+#include "base64.h"
 
-// Database library components
-extern __thiscall bool cif_Database_ExecuteMultiple(class_Database* this, const char* string, int length) __asm__("cif_Database_ExecuteMultiple");
-bool Database_ExecuteMultiple(class_Database* this, const char* string, int length) {
-  return cif_Database_ExecuteMultiple(this, string, length);
+static int decodeChar(char c) {
+    if(c >= 'A' && c <= 'Z') return c - 'A';
+    if(c >= 'a' && c <= 'z') return c - 'a' + 26;
+    if(c >= '0' && c <= '9') return c - '0' + 26 + 26;
+
+    if(c == '+') return 62;
+    if(c == '/') return 63;
+
+    return 0;
 }
 
-extern __thiscall bool cif_Database_LogMessage     (class_Database* this, const char* string) __asm__("cif_Database_LogMessage");
-bool Database_LogMessage(class_Database* this, const char* string) {
-  return cif_Database_LogMessage(this, string);
+void decodeBase64(const char* in, char* out, size_t len, size_t outlen) {
+    for(int i=0, j=0; i < len && j < outlen; i += 4, j += 3) {
+        char a = in[i  ];
+        char b = in[i+1];
+        char c = in[i+2];
+        char d = in[i+3];
+
+        if(a == 0 || b == 0 || c == 0 || d == 0) break;
+
+        a = decodeChar(a);
+        b = decodeChar(b);
+        c = decodeChar(c);
+        d = decodeChar(d);
+
+        out[j  ] = ((a << 2) | (b >> 4)) & 0xFF;
+        out[j+1] = ((b << 4) | (c >> 2)) & 0xFF;
+        out[j+2] = ((c << 6) | (d     )) & 0xFF;
+    }
 }

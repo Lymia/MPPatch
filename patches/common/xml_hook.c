@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -39,6 +39,7 @@
 #include "c_defines.h"
 #include "extern_defines.h"
 #include "version.h"
+#include "base64.h"
 
 static bool checkXmlNodeTag(class_XmlNode* xmlNode, const char* name) {
   size_t len = strlen(name);
@@ -47,8 +48,8 @@ static bool checkXmlNodeTag(class_XmlNode* xmlNode, const char* name) {
 
 // Main body
 bool xml_init = false;
-extern __attribute__((stdcall)) bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) __asm__("cif_XmlParserHookCore");
-__attribute__((stdcall)) bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) {
+extern HOOK_ATTR bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) __asm__("cif_XmlParserHookCore");
+HOOK_ATTR bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connection, int* success) {
     *success = 1;
 
     if(!xml_init) {
@@ -64,21 +65,31 @@ __attribute__((stdcall)) bool XmlParserHookCore(class_XmlNode* xmlNode, class_Da
         int   length;
         XmlNode_GetValUtf8(xmlNode, &string, &length);
 
+        char* tmpString = malloc(length + 1);
+        memset(tmpString, 0, length);
+
         #ifdef DEBUG
-            char* tmpString = malloc(length + 1);
             memcpy(tmpString, string, length);
             tmpString[length] = 0;
 
-            debug_print("Executing XML-encapsulated SQL:\n%s", tmpString);
-
-            free(tmpString);
+            debug_print("Decoding encoded string:\n%s", tmpString);
+            memset(tmpString, 0, length);
         #endif
 
-        if(!Database_ExecuteMultiple(connection, string, length)) {
+        decodeBase64(string, tmpString, length, length);
+
+        #ifdef DEBUG
+            debug_print("Executing XML-encapsulated SQL:\n%s", tmpString);
+        #endif
+
+        if(!Database_ExecuteMultiple(connection, tmpString, strlen(tmpString))) {
             Database_LogMessage(connection,
                 "Failed to execute statement while processing __MVMM_PATCH_RAWSQL tag.");
             *success = 0;
         }
+
+        free(tmpString);
+
         return true;
     } else {
         return false;

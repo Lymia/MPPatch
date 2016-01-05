@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -28,7 +28,7 @@
 
 // Database library components
 typedef struct class_Database class_Database;
-bool Database_ExecuteMultiple(class_Database* this, const char* string, size_t length);
+bool Database_ExecuteMultiple(class_Database* this, const char* string, int length);
 bool Database_LogMessage     (class_Database* this, const char* string);
 
 // XML library components

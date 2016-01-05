@@ -20,17 +20,12 @@
     SOFTWARE.
 */
 
-#include "c_rt.h"
-#include "c_defines.h"
-#include "extern_defines.h"
+#ifndef BASE64_H
+#define BASE64_H
 
-// Database library components
-extern __thiscall bool cif_Database_ExecuteMultiple(class_Database* this, const char* string, int length) __asm__("cif_Database_ExecuteMultiple");
-bool Database_ExecuteMultiple(class_Database* this, const char* string, int length) {
-  return cif_Database_ExecuteMultiple(this, string, length);
-}
+#include <stddef.h>
 
-extern __thiscall bool cif_Database_LogMessage     (class_Database* this, const char* string) __asm__("cif_Database_LogMessage");
-bool Database_LogMessage(class_Database* this, const char* string) {
-  return cif_Database_LogMessage(this, string);
-}
+void decodeBase64(const char* in, char* out, size_t len, size_t outlen);
+
+#endif /* BASE64_H */
+

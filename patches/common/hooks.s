@@ -1,4 +1,4 @@
-; Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
+; Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
 ;
 ; Permission is hereby granted, free of charge, to any person obtaining a copy of
 ; this software and associated documentation files (the "Software"), to deal in
@@ -36,7 +36,6 @@ extern cif_XmlParserHookCore
 global cif_XmlParserHook
 cif_XmlParserHook:
         sub esp, 4
-
         push_all
 
         XMLParserHook_LoadVariables
@@ -55,9 +54,7 @@ cif_XmlParserHook:
         jz .proceedExit
 
         mov [esp+4+4*8], ebx
-
         pop_all
-
         pop XMLParserHook_ContinueStatusRegister
 
         prepare_symbol XMLParserHook_ContinueSafeRegister, XMLParserHook_ContinueAddr
@@ -66,7 +63,6 @@ cif_XmlParserHook:
 
     .proceedExit:
         pop_all
-
         add esp, 4
 
         prepare_symbol XMLParserHook_SafeRegister, XMLParserHook_ReturnAddr

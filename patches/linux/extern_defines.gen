@@ -1,4 +1,4 @@
-Database_ExecuteMultiple:__attribute__((cdecl)):bool:class_Database* this, const char* string, size_t length
+Database_ExecuteMultiple:__attribute__((cdecl)):bool:class_Database* this, const char* string, int length
 Database_LogMessage:__attribute__((cdecl)):bool:class_Database* this, const char* string
 XmlNode_GetValUtf8:__attribute__((cdecl)):void:class_XmlNode* this, char** string_out, size_t* length_out
 XmlNode_NameMatches:__attribute__((cdecl)):bool:class_XmlNode* this, const char* string, size_t* tagSize

@@ -20,4 +20,3 @@ for line in data:
   print '  '+name+'_ptr = ('+name+'_fn) resolveAddress('+name+'_offset);'
   print '}'
   print ''
-

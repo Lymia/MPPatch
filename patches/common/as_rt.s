@@ -18,14 +18,24 @@
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
 
-bits 32
-segment .data
-__data_start:
-segment .text
-__start:
+; Import convenience functions
+extern cif_resolveAddress
+%macro prepare_symbol 2
+    push 0
+    push_all
+    push %2
+    call cif_resolveAddress
+    mov dword [esp+4+8*4], eax
+    pop_all
+    pop %1
+%endmacro
 
-%include "as_rt.s"
-%include "as_defines.s"
-%include "platform.s"
-%include "hooks.s"
-
+; Convenience functions for storing registers/etc
+%macro push_all 0
+    pushad
+    pushfd
+%endmacro
+%macro pop_all 0
+    popfd
+    popad
+%endmacro

@@ -1,5 +1,5 @@
 /**
-    Copyright (C) 2015 Lymia Aluysia <lymiahugs@gmail.com>
+    Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
     this software and associated documentation files (the "Software"), to deal in
@@ -37,6 +37,8 @@
 #else
     #define debug_print(format, ...)
 #endif
+
+#define HOOK_ATTR __attribute__((stdcall, force_align_arg_pointer))
 
 typedef struct UnpatchData {
     void* offset;

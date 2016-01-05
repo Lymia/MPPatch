@@ -3,9 +3,16 @@
 FLAGS=""
 if [ "$1" = "--debug" ]
 then
-    FLAGS="-O0 -DDEBUG"
+    FLAGS="-O2 -DDEBUG"
+    shift 1
 else
-    FLAGS="-O2 -D_FORTIFY_SOURCE=2"
+  if [ "$1" = "--debug-full" ]
+  then
+      FLAGS="-O0 -DDEBUG"
+      shift 1
+  else
+      FLAGS="-O2 -D_FORTIFY_SOURCE=2"
+  fi
 fi
 
 rm -rf out
@@ -28,7 +35,7 @@ do
     echo "   - Compiling assembly files"
     nasm $FLAGS -Ox -i $dirPath/ -i common/ -i win32/ -f win32 -o $outDir/as.obj common/as_entry.s
     echo "   - Compiling CvGameDatabaseWin32Final Release.dll"
-    i686-w64-mingw32-gcc $FLAGS -DCV_CHECKSUM=$checkSum -flto -g -shared -O2 --std=gnu99 -o "$outDir/CvGameDatabaseWin32Final Release.dll" \
+    i686-w64-mingw32-gcc $FLAGS -DCV_CHECKSUM=\"$checkSum\" -flto -g -shared -O2 --std=gnu99 -o "$outDir/CvGameDatabaseWin32Final Release.dll" \
                          -I common -I win32 -I $dirPath common/*.c win32/*.c out/win32/extern_defines_gen.c $outDir/as.obj \
                          -l lua51_Win32 -Wl,-L,"out/win32" -Wl,--enable-stdcall-fixup $* -Wl,-Bstatic \
                          -lssp -fstack-protector -fstack-protector-all -Wl,--dynamicbase,--nxcompat
