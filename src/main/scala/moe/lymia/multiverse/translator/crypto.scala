@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse
+package moe.lymia.multiverse.translator
 
 import java.nio._
 import java.security.MessageDigest

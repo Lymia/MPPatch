@@ -20,14 +20,15 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse
+package moe.lymia.multiverse.translator
 
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
+import moe.lymia.multiverse.data
 import moe.lymia.multiverse.platform.Platform
 
-import scala.xml.{Comment, PrettyPrinter, Node}
+import scala.xml.{Node, PrettyPrinter}
 
 case class DLCUISkin(name: String, set: String, platform: String, includeImports: Boolean,
                      skinSpecificDirectory: Map[String, Array[Byte]])

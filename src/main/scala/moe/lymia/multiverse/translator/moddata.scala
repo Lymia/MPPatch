@@ -20,13 +20,14 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse
+package moe.lymia.multiverse.translator
 
 import java.nio.file.{Files, Path}
 import java.util.UUID
+
 import moe.lymia.multiverse.platform.Platform
 
-import scala.xml.{XML, PrettyPrinter, NodeSeq, Node}
+import scala.xml.{Node, NodeSeq, XML}
 
 case class ModAuthorshipInformation(authors: String, specialThanks: String, homepage: String)
 

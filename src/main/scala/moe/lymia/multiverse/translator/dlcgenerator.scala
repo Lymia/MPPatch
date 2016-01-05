@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse
+package moe.lymia.multiverse.translator
 
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
@@ -29,7 +29,7 @@ import javax.xml.bind.DatatypeConverter
 import moe.lymia.multiverse.data.LuaCode
 import moe.lymia.multiverse.platform.Platform
 
-import scala.xml.{Node, Elem}
+import scala.xml.{Elem, Node}
 
 object DlcUUID {
   val BASE_DLC_UUID           = UUID.fromString("aa75946c-7fca-4166-874c-de18ecd39162")
