@@ -22,18 +22,25 @@
 
 package moe.lymia.multiverse.platform
 
-import java.nio.file.{Paths, Path}
-import java.util.Locale
+import java.nio.file.{Files, Path, Paths}
+import javax.swing.JFileChooser
 
-object LinuxPlatform extends Platform {
-  private val home = Paths.get(System.getProperty("user.home"))
-  def defaultSystemPaths: Seq[Path] =
-    loadSteamLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
-  def defaultUserPaths  : Seq[Path] =
-    Seq(home.resolve(".local/share/Aspyr/Sid Meier's Civilization 5"))
+import moe.lymia.multiverse.util.{Steam, WindowsRegistry}
 
-  def assetsPath = "steamassets/assets"
-  override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
+object Win32Platform extends Platform {
+  override def defaultSystemPaths: Seq[Path] =
+    WindowsRegistry.HKEY_CURRENT_USER("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
+      x => Steam.loadLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
+    WindowsRegistry.HKEY_CURRENT_USER("Software\\Firaxis\\Civilization5", "LastKnownPath").map(x => Paths.get(x)).toSeq
+  override def defaultUserPaths  : Seq[Path] = {
+    val regPath =
+      WindowsRegistry.HKEY_CURRENT_USER("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",
+        "Personal").map(x => Paths.get(x, "My Games", "Sid Meier's Civilization 5")).filter(x => Files.exists(x))
+    Seq(new JFileChooser().getFileSystemView.getDefaultDirectory.toPath.
+      resolve("\"My Games\\\\Sid Meier's Civilization 5\"")) ++ regPath
+  }
 
-  def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n")
+  override def assetsPath = "Assets"
+
+  def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
 }

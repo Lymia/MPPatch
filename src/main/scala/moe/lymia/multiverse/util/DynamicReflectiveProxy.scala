@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.platform.win32
+package moe.lymia.multiverse.util
 
 import java.lang.reflect.{Array => _, _}
 

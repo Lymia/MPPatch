@@ -22,24 +22,41 @@
 
 package moe.lymia.multiverse.platform
 
-import java.nio.file.{Files, Paths, Path}
-import javax.swing.JFileChooser
-import moe.lymia.multiverse.platform.win32.WindowsRegistry
+import java.nio.file.Path
+import java.util.Locale
 
-object Win32Platform extends Platform {
-  override def defaultSystemPaths: Seq[Path] =
-    WindowsRegistry.HKEY_CURRENT_USER("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
-      x => loadSteamLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
-    WindowsRegistry.HKEY_CURRENT_USER("Software\\Firaxis\\Civilization5", "LastKnownPath").map(x => Paths.get(x)).toSeq
-  override def defaultUserPaths  : Seq[Path] = {
-    val regPath =
-      WindowsRegistry.HKEY_CURRENT_USER("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",
-        "Personal").map(x => Paths.get(x, "My Games", "Sid Meier's Civilization 5")).filter(x => Files.exists(x))
-    Seq(new JFileChooser().getFileSystemView.getDefaultDirectory.toPath.
-      resolve("\"My Games\\\\Sid Meier's Civilization 5\"")) ++ regPath
+import moe.lymia.multiverse.platform.{LinuxPlatform, Win32Platform}
+
+sealed trait PlatformType
+object PlatformType {
+  case object Win32  extends PlatformType
+  case object MacOSX extends PlatformType
+  case object Linux  extends PlatformType
+  case object Other  extends PlatformType
+
+  lazy val currentPlatform = {
+    val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
+    if(os.contains("mac"   ) ||
+      os.contains("darwin")) MacOSX
+    else if(os.contains("win"   )) Win32
+    else if(os.contains("linux" )) Linux
+    else                           Other
   }
+}
 
-  override def assetsPath = "Assets"
+trait Platform {
+  def defaultSystemPaths: Seq[Path]
+  def defaultUserPaths  : Seq[Path]
 
-  def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
+  def assetsPath: String
+  def mapPath(name: String): String = name
+
+  def normalizeLineEndings(name: String): String
+}
+object Platform {
+  def apply(t: PlatformType) = t match {
+    case PlatformType.Win32 => Some(Win32Platform)
+    case PlatformType.Linux => Some(LinuxPlatform)
+    case _                  => None
+  }
 }

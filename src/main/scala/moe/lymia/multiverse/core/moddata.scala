@@ -26,6 +26,7 @@ import java.nio.file.{Files, Path}
 import java.util.UUID
 
 import moe.lymia.multiverse.platform.Platform
+import moe.lymia.multiverse.util.Crypto
 
 import scala.xml.{Node, NodeSeq, XML}
 

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.platform.win32
+package moe.lymia.multiverse.util
 
 import java.util.prefs.Preferences
 
@@ -57,10 +57,10 @@ object WindowsRegistry {
       }
   }
 
-  case class Hive private[WindowsRegistry] (
-      private[WindowsRegistry] val hiveId: Int,
-      private[WindowsRegistry] val hrName: String,
-      private[WindowsRegistry] val h: Dynamic) {
+  case class Hive private[WindowsRegistry](
+                                            private[WindowsRegistry] val hiveId: Int,
+                                            private[WindowsRegistry] val hrName: String,
+                                            private[WindowsRegistry] val h: Dynamic) {
 
     assert(System.getProperty("os.name").toLowerCase.contains("windows"), "Windows registry not available.")
 

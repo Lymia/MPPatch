@@ -28,6 +28,7 @@ import javax.xml.bind.DatatypeConverter
 
 import moe.lymia.multiverse.res.LuaCode
 import moe.lymia.multiverse.platform.Platform
+import moe.lymia.multiverse.util.Crypto
 
 import scala.xml.{Elem, Node}
 

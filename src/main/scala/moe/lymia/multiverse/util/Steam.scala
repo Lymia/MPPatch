@@ -20,17 +20,16 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse
+package moe.lymia.multiverse.util
 
-import java.io.File
 import java.nio.file.{Paths, Files, Path}
 
 import scala.collection.JavaConversions._
 
-package object platform {
+object Steam {
   // TODO: Parse this properly instead of this weirdness.
-  private[platform] val lineRegex = "\"[0-9]+\"\\s+\"(.*)\"".r
-  private[platform] def loadSteamLibraryFolders(p: Path) =
+  val lineRegex = "\"[0-9]+\"\\s+\"(.*)\"".r
+  def loadLibraryFolders(p: Path) =
     if(Files.exists(p))
       (for(l <- Files.readAllLines(p.resolve("steamapps").resolve("libraryfolders.vdf")).map(_.trim);
            m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)) :+ p
