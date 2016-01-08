@@ -25,8 +25,6 @@ package moe.lymia.multiverse.platform
 import java.nio.file.Path
 import java.util.Locale
 
-import moe.lymia.multiverse.platform.{LinuxPlatform, Win32Platform}
-
 sealed trait PlatformType
 object PlatformType {
   case object Win32  extends PlatformType
