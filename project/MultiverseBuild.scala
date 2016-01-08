@@ -50,7 +50,7 @@ object MultiverseBuild extends Build {
   def allFiles(path: File, extension: String) = path.listFiles.filter(_.getName.endsWith(extension)).toSeq
   val userHome = new File(System.getProperty("user.home"))
 
-  // Codegen for the proxy .gen files.
+  // Codegen for the proxy files.
   def generateProxyDefine(file: File, target: File) {
     val lines = IO.readLines(file).filter(_.nonEmpty)
     val proxies = for(Array(name, attr, ret, signature) <- lines.map(_.split(":"))) yield {
@@ -71,6 +71,7 @@ object MultiverseBuild extends Build {
                      "#include \"extern_defines.h\"\n\n"+
                      proxies.mkString("\n"))
   }
+  def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
 
   lazy val project = Project("multiverse-mod-manager", file(".")) settings (versionWithGit ++ proguardSettings ++ Seq(
     GitKeys.baseVersion in ThisBuild := version_baseVersion,
@@ -127,9 +128,10 @@ object MultiverseBuild extends Build {
       val patches = IO.withTemporaryDirectory { temp =>
         val patch = baseDirectory.value / "src" / "patch"
 
-        val win32Target = temp / "win32"
-        val linuxTarget = temp / "linux"
-        IO.createDirectories(Seq(win32Target, linuxTarget))
+        val win32Target  = temp / "win32"
+        val linuxTarget  = temp / "linux"
+        val commonTarget = temp / "common"
+        IO.createDirectories(Seq(win32Target, linuxTarget, commonTarget))
 
         logger.info("Compiling lua51_Win32.dll linking stub")
         mingw_gcc(Seq("-shared", "-o", win32Target / "lua51_Win32.dll", patch / "win32" / "lua51_Win32.c"))
@@ -137,6 +139,18 @@ object MultiverseBuild extends Build {
         logger.info("Generating extern_defines_gen.c for all platforms.")
         generateProxyDefine(patch / "win32" / "extern_defines.gen", win32Target / "extern_defines_gen.c")
         generateProxyDefine(patch / "linux" / "extern_defines.gen", linuxTarget / "extern_defines_gen.c")
+
+        logger.info("Generating version.h")
+        IO.write(commonTarget / "version.h",
+          "#ifndef VERSION_H\n"+
+          "#define VERSION_H\n"+
+          "#define patchMarkerString \"Multiverse Mod Manager CvGameDatabase patch by Lymia (lymia@lymiahugs.com)."+
+                                      "Website: https://github.com/Lymia/MultiverseModManager\"\n"+
+          "#define patchVersionMajor "+tryParse(major, -1)+"\n"+
+          "#define patchVersionMinor "+tryParse(minor, -1)+"\n"+
+          "#define patchCompatVersion "+version_patchCompat+"\n"+
+          "#endif /* VERSION_H */"
+        )
 
         for(versionDir <- (patch / "versions").listFiles) yield {
           val version = versionDir.getName
@@ -162,7 +176,7 @@ object MultiverseBuild extends Build {
                                      "-f", nasmFormat, "-o", buildTmp / "as.o", patch / "common" / "as_entry.s"))
             cc(versionFlags ++ Seq("-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu99", "-o", target,
                                    "-fstack-protector", "-fstack-protector-all",
-                                   "-I", versionDir, "-I", patch / "common", "-I", includePath,
+                                   "-I", versionDir, "-I", patch / "common", "-I", includePath, "-I", commonTarget,
                                    buildPath / "extern_defines_gen.c", buildTmp / "as.o") ++
                gccFlags ++ allFiles(patch / "common", ".c") ++ allFiles(includePath, ".c"))
           }
