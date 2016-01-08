@@ -18,8 +18,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-_mvmm.loadedModules.utils = true
-
 local function decode_u32(string, i)
     return string:byte(i+0) * 0x00000001 +
            string:byte(i+1) * 0x00000100 +
@@ -47,6 +45,7 @@ function _mvmm.panic(s)
     patch.panic(s)
 end
 function _mvmm.versionString(versioninfo)
+    if versioninfo.string then return versioninfo.string end
     return "v" .. versioninfo.major .. "." .. versioninfo.minor
 end
 
@@ -58,3 +57,5 @@ function _mvmm.debugPrint(s)
         _mvmm.print(s)
     end
 end
+
+_mvmm.loadedModules.utils = true

@@ -38,6 +38,9 @@
     #define debug_print(format, ...)
 #endif
 
+// Linux's ABI requires the stack to always be 16-byte aligned so SSE operations can be run more efficiently. This
+// used to cause a crash on Linux, as our ASM hooks do not preserve stack alignment. gcc's force_align_arg_pointer
+// attribute fixes this by forcing the C part of the hooks to fix the stack alignment when they are called.
 #define ASM_ENTRY __attribute__((stdcall, force_align_arg_pointer))
 
 typedef struct UnpatchData {

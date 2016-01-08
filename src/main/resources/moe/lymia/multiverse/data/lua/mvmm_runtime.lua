@@ -19,8 +19,6 @@
 -- THE SOFTWARE.
 
 _mvmm = {}
-_mvmm.version = {major=1, minor=0 }
-local requestedPatchVersion = 1
 
 local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70").__mvmm_load_patch
 if patch then patch = patch() end
@@ -37,17 +35,18 @@ end
 
 _mvmm.loadedModules = {}
 local function loadModule(name)
-    include("mvmm_"..name..".lua")
+    include("mvmm_mod_"..name..".lua")
     if not _mvmm.loadedModules[name] then
         print("WARNING: Could not load module "..name..".")
     end
 end
 
+loadModule("version")
 loadModule("utils")
 
-if patch.version.major ~= requestedPatchVersion then
+if patch.version.major ~= _mvmm.version.compatVersion then
     _mvmm.panic("Wrong version of the Multiverse Mod Manager CvGameDatabase patch installed! "..
-                "(Expected v"..requestedPatchVersion..".x, found ".._mvmm.versionString(patch.version)..")")
+                "(Expected v".._mvmm.version.major..".x, found ".._mvmm.versionString(patch.version)..")")
     return
 end
 

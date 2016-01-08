@@ -24,17 +24,17 @@ package moe.lymia.multiverse
 
 import java.io.InputStream
 
-package object res {
+package object data {
   val languageList = Seq("en_US","fr_FR","de_DE","es_ES","it_IT","ru_RU","ja_JP","pl_PL","ko_KR","zh_Hant_HK")
 
-  private[res] def getResource(s: String) =
-    getClass.getResourceAsStream("/moe/lymia/multiverse/res/" +s)
+  private[data] def getResource(s: String) =
+    getClass.getResourceAsStream("/moe/lymia/multiverse/data/" +s)
 
-  private[res] def loadFromStream(s: InputStream) =
+  private[data] def loadFromStream(s: InputStream) =
     io.Source.fromInputStream(s, "UTF-8").mkString
-  private[res] def loadBinaryResourceFromStream(s: InputStream) =
+  private[data] def loadBinaryResourceFromStream(s: InputStream) =
     Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
 
-  private[res] def loadResource(s: String) = loadFromStream(getResource(s))
-  private[res] def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
+  private[data] def loadResource(s: String) = loadFromStream(getResource(s))
+  private[data] def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
 }

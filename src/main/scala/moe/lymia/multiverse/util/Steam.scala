@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.util
 
+import java.nio.charset.Charset
 import java.nio.file.{Paths, Files, Path}
 
 import scala.collection.JavaConversions._
@@ -31,7 +32,8 @@ object Steam {
   val lineRegex = "\"[0-9]+\"\\s+\"(.*)\"".r
   def loadLibraryFolders(p: Path) =
     if(Files.exists(p))
-      (for(l <- Files.readAllLines(p.resolve("steamapps").resolve("libraryfolders.vdf")).map(_.trim);
+      (for(l <- Files.readAllLines(p.resolve("steamapps").resolve("libraryfolders.vdf"),
+                                   Charset.forName("UTF-8")).map(_.trim);
            m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)) :+ p
     else Seq(p)
 }

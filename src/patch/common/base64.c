@@ -20,6 +20,8 @@
     SOFTWARE.
 */
 
+// TODO: Eventually make this code more robust against bad input.
+
 #include "base64.h"
 
 static int decodeChar(char c) {

@@ -18,8 +18,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-_mvmm.loadedModules.mods = true
-
 local mod_info
 local mod_count = 0
 function _mvmm.registerMod(coreVersion, id, modVersion, name, modData)
@@ -55,3 +53,5 @@ function _mvmm.getMods()
     end
     return mod_info
 end
+
+_mvmm.loadedModules.mods = true

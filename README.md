@@ -1,9 +1,25 @@
-Mod2Dlc
-=======
+Multiverse Mod Manager
+======================
 
-Mod2Dlc is a project meant to try and allow mods to be used in Civilization V
-multiplayer by rewriting them so that the game treats them as official DLCs
-(which work perfectly in multiplayer.)
+Multiverse Mod Manager allows Civilization V mods to be used in multiplayer by rewriting mods so that the game
+treats them as official DLCs. To allow mods that use .sql scripts to work, Multiverse Mod Manager installs a patch
+that modifies some of Civilization's V code to allow .xml files to directly run SQL code.
 
-Currently there is no simple build system or script. This will eventually be
-fixed.
+In short, this program is an attempt to combine the simplicity of using JdH's CiV MP Mod Manager, and MPMPM's ability
+to actually support the majority of mods out there.
+
+Currently, Multiverse Mod Manager supports Windows and Linux. Mac support is planned "eventually", but, as I don't
+have a Mac, this will take a while. 
+
+Compiling
+---------
+
+Multiverse Mod Manager can only be built on Unix systems, and furthermore, the build scripts have only been tested
+for Arch Linux. You will need the following packages:
+
+ * TODO: package list goes here
+ 
+To build, simply type in `sbt proguard:proguard`. Note that Proguard currently doesn't support Java 1.8 classes, so,
+if you are running Java 8, it may be necessary to use `sbt -java-home /usr/lib/jvm/java-7-openjdk/ proguard:proguard`
+instead.
+

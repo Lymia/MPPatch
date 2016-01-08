@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.res
+package moe.lymia.multiverse
 
-object LuaCode {
-  lazy val core_entrypoint_hook = loadResource("lua/ep_hook.lua")
-  lazy val core_library_files = Seq("mvmm_runtime.lua", "mvmm_mods.lua", "mvmm_moddinghook.lua", "mvmm_utils.lua")
-  lazy val core_library = core_library_files.map(x => x -> loadBinaryResource("lua/core/"+x)).toMap
+object MultiverseModManager {
+  def main(args: Array[String]) {
+
+  }
 }

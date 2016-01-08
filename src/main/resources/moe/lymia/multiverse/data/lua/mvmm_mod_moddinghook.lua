@@ -18,8 +18,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-_mvmm.loadedModules.moddinghook = true
-
 local entryPointCache = {}
 local function getEntryPoint(entryPoint)
     if not entryPointCache[entryPoint] then
@@ -109,3 +107,5 @@ function _mvmm.installModdingHook()
         end
     })
 end
+
+_mvmm.loadedModules.moddinghook = true

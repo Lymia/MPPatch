@@ -26,7 +26,8 @@ import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 import javax.xml.bind.DatatypeConverter
 
-import moe.lymia.multiverse.res.LuaCode
+import moe.lymia.multiverse.data.LuaCode
+import moe.lymia.multiverse.data.LuaCode.quoteLuaString
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.Crypto
 
@@ -82,8 +83,6 @@ object ModTranslator {
     )
     case ModXmlSource(xml) => xml.child.filter(_.isInstanceOf[Elem])
   }
-
-  private def quoteLuaString(string: String) = "[["+string.replace("]", "]]..\"]\"..[[")+"]]"
 
   private val mapBoolean = (s: String) => {
     val i = try { s.toInt } catch { case _: NumberFormatException => 1 }
