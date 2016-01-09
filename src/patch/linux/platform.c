@@ -54,23 +54,25 @@ void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old) {
   protectRange((size_t) start, length, PROT_READ | PROT_EXEC);
 }
 
-// Symbol resolution
+// Symbol & address resolution
 static void* dlsymHandle;
 void* resolveSymbol (const char* symbol) {
     return dlsym(dlsymHandle, symbol);
 }
-__attribute__((constructor(201))) static void loadDysymHandle() {
-    dlsymHandle = dlopen(0, RTLD_NOW);
-}
 
-// Address resolution
 static unsigned base_offset;
 void* resolveAddress(int address) {
     return (void*) (base_offset + address);
 }
-__attribute__((constructor(201))) static void initializeConstantSymbol() {
+
+__attribute__((constructor(201))) static void loadDysymHandle() {
+    debug_print("Opening handle to main binary");
+    dlsymHandle = dlopen(0, RTLD_NOW);
     debug_print("Finding l_addr (to deal with ASLR)");
-    struct link_map *lm = (struct link_map*) dlopen(0, RTLD_NOW);
+    struct link_map *lm = (struct link_map*) dlsymHandle;
     base_offset = lm->l_addr;
 }
-
+__attribute__((destructor(201))) static void closeDysymHandle() {
+    debug_print("Closing handle to main binary");
+    dlclose(dlsymHandle);
+}
