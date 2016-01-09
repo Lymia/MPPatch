@@ -60,21 +60,21 @@ object MultiverseBuild extends Build {
         if(t == "offset") "resolveAddress(" + name + "_offset);"
         else if(t == "symbol") "resolveSymbol(\"" + rsymbol + "\");"
         else sys.error("Unknown proxy type "+t)
-      "// Proxy for " + name + "\n" +
+      ("// Proxy for " + name + "\n" +
         "typedef " + attr + " " + ret + " (*" + name + "_fn) (" + signature + ");\n" +
         "static " + name + "_fn " + name + "_ptr;\n" +
         ret + " " + name + "(" + signature + ") {\n" +
         "  return " + name + "_ptr(" + paramNames + ");\n" +
-        "}\n" +
-        "__attribute__((constructor(400))) static void " + name + "_loader() {\n" +
-        "  " + name + "_ptr = (" + name + "_fn) "+resolveBody+"\n" +
-        "}\n"
+        "}\n", "  " + name + "_ptr = (" + name + "_fn) "+resolveBody)
     }
 
     IO.write(target, "#include \"c_rt.h\"\n"+
                      "#include \"c_defines.h\"\n"+
                      "#include \"extern_defines.h\"\n\n"+
-                     proxies.mkString("\n"))
+                     proxies.map(_._1).mkString("\n")+"\n\n"+
+                     "__attribute__((constructor(400))) static void loadGeneratedExternSymbols() {\n"+
+                       proxies.map(_._2).mkString("\n")+"\n"+
+                     "}\n")
   }
   def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
 
