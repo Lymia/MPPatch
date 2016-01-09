@@ -45,11 +45,3 @@ global _InitializeProxy
 _InitializeProxy:
     proxy_symbols init_variables
     ret
-
-%macro redefine_for_c 2
-    global %2
-    %2: jmp %1
-%endmacro
-
-redefine_for_c _?ExecuteMultiple@Connection@Database@@QBE_NPBDH@Z, cif_Database_ExecuteMultiple
-redefine_for_c _?LogMessage@Connection@Database@@QBEXPBD@Z       , cif_Database_LogMessage

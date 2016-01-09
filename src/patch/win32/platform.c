@@ -51,23 +51,12 @@ static void fatalProxyFailure(const char* error) {
     snprintf(buffer, 1024, "Cannot proxy CvGameDatabase!\n%s", error);
     FatalAppExit(0, buffer);
 }
-static void* resolveSymbol(const char* symbol) {
-    void* procAddress = GetProcAddress(baseDll, symbol);
-    if(!procAddress) {
-        char buffer[1024];
-        snprintf(buffer, 1024, "Failed to load symbol %s.", symbol);
-        fatalProxyFailure(buffer);
-    }
-
-    debug_print("Resolving symbol - %s = 0x%08x", symbol, procAddress);
-
-    return procAddress;
-}
 extern __stdcall void* asm_resolveSymbol(const char* symbol) __asm__("cif_resolveSymbol");
 __stdcall void* asm_resolveSymbol(const char* symbol) /*   */ {
     return resolveSymbol(symbol);
 }
 
+// Symbol resolution
 #define TARGET_LIBRARY_NAME "CvGameDatabase_orig_" CV_CHECKSUM ".dll"
 extern __stdcall void InitializeProxy();
 __attribute__((constructor(200))) static void initializeProxy() {
@@ -86,6 +75,19 @@ __attribute__((constructor(200))) static void initializeProxy() {
 __attribute__((destructor(200))) static void deinitializeProxy() {
     debug_print("Unloading original CvGameDatabase");
     FreeLibrary(baseDll);
+}
+
+void* resolveSymbol(const char* symbol) {
+    void* procAddress = GetProcAddress(baseDll, symbol);
+    if(!procAddress) {
+        char buffer[1024];
+        snprintf(buffer, 1024, "Failed to load symbol %s.", symbol);
+        fatalProxyFailure(buffer);
+    }
+
+    debug_print("Resolving symbol - %s = 0x%08x", symbol, procAddress);
+
+    return procAddress;
 }
 
 // Address resolution

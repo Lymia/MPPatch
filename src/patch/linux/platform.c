@@ -54,6 +54,15 @@ void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old) {
   protectRange((size_t) start, length, PROT_READ | PROT_EXEC);
 }
 
+// Symbol resolution
+static void* dlsymHandle;
+void* resolveSymbol (const char* symbol) {
+    return dlsym(dlsymHandle, symbol);
+}
+__attribute__((constructor(201))) static void loadDysymHandle() {
+    dlsymHandle = dlopen(0, RTLD_NOW);
+}
+
 // Address resolution
 static unsigned base_offset;
 void* resolveAddress(int address) {

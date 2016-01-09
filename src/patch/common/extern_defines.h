@@ -32,7 +32,7 @@ bool Database_ExecuteMultiple(class_Database* this, const char* string, int leng
 bool Database_LogMessage     (class_Database* this, const char* string);
 
 // XML library components
-typedef struct class_XmlNode  class_XmlNode;
+typedef struct class_XmlNode class_XmlNode;
 bool XmlNode_NameMatches(class_XmlNode* this, const char* string, size_t* tagSize);
 void XmlNode_GetValUtf8 (class_XmlNode* this, char** string_out, size_t* length_out);
 

@@ -53,8 +53,13 @@ object MultiverseBuild extends Build {
   // Codegen for the proxy files.
   def generateProxyDefine(file: File, target: File) {
     val lines = IO.readLines(file).filter(_.nonEmpty)
-    val proxies = for(Array(name, attr, ret, signature) <- lines.map(_.split(":"))) yield {
+    val proxies = for(Array(t, name, attr, ret, signature, sym) <- lines.map(_.trim.split(":"))) yield {
       val paramNames = signature.split(",").map(_.trim.split(" ").last).mkString(", ")
+      val rsymbol = if(sym == "*") name else sym
+      val resolveBody =
+        if(t == "offset") "resolveAddress(" + name + "_offset);"
+        else if(t == "symbol") "resolveSymbol(\"" + rsymbol + "\");"
+        else sys.error("Unknown proxy type "+t)
       "// Proxy for " + name + "\n" +
         "typedef " + attr + " " + ret + " (*" + name + "_fn) (" + signature + ");\n" +
         "static " + name + "_fn " + name + "_ptr;\n" +
@@ -62,7 +67,7 @@ object MultiverseBuild extends Build {
         "  return " + name + "_ptr(" + paramNames + ");\n" +
         "}\n" +
         "__attribute__((constructor(400))) static void " + name + "_loader() {\n" +
-        "  " + name + "_ptr = (" + name + "_fn) resolveAddress(" + name + "_offset);\n" +
+        "  " + name + "_ptr = (" + name + "_fn) "+resolveBody+"\n" +
         "}\n"
     }
 
@@ -136,9 +141,9 @@ object MultiverseBuild extends Build {
         logger.info("Compiling lua51_Win32.dll linking stub")
         mingw_gcc(Seq("-shared", "-o", win32Target / "lua51_Win32.dll", patch / "win32" / "lua51_Win32.c"))
 
-        logger.info("Generating extern_defines_gen.c for all platforms.")
-        generateProxyDefine(patch / "win32" / "extern_defines.gen", win32Target / "extern_defines_gen.c")
-        generateProxyDefine(patch / "linux" / "extern_defines.gen", linuxTarget / "extern_defines_gen.c")
+        logger.info("Generating extern_defines.c for all platforms.")
+        generateProxyDefine(patch / "win32" / "extern_defines.gen", win32Target / "extern_defines.c")
+        generateProxyDefine(patch / "linux" / "extern_defines.gen", linuxTarget / "extern_defines.c")
 
         logger.info("Generating version.h")
         IO.write(commonTarget / "version.h",
@@ -177,7 +182,7 @@ object MultiverseBuild extends Build {
             cc(versionFlags ++ Seq("-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu99", "-o", target,
                                    "-fstack-protector", "-fstack-protector-all",
                                    "-I", versionDir, "-I", patch / "common", "-I", includePath, "-I", commonTarget,
-                                   buildPath / "extern_defines_gen.c", buildTmp / "as.o") ++
+                                   buildPath / "extern_defines.c", buildTmp / "as.o") ++
                gccFlags ++ allFiles(patch / "common", ".c") ++ allFiles(includePath, ".c"))
           }
 
