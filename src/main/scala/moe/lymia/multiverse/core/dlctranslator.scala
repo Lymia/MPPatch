@@ -26,7 +26,7 @@ import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 import javax.xml.bind.DatatypeConverter
 
-import moe.lymia.multiverse.data.LuaCode
+import moe.lymia.multiverse.data.{VersionInfo, LuaCode}
 import moe.lymia.multiverse.data.LuaCode.quoteLuaString
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.Crypto
@@ -210,7 +210,7 @@ object ModTranslator {
       }
       out.append("\n")
       out.append("if _mvmm and not _mvmm.disabled then\n")
-      out.append("  _mvmm.registerMod(1, uuid, version, name, " +
+      out.append("  _mvmm.registerMod("+VersionInfo.patchCompat+", uuid, version, name, " +
                                      "{ properties = rawProperties,"+
                                       " assetPrefix = assetPrefix,"+
                                       " entryPoints = entryPoints })\n")

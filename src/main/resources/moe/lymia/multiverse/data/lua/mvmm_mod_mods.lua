@@ -20,10 +20,10 @@
 
 local mod_info
 local mod_count = 0
-function _mvmm.registerMod(coreVersion, id, modVersion, name, modData)
+function _mvmm.registerMod(coreCompat, id, modVersion, name, modData)
     _mvmm.debugPrint(" - Discovered mod "..name.." v"..modVersion.." (uuid: "..id..")")
-    if coreVersion ~= _mvmm.version.major then
-        _mvmm.print(" - WARNING: Mod expects v"..coreVersion..".x of the Multiverse Mod Manager runtime, but "..
+    if coreCompat ~= _mvmm.version.compatVersion then
+        _mvmm.print(" - WARNING: Mod expects v"..coreCompat..".x of the Multiverse Mod Manager runtime, but "..
                     _mvmm.versionString(_mvmm.version).." is currently installed. "..
                     "The mod may function incorrectly.")
     end
