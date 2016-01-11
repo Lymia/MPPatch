@@ -27,6 +27,7 @@ import java.util.UUID
 
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.Crypto
+import moe.lymia.multiverse.util.XMLUtils._
 
 import scala.xml.{Node, NodeSeq, XML}
 
@@ -56,8 +57,6 @@ case class ModGameplay(fileList: Map[String, Array[Byte]], entryPoints: Seq[ModE
 case class ModData(manifest: ModManifest, rawProperties: Map[String, String], data: ModGameplay)
 
 object ModDataReader {
-  private def getAttribute(node: Node, attribute: String) = (node \ ("@" + attribute)).text
-  private def getNodeText (node: Node, tag: String) = (node \ tag).text.trim
   private def readFlag    (node: Node, tag: String) = getNodeText(node, tag) == "1"
   private def readFile(modBasePath: Path, path: String, platform: Platform) =
     Files.readAllBytes(modBasePath.resolve(platform.mapPath(path)))
