@@ -24,6 +24,8 @@ package moe.lymia.multiverse.data
 
 import java.util.Properties
 
+import moe.lymia.multiverse.util.Crypto
+
 object VersionInfo {
   private lazy val properties = {
     val prop = new Properties()
@@ -71,20 +73,23 @@ object LuaCode {
     core_library_files.map(x => x -> loadBinaryResource("lua/"+x)).toMap ++ core_library_generated
 }
 
-case class Patch(platform: String, version: String, patch: String, debugPatch: String) {
-  def fileData(debug: Boolean) =
-    if(debug) loadBinaryResource("patches/"+debugPatch)
-    else      loadBinaryResource("patches/"+patch)
+case class PatchData(path: String, sha1: String) {
+  def fileData = loadBinaryResource("patches/"+path)
+  lazy val validateFileData = Crypto.sha1_hex(fileData) == sha1
 }
-object Patch {
-  def loadPatch(targetPlatform: String, versionName: String) =
+case class PatchVersion(platform: String, version: String, patch: PatchData, debugPatch: PatchData)
+object PatchVersion {
+  def get(targetPlatform: String, versionName: String) =
     getResource("patches/"+targetPlatform+"_"+versionName+".properties") match {
       case null => None
       case version => Some {
         val properties = new Properties
         properties.load(version)
-        Patch(targetPlatform, versionName, properties.getProperty("normal.resname", ""),
-                                           properties.getProperty("debug.resname" , ""))
+        val normal = PatchData(properties.getProperty("normal.resname", ""),
+                               properties.getProperty("normal.sha1", ""))
+        val debug  = PatchData(properties.getProperty("debug.resname", ""),
+                               properties.getProperty("debug.sha1", ""))
+        PatchVersion(targetPlatform, versionName, normal, debug)
       }
     }
 }

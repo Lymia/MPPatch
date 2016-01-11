@@ -26,6 +26,8 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtProguard._
 import com.typesafe.sbt.SbtGit._
 
+import java.security.MessageDigest
+
 import language.postfixOps
 
 object MultiverseBuild extends Build {
@@ -77,6 +79,16 @@ object MultiverseBuild extends Build {
                      "}\n")
   }
   def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
+
+  // Crypto helper functions
+  def digest(algorithm: String, data: Seq[Byte]) = {
+    val md = MessageDigest.getInstance(algorithm)
+    val hash = md.digest(data.toArray)
+    hash
+  }
+  def hexdigest(algorithm: String, data: Seq[Byte]) =
+    digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
+  def sha1_hex(data: Seq[Byte]) = hexdigest("SHA1", data)
 
   lazy val project = Project("multiverse-mod-manager", file(".")) settings (versionWithGit ++ proguardSettings ++ Seq(
     GitKeys.baseVersion in ThisBuild := version_baseVersion,
@@ -186,18 +198,22 @@ object MultiverseBuild extends Build {
                gccFlags ++ allFiles(patch / "common", ".c") ++ allFiles(includePath, ".c"))
           }
 
-          buildVersion(debug = false, patchDirectory / (version+binaryExtension))
-          buildVersion(debug = true , patchDirectory / (version+"_debug"+binaryExtension))
+          val normalPath = patchDirectory / (version+binaryExtension)
+          val debugPath  = patchDirectory / (version+"_debug"+binaryExtension)
+
+          buildVersion(debug = false, normalPath)
+          buildVersion(debug = true , debugPath)
 
           val properties = new java.util.Properties
           properties.put("normal.resname", version+binaryExtension)
+          properties.put("normal.sha1"   , sha1_hex(IO.readBytes(normalPath)))
           properties.put("debug.resname" , version+"_debug"+binaryExtension)
+          properties.put("debug.sha1"    , sha1_hex(IO.readBytes(debugPath)))
           properties.put("platform"      , platform)
-          properties.put("sha1"          , sha1)
+          properties.put("target.sha1"   , sha1)
           IO.write(properties, "Patch information for version "+version, patchDirectory / (version+".properties"))
 
-          Seq(patchDirectory / (version+binaryExtension), patchDirectory / (version+"_debug"+binaryExtension),
-              patchDirectory / (version+".properties"))
+          Seq(normalPath, debugPath, patchDirectory / (version+".properties"))
         }
       }
 
