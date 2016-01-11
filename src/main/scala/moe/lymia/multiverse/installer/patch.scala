@@ -22,20 +22,22 @@
 
 package moe.lymia.multiverse.installer
 
+import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
 
-import moe.lymia.multiverse.data.{PatchVersion, PathNames}
+import moe.lymia.multiverse.data.{PatchData, PatchVersion, PathNames}
 import moe.lymia.multiverse.platform.Platform
-import moe.lymia.multiverse.util.{Crypto, XMLUtils}
+import moe.lymia.multiverse.util.{IOUtils, Crypto, XMLUtils}
 
 import scala.xml.{XML, Node}
+import scala.collection.JavaConversions._
 
 sealed trait PatchStatus
 object PatchStatus {
   case class Installed(isDebug: Boolean) extends PatchStatus
   case object RequiresUpdate extends PatchStatus
   case object UnknownVersionInstalled extends PatchStatus
-  case class NotInstalled(canInstall: Boolean) extends PatchStatus
+  case class NotInstalled(isKnownVersion: Boolean) extends PatchStatus
 
   case object StateCorrupted extends PatchStatus
   case object FatalIncompatibility extends PatchStatus
@@ -64,25 +66,32 @@ object PatchState {
   def unserialize(node: Node): Option[PatchState] = ??? // TODO Write unserialize code. Needs data validation.
 }
 
+case class PatchInstalledFile(name: String, data: Array[Byte], executable: Boolean = false)
 trait PatchPlatformInfo {
   val replacementTarget: String
   def replacementNewName(versionName: String): String
   def patchInstallTarget(versionName: String): String
-  def additionalFiles(versionName: String): Seq[(String, Array[Byte])]
+
+  def patchReplacementFile(versionName: String): Option[PatchInstalledFile]
+  def additionalFiles(versionName: String): Seq[PatchInstalledFile]
 
   // TODO Installation sanity check so we can infer when we might have a damaged installation.
 }
 
 class PatchInstaller(basePath: Path, platform: Platform) {
-  val patchStatePath = platform.resolve(basePath, PathNames.PATCH_STATE_FILENAME)
+  private def resolve(path: String) = basePath.resolve(path)
+
+  val patchStatePath = resolve(PathNames.PATCH_STATE_FILENAME)
   val platformInfo   = platform.patchInfo
 
   private def validatePatchFile(file: PatchFile) = {
-    val path = platform.resolve(basePath, file.path)
+    val path = resolve(file.path)
     Files.exists(path) && Files.isRegularFile(path) && Crypto.sha1_hex(Files.readAllBytes(path)) == file.expectedSha1
   }
   private def isVersionKnown(path: String) =
-    PatchVersion.exists(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(platform.resolve(basePath, path))))
+    PatchVersion.exists(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
+  private def getVersion(path: String) =
+    PatchVersion.get(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
   private def loadPatchState() = try {
     PatchState.unserialize(XML.load(patchStatePath.toUri.toURL))
   } catch {
@@ -105,13 +114,70 @@ class PatchInstaller(basePath: Path, platform: Platform) {
           else PatchVersion.get(platform.platformName, patchState.originalFileSha1) match {
             case Some(version) =>
               if(version.patch.sha1 == patchState.patchVersionSha1)
-                PatchStatus.Installed(false)
+                PatchStatus.Installed(isDebug = false)
               else if(version.debugPatch.sha1 == patchState.patchVersionSha1)
-                PatchStatus.Installed(true)
+                PatchStatus.Installed(isDebug = true)
               else PatchStatus.RequiresUpdate
             case None => PatchStatus.UnknownVersionInstalled
           }
         }
       case None => PatchStatus.StateCorrupted
     } else PatchStatus.NotInstalled(isVersionKnown(platformInfo.replacementTarget))
+
+  private def installFile(file: PatchInstalledFile) = {
+    val PatchInstalledFile(name, data, executable) = file
+    val path = resolve(name)
+    Files.write(path, data)
+    if(executable) Files.setPosixFilePermissions(path,
+      Files.getPosixFilePermissions(path) + OWNER_EXECUTE + GROUP_EXECUTE + OTHERS_EXECUTE)
+    PatchFile(name, Crypto.sha1_hex(data))
+  }
+  private def installFromPatchData(target: String, patch: PatchData) =
+    PatchInstalledFile(target, patch.fileData)
+
+  // TODO: Make sure this is atomic enough
+  private def installPatch(debug: Boolean) = getVersion(platformInfo.replacementTarget) match {
+    case None => sys.error("attempt to install patch on unknown version")
+    case Some(version) =>
+      val patchData = if(debug) version.debugPatch else version.patch
+
+      val patchInstallTarget = resolve(platformInfo.replacementNewName(version.version))
+      Files.move(resolve(platformInfo.replacementTarget), patchInstallTarget)
+      val patchTarget = installFromPatchData(platformInfo.patchInstallTarget(version.version), patchData)
+      val (replacementTarget, patchAdditional) = platformInfo.patchReplacementFile(version.version) match {
+        case Some(replacementFile) =>
+          assert(replacementFile.name != platformInfo.patchInstallTarget(version.version))
+          assert(replacementFile.name == platformInfo.replacementTarget)
+          (installFile(replacementFile), Seq(installFile(patchTarget)))
+        case None =>
+          assert(platformInfo.patchInstallTarget(version.version) == platformInfo.replacementTarget)
+          (installFile(patchTarget), Seq())
+      }
+      val additional = patchAdditional ++ (
+        for(file <- platformInfo.additionalFiles(version.version)) yield installFile(file)
+      )
+
+      val state = PatchState(patchData.sha1, version.version, replacementTarget,
+                             PatchFile(platformInfo.replacementNewName(version.version), version.version),
+                             additional)
+      IOUtils.writeXML(patchStatePath, PatchState.serialize(state))
+  }
+
+  private def uninstallPatch() = loadPatchState() match {
+    case None => sys.error("could not load patch state")
+    case Some(patchState) =>
+      for(PatchFile(name, _) <- patchState.additionalFiles) Files.delete(resolve(name))
+      Files.delete(resolve(patchState.replacementTarget.path))
+      Files.move(resolve(patchState.originalFile.path), resolve(patchState.replacementTarget.path))
+  }
+
+  def safeUpdate(debug: Boolean) = checkPatchStatus() match {
+    case PatchStatus.Installed(`debug`) =>
+    case PatchStatus.Installed(_) | PatchStatus.RequiresUpdate | PatchStatus.TargetUpdated(true) =>
+      uninstallPatch()
+      installPatch(debug)
+    case PatchStatus.NotInstalled(true) =>
+      installPatch(debug)
+    case _ => sys.error("cannot safely update")
+  }
 }

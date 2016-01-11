@@ -61,7 +61,7 @@ trait Platform {
 
   def normalizeLineEndings(name: String): String
 
-  val patchInfo: PatchPlatformInfo
+  def patchInfo: PatchPlatformInfo
 }
 object Platform {
   def apply(t: PlatformType) = t match {
@@ -69,4 +69,6 @@ object Platform {
     case PlatformType.Linux => Some(LinuxPlatform)
     case _                  => None
   }
+
+  lazy val currentPlatform = apply(PlatformType.currentPlatform)
 }

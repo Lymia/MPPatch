@@ -47,5 +47,5 @@ object Win32Platform extends Platform {
 
   def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
 
-  val patchInfo = ???
+  def patchInfo = ???
 }

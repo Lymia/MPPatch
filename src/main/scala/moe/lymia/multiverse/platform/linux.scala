@@ -25,7 +25,7 @@ package moe.lymia.multiverse.platform
 import java.nio.file.{Path, Paths}
 import java.util.Locale
 
-import moe.lymia.multiverse.installer.PatchPlatformInfo
+import moe.lymia.multiverse.installer.{PatchInstalledFile, PatchPlatformInfo}
 import moe.lymia.multiverse.util.Steam
 
 object LinuxPlatform extends Platform {
@@ -42,5 +42,32 @@ object LinuxPlatform extends Platform {
 
   def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n")
 
-  val patchInfo = ???
+  private def shellScript(name: String, text: String) =
+    PatchInstalledFile(name, ("#!/bin/bash\n"+text).getBytes("UTF-8"), executable = true)
+
+  def patchInfo = new PatchPlatformInfo {
+    val replacementTarget = "Civ5XP"
+    def replacementNewName(versionName: String) = "Civ5XP.orig."+versionName
+    def patchInstallTarget(versionName: String) = "mvmm_patch_"+versionName+".so"
+
+    def patchReplacementFile(versionName: String) =
+      Some(shellScript(replacementTarget,
+        "version=\""+versionName+"\"\n"+
+        """path="`dirname "$0"`"
+          |export LD_LIBRARY_PATH="$path:$LD_LIBRARY_PATH"
+          |export LD_PRELOAD="mvmm_patch_$version.so"
+          |"$path/Civ5XP.orig.$version" $*
+          |""".stripMargin))
+
+    def additionalFiles(versionName: String) = Seq(
+      shellScript("Civ5XP.launch",
+        "version=\""+versionName+"\"\n"+
+        """path="`dirname "$0"`"
+          |export LD_PRELOAD="$path/mvmm_patch_$version.so"
+          |export SteamAppId=8930
+          |export LD_LIBRARY_PATH="$HOME/.steam/bin32/steam-runtime/i386/lib/i386-linux-gnu/:$HOME/.steam/bin32/steam-runtime/i386/usr/lib/i386-linux-gnu/"
+          |"$path/Civ5XP.orig.$version" $*
+          |""".stripMargin)
+    )
+  }
 }
