@@ -22,8 +22,14 @@
 
 package moe.lymia.multiverse
 
+import moe.lymia.multiverse.ui.CLI
+
 object MultiverseModManager {
   def main(args: Array[String]) {
-
+    if(args.length == 0) {
+      sys.error("gui not yet implemented")
+    } else {
+      CLI.executeCommand(args)
+    }
   }
 }
