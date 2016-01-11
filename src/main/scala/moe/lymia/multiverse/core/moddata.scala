@@ -112,7 +112,7 @@ object ModDataReader {
     n.flatMap(_.child).collect {
       case file @ <File>{name}</File> =>
         name.toString().toLowerCase() ->
-          (name.toString(), getAttribute(file, "import") == "1", getAttribute(file, "md5"))
+          ((name.toString(), getAttribute(file, "import") == "1", getAttribute(file, "md5")))
     }.toMap
   private def loadFiles(modBasePath: Path, files: Map[String, (String, Boolean, String)], platform: Platform) =
     for((_, (name, doImport, md5)) <- files if doImport) yield {
