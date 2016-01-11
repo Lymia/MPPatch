@@ -79,17 +79,18 @@ case class PatchData(path: String, sha1: String) {
 }
 case class PatchVersion(platform: String, version: String, patch: PatchData, debugPatch: PatchData)
 object PatchVersion {
+  def getPatchManifest(targetPlatform: String, versionName: String) =
+    Option(getResource("patches/"+targetPlatform+"_"+versionName+".properties"))
   def get(targetPlatform: String, versionName: String) =
-    getResource("patches/"+targetPlatform+"_"+versionName+".properties") match {
-      case null => None
-      case version => Some {
-        val properties = new Properties
-        properties.load(version)
-        val normal = PatchData(properties.getProperty("normal.resname", ""),
-                               properties.getProperty("normal.sha1", ""))
-        val debug  = PatchData(properties.getProperty("debug.resname", ""),
-                               properties.getProperty("debug.sha1", ""))
-        PatchVersion(targetPlatform, versionName, normal, debug)
-      }
+    getPatchManifest(targetPlatform, versionName).map { version =>
+      val properties = new Properties
+      properties.load(version)
+      val normal = PatchData(properties.getProperty("normal.resname", ""),
+                             properties.getProperty("normal.sha1", ""))
+      val debug  = PatchData(properties.getProperty("debug.resname", ""),
+                             properties.getProperty("debug.sha1", ""))
+      PatchVersion(targetPlatform, versionName, normal, debug)
     }
+  def exists(targetPlatform: String, versionName: String) =
+    getPatchManifest(targetPlatform, versionName).nonEmpty
 }

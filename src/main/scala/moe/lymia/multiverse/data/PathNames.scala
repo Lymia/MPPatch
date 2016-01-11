@@ -20,27 +20,8 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.platform
+package moe.lymia.multiverse.data
 
-import java.nio.file.{Path, Paths}
-import java.util.Locale
-
-import moe.lymia.multiverse.installer.PatchPlatformInfo
-import moe.lymia.multiverse.util.Steam
-
-object LinuxPlatform extends Platform {
-  val platformName = "linux"
-
-  private val home = Paths.get(System.getProperty("user.home"))
-  def defaultSystemPaths: Seq[Path] =
-    Steam.loadLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
-  def defaultUserPaths  : Seq[Path] =
-    Seq(home.resolve(".local/share/Aspyr/Sid Meier's Civilization 5"))
-
-  def assetsPath = "steamassets/assets"
-  override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
-
-  def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n")
-
-  val patchInfo = ???
+object PathNames {
+  val PATCH_STATE_FILENAME = "mvmm_patch_state.xml"
 }

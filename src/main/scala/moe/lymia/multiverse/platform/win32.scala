@@ -25,9 +25,12 @@ package moe.lymia.multiverse.platform
 import java.nio.file.{Files, Path, Paths}
 import javax.swing.JFileChooser
 
+import moe.lymia.multiverse.installer.PatchPlatformInfo
 import moe.lymia.multiverse.util.{Steam, WindowsRegistry}
 
 object Win32Platform extends Platform {
+  val platformName = "win32"
+
   override def defaultSystemPaths: Seq[Path] =
     WindowsRegistry.HKEY_CURRENT_USER("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
       x => Steam.loadLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
@@ -43,4 +46,6 @@ object Win32Platform extends Platform {
   override def assetsPath = "Assets"
 
   def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
+
+  val patchInfo = ???
 }

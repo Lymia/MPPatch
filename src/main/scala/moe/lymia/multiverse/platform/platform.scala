@@ -47,6 +47,8 @@ object PlatformType {
 }
 
 trait Platform {
+  val platformName: String
+
   def defaultSystemPaths: Seq[Path]
   def defaultUserPaths  : Seq[Path]
 
@@ -58,6 +60,8 @@ trait Platform {
     else resolve(path.resolve(mapPath(name.head)), name.tail: _*)
 
   def normalizeLineEndings(name: String): String
+
+  val patchInfo: PatchPlatformInfo
 }
 object Platform {
   def apply(t: PlatformType) = t match {
