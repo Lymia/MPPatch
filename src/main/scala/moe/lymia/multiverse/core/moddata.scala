@@ -59,7 +59,7 @@ case class ModData(manifest: ModManifest, rawProperties: Map[String, String], da
 object ModDataReader {
   private def readFlag    (node: Node, tag: String) = getNodeText(node, tag) == "1"
   private def readFile(modBasePath: Path, path: String, platform: Platform) =
-    Files.readAllBytes(modBasePath.resolve(platform.mapPath(path)))
+    Files.readAllBytes(platform.resolve(modBasePath, path))
   private def loadScriptFile(string: String) = try {
     ModXmlSource(XML.loadString(string))
   } catch {

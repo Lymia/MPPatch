@@ -45,7 +45,7 @@ object BaseDLC {
     "GameplayUtilities.lua" -> "Gameplay/Lua/GameplayUtilities.lua")
   def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
     val patchedFileList = (for((file, realPath) <- patchList) yield {
-      val targetPath = civBaseDirectory.resolve(platform.assetsPath).resolve(platform.mapPath(realPath))
+      val targetPath = platform.resolve(civBaseDirectory, platform.assetsPath, realPath)
       (file, LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath))
     }).toMap
     DLCData(DlcUUID.BASE_DLC_UUID, 1, 250,

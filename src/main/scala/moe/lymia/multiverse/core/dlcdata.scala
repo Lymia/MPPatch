@@ -92,20 +92,20 @@ object DLCDataWriter {
     val nameString = dlcData.id.toString.replace("-", "") + "_v" + dlcData.version
 
     def writeIncludes(pathName: String, includes: Seq[DLCInclude]) = {
-      val path = dlcBasePath.resolve(platform.mapPath(pathName))
+      val path = platform.resolve(dlcBasePath, pathName)
       if(includes.nonEmpty) Files.createDirectories(path)
       for(DLCInclude(event, fileData) <- includes) yield {
         val fileName = "mvmm_include_"+nameString+"_"+event+"_"+newId()+".xml"
-        IOUtils.writeXML(path.resolve(platform.mapPath(fileName)), fileData)
+        IOUtils.writeXML(platform.resolve(path, fileName), fileData)
         <NODE>{fileName}</NODE>.copy(label = event)
       }
     }
     def writeUISkins(skins: Seq[DLCUISkin]) =
       for(DLCUISkin(name, set, skinPlatform, includeImports, files) <- skins) yield {
         val dirName = "UISkin_"+name+"_"+set+"_"+skinPlatform
-        val dirPath = dlcBasePath.resolve(platform.mapPath(dirName))
+        val dirPath = platform.resolve(dlcBasePath, dirName)
         if(files.nonEmpty) Files.createDirectories(dirPath)
-        for((name, file) <- files) IOUtils.writeFile(dirPath.resolve(platform.mapPath(name)), file)
+        for((name, file) <- files) IOUtils.writeFile(platform.resolve(dirPath, name), file)
         <UISkin name={name} set={set} platform={skinPlatform}>
           <Skin>
             { if(files.nonEmpty) Seq(<Directory>{dirName}</Directory>) else Seq() }
@@ -115,18 +115,18 @@ object DLCDataWriter {
       }
 
     if(dlcData.mapEntries.nonEmpty) {
-      val mapDirectory = dlcBasePath.resolve(platform.mapPath("Maps"))
+      val mapDirectory = platform.resolve(dlcBasePath, "Maps")
       Files.createDirectories(mapDirectory)
       for (DLCMap(extension, data) <- dlcData.mapEntries)
         IOUtils.writeFile(mapDirectory.resolve("mvmm_map_" + nameString + "_" + newId() + "." + extension), data)
     }
     val mapsTag = if(dlcData.mapEntries.nonEmpty) Seq(<MapDirectory>Maps</MapDirectory>) else Seq()
 
-    val filesDirectory = dlcBasePath.resolve(platform.mapPath("Files"))
+    val filesDirectory = platform.resolve(dlcBasePath, "Files")
     Files.createDirectories(filesDirectory)
-    for((name, file) <- dlcData.importFileList) IOUtils.writeFile(filesDirectory.resolve(platform.mapPath(name)), file)
+    for((name, file) <- dlcData.importFileList) IOUtils.writeFile(platform.resolve(filesDirectory, name), file)
 
-    IOUtils.writeXML(dlcBasePath.resolve(platform.mapPath(nameString+".Civ5Pkg")), <Civ5Package>
+    IOUtils.writeXML(platform.resolve(dlcBasePath, nameString+".Civ5Pkg"), <Civ5Package>
       {commonHeader(dlcData.name, dlcData.id, dlcData.version)}
 
       <Priority>{dlcData.priority.toString}</Priority>

@@ -25,6 +25,10 @@ package moe.lymia.multiverse.platform
 import java.nio.file.Path
 import java.util.Locale
 
+import moe.lymia.multiverse.installer.PatchPlatformInfo
+
+import scala.annotation.tailrec
+
 sealed trait PlatformType
 object PlatformType {
   case object Win32  extends PlatformType
@@ -48,6 +52,10 @@ trait Platform {
 
   def assetsPath: String
   def mapPath(name: String): String = name
+
+  @tailrec final def resolve(path: Path, name: String*): Path =
+    if(name.length == 1) path.resolve(mapPath(name.head))
+    else resolve(path.resolve(mapPath(name.head)), name.tail: _*)
 
   def normalizeLineEndings(name: String): String
 }
