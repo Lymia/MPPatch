@@ -36,7 +36,7 @@ object WindowsRegistry {
     if(success == 0) try {
       Some(f(handle))
     } catch {
-      case t: Throwable => None
+      case t: Exception => None
     } finally {
       hive.h.WindowsRegCloseKey(handle)
     } else None

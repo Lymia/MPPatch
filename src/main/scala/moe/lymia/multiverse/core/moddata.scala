@@ -63,7 +63,7 @@ object ModDataReader {
   private def loadScriptFile(string: String) = try {
     ModXmlSource(XML.loadString(string))
   } catch {
-    case _: Throwable => ModSqlSource(string)
+    case _: Exception => ModSqlSource(string)
   }
   private def readModActionList(modBasePath: Path, n: NodeSeq, p: Platform) = n.flatMap(_.child).collect {
     case <UpdateDatabase>{str}</UpdateDatabase> =>
