@@ -63,7 +63,14 @@ object PatchState {
       <OriginalFile>{serializePatchFile(state.originalFile)}</OriginalFile>
       <InstalledFile>{state.additionalFiles.map(serializePatchFile)}</InstalledFile>
     </PatchState>
-  def unserialize(node: Node): Option[PatchState] = ??? // TODO Write unserialize code. Needs data validation.
+  def unserialize(node: Node) = { // TODO: Better version checking, maybe make this return Option
+    assert(node.label == "PatchState" && XMLUtils.getAttribute(node, "stateVersion") == "1")
+    val versionInfo       = (node \ "VersionInfo").head
+    PatchState(XMLUtils.getAttribute(versionInfo, "patchSha1"), XMLUtils.getAttribute(versionInfo, "originalSha1"),
+               unserializePatchFile((node \ "ReplacementTarget" \ "PatchFile").head),
+               unserializePatchFile((node \ "OriginalFile" \ "PatchFile").head),
+               (node \ "InstalledFile" \ "PatchFile").map(unserializePatchFile))
+  }
 }
 
 case class PatchInstalledFile(name: String, data: Array[Byte], executable: Boolean = false)
@@ -93,7 +100,7 @@ class PatchInstaller(basePath: Path, platform: Platform) {
   private def getVersion(path: String) =
     PatchVersion.get(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
   private def loadPatchState() = try {
-    PatchState.unserialize(XML.load(patchStatePath.toUri.toURL))
+    Some(PatchState.unserialize(XML.load(patchStatePath.toUri.toURL)))
   } catch {
     case _: Exception => None
   }
