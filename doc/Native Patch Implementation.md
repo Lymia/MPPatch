@@ -1,4 +1,4 @@
-Binary Patch Implementation Details
+Native Patch Implementation Details
 ===================================
 
 Multiverse Mod Manager's patch hooks two functions in CvGameDatabase:
@@ -11,16 +11,16 @@ Multiverse Mod Manager's patch hooks two functions in CvGameDatabase:
 Lua Patch API Details (lua_hook.c)
 ----------------------------------
 
-In Lua, the function our patch hooks is called `DB.GetMemoryUsage`. The hook checks if a marker value is passed into
-the function, and if it is, adds a function to the table it returns named `__mvmm_load_patch` which loads the patch's
-Lua API. Thus, to load the patch:
+The function our patch hooks is exported to Lua code as `DB.GetMemoryUsage`. The hook checks if a marker value is
+passed into the function, and if it is, adds a function to the table it returns named `__mvmm_load_patch`, which loads
+the native patch's Lua API. Thus, to load the injected API:
 
 ```lua
 local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70").__mvmm_load_patch
 if patch then patch = patch() end
 ```
 
-From here, it exports a few functions and tables:
+This exports a few functions and tables:
 
  * `patch.version`, containing version information for the patch.
  * `patch.panic(string)`, a function allowing a Lua script to report a critical error and bail.
@@ -35,10 +35,10 @@ In addition, if a debug version of the patch is installed, additional tables are
 XML Patch Details (xml_hook.c)
 ------------------------------
 
-In addition to hooking Lua, the patch adds two additional tags to the .xml serialization format that Civilization V
-uses. Mods can use .sql files to modify the database, while DLC file can only use .xml files. A good portion of mods
-wouldn't run without this capability, which has been a stumbling block for JdH's CiV MP Mod Manager, and the reason
-MPMPM was written.
+In addition to hooking Lua, the native patch adds two new tags to the .xml serialization format that Civilization V
+uses. Because mods can use .sql files to modify the database, while DLC file can only use .xml files, a good portion of
+mods can't run without this capability, which has been a stumbling block for JdH's CiV MP Mod Manager and was the
+reason MPMPM was written.
 
 The patch adds the following tags to the .xml serialization format:
 
