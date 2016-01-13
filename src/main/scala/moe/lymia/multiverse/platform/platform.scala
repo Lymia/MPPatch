@@ -39,7 +39,7 @@ object PlatformType {
   lazy val currentPlatform = {
     val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
     if(os.contains("mac"   ) ||
-      os.contains("darwin")) MacOSX
+       os.contains("darwin")) MacOSX
     else if(os.contains("win"   )) Win32
     else if(os.contains("linux" )) Linux
     else                           Other

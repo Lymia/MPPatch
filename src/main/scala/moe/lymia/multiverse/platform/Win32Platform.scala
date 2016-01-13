@@ -25,7 +25,6 @@ package moe.lymia.multiverse.platform
 import java.nio.file.{Files, Path, Paths}
 import javax.swing.JFileChooser
 
-import moe.lymia.multiverse.installer.PatchPlatformInfo
 import moe.lymia.multiverse.util.{Steam, WindowsRegistry}
 
 object Win32Platform extends Platform {
