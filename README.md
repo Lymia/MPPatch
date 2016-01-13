@@ -1,6 +1,9 @@
 Multiverse Mod Manager
 ======================
 
+[![Build Status](https://lymia.moe/jenkins/job/MultiverseModManager/badge/icon)]
+(https://lymia.moe/jenkins/job/MultiverseModManager/)
+
 Multiverse Mod Manager allows Civilization V mods to be used in multiplayer by rewriting mods so that the game
 treats them as official DLCs. To allow mods that use .sql scripts to work, Multiverse Mod Manager installs a patch
 that modifies some of Civilization's V code to allow .xml files to directly run SQL code.
