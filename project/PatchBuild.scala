@@ -80,17 +80,20 @@ trait PatchBuild { this: Build =>
   import PatchBuildUtils._
 
   object PatchBuildKeys {
-    val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
-    val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
-    val patchSourceDir = SettingKey[File]("native-patch-source-directory")
+    val patchBuildDir       = SettingKey[File]("native-patch-build-directory")
+    val patchCacheDir       = SettingKey[File]("native-patch-cache-directory")
+    val patchSourceDir      = SettingKey[File]("native-patch-source-directory")
 
-    val win32Directory = TaskKey[File]("native-patch-win32-directory")
-    val linuxDirectory = TaskKey[File]("native-patch-linux-directory")
+    val win32Directory      = TaskKey[File]("native-patch-win32-directory")
+    val linuxDirectory      = TaskKey[File]("native-patch-linux-directory")
 
-    val commonIncludes = TaskKey[File]("native-patch-common-includes")
+    val steamRuntimeSDLPath = SettingKey[File]("native-patch-download-steam-runtime-sdl-path")
+    val steamRuntimeSDL     = TaskKey[File]("native-patch-download-steam-runtime-sdl")
 
-    val win32ExternDef = TaskKey[File]("native-patch-win32-extern-defines")
-    val linuxExternDef = TaskKey[File]("native-patch-linux-extern-defines")
+    val commonIncludes      = TaskKey[File]("native-patch-common-includes")
+
+    val win32ExternDef      = TaskKey[File]("native-patch-win32-extern-defines")
+    val linuxExternDef      = TaskKey[File]("native-patch-linux-extern-defines")
   }
   import PatchBuildKeys._
 
@@ -112,6 +115,19 @@ trait PatchBuild { this: Build =>
     },
     linuxDirectory := simplePrepareDirectory(patchBuildDir.value / "linux"),
 
+    // Download libSDL from the Steam runtime.
+    steamRuntimeSDLPath := patchCacheDir.value / config_steam_sdlname,
+    steamRuntimeSDL := (if(steamRuntimeSDLPath.value.exists) steamRuntimeSDLPath.value else {
+      streams.value.log.info("Downloading "+config_steam_sdlname+" from Steam runtime.")
+      IO.withTemporaryDirectory { temp =>
+        IO.download(new URL(config_steam_sdlpath), temp / "steam_sdl.deb")
+        runProcess(Seq("ar", "xv", temp / "steam_sdl.deb"), temp)
+        runProcess(Seq("tar", "xvf", temp / "data.tar.gz"), temp)
+        IO.copyFile(temp / "usr" / "lib" / "i386-linux-gnu" / config_steam_sdlname, steamRuntimeSDLPath.value)
+      }
+      steamRuntimeSDLPath.value
+    }),
+
     // prepare generated source
     win32ExternDef := cachedTransform(patchCacheDir.value / "win32_extern",
       patchSourceDir.value / "win32" / "extern_defines.gen",
@@ -130,19 +146,20 @@ trait PatchBuild { this: Build =>
         val version = versionDir.getName
         val Array(platform, sha1) = version.split("_")
 
-        val (cc, nasmFormat, binaryExtension, sourcePath, sourceFiles, gccFlags) =
+        val (cc, nasmFormat, binaryExtension, sourcePath, sourceFiles, extraCDeps, gccFlags) =
           platform match {
             case "win32" => (mingw_gcc _, "win32", ".dll",
-              Seq(patchSourceDir.value / "win32"), Seq(win32ExternDef.value),
+              Seq(patchSourceDir.value / "win32"), Seq(win32ExternDef.value), allFiles(win32Directory.value, ".dll"),
               Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
                 "-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat",
                 "-DCV_CHECKSUM=\""+sha1+"\""))
             case "linux" => (gcc       _, "elf"  , ".so" ,
-              Seq(patchSourceDir.value / "linux"), Seq(linuxExternDef.value),
-              Seq("-I", "/usr/include/SDL2/", userHome / ".steam/bin32/libSDL2-2.0.so.0", "-ldl"))
+              Seq(patchSourceDir.value / "linux"), Seq(linuxExternDef.value), Seq(steamRuntimeSDL.value),
+              Seq("-I", "/usr/include/SDL2/", steamRuntimeSDL.value, "-ldl"))
           }
         val fullSourcePath = Seq(patchSourceDir.value / "common", commonIncludes.value, versionDir) ++ sourcePath
-        val cBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".c") ++ allFiles(x, ".h")) ++ sourceFiles
+        val cBuildDependencies =
+          fullSourcePath.flatMap(x => allFiles(x, ".c") ++ allFiles(x, ".h")) ++ sourceFiles ++ extraCDeps
         val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s"))
         def includePaths(flag: String) = fullSourcePath.flatMap(x => Seq(flag, dir(x)))
 

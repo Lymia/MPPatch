@@ -31,12 +31,15 @@ import com.typesafe.sbt.SbtProguard._
 object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
   val config_scalaVersion = "2.11.7"
 
-  val config_mingw_gcc    = "i686-w64-mingw32-gcc"
-  val config_gcc          = "gcc"
-  val config_nasm         = "nasm"
+  val config_mingw_gcc     = "i686-w64-mingw32-gcc"
+  val config_gcc           = "gcc"
+  val config_nasm          = "nasm"
 
-  val version_baseVersion = "0.5.0"
-  val version_patchCompat = 1
+  val config_steam_sdlpath = "http://repo.steamstatic.com/steamrt/pool/main/libs/libsdl2/libsdl2_2.0.3+steamrt1+srt4_i386.deb"
+  val config_steam_sdlname = "libSDL2-2.0.so.0"
+
+  val version_baseVersion  = "0.5.0"
+  val version_patchCompat  = 1
 
   // Additional keys
   val proguardMapping = TaskKey[File]("proguard-mapping")

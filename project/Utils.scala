@@ -33,11 +33,11 @@ object Utils {
   val VersionRegex = "([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(-(.*))?".r // major.minor.patch-suffix
   def assertProcess(i: Int) = if(i != 0) sys.error("Process returned non-zero return value! (ret: "+i+")")
   def runProcess   (p: Seq[Any]) = assertProcess(Process(p.map(_.toString)) !)
+  def runProcess   (p: Seq[Any], cd: File) = assertProcess(Process(p.map(_.toString), cd) !)
   def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
 
   def dir     (path: File) = path.toString + "/"
   def allFiles(path: File, extension: String) = path.listFiles.filter(_.getName.endsWith(extension)).toSeq
-  val userHome = new File(System.getProperty("user.home"))
 
   def prepareDirectory(path: File)(fn: File => Unit) = {
     IO.createDirectory(path)
