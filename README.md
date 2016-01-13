@@ -14,9 +14,14 @@ have a Mac, this will take a while.
 Compiling
 ---------
 
-Multiverse Mod Manager can only be built on Unix systems, and furthermore, the build scripts have only been tested
-for Arch Linux. You will need the following packages:
+Multiverse Mod Manager can only be built on Unix systems. The build scripts have only been tested on the distributions
+listed below, and have only been extensively tested on Arch Linux. You are on your own for other distributions.
 
- * TODO: package list goes here
- 
+On Ubuntu, you will need the following packages: `openjdk-8-jdk sbt mingw-w64 nasm`. In addition, on 64-bit systems you
+will need `libc6-dev-i386`. Note that sbt is not in the default repositories, so, you will need to add the repository
+manually. See [here](http://www.scala-sbt.org/0.13/tutorial/Installing-sbt-on-Linux.html) for details.
+
+On Arch Linux, you will need the following packages: `base-devel jdk8-openjdk sbt mingw-w64-gcc nasm`. In addition, on
+64-bit systems, you will need `gcc-multilib`.
+
 To build, simply type in `sbt proguard:proguard`.
