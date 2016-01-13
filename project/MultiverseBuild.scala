@@ -20,17 +20,15 @@
  * SOFTWARE.
  */
 
+package moe.lymia.multiverse.build
+
 import sbt._
 import sbt.Keys._
 
-import com.typesafe.sbt.SbtProguard._
 import com.typesafe.sbt.SbtGit._
+import com.typesafe.sbt.SbtProguard._
 
-import java.security.MessageDigest
-
-import language.postfixOps
-
-object MultiverseBuild extends Build with PatchBuild {
+object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
   val config_scalaVersion = "2.11.7"
 
   val config_mingw_gcc    = "i686-w64-mingw32-gcc"
@@ -39,10 +37,6 @@ object MultiverseBuild extends Build with PatchBuild {
 
   val version_baseVersion = "0.5.0"
   val version_patchCompat = 1
-
-  // Helper functions for working with external programs
-  def assertProcess(i: Int) = if(i != 0) sys.error("Process returned non-zero return value! (ret: "+i+")")
-  def runProcess   (p: Seq[Any]) = assertProcess(Process(p.map(_.toString)) !)
 
   // Additional keys
   val proguardMapping = TaskKey[File]("proguard-mapping")
@@ -58,48 +52,8 @@ object MultiverseBuild extends Build with PatchBuild {
     // Dependencies
     resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.4",
-    libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0",
-
-    resourceGenerators in Compile += Def.task {
-      val basePath = (resourceManaged in Compile).value
-      val logger   = streams.value.log
-
-      // Generate version information file
-      val properties = new java.util.Properties
-      properties.put("mvmm.version.string", version.value)
-      val Version = "([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(-(.*))?".r // major.minor.patch-suffix
-      val Version(major, minor, _, patch, _, suffix) = version.value
-      properties.put("mvmm.version.major" , major)
-      properties.put("mvmm.version.minor" , minor)
-      properties.put("mvmm.version.patch" , patch)
-      properties.put("mvmm.version.suffix", suffix)
-      properties.put("mvmm.version.commit", git.gitHeadCommit.value getOrElse "<unknown>")
-
-      properties.put("mvmm.patch.compat"  , version_patchCompat.toString)
-
-      properties.put("mvmm.build.time"    , new java.util.Date().toString)
-      properties.put("mvmm.build.path"    , baseDirectory.value.getAbsolutePath)
-
-      properties.put("mvmm.build.treestatus", try {
-        IO.withTemporaryFile[String]("git-status", ".txt") { file =>
-          assertProcess("git status --porcelain" #> file !)
-          IO.read(file)
-        }
-      } catch {
-        case _: Throwable => "<unknown>"
-      })
-
-      val versionPropertiesPath = basePath / "moe" / "lymia" / "multiverse" / "data" / "version.properties"
-      IO.write(properties, "Multiverse Mod Manager build information", versionPropertiesPath)
-
-      // Compile patches
-      val patchFiles = buildPatch(basePath, baseDirectory.value, logger,
-                                  tryParse(major, -1), tryParse(minor, -1))
-
-      // Final generated files list
-      Seq(versionPropertiesPath) ++ patchFiles
-    }.taskValue
-  ) ++ inConfig(Proguard)(Seq(
+    libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0"
+  ) ++ patchBuildSettings ++ resourceGeneratorSettings ++ inConfig(Proguard)(Seq(
     // Package whole project into a single .jar file with Proguard.
     ProguardKeys.proguardVersion := "5.2.1",
     ProguardKeys.options ++= Seq("-verbose", "-ignorewarnings"),

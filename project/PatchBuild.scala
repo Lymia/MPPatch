@@ -20,142 +20,180 @@
  * SOFTWARE.
  */
 
-import java.security.MessageDigest
+package moe.lymia.multiverse.build
 
 import sbt._
+import sbt.Keys._
 
 import MultiverseBuild._
-
-import language.postfixOps
+import Utils._
 
 trait PatchBuild { this: Build =>
-  // Helper functions for compiling
-  def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
-  def gcc      (p: Seq[Any]) = runProcess(config_gcc +: p)
-  def nasm     (p: Seq[Any]) = runProcess(config_nasm +: p)
+  object PatchBuildUtils {
+    // Helper functions for compiling
+    def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
+    def gcc      (p: Seq[Any]) = runProcess(config_gcc +: p)
+    def nasm     (p: Seq[Any]) = runProcess(config_nasm +: p)
 
-  def dir     (path: File) = path.toString + "/"
-  def allFiles(path: File, extension: String) = path.listFiles.filter(_.getName.endsWith(extension)).toSeq
-  val userHome = new File(System.getProperty("user.home"))
+    // Codegen for the proxy files.
+    def generateProxyDefine(file: File, target: File) {
+      val lines = IO.readLines(file).filter(_.nonEmpty)
+      val proxies = for(Array(t, name, attr, ret, signature, sym) <- lines.map(_.trim.split(":"))) yield {
+        val paramNames = signature.split(",").map(_.trim.split(" ").last).mkString(", ")
+        val rsymbol = if(sym == "*") name else sym
+        val resolveBody =
+          if(t == "offset") "resolveAddress(" + name + "_offset);"
+          else if(t == "symbol") "resolveSymbol(\"" + rsymbol + "\");"
+          else sys.error("Unknown proxy type "+t)
+        ("// Proxy for " + name + "\n" +
+          "typedef " + attr + " " + ret + " (*" + name + "_fn) (" + signature + ");\n" +
+          "static " + name + "_fn " + name + "_ptr;\n" +
+          ret + " " + name + "(" + signature + ") {\n" +
+          "  return " + name + "_ptr(" + paramNames + ");\n" +
+          "}\n", "  " + name + "_ptr = (" + name + "_fn) "+resolveBody)
+      }
 
-  // Codegen for the proxy files.
-  def generateProxyDefine(file: File, target: File) {
-    val lines = IO.readLines(file).filter(_.nonEmpty)
-    val proxies = for(Array(t, name, attr, ret, signature, sym) <- lines.map(_.trim.split(":"))) yield {
-      val paramNames = signature.split(",").map(_.trim.split(" ").last).mkString(", ")
-      val rsymbol = if(sym == "*") name else sym
-      val resolveBody =
-        if(t == "offset") "resolveAddress(" + name + "_offset);"
-        else if(t == "symbol") "resolveSymbol(\"" + rsymbol + "\");"
-        else sys.error("Unknown proxy type "+t)
-      ("// Proxy for " + name + "\n" +
-        "typedef " + attr + " " + ret + " (*" + name + "_fn) (" + signature + ");\n" +
-        "static " + name + "_fn " + name + "_ptr;\n" +
-        ret + " " + name + "(" + signature + ") {\n" +
-        "  return " + name + "_ptr(" + paramNames + ");\n" +
-        "}\n", "  " + name + "_ptr = (" + name + "_fn) "+resolveBody)
+      IO.write(target, "#include \"c_rt.h\"\n"+
+        "#include \"c_defines.h\"\n"+
+        "#include \"extern_defines.h\"\n\n"+
+        proxies.map(_._1).mkString("\n")+"\n\n"+
+        "__attribute__((constructor(400))) static void loadGeneratedExternSymbols() {\n"+
+        proxies.map(_._2).mkString("\n")+"\n"+
+        "}\n")
     }
 
-    IO.write(target, "#include \"c_rt.h\"\n"+
-      "#include \"c_defines.h\"\n"+
-      "#include \"extern_defines.h\"\n\n"+
-      proxies.map(_._1).mkString("\n")+"\n\n"+
-      "__attribute__((constructor(400))) static void loadGeneratedExternSymbols() {\n"+
-      proxies.map(_._2).mkString("\n")+"\n"+
-      "}\n")
+    // Codegen for version header
+    def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
+      val VersionRegex(major, minor, _, patch, _, suffix) = version
+      cachedGeneration(cacheDirectory, tempTarget, finalTarget,
+        "#ifndef VERSION_H\n"+
+        "#define VERSION_H\n"+
+        "#define patchMarkerString \"Multiverse Mod Manager CvGameDatabase patch by Lymia (lymia@lymiahugs.com)."+
+        "Website: https://github.com/Lymia/MultiverseModManager\"\n"+
+        "#define patchVersionMajor "+tryParse(major, -1)+"\n"+
+        "#define patchVersionMinor "+tryParse(minor, -1)+"\n"+
+        "#define patchCompatVersion "+version_patchCompat+"\n"+
+        "#endif /* VERSION_H */"
+      )
+    }
   }
-  def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
+  import PatchBuildUtils._
 
-  // Crypto helper functions
-  def digest(algorithm: String, data: Seq[Byte]) = {
-    val md = MessageDigest.getInstance(algorithm)
-    val hash = md.digest(data.toArray)
-    hash
+  object PatchBuildKeys {
+    val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
+    val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
+    val patchSourceDir = SettingKey[File]("native-patch-source-directory")
+
+    val win32Directory = TaskKey[File]("native-patch-win32-directory")
+    val linuxDirectory = TaskKey[File]("native-patch-linux-directory")
+
+    val commonIncludes = TaskKey[File]("native-patch-common-includes")
+
+    val win32ExternDef = TaskKey[File]("native-patch-win32-extern-defines")
+    val linuxExternDef = TaskKey[File]("native-patch-linux-extern-defines")
   }
-  def hexdigest(algorithm: String, data: Seq[Byte]) =
-    digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
-  def sha1_hex(data: Seq[Byte]) = hexdigest("SHA1", data)
+  import PatchBuildKeys._
 
   // Patch build script
-  def buildPatch(basePath: File, baseDirectory: File, logger: Logger,
-                 major: Int, minor: Int) = {
-    val patchDirectory = basePath / "moe" / "lymia" / "multiverse" / "data" / "patches"
-    IO.createDirectory(patchDirectory)
-    val patches = IO.withTemporaryDirectory { temp =>
-      val patch = baseDirectory / "src" / "patch"
+  val patchBuildSettings = Seq(
+    patchBuildDir  := crossTarget.value / "native-patch-build",
+    patchCacheDir  := patchBuildDir.value / "cache",
+    patchSourceDir := baseDirectory.value / "src" / "patch",
 
-      val win32Target  = temp / "win32"
-      val linuxTarget  = temp / "linux"
-      val commonTarget = temp / "common"
-      IO.createDirectories(Seq(win32Target, linuxTarget, commonTarget))
+    // prepare common directories
+    commonIncludes := prepareDirectory(patchBuildDir.value / "common") { dir =>
+      cacheVersionHeader(patchCacheDir.value / "version_h", patchBuildDir.value / "tmp_version.h",
+                         dir / "version.h", version.value)
+    },
+    win32Directory := prepareDirectory(patchBuildDir.value / "win32") { dir =>
+      cachedTransform(patchCacheDir.value / "win23_lua_stub",
+        patchSourceDir.value / "win32" / "lua51_Win32.c",
+        dir / "lua51_Win32.dll")((in, out) => mingw_gcc(Seq("-shared", "-o", out, in)))
+    },
+    linuxDirectory := simplePrepareDirectory(patchBuildDir.value / "linux"),
 
-      logger.info("Compiling lua51_Win32.dll linking stub")
-      mingw_gcc(Seq("-shared", "-o", win32Target / "lua51_Win32.dll", patch / "win32" / "lua51_Win32.c"))
+    // prepare generated source
+    win32ExternDef := cachedTransform(patchCacheDir.value / "win32_extern",
+      patchSourceDir.value / "win32" / "extern_defines.gen",
+      win32Directory.value / "extern_defines.c")(generateProxyDefine),
+    linuxExternDef := cachedTransform(patchCacheDir.value / "linux_extern",
+      patchSourceDir.value / "linux" / "extern_defines.gen",
+      linuxDirectory.value / "extern_defines.c")(generateProxyDefine),
 
-      logger.info("Generating extern_defines.c for all platforms.")
-      generateProxyDefine(patch / "win32" / "extern_defines.gen", win32Target / "extern_defines.c")
-      generateProxyDefine(patch / "linux" / "extern_defines.gen", linuxTarget / "extern_defines.c")
+    resourceGenerators in Compile += Def.task {
+      val patchDirectory = (resourceManaged in Compile).value / "moe" / "lymia" / "multiverse" / "data" / "patches"
+      val logger         = streams.value.log
 
-      logger.info("Generating version.h")
-      IO.write(commonTarget / "version.h",
-        "#ifndef VERSION_H\n"+
-          "#define VERSION_H\n"+
-          "#define patchMarkerString \"Multiverse Mod Manager CvGameDatabase patch by Lymia (lymia@lymiahugs.com)."+
-          "Website: https://github.com/Lymia/MultiverseModManager\"\n"+
-          "#define patchVersionMajor "+major+"\n"+
-          "#define patchVersionMinor "+minor+"\n"+
-          "#define patchCompatVersion "+version_patchCompat+"\n"+
-          "#endif /* VERSION_H */"
-      )
+      IO.createDirectory(patchDirectory)
 
-      for(versionDir <- (patch / "versions").listFiles) yield {
+      val patches = for(versionDir <- (patchSourceDir.value / "versions").listFiles) yield {
         val version = versionDir.getName
         val Array(platform, sha1) = version.split("_")
 
-        logger.info("Compiling patch for version "+version)
+        val (cc, nasmFormat, binaryExtension, sourcePath, sourceFiles, gccFlags) =
+          platform match {
+            case "win32" => (mingw_gcc _, "win32", ".dll",
+              Seq(patchSourceDir.value / "win32"), Seq(win32ExternDef.value),
+              Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
+                "-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat",
+                "-DCV_CHECKSUM=\""+sha1+"\""))
+            case "linux" => (gcc       _, "elf"  , ".so" ,
+              Seq(patchSourceDir.value / "linux"), Seq(linuxExternDef.value),
+              Seq("-I", "/usr/include/SDL2/", userHome / ".steam/bin32/libSDL2-2.0.so.0", "-ldl"))
+          }
+        val fullSourcePath = Seq(patchSourceDir.value / "common", commonIncludes.value, versionDir) ++ sourcePath
+        val cBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".c") ++ allFiles(x, ".h")) ++ sourceFiles
+        val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s"))
+        def includePaths(flag: String) = fullSourcePath.flatMap(x => Seq(flag, dir(x)))
 
-        val (cc, nasmFormat, buildPath, includePath, binaryExtension, gccFlags) = platform match {
-          case "win32" => (mingw_gcc _, "win32", win32Target, patch / "win32", ".dll",
-            Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Target, "-Wl,--enable-stdcall-fixup",
-              "-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat",
-              "-DCV_CHECKSUM=\""+sha1+"\""))
-          case "linux" => (gcc       _, "elf"  , linuxTarget, patch / "linux", ".so" ,
-            Seq("-I", "/usr/include/SDL2/", userHome / ".steam/bin32/libSDL2-2.0.so.0", "-ldl"))
-        }
-
-        def buildVersion(debug: Boolean, target: File) {
-          val buildTmp = temp / ("build_" + version + (if(debug) "_debug" else ""))
+        def buildVersion(debug: Boolean, target: File) = {
+          val versionStr = "version_"+version + (if(debug) "_debug" else "")
+          val logIsDebug = if(debug) " (debug version)" else ""
+          val buildTmp = patchBuildDir.value / versionStr
           IO.createDirectory(buildTmp)
-          val versionFlags = if(debug) Seq("-DDEBUG") else Seq("-D_FORTIFY_SOURCE=2")
 
-          nasm(versionFlags ++ Seq("-Ox", "-i", dir(versionDir), "-i", dir(patch / "common"), "-i", dir(includePath),
-            "-f", nasmFormat, "-o", buildTmp / "as.o", patch / "common" / "as_entry.s"))
-          cc(versionFlags ++ Seq("-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu99", "-o", target,
-            "-fstack-protector", "-fstack-protector-all",
-            "-I", versionDir, "-I", patch / "common", "-I", includePath, "-I", commonTarget,
-            buildPath / "extern_defines.c", buildTmp / "as.o") ++
-            gccFlags ++ allFiles(patch / "common", ".c") ++ allFiles(includePath, ".c"))
+          val versionFlags = if(debug) Seq("-DDEBUG") else Seq()
+          val nasm_o = trackDependencies(patchCacheDir.value / (versionStr + "_nasm_o"), sBuildDependencies.toSet) {
+            logger.info("Compiling as_entry.o"+logIsDebug+" for version "+version)
+
+            val output = buildTmp / "as_entry.o"
+            nasm(versionFlags ++ includePaths("-i") ++ Seq("-Ox", "-f", nasmFormat, "-o", output,
+                                                           patchSourceDir.value / "common" / "as_entry.s"))
+            output
+          }
+          trackDependencies(patchCacheDir.value / (versionStr + "_c_out"), cBuildDependencies.toSet + nasm_o) {
+            logger.info("Compiling binary patch"+logIsDebug+" for version "+version)
+
+            cc(versionFlags ++ includePaths("-I") ++ Seq(
+              "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu99", "-o", target,
+              "-fstack-protector", "-fstack-protector-all", "-D_FORTIFY_SOURCE=2", nasm_o) ++
+              gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ sourceFiles)
+            target
+          }
         }
 
-        val normalPath = patchDirectory / (version+binaryExtension)
-        val debugPath  = patchDirectory / (version+"_debug"+binaryExtension)
+        val normalPath = buildVersion(debug = false, patchDirectory / (version+binaryExtension))
+        val debugPath  = buildVersion(debug = true , patchDirectory / (version+"_debug"+binaryExtension))
 
-        buildVersion(debug = false, normalPath)
-        buildVersion(debug = true , debugPath)
+        val mf = trackDependencies(patchCacheDir.value / ("version_manifest_"+version), Set(normalPath, debugPath)) {
+          logger.info("Creating version manifest for version "+version)
 
-        val properties = new java.util.Properties
-        properties.put("normal.resname", version+binaryExtension)
-        properties.put("normal.sha1"   , sha1_hex(IO.readBytes(normalPath)))
-        properties.put("debug.resname" , version+"_debug"+binaryExtension)
-        properties.put("debug.sha1"    , sha1_hex(IO.readBytes(debugPath)))
-        properties.put("platform"      , platform)
-        properties.put("target.sha1"   , sha1)
-        IO.write(properties, "Patch information for version "+version, patchDirectory / (version+".properties"))
+          val propTarget = patchDirectory / (version+".properties")
+          val properties = new java.util.Properties
+          properties.put("normal.resname", version+binaryExtension)
+          properties.put("normal.sha1"   , sha1_hex(IO.readBytes(normalPath)))
+          properties.put("debug.resname" , version+"_debug"+binaryExtension)
+          properties.put("debug.sha1"    , sha1_hex(IO.readBytes(debugPath)))
+          properties.put("platform"      , platform)
+          properties.put("target.sha1"   , sha1)
+          IO.write(properties, "Patch information for version "+version, propTarget)
+          propTarget
+        }
 
-        Seq(normalPath, debugPath, patchDirectory / (version+".properties"))
+        Seq(normalPath, debugPath, mf)
       }
-    }
 
-    patches.toSeq.flatten
-  }
+      patches.toSeq.flatten
+    }.taskValue
+  )
 }
