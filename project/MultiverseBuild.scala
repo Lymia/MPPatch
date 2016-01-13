@@ -44,6 +44,9 @@ object MultiverseBuild extends Build with PatchBuild {
   def assertProcess(i: Int) = if(i != 0) sys.error("Process returned non-zero return value! (ret: "+i+")")
   def runProcess   (p: Seq[Any]) = assertProcess(Process(p.map(_.toString)) !)
 
+  // Additional keys
+  val proguardMapping = TaskKey[File]("proguard-mapping")
+
   lazy val project = Project("multiverse-mod-manager", file(".")) settings (versionWithGit ++ proguardSettings ++ Seq(
     GitKeys.baseVersion in ThisBuild := version_baseVersion,
 
@@ -56,19 +59,6 @@ object MultiverseBuild extends Build with PatchBuild {
     resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.4",
     libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0",
-
-    // Package whole project into a single .jar file with Proguard.
-    ProguardKeys.proguardVersion in Proguard := "5.2.1",
-    ProguardKeys.options in Proguard ++= Seq("-verbose", "-ignorewarnings"),
-    ProguardKeys.options in Proguard ++= Seq( // Obfuscation options
-      "-keeppackagenames" ,"moe.lymia.**", "-flattenpackagehierarchy", "moe.lymia.multiverse.contrib",
-      "-keepattributes", "SourceFile,LineNumberTable", "-overloadaggressively"),
-    ProguardKeys.options in Proguard += ProguardOptions.keepMain("moe.lymia.multiverse.MultiverseModManager"),
-
-    // Proguard filter configuration
-    ProguardKeys.outputFilter in Proguard := (_ => Some("!library.properties,!scala-xml.properties,!rootdoc.txt")),
-    ProguardKeys.inputs in Proguard := (dependencyClasspath in Compile).value.files,
-    ProguardKeys.filteredInputs in Proguard ++= ProguardOptions.noFilter((packageBin in Compile).value),
 
     resourceGenerators in Compile += Def.task {
       val basePath = (resourceManaged in Compile).value
@@ -109,5 +99,23 @@ object MultiverseBuild extends Build with PatchBuild {
       // Final generated files list
       Seq(versionPropertiesPath) ++ patchFiles
     }.taskValue
-  ))
+  ) ++ inConfig(Proguard)(Seq(
+    // Package whole project into a single .jar file with Proguard.
+    ProguardKeys.proguardVersion := "5.2.1",
+    ProguardKeys.options ++= Seq("-verbose", "-ignorewarnings"),
+    ProguardKeys.options ++= Seq("-optimizationpasses", "3", "-allowaccessmodification"),
+    ProguardKeys.options ++= Seq( // Obfuscation options
+      "-keeppackagenames" ,"moe.lymia.**", "-flattenpackagehierarchy", "moe.lymia.multiverse.contrib",
+      "-keepattributes", "SourceFile,LineNumberTable", "-overloadaggressively"),
+    ProguardKeys.options += ProguardOptions.keepMain("moe.lymia.multiverse.MultiverseModManager"),
+
+    // Print mapping to file
+    proguardMapping := ProguardKeys.proguardDirectory.value / ("multiverse-mod-manager_symbols-"+version.value+".map"),
+    ProguardKeys.options ++= Seq("-printmapping", proguardMapping.value.toString),
+
+    // Proguard filter configuration
+    ProguardKeys.outputFilter := (_ => Some("!library.properties,!scala-xml.properties,!rootdoc.txt")),
+    ProguardKeys.inputs := (dependencyClasspath in Compile).value.files,
+    ProguardKeys.filteredInputs ++= ProguardOptions.noFilter((packageBin in Compile).value)
+  )))
 }
