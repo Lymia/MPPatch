@@ -27,7 +27,7 @@ import sbt.Keys._
 
 import com.typesafe.sbt.SbtGit._
 
-import MultiverseBuild._
+import Config._
 import Utils._
 
 import language.postfixOps

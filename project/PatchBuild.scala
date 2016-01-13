@@ -25,7 +25,7 @@ package moe.lymia.multiverse.build
 import sbt._
 import sbt.Keys._
 
-import MultiverseBuild._
+import Config._
 import Utils._
 
 trait PatchBuild { this: Build =>
@@ -80,20 +80,20 @@ trait PatchBuild { this: Build =>
   import PatchBuildUtils._
 
   object PatchBuildKeys {
-    val patchBuildDir       = SettingKey[File]("native-patch-build-directory")
-    val patchCacheDir       = SettingKey[File]("native-patch-cache-directory")
-    val patchSourceDir      = SettingKey[File]("native-patch-source-directory")
+    val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
+    val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
+    val patchSourceDir = SettingKey[File]("native-patch-source-directory")
 
-    val win32Directory      = TaskKey[File]("native-patch-win32-directory")
-    val linuxDirectory      = TaskKey[File]("native-patch-linux-directory")
+    val win32Directory = TaskKey[File]("native-patch-win32-directory")
+    val linuxDirectory = TaskKey[File]("native-patch-linux-directory")
 
-    val steamRuntimeSDLPath = SettingKey[File]("native-patch-download-steam-runtime-sdl-path")
-    val steamRuntimeSDL     = TaskKey[File]("native-patch-download-steam-runtime-sdl")
+    val steamrtSDL     = TaskKey[File]("native-patch-download-steam-runtime-sdl")
+    val steamrtSDLDev  = TaskKey[File]("native-patch-download-steam-runtime-sdl-dev")
 
-    val commonIncludes      = TaskKey[File]("native-patch-common-includes")
+    val commonIncludes = TaskKey[File]("native-patch-common-includes")
 
-    val win32ExternDef      = TaskKey[File]("native-patch-win32-extern-defines")
-    val linuxExternDef      = TaskKey[File]("native-patch-linux-extern-defines")
+    val win32ExternDef = TaskKey[File]("native-patch-win32-extern-defines")
+    val linuxExternDef = TaskKey[File]("native-patch-linux-extern-defines")
   }
   import PatchBuildKeys._
 
@@ -116,17 +116,16 @@ trait PatchBuild { this: Build =>
     linuxDirectory := simplePrepareDirectory(patchBuildDir.value / "linux"),
 
     // Download libSDL from the Steam runtime.
-    steamRuntimeSDLPath := patchCacheDir.value / config_steam_sdlname,
-    steamRuntimeSDL := (if(steamRuntimeSDLPath.value.exists) steamRuntimeSDLPath.value else {
-      streams.value.log.info("Downloading "+config_steam_sdlname+" from Steam runtime.")
-      IO.withTemporaryDirectory { temp =>
-        IO.download(new URL(config_steam_sdlpath), temp / "steam_sdl.deb")
-        runProcess(Seq("ar", "xv", temp / "steam_sdl.deb"), temp)
-        runProcess(Seq("tar", "xvf", temp / "data.tar.gz"), temp)
-        IO.copyFile(temp / "usr" / "lib" / "i386-linux-gnu" / config_steam_sdlname, steamRuntimeSDLPath.value)
-      }
-      steamRuntimeSDLPath.value
-    }),
+    steamrtSDL :=
+      downloadSteamRuntime(config_steam_sdlbin_path, patchBuildDir.value / config_steam_sdlbin_name,
+                           streams.value.log.info("Downloading "+config_steam_sdlbin_name+"...")) { (dir, target) =>
+        IO.copyFile(dir / "usr" / "lib" / "i386-linux-gnu" / config_steam_sdlbin_name, target)
+      },
+    steamrtSDLDev :=
+      downloadSteamRuntime(config_steam_sdldev_path, patchBuildDir.value / "SDL2_include",
+        streams.value.log.info("Downloading SDL2 headers...")) { (dir, target) =>
+        IO.copyDirectory(dir / "usr" / "include" / "SDL2", target)
+      },
 
     // prepare generated source
     win32ExternDef := cachedTransform(patchCacheDir.value / "win32_extern",
@@ -149,13 +148,15 @@ trait PatchBuild { this: Build =>
         val (cc, nasmFormat, binaryExtension, sourcePath, sourceFiles, extraCDeps, gccFlags) =
           platform match {
             case "win32" => (mingw_gcc _, "win32", ".dll",
-              Seq(patchSourceDir.value / "win32"), Seq(win32ExternDef.value), allFiles(win32Directory.value, ".dll"),
+              Seq(patchSourceDir.value / "win32"), Seq(win32ExternDef.value),
+              allFiles(win32Directory.value, ".dll"),
               Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
-                "-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat",
-                "-DCV_CHECKSUM=\""+sha1+"\""))
+                  "-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat",
+                  "-DCV_CHECKSUM=\""+sha1+"\""))
             case "linux" => (gcc       _, "elf"  , ".so" ,
-              Seq(patchSourceDir.value / "linux"), Seq(linuxExternDef.value), Seq(steamRuntimeSDL.value),
-              Seq("-I", "/usr/include/SDL2/", steamRuntimeSDL.value, "-ldl"))
+              Seq(patchSourceDir.value / "linux", steamrtSDLDev.value), Seq(linuxExternDef.value),
+              Seq(steamrtSDL.value),
+              Seq("-ldl"))
           }
         val fullSourcePath = Seq(patchSourceDir.value / "common", commonIncludes.value, versionDir) ++ sourcePath
         val cBuildDependencies =
