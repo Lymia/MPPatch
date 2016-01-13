@@ -33,6 +33,8 @@ import Config._
 object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
   // Additional keys
   val proguardMapping = TaskKey[File]("proguard-mapping")
+  val buildDist       = TaskKey[File]("build-dist")
+  val dist            = InputKey[Unit]("dist")
 
   lazy val project = Project("multiverse-mod-manager", file(".")) settings (versionWithGit ++ proguardSettings ++ Seq(
     GitKeys.baseVersion in ThisBuild := version_baseVersion,
@@ -45,7 +47,23 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
     // Dependencies
     resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.4",
-    libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0"
+    libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0",
+
+    // Build distribution file
+    buildDist := {
+      val path   = crossTarget.value / "dist"
+      val source = (ProguardKeys.proguard in Proguard).value.head
+      val target = path / source.getName
+
+      IO.createDirectory(path)
+      IO.withTemporaryDirectory { dir =>
+        IO.unzip(source, dir)
+        val f = Path.allSubpaths(dir) ++ Seq(((proguardMapping in Proguard).value, "moe/lymia/multiverse/symbols.map"))
+        IO.zip(f, target)
+      }
+      target
+    },
+    dist := streams.value.log.info("Final binary output to: "+buildDist.value)
   ) ++ patchBuildSettings ++ resourceGeneratorSettings ++ inConfig(Proguard)(Seq(
     // Package whole project into a single .jar file with Proguard.
     ProguardKeys.proguardVersion := "5.2.1",
