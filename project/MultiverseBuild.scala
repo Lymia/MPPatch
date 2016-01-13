@@ -104,8 +104,17 @@ object MultiverseBuild extends Build {
     libraryDependencies += "com.github.scopt" %% "scopt" % "3.3.0",
 
     // Package whole project into a single .jar file with Proguard.
-    ProguardKeys.options in Proguard ++= Seq("-dontnote", "-dontwarn", "-ignorewarnings"),
+    ProguardKeys.proguardVersion in Proguard := "5.2.1",
+    ProguardKeys.options in Proguard ++= Seq("-verbose", "-ignorewarnings"),
+    ProguardKeys.options in Proguard ++= Seq( // Obfuscation options
+      "-keeppackagenames" ,"moe.lymia.**", "-flattenpackagehierarchy", "moe.lymia.multiverse.contrib",
+      "-keepattributes", "SourceFile,LineNumberTable", "-overloadaggressively"),
     ProguardKeys.options in Proguard += ProguardOptions.keepMain("moe.lymia.multiverse.MultiverseModManager"),
+
+    // Proguard filter configuration
+    ProguardKeys.outputFilter in Proguard := (_ => Some("!library.properties,!scala-xml.properties,!rootdoc.txt")),
+    ProguardKeys.inputs in Proguard := (dependencyClasspath in Compile).value.files,
+    ProguardKeys.filteredInputs in Proguard ++= ProguardOptions.noFilter((packageBin in Compile).value),
 
     resourceGenerators in Compile += Def.task {
       val basePath = (resourceManaged in Compile).value
