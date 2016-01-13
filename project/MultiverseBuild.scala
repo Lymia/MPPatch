@@ -46,7 +46,7 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
 
     organization := "moe.lymia",
     scalaVersion := config_scalaVersion,
-    scalacOptions ++= ("-Xlint -Yclosure-elim -target:jvm-1.7 -optimize -deprecation -unchecked "+
+    scalacOptions ++= ("-Xlint -Yclosure-elim -target:jvm-1.8 -optimize -deprecation -unchecked "+
                        "-Ydead-code -Yinline -Yinline-handlers").split(" ").toSeq,
 
     // Dependencies
@@ -57,7 +57,7 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
     // Package whole project into a single .jar file with Proguard.
     ProguardKeys.proguardVersion := "5.2.1",
     ProguardKeys.options ++= Seq("-verbose", "-ignorewarnings"),
-    ProguardKeys.options ++= Seq("-optimizationpasses", "3", "-allowaccessmodification"),
+    ProguardKeys.options ++= Seq("-optimizationpasses", "4", "-allowaccessmodification"),
     ProguardKeys.options ++= Seq( // Obfuscation options
       "-keeppackagenames" ,"moe.lymia.**", "-flattenpackagehierarchy", "moe.lymia.multiverse.contrib",
       "-keepattributes", "SourceFile,LineNumberTable", "-overloadaggressively"),

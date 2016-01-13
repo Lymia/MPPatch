@@ -19,7 +19,4 @@ for Arch Linux. You will need the following packages:
 
  * TODO: package list goes here
  
-To build, simply type in `sbt proguard:proguard`. Note that Proguard currently doesn't support Java 1.8 classes, so,
-if you are running Java 8, it may be necessary to use `sbt -java-home /usr/lib/jvm/java-7-openjdk/ proguard:proguard`
-instead.
-
+To build, simply type in `sbt proguard:proguard`.
