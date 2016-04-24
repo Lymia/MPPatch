@@ -23,5 +23,6 @@
 package moe.lymia.multiverse.data
 
 object PathNames {
-  val PATCH_STATE_FILENAME = "mvmm_patch_state.xml"
+  val PATCH_STATE_FILENAME = "mvmm_patch_state.json"
+  val PATCH_LOCK_FILENAME  = ".mvmm_patch_dirty"
 }

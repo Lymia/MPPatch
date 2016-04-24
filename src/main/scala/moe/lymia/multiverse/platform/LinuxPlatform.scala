@@ -47,8 +47,8 @@ object LinuxPlatform extends Platform {
 
   def patchInfo = new PatchPlatformInfo {
     val replacementTarget = "Civ5XP"
-    def replacementNewName(versionName: String) = "Civ5XP.orig."+versionName
-    def patchInstallTarget(versionName: String) = "mvmm_patch_"+versionName+".so"
+    def replacementNewName(versionName: String) = s"Civ5XP.orig.$versionName"
+    def patchInstallTarget(versionName: String) = s"mvmm_patch_$versionName.so"
 
     def patchReplacementFile(versionName: String) =
       Some(shellScript(replacementTarget,
@@ -68,6 +68,12 @@ object LinuxPlatform extends Platform {
           |export LD_LIBRARY_PATH="$HOME/.steam/bin32/steam-runtime/i386/lib/i386-linux-gnu/:$HOME/.steam/bin32/steam-runtime/i386/usr/lib/i386-linux-gnu/"
           |"$path/Civ5XP.orig.$version" $*
           |""".stripMargin)
+    )
+
+    def findInstalledFiles(list: Seq[String]) = list.filter(x =>
+      x == "Civ5XP.launch" ||
+      x.matches("Civ5XP\\.orig\\.[0-9a-f]+") ||
+      x.matches("mvmm_patch_[0-9a-f]+\\.so")
     )
   }
 }

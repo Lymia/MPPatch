@@ -23,7 +23,7 @@
 package moe.lymia.multiverse.build
 
 object Config {
-  val config_scalaVersion = "2.11.7"
+  val config_scalaVersion = "2.11.8"
 
   val config_mingw_gcc     = "i686-w64-mingw32-gcc"
   val config_gcc           = "gcc"

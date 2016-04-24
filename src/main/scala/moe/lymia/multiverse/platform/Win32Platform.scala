@@ -25,6 +25,7 @@ package moe.lymia.multiverse.platform
 import java.nio.file.{Files, Path, Paths}
 import javax.swing.JFileChooser
 
+import moe.lymia.multiverse.installer.{PatchInstalledFile, PatchPlatformInfo}
 import moe.lymia.multiverse.util.{Steam, WindowsRegistry}
 
 object Win32Platform extends Platform {
@@ -34,17 +35,28 @@ object Win32Platform extends Platform {
     WindowsRegistry.HKEY_CURRENT_USER("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
       x => Steam.loadLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
     WindowsRegistry.HKEY_CURRENT_USER("Software\\Firaxis\\Civilization5", "LastKnownPath").map(x => Paths.get(x)).toSeq
+
+  private val explorer = "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer"
   override def defaultUserPaths  : Seq[Path] = {
     val regPath =
-      WindowsRegistry.HKEY_CURRENT_USER("Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders",
-        "Personal").map(x => Paths.get(x, "My Games", "Sid Meier's Civilization 5")).filter(x => Files.exists(x))
-    Seq(new JFileChooser().getFileSystemView.getDefaultDirectory.toPath.
-      resolve("\"My Games\\\\Sid Meier's Civilization 5\"")) ++ regPath
+      WindowsRegistry.HKEY_CURRENT_USER(s"$explorer\\Shell Folders", "Personal").map(x =>
+        Paths.get(x, "My Games", "Sid Meier's Civilization 5")).filter(x => Files.exists(x))
+    val defaultDirectory = new JFileChooser().getFileSystemView.getDefaultDirectory
+    Seq(defaultDirectory.toPath.resolve("My Games").resolve("Sid Meier's Civilization 5")) ++ regPath
   }
 
   override def assetsPath = "Assets"
 
   def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
 
-  def patchInfo = ???
+  def patchInfo = new PatchPlatformInfo {
+    val replacementTarget = "CvGameDatabaseWin32Final Release.dll"
+
+    def patchInstallTarget(versionName: String) = replacementTarget
+    def patchReplacementFile(versionName: String) = None
+    def additionalFiles(versionName: String) = Seq()
+    def replacementNewName(versionName: String): String = s"CvGameDatabase_orig_$versionName.dll"
+
+    def findInstalledFiles(list: Seq[String]) = list.filter(_.matches("CvGameDatabase_orig_[0-9a-f]+\\.dll"))
+  }
 }

@@ -95,9 +95,9 @@ class DynamicReflectiveProxy(obj: AnyRef) extends Dynamic {
               x.setAccessible(true)
               DynamicReflectiveProxy(x.get(obj))(params.head.asInstanceOf[Int])
             case None =>
-              throw new NoSuchMethodError("Non-existent method "+name+" in "+clazz.getName+" was accessed.")
+              throw new NoSuchMethodError(s"Non-existent method $name in ${clazz.getName} was accessed.")
           }
-        } else throw new NoSuchMethodError("Non-existent method "+name+" in "+clazz.getName+" was accessed.")
+        } else throw new NoSuchMethodError(s"Non-existent method $name in ${clazz.getName} was accessed.")
     }
   def selectDynamic(name: String) =
     resolveDeclaredField(name) match {
@@ -109,7 +109,7 @@ class DynamicReflectiveProxy(obj: AnyRef) extends Dynamic {
           x.setAccessible(true)
           DynamicReflectiveProxy(x.invoke(obj))
         case None =>
-          throw new NoSuchFieldError("Non-existent field "+name+" in "+clazz.getName+" was accessed.")
+          throw new NoSuchFieldError(s"Non-existent field $name in ${clazz.getName} was accessed.")
       }
     }
   def updateDynamic(name: String)(v: Any) =
@@ -118,7 +118,7 @@ class DynamicReflectiveProxy(obj: AnyRef) extends Dynamic {
         x.setAccessible(true)
         x.set(obj, v)
       case None =>
-        throw new NoSuchFieldError("Non-existent field "+name+" in "+clazz.getName+" was accessed.")
+        throw new NoSuchFieldError(s"Non-existent field $name in ${clazz.getName} was accessed.")
     }
   def applyDynamicNamed(name: String)(params: (String, Any)*) =
     sys.error("DynamicReflectiveProxy does not support named parameter calls")
