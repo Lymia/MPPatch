@@ -80,7 +80,8 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
     ProguardKeys.options ++= Seq("-printmapping", proguardMapping.value.toString),
 
     // Proguard filter configuration
-    ProguardKeys.outputFilter := (_ => Some("!library.properties,!scala-xml.properties,!rootdoc.txt")),
+    ProguardKeys.outputFilter := (_ => Some(
+      "!library.properties,!scala-xml.properties,!rootdoc.txt,!reflect.properties")),
     ProguardKeys.inputs := (dependencyClasspath in Compile).value.files,
     ProguardKeys.filteredInputs ++= ProguardOptions.noFilter((packageBin in Compile).value)
   )))
