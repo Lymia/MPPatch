@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.util
+package moe.lymia.multiverse.util.win32
 
 import java.util.prefs.Preferences
 
@@ -76,5 +76,4 @@ object WindowsRegistry {
                                 DynamicReflectiveProxy(Preferences.systemRoot()))
   val HKEY_LOCAL_MACHINE = Hive(0x80000002, "HKEY_LOCAL_MACHINE",
                                 DynamicReflectiveProxy(Preferences.userRoot()))
-
 }

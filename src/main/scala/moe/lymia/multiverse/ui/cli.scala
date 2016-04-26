@@ -3,7 +3,7 @@ package moe.lymia.multiverse.ui
 import java.io.File
 import java.nio.file.{Files, Path}
 
-import moe.lymia.multiverse.data.VersionInfo
+import moe.lymia.multiverse.util.res.VersionInfo
 import moe.lymia.multiverse.installer.Installer
 import moe.lymia.multiverse.platform.Platform
 

@@ -26,7 +26,8 @@ import java.nio.file.{Files, Path, Paths}
 import javax.swing.JFileChooser
 
 import moe.lymia.multiverse.installer.{PatchInstalledFile, PatchPlatformInfo}
-import moe.lymia.multiverse.util.{Steam, WindowsRegistry}
+import moe.lymia.multiverse.util.Steam
+import moe.lymia.multiverse.util.win32.WindowsRegistry
 
 object Win32Platform extends Platform {
   val platformName = "win32"

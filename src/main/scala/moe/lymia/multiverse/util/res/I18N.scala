@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.data
+package moe.lymia.multiverse.util.res
 
 import java.text.MessageFormat
 import java.util.{Locale, Properties}
@@ -64,5 +64,5 @@ object I18N {
     includeData ++ prop.filter(_._1 != "includes")
   }
 
-  def apply(locale: Locale) = I18N(locale, loadI18NData(findSourceFile(locale)))
+  def apply(locale: Locale) = new I18N(locale, loadI18NData(findSourceFile(locale)))
 }

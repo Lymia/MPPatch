@@ -25,7 +25,6 @@ package moe.lymia.multiverse.core
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
-import moe.lymia.multiverse.data
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.{IOUtils, Crypto}
 
@@ -66,9 +65,11 @@ object DLCKey {
   }
 }
 object DLCDataWriter {
-  private def languageValues(string: String) = data.languageList.map { x =>
+  private val languageList = Seq("en_US","fr_FR","de_DE","es_ES","it_IT","ru_RU","ja_JP","pl_PL","ko_KR","zh_Hant_HK")
+  private def languageValues(string: String) = languageList.map { x =>
     <Value language={x}>{string}</Value>
   }
+
   private def commonHeader(name: String, id: UUID, version: Int) =
     <GUID>{"{"+id+"}"}</GUID>
     <Version>{version.toString}</Version>
@@ -145,7 +146,7 @@ object DLCDataWriter {
     val uuid_string = dlcData.id.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
     IOUtils.writeXML(languageFilePath, <GameData>
       {
-        data.languageList.flatMap(x =>
+        languageList.flatMap(x =>
           <NODE>
             <Row Tag={"TXT_KEY_"+uuid_string+"_NAME"}>
               <Text>{dlcData.id.toString.replace("-", "")+"_v"+dlcData.version}</Text>

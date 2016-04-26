@@ -20,9 +20,26 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.data
+package moe.lymia.multiverse.util
 
-object PathNames {
-  val PATCH_STATE_FILENAME = "mvmm_patch_state.json"
-  val PATCH_LOCK_FILENAME  = ".mvmm_patch_dirty"
+import java.io.InputStream
+
+package object res {
+  private val base = "/moe/lymia/multiverse/data/"
+
+  private[res] def resourceExists(s: String) = {
+    val res = getClass.getResourceAsStream(base + s)
+    if(res != null) res.close()
+    res != null
+  }
+  private[res] def getResource(s: String) =
+    getClass.getResourceAsStream(base + s)
+
+  private[res] def loadFromStream(s: InputStream) =
+    io.Source.fromInputStream(s, "UTF-8").mkString
+  private[res] def loadBinaryResourceFromStream(s: InputStream) =
+    Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
+
+  private[res] def loadResource(s: String) = loadFromStream(getResource(s))
+  private[res] def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
 }

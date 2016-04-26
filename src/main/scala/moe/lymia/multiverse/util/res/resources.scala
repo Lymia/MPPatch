@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.data
+package moe.lymia.multiverse.util.res
 
 import java.util.Properties
 

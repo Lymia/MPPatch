@@ -26,8 +26,8 @@ import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 import javax.xml.bind.DatatypeConverter
 
-import moe.lymia.multiverse.data.{VersionInfo, LuaCode}
-import moe.lymia.multiverse.data.LuaCode.quoteLuaString
+import moe.lymia.multiverse.util.res.{VersionInfo, LuaCode}
+import moe.lymia.multiverse.util.res.LuaCode.quoteLuaString
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.Crypto
 

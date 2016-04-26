@@ -25,14 +25,13 @@ package moe.lymia.multiverse.installer
 import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
 
-import moe.lymia.multiverse.data.{PatchData, PatchVersion, PathNames}
+import moe.lymia.multiverse.util.res.{PatchData, PatchVersion}
 import moe.lymia.multiverse.platform.Platform
-import moe.lymia.multiverse.util.{IOUtils, Crypto, XMLUtils}
+import moe.lymia.multiverse.util.{IOUtils, Crypto}
 
 import scala.collection.JavaConversions._
 
 import play.api.libs.json._
-import play.api.libs.functional.syntax._
 
 sealed trait PatchStatus
 object PatchStatus {
@@ -102,9 +101,7 @@ class PatchInstaller(basePath: Path, platform: Platform) {
 
   private def lock[T](f: => T) = {
     Files.createFile(patchLockPath)
-    val v = f
-    Files.delete(patchLockPath)
-    v
+    try { f } finally { Files.delete(patchLockPath) }
   }
 
   private def validatePatchFile(file: PatchFile) = {
