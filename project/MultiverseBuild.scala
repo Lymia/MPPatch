@@ -44,6 +44,9 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
     scalacOptions ++= ("-Xlint -Yclosure-elim -target:jvm-1.8 -optimize -deprecation -unchecked "+
                        "-Ydead-code -Yinline -Yinline-handlers").split(" ").toSeq,
 
+    homepage := Some(url("https://github.com/Lymia/MultiverseModManager")),
+    licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
+
     // Dependencies
     resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
