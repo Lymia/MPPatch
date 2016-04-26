@@ -68,20 +68,13 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
   ) ++ patchBuildSettings ++ resourceGeneratorSettings ++ inConfig(Proguard)(Seq(
     // Package whole project into a single .jar file with Proguard.
     ProguardKeys.proguardVersion := "5.2.1",
-    ProguardKeys.options ++= Seq("-verbose", "-ignorewarnings"),
-    ProguardKeys.options ++= Seq("-optimizationpasses", "5", "-allowaccessmodification"),
-    ProguardKeys.options ++= Seq( // Obfuscation options
-      "-keeppackagenames" ,"moe.lymia.**", "-flattenpackagehierarchy", "moe.lymia.multiverse.libraries",
-      "-keepattributes", "SourceFile,LineNumberTable", "-overloadaggressively"),
-    ProguardKeys.options += ProguardOptions.keepMain("moe.lymia.multiverse.MultiverseModManager"),
+    ProguardKeys.options ++= Seq("-verbose", "@"+(baseDirectory.value / "project" / "proguard.pro").getCanonicalPath),
 
     // Print mapping to file
     proguardMapping := ProguardKeys.proguardDirectory.value / ("multiverse-mod-manager_symbols-"+version.value+".map"),
     ProguardKeys.options ++= Seq("-printmapping", proguardMapping.value.toString),
 
     // Proguard filter configuration
-    ProguardKeys.outputFilter := (_ => Some(
-      "!library.properties,!scala-xml.properties,!rootdoc.txt,!reflect.properties")),
     ProguardKeys.inputs := (dependencyClasspath in Compile).value.files,
     ProguardKeys.filteredInputs ++= ProguardOptions.noFilter((packageBin in Compile).value)
   )))
