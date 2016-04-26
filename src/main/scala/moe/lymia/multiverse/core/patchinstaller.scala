@@ -20,18 +20,18 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.installer
+package moe.lymia.multiverse.core
 
 import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
 
-import moe.lymia.multiverse.util.res.{PatchData, PatchVersion}
 import moe.lymia.multiverse.platform.Platform
-import moe.lymia.multiverse.util.{IOUtils, Crypto}
-
-import scala.collection.JavaConversions._
+import moe.lymia.multiverse.util.res.{PatchData, PatchVersion}
+import moe.lymia.multiverse.util.{Crypto, IOUtils}
 
 import play.api.libs.json._
+
+import scala.collection.JavaConversions._
 
 sealed trait PatchStatus
 object PatchStatus {

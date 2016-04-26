@@ -25,7 +25,8 @@ package moe.lymia.multiverse.platform
 import java.nio.file.{Path, Paths}
 import java.util.Locale
 
-import moe.lymia.multiverse.installer.{PatchInstalledFile, PatchPlatformInfo}
+import moe.lymia.multiverse.core.{PatchInstalledFile, PatchPlatformInfo}
+import moe.lymia.multiverse.installer.PatchPlatformInfo
 import moe.lymia.multiverse.util.Steam
 
 object LinuxPlatform extends Platform {
