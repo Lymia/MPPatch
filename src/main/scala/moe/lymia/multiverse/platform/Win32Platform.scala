@@ -25,7 +25,7 @@ package moe.lymia.multiverse.platform
 import java.nio.file.{Files, Path, Paths}
 import javax.swing.JFileChooser
 
-import moe.lymia.multiverse.core.PatchPlatformInfo
+import moe.lymia.multiverse.core.installer.PatchPlatformInfo
 import moe.lymia.multiverse.util.Steam
 import moe.lymia.multiverse.util.win32.WindowsRegistry
 

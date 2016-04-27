@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Lymia Alusyia <lymia@lymiahugs.com>
+ * Copyright (c) 2015 Lymia Alusyia <lymia@lymiahugs.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core
+package moe.lymia.multiverse.core.installer
 
 import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
@@ -28,7 +28,6 @@ import java.nio.file.{Files, Path}
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.res.{PatchData, PatchVersion}
 import moe.lymia.multiverse.util.{Crypto, IOUtils}
-
 import play.api.libs.json._
 
 import scala.collection.JavaConversions._

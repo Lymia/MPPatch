@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2016 Lymia Alusyia <lymia@lymiahugs.com>
+ * Copyright (c) 2015 Lymia Alusyia <lymia@lymiahugs.com>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,18 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core
+package moe.lymia.multiverse.core.generator
 
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 import javax.xml.bind.DatatypeConverter
 
-import moe.lymia.multiverse.util.res.{VersionInfo, LuaCode}
-import moe.lymia.multiverse.util.res.LuaCode.quoteLuaString
+import moe.lymia.multiverse.core.mods._
+import moe.lymia.multiverse.core.dlc._
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.Crypto
+import moe.lymia.multiverse.util.res.LuaCode.quoteLuaString
+import moe.lymia.multiverse.util.res.{LuaCode, VersionInfo}
 
 import scala.xml.{Elem, Node}
 
