@@ -74,7 +74,7 @@ object DLCDataWriter {
       <Tag>Ownership</Tag>
     </PTags>
     <Key>{DLCKey.key(id, Seq(99999), version.toString, "FREE")}</Key>
-  def writeDLC(dlcBasePath: Path, languageFilePath: Path, dlcData: DLCData, platform: Platform) = {
+  def writeDLC(dlcBasePath: Path, languageFilePath: Option[Path], dlcData: DLCData, platform: Platform) = {
     var id = 0
     def newId() = {
       id = id + 1
@@ -135,19 +135,21 @@ object DLCDataWriter {
     </Civ5Package>)
 
     val uuid_string = dlcData.manifest.uuid.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
-    IOUtils.writeXML(languageFilePath, <GameData>
-      {
-        languageList.flatMap(x =>
-          <NODE>
-            <Row Tag={s"TXT_KEY_${uuid_string}_NAME"}>
-              <Text>{dlcData.manifest.uuid.toString.replace("-", "")+"_v"+dlcData.manifest.version}</Text>
-            </Row>
-            <Row Tag={s"TXT_KEY_${uuid_string}_DESCRIPTION"}>
-              <Text>{dlcData.manifest.name}</Text>
-            </Row>
-          </NODE>.copy(label = s"Language_$x")
-        )
-      }
-    </GameData>)
+    languageFilePath.foreach(languagePath =>
+      IOUtils.writeXML(languagePath, <GameData>
+        {
+          languageList.flatMap(x =>
+            <NODE>
+              <Row Tag={s"TXT_KEY_${uuid_string}_NAME"}>
+                <Text>{dlcData.manifest.uuid.toString.replace("-", "")+"_v"+dlcData.manifest.version}</Text>
+              </Row>
+              <Row Tag={s"TXT_KEY_${uuid_string}_DESCRIPTION"}>
+                <Text>{dlcData.manifest.name}</Text>
+              </Row>
+            </NODE>.copy(label = s"Language_$x")
+          )
+        }
+      </GameData>)
+    )
   }
 }
