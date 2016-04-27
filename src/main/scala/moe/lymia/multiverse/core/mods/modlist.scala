@@ -27,9 +27,17 @@ import java.util.{Locale, UUID}
 
 import moe.lymia.multiverse.util.IOUtils
 
-case class ModList(modList: Seq[ModManifest], conflictingModList: Seq[ModManifest]) {
+case class ModEntry(path: Path, manifest: ModManifest)
+case class ModList(modList: Seq[ModEntry], conflictingModList: Seq[ModEntry]) {
+  lazy val allMods = modList ++ conflictingModList
 
+  private def byUUIDCache = new collection.mutable.HashMap[UUID, Option[ModEntry]]
+  def getByUUID(uuid: UUID) = byUUIDCache.getOrElseUpdate(uuid, {
+    val found = allMods.filter(_.manifest.uuid == uuid)
+    if(found.length == 1) Some(found.head) else None
+  })
 }
+
 object ModList {
   def apply(path: Path) = {
     val enumeratedMods = ModEnumerator.enumerateModFiles(path)
@@ -59,5 +67,5 @@ object ModEnumerator {
   }
 
   def loadEnumeratedMods(paths: Seq[Path]) =
-    paths.map(x => ModDataReader.readModManifest(IOUtils.readXML(x)))
+    paths.map(x => ModEntry(x, ModDataReader.readModManifest(IOUtils.readXML(x))))
 }

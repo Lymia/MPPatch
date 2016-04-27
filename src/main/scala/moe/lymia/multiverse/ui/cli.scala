@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.{Files, Path}
 
 import moe.lymia.multiverse.core.installer.Installer
-import moe.lymia.multiverse.core.mods.ModManifest
+import moe.lymia.multiverse.core.mods.ModEntry
 import moe.lymia.multiverse.util.res.VersionInfo
 import moe.lymia.multiverse.platform.Platform
 
@@ -47,10 +47,10 @@ object CLI {
   private def loadInstaller(args: CLIArguments, platform: Platform) =
     new Installer(args.systemPath.get, args.userPath.get, platform)
 
-  private def printModList(mods: Seq[ModManifest]): Unit = {
+  private def printModList(mods: Seq[ModEntry]): Unit = {
     if(mods.isEmpty) println("  - <no mods found>")
     else for(mod <- mods) {
-      println(s"  - ${mod.uuid}: ${mod.name}")
+      println(s"  - ${mod.manifest.uuid}: ${mod.manifest.name}")
     }
   }
 
