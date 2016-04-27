@@ -22,39 +22,17 @@
 
 package moe.lymia.multiverse.core.generator
 
-import java.nio.file.{Files, Path}
-import java.util.{Locale, UUID}
+import java.util.Locale
 import javax.xml.bind.DatatypeConverter
 
-import moe.lymia.multiverse.core.mods._
 import moe.lymia.multiverse.core.dlc._
+import moe.lymia.multiverse.core.mods._
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.Crypto
 import moe.lymia.multiverse.util.res.LuaCode.quoteLuaString
 import moe.lymia.multiverse.util.res.{LuaCode, VersionInfo}
 
 import scala.xml.{Elem, Node}
-
-object DlcUUID {
-  val BASE_DLC_UUID           = UUID.fromString("aa75946c-7fca-4166-874c-de18ecd39162")
-  val MOD_UUID_NAMESPACE      = UUID.fromString("28b620c3-93a8-4b4d-9cee-58bc71640a58")
-  val MOD_PACK_UUID_NAMESPACE = UUID.fromString("0b3e3322-2dee-45c1-9f4c-091136c7cf29")
-}
-
-object BaseDLC {
-  val patchList = Seq(
-    "InstanceManager.lua"   -> "UI/InstanceManager.lua",
-    "GameplayUtilities.lua" -> "Gameplay/Lua/GameplayUtilities.lua")
-  def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
-    val patchedFileList = (for((file, realPath) <- patchList) yield {
-      val targetPath = platform.resolve(civBaseDirectory, platform.assetsPath, realPath)
-      (file, LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath))
-    }).toMap
-    DLCData(DlcUUID.BASE_DLC_UUID, 1, 250,
-            "Multiverse - Base DLC", "Base DLC for Multiverse",
-            Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library, Nil)
-  }
-}
 
 object ModTranslator {
   val audioTables = Set("Audio_SoundScapeElementScripts", "Audio_SoundScapeElements", "Audio_SoundScapes")
@@ -79,9 +57,9 @@ object ModTranslator {
         <Please_install_the_CvGameDatabase_patch_for_Multiverse_Mod_Manager>
         </Please_install_the_CvGameDatabase_patch_for_Multiverse_Mod_Manager>
       </__MVMM_PATCH_IGNORE>,
-      <__MVMM_PATCH_RAWSQL>{
+      <__MVMM_PATCH_RAWSQL> {
         DatatypeConverter.printBase64Binary(sql.replace("\r\n","\n").getBytes("UTF-8"))
-      }</__MVMM_PATCH_RAWSQL>
+      } </__MVMM_PATCH_RAWSQL>
     )
     case ModXmlSource(xml) => xml.child.filter(_.isInstanceOf[Elem])
   }
@@ -94,16 +72,16 @@ object ModTranslator {
   val audioScriptMap = {
     val stringFields  = Seq("ScriptID", "SoundID", "SoundType", "StartPosition", "EndPosition", "Channel")
     val booleanFields = Seq("Looping", "StartFromRandomPosition", "OnlyTriggerOnUnitRuns", "DontPlay",
-                            "DontTriggerDuplicates", "DontTriggerDuplicatesOnUnits", "IsMusic")
+      "DontTriggerDuplicates", "DontTriggerDuplicatesOnUnits", "IsMusic")
     val integerFields = Seq("MaxVolume", "MinVolume", "DontPlayMoreThan", "PercentChanceOfPlaying",
-                            "MinTimeMustNotPlayAgain", "MaxTimeMustNotPlayAgain", "MinTimeDelay", "MaxTimeDelay",
-                            "PitchChangeDown", "PitchChangeUp", "Priority", "MinRightPan", "MaxRightPan",
-                            "MinLeftPan", "MaxLeftPan", "MinVelocity", "MaxVelocity")
+      "MinTimeMustNotPlayAgain", "MaxTimeMustNotPlayAgain", "MinTimeDelay", "MaxTimeDelay",
+      "PitchChangeDown", "PitchChangeUp", "Priority", "MinRightPan", "MaxRightPan",
+      "MinLeftPan", "MaxLeftPan", "MinVelocity", "MaxVelocity")
     val floatFields   = Seq("DryLevel", "WetLevel", "TaperSoundtrackVolume", "DistanceFromListener", "MinDistance",
-                            "CutoffDistance")
+      "CutoffDistance")
 
     ((stringFields.map(x => (x, x)) ++ booleanFields.map(x => (x, "b"+x)) ++
-        integerFields.map(x => (x, "i"+x)) ++ floatFields.map(x => (x, "f"+x))).toMap,
+      integerFields.map(x => (x, "i"+x)) ++ floatFields.map(x => (x, "f"+x))).toMap,
       booleanFields.map(x => (x, mapBoolean)).toMap)
   }
   val audioDefineMap = (Map(
@@ -213,9 +191,9 @@ object ModTranslator {
       out.append("\n")
       out.append("if _mvmm and not _mvmm.disabled then\n")
       out.append("  _mvmm.registerMod("+VersionInfo.patchCompat+", uuid, version, name, " +
-                                     "{ properties = rawProperties,"+
-                                      " assetPrefix = assetPrefix,"+
-                                      " entryPoints = entryPoints })\n")
+                 "{ properties = rawProperties,"+
+                 " assetPrefix = assetPrefix,"+
+                 " entryPoints = entryPoints })\n")
       out.append("end\n")
 
       Map("mvmm_modmanifest_"+translatedUUID.toString.replace("-", "")+".lua" -> out.toString().getBytes("UTF8"))
