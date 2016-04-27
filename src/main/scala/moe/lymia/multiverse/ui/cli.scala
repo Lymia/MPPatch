@@ -25,9 +25,11 @@ object CLI {
     opt[File]("user-path"  ).action((f, args) => args.copy(userPath   = Some(f.toPath)))
       .valueName("<directory>").text("Path for the Civilization v user directory")
 
+    note("")
     cmd("status").action((_, args) => args.copy(command = cmd_status))
       .text("Displays installation status for mods/the patch.")
 
+    note("")
     cmd("updatePatch").action((_, args) => args.copy(command = cmd_update))
       .text("Updates the Multiverse Mod Manager patch.")
       .children(
