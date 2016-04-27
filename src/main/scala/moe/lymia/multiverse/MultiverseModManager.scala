@@ -22,6 +22,8 @@
 
 package moe.lymia.multiverse
 
+import java.util.Locale
+
 import moe.lymia.multiverse.ui.CLI
 
 object MultiverseModManager {
@@ -29,7 +31,7 @@ object MultiverseModManager {
     if(args.length == 0) {
       sys.error("gui not yet implemented")
     } else {
-      CLI.executeCommand(args)
+      new CLI(Locale.getDefault).executeCommand(args)
     }
   }
 }

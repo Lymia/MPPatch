@@ -31,7 +31,7 @@ import scala.collection.JavaConversions._
 case class I18N(locale: Locale, map: Map[String, String]) {
   private val messageFormatCache = new collection.mutable.HashMap[String, Option[MessageFormat]]
   def getFormat(key: String) =
-    messageFormatCache.getOrElseUpdate(key, map.get(key).map(s => new MessageFormat(key, locale)))
+    messageFormatCache.getOrElseUpdate(key, map.get(key).map(s => new MessageFormat(s, locale)))
   def apply(key: String, args: Any*) = getFormat(key).map(format =>
     format.format(args.toArray)
   ).getOrElse("<"+key+">")
@@ -57,7 +57,7 @@ object I18N {
       includes.trim.split(",").map(x => loadI18NData(x.trim)).reduce(_ ++ _)
     } else Map()
 
-    includeData ++ prop.filter(_._1 != "includes")
+    includeData ++ prop.filter(_._1 != "includes").map(x => x.copy(_1 = x._1.trim, _2 = x._2.trim))
   }
 
   def apply(locale: Locale) = new I18N(locale, loadI18NData(findSourceFile(locale)))

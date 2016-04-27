@@ -24,13 +24,12 @@ package moe.lymia.multiverse.ui
 
 import java.io.File
 import java.nio.file.{Files, Path}
+import java.util.Locale
 
 import moe.lymia.multiverse.core.data._
 import moe.lymia.multiverse.core.installer.Installer
-import moe.lymia.multiverse.util.res.VersionInfo
+import moe.lymia.multiverse.util.res.{I18N, VersionInfo}
 import moe.lymia.multiverse.platform.Platform
-
-import scala.collection.generic.GenericClassManifestCompanion
 
 case class CLIArguments(command: (CLIArguments, Platform) => Unit,
                         systemPath: Option[Path], userPath: Option[Path],
@@ -39,31 +38,29 @@ case class CLIArguments(command: (CLIArguments, Platform) => Unit,
                         // patch options
                         debug: Boolean = false)
 
-object CLI {
+class CLI(locale: Locale) {
+  private val i18n = I18N(locale)
   private val parser = new scopt.OptionParser[CLIArguments]("mvmm") {
     head("Multiverse Mod Manager", "v"+VersionInfo.versionString)
 
-    help("help") text "Shows usage information."
+    help("help").text(i18n(s"cli.param.help"))
+
+    private def cmd2(name: String) = {
+      note("")
+      cmd(name).text(i18n(s"cli.cmd.$name"))
+    }
 
     opt[File]("system-path").action((f, args) => args.copy(systemPath = Some(f.toPath)))
-      .valueName("<directory>").text("Path for the Civilization V installation directory.")
+      .valueName(i18n("cli.param.args.directory")).text(i18n("cli.param.system-path"))
     opt[File]("user-path"  ).action((f, args) => args.copy(userPath   = Some(f.toPath)))
-      .valueName("<directory>").text("Path for the Civilization v user directory")
+      .valueName(i18n("cli.param.args.directory")).text(i18n("cli.param.user-path"  ))
 
-    note("")
-    cmd("status").action((_, args) => args.copy(command = cmd_status))
-      .text("Displays installation status for mods/the patch.")
-
-    note("")
-    cmd("list").action((_, args) => args.copy(command = cmd_list))
-      .text("Lists installed DLC and mods available for installation.")
-
-    note("")
-    cmd("updatePatch").action((_, args) => args.copy(command = cmd_update))
-      .text("Updates the Multiverse Mod Manager patch.")
+    cmd2("status").action((_, args) => args.copy(command = cmd_status))
+    cmd2("list").action((_, args) => args.copy(command = cmd_list))
+    cmd2("updatePatch").action((_, args) => args.copy(command = cmd_update))
       .children(
-        opt[Unit]('f', "force").action((_, args) => args.copy(force = true)).text("Force update patch."),
-        opt[Unit]('d', "debug").action((_, args) => args.copy(debug = true)).text("Install debug version of patch.")
+        opt[Unit]('f', "force").action((_, args) => args.copy(force = true)).text(i18n("cli.param.updatePatch.force")),
+        opt[Unit]('d', "debug").action((_, args) => args.copy(debug = true)).text(i18n("cli.param.updatePatch.debug"))
       )
   }
 
@@ -71,25 +68,27 @@ object CLI {
   private def loadInstaller(args: CLIArguments, platform: Platform) =
     new Installer(args.systemPath.get, args.userPath.get, platform)
 
-  private def printManifestList[T <: ManifestCommon](entries: ManifestList[T]): Unit = {
-    if(entries.manifestList.isEmpty) println("  - <no entries found>")
-    else for(entry <- entries.manifestList) {
-      println(s"  - ${entry.manifest.uuid}: ${entry.manifest.name}")
-    }
+  private def cmd_unknown(args: CLIArguments, platform: Platform) = {
+    println(i18n("cli.cmd.unknown"))
   }
-
-  private def cmd_unknown(args: CLIArguments, platform: Platform) = sys.error("No command given!")
   private def cmd_status(args: CLIArguments, platform: Platform) = {
     val installer = loadInstaller(args, platform)
-    println("Patch status: "+installer.patchInstaller.checkPatchStatus())
+    println(i18n("cli.cmd.status.patchStatus", installer.patchInstaller.checkPatchStatus()))
   }
   private def cmd_list(args: CLIArguments, platform: Platform) = {
     val installer = loadInstaller(args, platform)
 
-    println("Available Mods:")
+    def printManifestList[T <: ManifestCommon](entries: ManifestList[T]): Unit = {
+      if(entries.manifestList.isEmpty) println(s"  - ${i18n("cli.cmd.list.noEntries")}")
+      else for(entry <- entries.manifestList) {
+        println(s"  - ${entry.manifest.uuid}: ${entry.manifest.name}")
+      }
+    }
+
+    println(i18n("cli.cmd.list.mods"))
     printManifestList(installer.listMods())
 
-    println("Installed DLC:")
+    println(i18n("cli.cmd.list.dlc"))
     printManifestList(installer.listDLC())
   }
   private def cmd_update(args: CLIArguments, platform: Platform) = {
