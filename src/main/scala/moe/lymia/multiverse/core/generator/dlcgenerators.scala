@@ -25,7 +25,7 @@ package moe.lymia.multiverse.core.generator
 import java.nio.file.{Files, Path}
 import java.util.UUID
 
-import moe.lymia.multiverse.core.dlc._
+import moe.lymia.multiverse.core.data.DLCData
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.res.LuaCode
 

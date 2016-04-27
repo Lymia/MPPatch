@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core.mods
+package moe.lymia.multiverse.core.data
 
 import java.nio.file.{Files, Path}
 import java.util.UUID

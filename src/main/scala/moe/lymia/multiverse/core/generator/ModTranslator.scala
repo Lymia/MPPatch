@@ -25,8 +25,7 @@ package moe.lymia.multiverse.core.generator
 import java.util.Locale
 import javax.xml.bind.DatatypeConverter
 
-import moe.lymia.multiverse.core.dlc._
-import moe.lymia.multiverse.core.mods._
+import moe.lymia.multiverse.core.data._
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.Crypto
 import moe.lymia.multiverse.util.res.LuaCode.quoteLuaString

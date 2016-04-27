@@ -24,7 +24,7 @@ package moe.lymia.multiverse.core.installer
 
 import java.nio.file.Path
 
-import moe.lymia.multiverse.core.mods.ModList
+import moe.lymia.multiverse.core.data.ModList
 import moe.lymia.multiverse.platform.Platform
 
 class Installer(systemPath: Path, userPath: Path, platform: Platform,
