@@ -4,6 +4,7 @@ import java.io.File
 import java.nio.file.{Files, Path}
 
 import moe.lymia.multiverse.core.installer.Installer
+import moe.lymia.multiverse.core.mods.ModManifest
 import moe.lymia.multiverse.util.res.VersionInfo
 import moe.lymia.multiverse.platform.Platform
 
@@ -15,7 +16,7 @@ case class CLIArguments(command: (CLIArguments, Platform) => Unit,
                         debug: Boolean = false)
 
 object CLI {
-  val parser = new scopt.OptionParser[CLIArguments]("mvmm") {
+  private val parser = new scopt.OptionParser[CLIArguments]("mvmm") {
     head("Multiverse Mod Manager", "v"+VersionInfo.versionString)
 
     help("help") text "Shows usage information."
@@ -30,6 +31,10 @@ object CLI {
       .text("Displays installation status for mods/the patch.")
 
     note("")
+    cmd("list").action((_, args) => args.copy(command = cmd_list))
+      .text("Lists installed DLC and mods available for installation.")
+
+    note("")
     cmd("updatePatch").action((_, args) => args.copy(command = cmd_update))
       .text("Updates the Multiverse Mod Manager patch.")
       .children(
@@ -42,10 +47,27 @@ object CLI {
   private def loadInstaller(args: CLIArguments, platform: Platform) =
     new Installer(args.systemPath.get, args.userPath.get, platform)
 
+  private def printModList(mods: Seq[ModManifest]): Unit = {
+    if(mods.isEmpty) println("  - <no mods found>")
+    else for(mod <- mods) {
+      println(s"  - ${mod.uuid}: ${mod.name}")
+    }
+  }
+
   private def cmd_unknown(args: CLIArguments, platform: Platform) = sys.error("No command given!")
   private def cmd_status(args: CLIArguments, platform: Platform) = {
     val installer = loadInstaller(args, platform)
-    System.out.println("Patch status: "+installer.patchInstaller.checkPatchStatus())
+    println("Patch status: "+installer.patchInstaller.checkPatchStatus())
+  }
+  private def cmd_list(args: CLIArguments, platform: Platform) = {
+    val installer = loadInstaller(args, platform)
+    val listedMods = installer.listMods()
+
+    println("Mods:")
+    printModList(listedMods.modList)
+
+    println("Conflicting mods:")
+    printModList(listedMods.conflictingModList)
   }
   private def cmd_update(args: CLIArguments, platform: Platform) = {
     val installer = loadInstaller(args, platform)
