@@ -122,7 +122,6 @@ class PatchInstaller(basePath: Path, platform: Platform) {
       None
   }
 
-
   def checkPatchStatus() = {
     val detectedPatchFiles = platformInfo.findInstalledFiles(IOUtils.listFileNames(basePath))
 
@@ -134,7 +133,7 @@ class PatchInstaller(basePath: Path, platform: Platform) {
         else {
           val originalFileStatus = validatePatchFile(patchState.originalFile)
 
-          if((detectedPatchFiles.toSet - patchState.additionalFiles).nonEmpty)
+          if((detectedPatchFiles.toSet -- patchState.expectedFiles).nonEmpty)
             PatchStatus.FoundLeftoverFiles
           else if(!Files.exists(resolve(patchState.replacementTarget.path)) ||
              !patchState.additionalFiles.forall(validatePatchFile) || !originalFileStatus)
