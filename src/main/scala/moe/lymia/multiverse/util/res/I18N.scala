@@ -29,13 +29,9 @@ import scala.annotation.tailrec
 import scala.collection.JavaConversions._
 
 case class I18N(locale: Locale, map: Map[String, String]) {
-  private val messageFormatCache = new collection.mutable.HashMap[String, MessageFormat]
-  def getFormat(key: String) = messageFormatCache.get(key) orElse map.get(key).map(s => {
-    val format = new MessageFormat(key, locale)
-    messageFormatCache.put(key, format)
-    format
-  })
-
+  private val messageFormatCache = new collection.mutable.HashMap[String, Option[MessageFormat]]
+  def getFormat(key: String) =
+    messageFormatCache.getOrElseUpdate(key, map.get(key).map(s => new MessageFormat(key, locale)))
   def apply(key: String, args: Any*) = getFormat(key).map(format =>
     format.format(args.toArray)
   ).getOrElse("<"+key+">")
