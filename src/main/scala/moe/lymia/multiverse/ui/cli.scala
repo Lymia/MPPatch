@@ -3,10 +3,12 @@ package moe.lymia.multiverse.ui
 import java.io.File
 import java.nio.file.{Files, Path}
 
-import moe.lymia.multiverse.core.data.ModEntry
+import moe.lymia.multiverse.core.data._
 import moe.lymia.multiverse.core.installer.Installer
 import moe.lymia.multiverse.util.res.VersionInfo
 import moe.lymia.multiverse.platform.Platform
+
+import scala.collection.generic.GenericClassManifestCompanion
 
 case class CLIArguments(command: (CLIArguments, Platform) => Unit,
                         systemPath: Option[Path], userPath: Option[Path],
@@ -47,10 +49,10 @@ object CLI {
   private def loadInstaller(args: CLIArguments, platform: Platform) =
     new Installer(args.systemPath.get, args.userPath.get, platform)
 
-  private def printModList(mods: Seq[ModEntry]): Unit = {
-    if(mods.isEmpty) println("  - <no mods found>")
-    else for(mod <- mods) {
-      println(s"  - ${mod.manifest.uuid}: ${mod.manifest.name}")
+  private def printManifestList[T <: ManifestCommon](entries: ManifestList[T]): Unit = {
+    if(entries.manifestList.isEmpty) println("  - <no entries found>")
+    else for(entry <- entries.manifestList) {
+      println(s"  - ${entry.manifest.uuid}: ${entry.manifest.name}")
     }
   }
 
@@ -61,13 +63,12 @@ object CLI {
   }
   private def cmd_list(args: CLIArguments, platform: Platform) = {
     val installer = loadInstaller(args, platform)
-    val listedMods = installer.listMods()
 
-    println("Mods:")
-    printModList(listedMods.modList)
+    println("Available Mods:")
+    printManifestList(installer.listMods())
 
-    println("Conflicting mods:")
-    printModList(listedMods.conflictingModList)
+    println("Installed DLC:")
+    printManifestList(installer.listDLC())
   }
   private def cmd_update(args: CLIArguments, platform: Platform) = {
     val installer = loadInstaller(args, platform)

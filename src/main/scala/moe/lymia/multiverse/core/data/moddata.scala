@@ -46,6 +46,7 @@ case class ModEntryPoint(event: String, name: String, description: String, file:
 case class ModManifest(uuid: UUID, version: Int, name: String, teaser: String, description: String,
                        authorship: ModAuthorshipInformation, rawProperties: Map[String, String],
                        dependencies: Seq[ModReference], references: Seq[ModReference], blocks: Seq[ModReference])
+  extends ManifestCommon
 case class ModGameplay(fileList: Map[String, Array[Byte]], entryPoints: Seq[ModEntryPoint],
                        onModActivated: Seq[ModAction], onCreateUserData: Seq[ModAction],
                        dllOverride: Option[Array[Byte]])

@@ -208,7 +208,7 @@ object ModTranslator {
       } else x._2)) ++ manifest
 
     DLCData(DLCManifest(translatedUUID, modData.manifest.version, 300 + priority,
-                        modData.manifest.name, fullDescription),
+                        modData.manifest.name, modData.manifest.name),
             DLCGameplay(data.flatMap(_._1.flatMap(_.toSeq)), data.flatMap(_._2.flatMap(_.toSeq)),
                         mapScripts, fileList, Seq(targetUISkin)))
   }

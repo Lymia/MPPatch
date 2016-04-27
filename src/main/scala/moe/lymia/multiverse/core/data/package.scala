@@ -20,20 +20,14 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core.data
+package moe.lymia.multiverse.core
 
 import java.util.UUID
 
-import scala.xml.Node
-
-case class DLCUISkin(name: String, set: String, platform: String, includeImports: Boolean,
-                     skinSpecificDirectory: Map[String, Array[Byte]])
-case class DLCInclude(event: String, fileData: Node)
-case class DLCMap(extension: String, data: Array[Byte])
-
-case class DLCGameplay(gameplayIncludes: Seq[DLCInclude], globalIncludes: Seq[DLCInclude], mapEntries: Seq[DLCMap],
-                       importFileList: Map[String, Array[Byte]], uiSkins: Seq[DLCUISkin])
-case class DLCManifest(uuid: UUID, version: Int, priority: Int, shortName: String, name: String)
-  extends ManifestCommon
-
-case class DLCData(manifest: DLCManifest, data: DLCGameplay)
+package object data {
+  trait ManifestCommon {
+    val uuid       : UUID
+    val version    : Int
+    val name       : String
+  }
+}

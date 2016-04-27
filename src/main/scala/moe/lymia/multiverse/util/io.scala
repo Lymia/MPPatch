@@ -3,12 +3,19 @@ package moe.lymia.multiverse.util
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
-import scala.xml.{XML, Node, PrettyPrinter}
+import scala.xml.{Node, NodeSeq, PrettyPrinter, XML}
 import play.api.libs.json._
 
 object XMLUtils {
-  def getAttribute(node: Node, attribute: String) = (node \ ("@" + attribute)).text
-  def getNodeText (node: Node, tag: String) = (node \ tag).text.trim
+  def getOptional(nodes: NodeSeq) =
+    if(nodes.isEmpty) None else Some(nodes.text)
+
+  def getAttributeNode    (node: Node, attribute: String) = node \ s"@$attribute"
+  def getAttribute        (node: Node, attribute: String) = getAttributeNode(node, attribute).text
+  def getOptionalAttribute(node: Node, attribute: String) = getOptional(getAttributeNode(node, attribute))
+
+  def getNodeText         (node: Node, tag: String)       = (node \ tag).text.trim
+  def getOptionalNodeText (node: Node, tag: String)       = getOptional(node \ tag).map(_.trim)
 }
 
 object IOUtils {

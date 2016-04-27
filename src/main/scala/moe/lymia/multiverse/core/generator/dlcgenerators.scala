@@ -45,7 +45,7 @@ object BaseDLC {
       (file, LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath))
     }).toMap
     DLCData(DLCManifest(DlcUUID.BASE_DLC_UUID, 1, 250,
-                        "Multiverse - Base DLC", "Base DLC for Multiverse"),
+                        "Multiverse - Base DLC", "Multiverse - Base DLC"),
             DLCGameplay(Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library, Nil))
   }
 }

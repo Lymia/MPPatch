@@ -81,7 +81,7 @@ object DLCDataWriter {
       id
     }
 
-    val nameString = s"${dlcData.manifest.id.toString.replace("-", "")}_v${dlcData.manifest.version}"
+    val nameString = s"${dlcData.manifest.uuid.toString.replace("-", "")}_v${dlcData.manifest.version}"
 
     def writeIncludes(pathName: String, includes: Seq[DLCInclude]) = {
       val path = platform.resolve(dlcBasePath, pathName)
@@ -119,7 +119,7 @@ object DLCDataWriter {
     for((name, file) <- dlcData.data.importFileList) IOUtils.writeFile(platform.resolve(filesDirectory, name), file)
 
     IOUtils.writeXML(platform.resolve(dlcBasePath, s"$nameString.Civ5Pkg"), <Civ5Package>
-      {commonHeader(dlcData.manifest.name, dlcData.manifest.id, dlcData.manifest.version)}
+      {commonHeader(dlcData.manifest.name, dlcData.manifest.uuid, dlcData.manifest.version)}
 
       <Priority>{dlcData.manifest.priority.toString}</Priority>
 
@@ -134,13 +134,13 @@ object DLCDataWriter {
       { writeUISkins(dlcData.data.uiSkins) }
     </Civ5Package>)
 
-    val uuid_string = dlcData.manifest.id.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
+    val uuid_string = dlcData.manifest.uuid.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
     IOUtils.writeXML(languageFilePath, <GameData>
       {
         languageList.flatMap(x =>
           <NODE>
             <Row Tag={s"TXT_KEY_${uuid_string}_NAME"}>
-              <Text>{dlcData.manifest.id.toString.replace("-", "")+"_v"+dlcData.manifest.version}</Text>
+              <Text>{dlcData.manifest.uuid.toString.replace("-", "")+"_v"+dlcData.manifest.version}</Text>
             </Row>
             <Row Tag={s"TXT_KEY_${uuid_string}_DESCRIPTION"}>
               <Text>{dlcData.manifest.name}</Text>
