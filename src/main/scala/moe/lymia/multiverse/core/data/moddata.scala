@@ -44,10 +44,10 @@ case class ModExecuteScriptAction (data: String) extends ModAction
 
 case class ModEntryPoint(event: String, name: String, description: String, file: String)
 case class ModManifest(uuid: UUID, version: Int, name: String, teaser: String, description: String,
-                       authorship: ModAuthorshipInformation,
+                       authorship: ModAuthorshipInformation, rawProperties: Map[String, String],
                        dependencies: Seq[ModReference], references: Seq[ModReference], blocks: Seq[ModReference])
 case class ModGameplay(fileList: Map[String, Array[Byte]], entryPoints: Seq[ModEntryPoint],
                        onModActivated: Seq[ModAction], onCreateUserData: Seq[ModAction],
                        dllOverride: Option[Array[Byte]])
-case class ModData(manifest: ModManifest, rawProperties: Map[String, String], data: ModGameplay)
+case class ModData(manifest: ModManifest, data: ModGameplay)
 

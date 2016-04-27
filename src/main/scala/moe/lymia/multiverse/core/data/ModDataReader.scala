@@ -94,6 +94,10 @@ object ModDataReader {
       assert(Crypto.md5_hex(data).equalsIgnoreCase(md5))
       (name, data)
     }
+  private def readModRawProperties(modData: Node) = (modData \ "Properties").flatMap(_.child).collect {
+    case n: Node => (n.label, n.text)
+  }.toMap
+
   def readModManifest(modData: Node) = {
     val properties = (modData \ "Properties").head
     val authorship = ModAuthorshipInformation(getNodeText(properties, "Authors"),
@@ -105,6 +109,7 @@ object ModDataReader {
                 getNodeText(properties, "Teaser"),
                 getNodeText(properties, "Description"),
                 authorship,
+                readModRawProperties(modData),
                 readModReferenceList(modData \ "Dependencies"),
                 readModReferenceList(modData \ "References"),
                 readModReferenceList(modData \ "Blocks"))
@@ -122,9 +127,6 @@ object ModDataReader {
                   readFile(modBasePath, pathElem.text.trim, platform)})
   }
 
-  def readModRawProperties(modData: Node) = (modData \ "Properties").flatMap(_.child).collect {
-    case n: Node => (n.label, n.text)
-  }.toMap
   def loadMod(modBasePath: Path, modData: Node, platform: Platform) =
-    ModData(readModManifest(modData), readModRawProperties(modData), readModGameplay(modBasePath, modData, platform))
+    ModData(readModManifest(modData), readModGameplay(modBasePath, modData, platform))
 }
