@@ -171,7 +171,7 @@ object ModTranslator {
       out.append("local assetPrefix = _mvmm.getAssetPrefix(function() end)")
       out.append("\n")
       out.append("local rawProperties = {}\n")
-      for((name, value) <- modData.rawProperties) {
+      for((name, value) <- modData.manifest.rawProperties) {
         out.append("rawProperties[ "+quoteLuaString(name)+" ] = "+quoteLuaString(value)+"\n")
       }
       out.append("\n")
@@ -207,8 +207,9 @@ object ModTranslator {
         LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ x._2
       } else x._2)) ++ manifest
 
-    DLCData(translatedUUID, modData.manifest.version, 300 + priority, modData.manifest.name, fullDescription,
-            data.flatMap(_._1.flatMap(_.toSeq)), data.flatMap(_._2.flatMap(_.toSeq)),
-            mapScripts, fileList, Seq(targetUISkin))
+    DLCData(DLCManifest(translatedUUID, modData.manifest.version, 300 + priority,
+                        modData.manifest.name, fullDescription),
+            DLCGameplay(data.flatMap(_._1.flatMap(_.toSeq)), data.flatMap(_._2.flatMap(_.toSeq)),
+                        mapScripts, fileList, Seq(targetUISkin)))
   }
 }

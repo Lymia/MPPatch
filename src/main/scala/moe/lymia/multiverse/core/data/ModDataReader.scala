@@ -51,11 +51,11 @@ object ModDataReader {
     case game @ <Game/> => ModGameVersion(getAttribute(game, "minversion"), getAttribute(game, "maxversion"))
     case mod @ <Mod/> =>
       ModToModReference(UUID.fromString(getAttribute(mod, "id")),
-                        getAttribute(mod, "minversion").toInt, getAttribute(mod, "maxversion").toInt,
-                        getAttribute(mod, "title"))
+                                        getAttribute(mod, "minversion").toInt, getAttribute(mod, "maxversion").toInt,
+                                        getAttribute(mod, "title"))
     case dlc @ <DLC/> =>
       ModDlcDependency(UUID.fromString(getAttribute(dlc, "id")),
-                       getAttribute(dlc, "minversion").toInt, getAttribute(dlc, "maxversion").toInt)
+                                       getAttribute(dlc, "minversion").toInt, getAttribute(dlc, "maxversion").toInt)
   }
   private def readModEntryPoints(uuid: UUID, modBasePath: Path, n: NodeSeq,
                                  files: Map[String, (String, Boolean, String)], platform: Platform) = {

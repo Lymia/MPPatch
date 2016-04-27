@@ -25,7 +25,7 @@ package moe.lymia.multiverse.core.generator
 import java.nio.file.{Files, Path}
 import java.util.UUID
 
-import moe.lymia.multiverse.core.data.DLCData
+import moe.lymia.multiverse.core.data._
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.res.LuaCode
 
@@ -44,8 +44,8 @@ object BaseDLC {
       val targetPath = platform.resolve(civBaseDirectory, platform.assetsPath, realPath)
       (file, LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath))
     }).toMap
-    DLCData(DlcUUID.BASE_DLC_UUID, 1, 250,
-      "Multiverse - Base DLC", "Base DLC for Multiverse",
-      Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library, Nil)
+    DLCData(DLCManifest(DlcUUID.BASE_DLC_UUID, 1, 250,
+                        "Multiverse - Base DLC", "Base DLC for Multiverse"),
+            DLCGameplay(Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library, Nil))
   }
 }
