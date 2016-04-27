@@ -124,7 +124,7 @@ class PatchInstaller(basePath: Path, platform: Platform) {
 
 
   def checkPatchStatus() = {
-    val detectedPatchFiles = platformInfo.findInstalledFiles(IOUtils.listFiles(basePath))
+    val detectedPatchFiles = platformInfo.findInstalledFiles(IOUtils.listFileNames(basePath))
 
     if(Files.exists(patchLockPath)) PatchStatus.StateIsDirty
     else if(Files.exists(patchStatePath)) loadPatchState() match {

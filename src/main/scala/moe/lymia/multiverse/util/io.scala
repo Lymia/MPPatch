@@ -21,7 +21,8 @@ object IOUtils {
   def readFileAsBytes(path: Path) = Files.readAllBytes(path)
   def readFileAsString(path: Path) = new String(readFileAsBytes(path), StandardCharsets.UTF_8)
 
-  def listFiles(path: Path) = Files.list(path).toArray.map(_.toString)
+  def listFiles(path: Path) = Files.list(path).toArray.map(_.asInstanceOf[Path])
+  def listFileNames(path: Path) = listFiles(path).map(_.getFileName.toString)
 
   val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
   def writeXML(path: Path, xml: Node, prettyPrint: Boolean = true) = {
