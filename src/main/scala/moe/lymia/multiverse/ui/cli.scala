@@ -89,7 +89,9 @@ class CLI(locale: Locale) {
   }
 
   private def cmd_status(args: CLIArguments, platform: Platform, installer: Installer) = {
-    println(i18n("cli.cmd.status.patchStatus", installer.patchInstaller.checkPatchStatus()))
+    val status = installer.patchInstaller.checkPatchStatus()
+    println(i18n("cli.cmd.status.patchStatus", status, installer.patchInstaller.actionStatus(false)
+                                                     , installer.patchInstaller.actionStatus(true )))
   }
 
   private def cmd_list(args: CLIArguments, platform: Platform, installer: Installer) = {
@@ -111,7 +113,7 @@ class CLI(locale: Locale) {
     val dlc =
       if(args.uuid == "base") BaseDLC.generateBaseDLC(args.systemPath.get, platform)
       else try {
-        installer.listMods().getByUUID(UUID.fromString(args.uuid)) match {
+        installer.listMods().byUUID.get(UUID.fromString(args.uuid)) match {
           case Some(x) =>
             val mod = ModDataReader.loadMod(x.path.getParent, IOUtils.readXML(x.path), platform)
             ModTranslator.translateModToDLC(mod, 0, ModTranslator.UISkin_BraveNewWorld, platform)

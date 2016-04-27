@@ -29,11 +29,19 @@ import moe.lymia.multiverse.util.IOUtils
 
 case class ManifestEntry[Manifest <: ManifestCommon](path: Path, manifest: Manifest)
 case class ManifestList [Manifest <: ManifestCommon](manifestList: Seq[ManifestEntry[Manifest]]) {
-  private def byUUIDCache = new collection.mutable.HashMap[UUID, Option[ManifestEntry[Manifest]]]
-  def getByUUID(uuid: UUID) = byUUIDCache.getOrElseUpdate(uuid, {
-    val found = manifestList.filter(_.manifest.uuid == uuid)
-    if(found.length == 1) Some(found.head) else None
-  })
+  lazy val (byUUID, uuidConflicts) = {
+    val byUUID        = new collection.mutable.HashMap[UUID, ManifestEntry[Manifest]]
+    val uuidConflicts = new collection.mutable.TreeSet[UUID]
+    for(entry <- manifestList) {
+      if(byUUID.contains(entry.manifest.uuid)) {
+        byUUID.remove(entry.manifest.uuid)
+        uuidConflicts.add(entry.manifest.uuid)
+      } else if(!uuidConflicts.contains(entry.manifest.uuid)) {
+        byUUID.put(entry.manifest.uuid, entry)
+      }
+    }
+    (byUUID.toMap, uuidConflicts.toSet)
+  }
 }
 class GenericListWrapper[Manifest <: ManifestCommon](defaultExtension: String,
                                                      loader: Seq[Path] => Seq[ManifestEntry[Manifest]]) {

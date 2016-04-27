@@ -74,9 +74,9 @@ private object PatchState {
 
 sealed trait PatchActionStatus
 object PatchActionStatus {
-  case object CanLaunch extends PatchActionStatus
+  case object CanLaunch   extends PatchActionStatus
   case object NeedsUpdate extends PatchActionStatus
-  case object FatalError           extends PatchActionStatus
+  case object FatalError  extends PatchActionStatus
 }
 
 case class PatchInstalledFile(name: String, data: Array[Byte], executable: Boolean = false)
