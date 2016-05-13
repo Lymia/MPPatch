@@ -24,7 +24,7 @@ package moe.lymia.multiverse.util
 
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path}
+import java.nio.file.{Files, Path, StandardOpenOption}
 
 import scala.xml.{Node, NodeSeq, PrettyPrinter, XML}
 import play.api.libs.json._
@@ -68,7 +68,7 @@ object IOUtils {
 
   def withLock[T](lockFile: Path)(f: => T) = {
     val lock = new FileLock(lockFile)
-    if(!lock.acquired) sys.error("Could not acquire lock $lockFile")
+    if(!lock.acquired) sys.error(s"Could not acquire lock $lockFile")
     try {
       f
     } finally {
@@ -78,7 +78,7 @@ object IOUtils {
 }
 
 class FileLock(lockFile: Path) {
-  private val channel  = FileChannel.open(lockFile)
+  private val channel  = FileChannel.open(lockFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
   private val lock     = Option(channel.tryLock)
   private var released = false
 
