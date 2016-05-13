@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.util
 
+import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
@@ -64,4 +65,28 @@ object IOUtils {
 
   def writeJson(path: Path, json: JsValue) = writeFile(path, Json.prettyPrint(json))
   def readJson(path: Path) = Json.parse(readFileAsString(path))
+
+  def withLock[T](lockFile: Path)(f: => T) = {
+    val lock = new FileLock(lockFile)
+    if(!lock.acquired) sys.error("Could not acquire lock $lockFile")
+    try {
+      f
+    } finally {
+      lock.release()
+    }
+  }
+}
+
+class FileLock(lockFile: Path) {
+  private val channel  = FileChannel.open(lockFile)
+  private val lock     = Option(channel.tryLock)
+  private var released = false
+
+  val acquired = lock.isDefined
+  def release() = if(!released) {
+    lock.foreach(_.release)
+    channel.close()
+    released = true
+  }
+  if(lock.isEmpty) release()
 }

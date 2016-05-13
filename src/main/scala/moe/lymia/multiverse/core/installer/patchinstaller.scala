@@ -99,8 +99,11 @@ class PatchInstaller(basePath: Path, platform: Platform) {
   private val platformInfo   = platform.patchInfo
 
   private def lock[T](f: => T) = {
-    Files.createFile(patchLockPath)
-    try { f } finally { Files.delete(patchLockPath) }
+    try {
+      IOUtils.withLock(patchLockPath)(f)
+    } finally {
+      Files.deleteIfExists(patchLockPath)
+    }
   }
 
   private def validatePatchFile(file: PatchFile) = {
