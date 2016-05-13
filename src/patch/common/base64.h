@@ -25,6 +25,7 @@
 
 #include <stddef.h>
 
+size_t base64OutputSize(size_t len);
 void decodeBase64(const char* in, char* out, size_t len, size_t outlen);
 
 #endif /* BASE64_H */

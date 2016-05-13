@@ -54,16 +54,15 @@ ASM_ENTRY bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connect
         int   length;
         XmlNode_GetValUtf8(xmlNode, &string, &length);
 
-        // TODO: Calculate base64 size more precisely. This is massive overkill.
-        char* tmpString = malloc(length + 1);
-        memset(tmpString, 0, length);
-        decodeBase64(string, tmpString, length, length);
+        size_t targetLength = base64OutputSize(length);
+        char* tmpString = malloc(targetLength);
+        memset(tmpString, 0, targetLength);
+        decodeBase64(string, tmpString, length, targetLength);
 
         debug_print("Executing XML-encapsulated SQL:\n%s", tmpString);
 
         if(!Database_ExecuteMultiple(connection, tmpString, strlen(tmpString))) {
-            Database_LogMessage(connection,
-                "Failed to execute statement while processing __MVMM_PATCH_RAWSQL tag.");
+            Database_LogMessage(connection, "Failed to execute statement while processing __MVMM_PATCH_RAWSQL tag.");
             *success = 0;
         }
 

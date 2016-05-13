@@ -35,6 +35,9 @@ static int decodeChar(char c) {
     return 0;
 }
 
+size_t base64OutputSize(size_t len) {
+    return ((len - 1) / 4 + 1) * 3 + 1;
+}
 void decodeBase64(const char* in, char* out, size_t len, size_t outlen) {
     for(int i=0, j=0; i < len && j < outlen; i += 4, j += 3) {
         char a = in[i  ];
