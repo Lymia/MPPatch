@@ -72,6 +72,7 @@ class CLI(locale: Locale) {
       opt[Unit]('d', "debug").action((_, args) => args.copy(debug = true))
         .text(i18n("cli.cmd.updatePatch.param.debug"))
     )
+    cmd2("uninstallPatch").action((_, args) => args.copy(command = cmd_uninstall))
   }
 
   private def fatal(err: String) = {
@@ -131,6 +132,9 @@ class CLI(locale: Locale) {
   private def cmd_update(args: CLIArguments, platform: Platform, installer: Installer) = {
     if(!args.force) installer.patchInstaller.safeUpdate(args.debug)
     else sys.error("force update not yet implemented")
+  }
+  private def cmd_uninstall(args: CLIArguments, platform: Platform, installer: Installer) = {
+    installer.patchInstaller.safeUninstall()
   }
 
   def executeCommand(args: Seq[String]) = {

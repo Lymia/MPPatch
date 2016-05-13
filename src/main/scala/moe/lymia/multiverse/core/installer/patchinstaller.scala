@@ -224,6 +224,7 @@ class PatchInstaller(basePath: Path, platform: Platform) {
     case _ =>
       PatchActionStatus.FatalError
   }
+
   def safeUpdate(debug: Boolean) = checkPatchStatus() match {
     case PatchStatus.Installed(`debug`) => sys.error("no need to update")
     case PatchStatus.Installed(_) | PatchStatus.RequiresUpdate =>
@@ -235,5 +236,13 @@ class PatchInstaller(basePath: Path, platform: Platform) {
     case PatchStatus.NotInstalled(true) =>
       installPatch(debug)
     case _ => sys.error("cannot safely update")
+  }
+  def safeUninstall() = checkPatchStatus() match {
+    case PatchStatus.NotInstalled(_) => sys.error("no need to uninstall")
+    case PatchStatus.Installed(_) | PatchStatus.RequiresUpdate =>
+      uninstallPatch(false)
+    case PatchStatus.TargetUpdated(true) =>
+      uninstallPatch(true)
+    case _ => sys.error("cannot safely uninstall")
   }
 }
