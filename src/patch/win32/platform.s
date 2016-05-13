@@ -24,24 +24,16 @@ extern cif_resolveSymbol
 
 %macro generate_variables 1
     %defstr proxy_symbol_name %1
-    segment .data
-        %1_offset: dd 0
     segment .rdata
         %1_name: dd proxy_symbol_name, 0
-    segment .text
     %undef proxy_symbol_name
-    global _%1
-    _%1: jmp [%1_offset]
-    export %1
+
+    segment .text_proxy
+        global _%1
+        jmptarget _%1
+        export %1
+    segment .text
+
+    jmplist_add _%1, 1, %1_name
 %endmacro
 proxy_symbols generate_variables
-
-%macro init_variables 1
-    push %1_name
-    call cif_resolveSymbol
-    mov [%1_offset], eax
-%endmacro
-global _InitializeProxy
-_InitializeProxy:
-    proxy_symbols init_variables
-    ret

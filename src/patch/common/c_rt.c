@@ -21,6 +21,7 @@
 */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
@@ -37,11 +38,6 @@
 #else
     #define debug_print(format, ...)
 #endif
-
-extern ASM_ENTRY void* asm_resolveAddress(int address) __asm__("cif_resolveAddress");
-ASM_ENTRY void* asm_resolveAddress(int address) {
-    return resolveAddress(address);
-}
 
 // Actual patch code!
 static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, const char* reason) {
@@ -77,4 +73,18 @@ void unpatch(UnpatchData* data) {
     memcpy(data->offset, data->oldData, 5);
     protectMemoryRegion(data->offset, 5, &protectFlags);
     free(data);
+}
+
+typedef struct jmplist_type {
+    int32_t exists;
+    int32_t addr;
+    int32_t isSymbol;
+    int32_t target;
+} __attribute__((packed)) jmplist_type;
+extern jmplist_type jmplist[] __asm__("cif_jmplist");
+__attribute__((constructor(250))) static void initJmps() {
+    for(jmplist_type* t = jmplist; t->exists; t++) {
+        void* targetAddress = !t->isSymbol ? resolveAddress(t->target) : resolveSymbol((const char*) t->target);
+        free(doPatch((int) t->addr, targetAddress, "jmplist initialization"));
+    }
 }

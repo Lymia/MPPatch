@@ -28,9 +28,7 @@ cif_LuaTableHook:
     call cif_LuaTableHookCore
     pop_all
 
-    prepare_symbol LuaTableHook_SafeRegister, LuaTableHook_ReturnAddr
-    LuaTableHook_PatchInstructions
-    jmp LuaTableHook_SafeRegister
+    dynamic_jmp LuaTableHook_ReturnAddr
 
 extern cif_XmlParserHookCore
 global cif_XmlParserHook
@@ -57,15 +55,11 @@ cif_XmlParserHook:
         pop_all
         pop XMLParserHook_ContinueStatusRegister
 
-        prepare_symbol XMLParserHook_ContinueSafeRegister, XMLParserHook_ContinueAddr
-        XMLParserHook_ContinuePatchInstructions
-        jmp XMLParserHook_ContinueSafeRegister
+        dynamic_jmp XMLParserHook_ContinueAddr
 
     .proceedExit:
         pop_all
         add esp, 4
 
-        prepare_symbol XMLParserHook_SafeRegister, XMLParserHook_ReturnAddr
-        XMLParserHook_PatchInstructions
-        jmp XMLParserHook_SafeRegister
+        dynamic_jmp XMLParserHook_ReturnAddr
 

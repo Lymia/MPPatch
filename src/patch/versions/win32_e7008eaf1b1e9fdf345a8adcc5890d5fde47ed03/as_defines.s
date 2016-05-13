@@ -28,12 +28,10 @@ LuaTableHook_ReturnAddr   : equ 0x1000B49E
     lea esi, [esp+0x10+8*4+8] ; name_node
     mov edi, [edi + 768]      ; connection
 %endmacro
-%define XMLParserHook_ContinueSafeRegister ecx
 %define XMLParserHook_ContinueStatusRegister eax
 %macro XMLParserHook_ContinuePatchInstructions 0
     ; Nothing here!
 %endmacro
-%define XMLParserHook_SafeRegister ecx
 %macro XMLParserHook_PatchInstructions 0
     lea edx, [esp+0x20-0x14]
     push edx
@@ -43,7 +41,6 @@ LuaTableHook_ReturnAddr   : equ 0x1000B49E
     mov edi, esi ; Lua state
     mov esi, ebx ; Lua table
 %endmacro
-%define LuaTableHook_SafeRegister ebx
 %macro LuaTableHook_PatchInstructions 0
     add esp, 0x38
     pop edi

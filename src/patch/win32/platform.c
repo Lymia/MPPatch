@@ -58,7 +58,6 @@ __stdcall void* asm_resolveSymbol(const char* symbol) /*   */ {
 
 // Symbol resolution
 #define TARGET_LIBRARY_NAME "CvGameDatabase_orig_" CV_CHECKSUM ".dll"
-extern __stdcall void InitializeProxy();
 __attribute__((constructor(200))) static void initializeProxy() {
     debug_print("Loading original CvGameDatabase");
     char buffer[1024];
@@ -69,8 +68,6 @@ __attribute__((constructor(200))) static void initializeProxy() {
         snprintf(buffer, 1024, "Could not load original .dll file. (code: 0x%08x)", GetLastError());
         fatalProxyFailure(buffer);
     }
-    debug_print("Initializing symbol cache for proxying");
-    InitializeProxy();
 }
 __attribute__((destructor(200))) static void deinitializeProxy() {
     debug_print("Unloading original CvGameDatabase");

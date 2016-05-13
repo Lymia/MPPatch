@@ -18,18 +18,6 @@
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
 
-; Import convenience functions
-extern cif_resolveAddress
-%macro prepare_symbol 2
-    push 0
-    push_all
-    push %2
-    call cif_resolveAddress
-    mov dword [esp+4+8*4], eax
-    pop_all
-    pop %1
-%endmacro
-
 ; Convenience functions for storing registers/etc
 %macro push_all 0
     pushad
@@ -38,4 +26,35 @@ extern cif_resolveAddress
 %macro pop_all 0
     popfd
     popad
+%endmacro
+
+; Generate jump target symbol
+segment .rdata_jmplist
+global cif_jmplist
+cif_jmplist:
+segment .text
+
+%macro jmptarget 1
+    %1: dd 0, 0
+%endmacro
+
+%macro jmplist_add 3
+    segment .rdata_jmplist
+        dd 1, %1, %2, %3
+    segment .text
+%endmacro
+%macro jmplist_end 0
+    segment .rdata_jmplist
+        dd 0, 0, 0, 0
+    segment .text
+%endmacro
+
+%macro dynamic_jmp 1
+    segment .text_jmplist
+        jmptarget .%1_jmp
+
+    jmplist_add .%1_jmp, 0, %1
+
+    segment .text
+        jmp .%1_jmp
 %endmacro

@@ -25,7 +25,9 @@ segment .text
 __start:
 
 %include "as_rt.s"
+
 %include "as_defines.s"
 %include "platform.s"
 %include "hooks.s"
 
+jmplist_end
