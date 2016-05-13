@@ -35,8 +35,6 @@ import moe.lymia.multiverse.util.IOUtils
 
 case class CLIArguments(command: (CLIArguments, Platform, Installer) => Unit,
                         systemPath: Option[Path], userPath: Option[Path],
-                        // common options
-                        force: Boolean = false,
                         // write data options
                         uuid  : String = "",
                         target: File   = null,
@@ -67,8 +65,6 @@ class CLI(locale: Locale) {
       arg[File  ](i18n("cli.cmd.writeDLCData.args.target")).action((f, args) => args.copy(target = f)).hidden
     )
     cmd2("updatePatch").action((_, args) => args.copy(command = cmd_update)).children(
-      opt[Unit]('f', "force").action((_, args) => args.copy(force = true))
-        .text(i18n("cli.cmd.updatePatch.param.force")),
       opt[Unit]('d', "debug").action((_, args) => args.copy(debug = true))
         .text(i18n("cli.cmd.updatePatch.param.debug"))
     )
@@ -130,8 +126,7 @@ class CLI(locale: Locale) {
   }
 
   private def cmd_update(args: CLIArguments, platform: Platform, installer: Installer) = {
-    if(!args.force) installer.patchInstaller.safeUpdate(args.debug)
-    else sys.error("force update not yet implemented")
+    installer.patchInstaller.safeUpdate(args.debug)
   }
   private def cmd_uninstall(args: CLIArguments, platform: Platform, installer: Installer) = {
     installer.patchInstaller.safeUninstall()
