@@ -18,7 +18,7 @@
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
 
-; Convenience functions for storing registers/etc
+; Convenience functions
 %macro push_all 0
     pushad
     pushfd
@@ -26,6 +26,14 @@
 %macro pop_all 0
     popfd
     popad
+%endmacro
+
+%macro symbol_toString 2
+    %defstr tmp_str %2
+    segment .rdata
+        %1: dd tmp_str, 0
+    segment .text
+    %undef tmp_str
 %endmacro
 
 ; Generate jump target symbol
@@ -38,22 +46,24 @@ segment .text
     %1: dd 0, 0
 %endmacro
 
-%macro jmplist_add 3
+%macro jmplist_add 4
     segment .rdata_jmplist
-        dd 1, %1, %2, %3
+        dd 1, %1, %2, %3, %4
     segment .text
 %endmacro
 %macro jmplist_end 0
     segment .rdata_jmplist
-        dd 0, 0, 0, 0
+        dd 0, 0, 0, 0, 0
     segment .text
 %endmacro
 
 %macro dynamic_jmp 1
+    symbol_toString .%1_name, %1
+
     segment .text_jmplist
         jmptarget .%1_jmp
 
-    jmplist_add .%1_jmp, 0, %1
+    jmplist_add .%1_jmp, 0, %1, .%1_name
 
     segment .text
         jmp .%1_jmp

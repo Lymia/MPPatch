@@ -80,11 +80,14 @@ typedef struct jmplist_type {
     int32_t addr;
     int32_t isSymbol;
     int32_t target;
+    const char* string;
 } __attribute__((packed)) jmplist_type;
 extern jmplist_type jmplist[] __asm__("cif_jmplist");
 __attribute__((constructor(250))) static void initJmps() {
     for(jmplist_type* t = jmplist; t->exists; t++) {
         void* targetAddress = !t->isSymbol ? resolveAddress(t->target) : resolveSymbol((const char*) t->target);
-        free(doPatch((int) t->addr, targetAddress, "jmplist initialization"));
+        char buffer[128];
+        snprintf(buffer, 128, "jmplist initialization (%s)", t->string);
+        free(doPatch((int) t->addr, targetAddress, buffer));
     }
 }

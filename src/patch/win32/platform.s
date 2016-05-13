@@ -23,10 +23,7 @@ extern cif_resolveSymbol
 %include "symbols.s"
 
 %macro generate_variables 1
-    %defstr proxy_symbol_name %1
-    segment .rdata
-        %1_name: dd proxy_symbol_name, 0
-    %undef proxy_symbol_name
+    symbol_toString %1_name, %1
 
     segment .text_proxy
         global _%1
@@ -34,6 +31,6 @@ extern cif_resolveSymbol
         export %1
     segment .text
 
-    jmplist_add _%1, 1, %1_name
+    jmplist_add _%1, 1, %1_name, %1_name
 %endmacro
 proxy_symbols generate_variables
