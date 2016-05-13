@@ -71,13 +71,13 @@ object ModTranslator {
   val audioScriptMap = {
     val stringFields  = Seq("ScriptID", "SoundID", "SoundType", "StartPosition", "EndPosition", "Channel")
     val booleanFields = Seq("Looping", "StartFromRandomPosition", "OnlyTriggerOnUnitRuns", "DontPlay",
-      "DontTriggerDuplicates", "DontTriggerDuplicatesOnUnits", "IsMusic")
+                            "DontTriggerDuplicates", "DontTriggerDuplicatesOnUnits", "IsMusic")
     val integerFields = Seq("MaxVolume", "MinVolume", "DontPlayMoreThan", "PercentChanceOfPlaying",
-      "MinTimeMustNotPlayAgain", "MaxTimeMustNotPlayAgain", "MinTimeDelay", "MaxTimeDelay",
-      "PitchChangeDown", "PitchChangeUp", "Priority", "MinRightPan", "MaxRightPan",
-      "MinLeftPan", "MaxLeftPan", "MinVelocity", "MaxVelocity")
+                            "MinTimeMustNotPlayAgain", "MaxTimeMustNotPlayAgain", "MinTimeDelay", "MaxTimeDelay",
+                            "PitchChangeDown", "PitchChangeUp", "Priority", "MinRightPan", "MaxRightPan",
+                            "MinLeftPan", "MaxLeftPan", "MinVelocity", "MaxVelocity")
     val floatFields   = Seq("DryLevel", "WetLevel", "TaperSoundtrackVolume", "DistanceFromListener", "MinDistance",
-      "CutoffDistance")
+                            "CutoffDistance")
 
     ((stringFields.map(x => (x, x)) ++ booleanFields.map(x => (x, "b"+x)) ++
       integerFields.map(x => (x, "i"+x)) ++ floatFields.map(x => (x, "f"+x))).toMap,
@@ -93,7 +93,7 @@ object ModTranslator {
     "OnlyLoadOneVariationEachTime" -> mapBoolean,
     "DontCache"                    -> mapBoolean,
     "LoadType"                     -> ((s: String) => {
-      // I'm pretty sure DynamicResident doesn't actually exist, and modders are just being stupid.
+      // I'm pretty sure DynamicResident doesn't actually exist, and modders are copying other modders' mistakes.
       // Probably ends up defaulting to STREAMED or something. I'd need to investigate and find out.
       if(s.equalsIgnoreCase("DynamicResident"))  "DYNAMIC_RES"
       else if(s.equalsIgnoreCase("Dynamic_Res")) "DYNAMIC_RES"
@@ -190,9 +190,9 @@ object ModTranslator {
       out.append("\n")
       out.append("if _mvmm and not _mvmm.disabled then\n")
       out.append("  _mvmm.registerMod("+VersionInfo.patchCompat+", uuid, version, name, " +
-                 "{ properties = rawProperties,"+
-                 " assetPrefix = assetPrefix,"+
-                 " entryPoints = entryPoints })\n")
+                 "                    { properties = rawProperties,"+
+                 "                      assetPrefix = assetPrefix,"+
+                 "                      entryPoints = entryPoints })\n")
       out.append("end\n")
 
       Map("mvmm_modmanifest_"+translatedUUID.toString.replace("-", "")+".lua" -> out.toString().getBytes("UTF8"))
