@@ -25,7 +25,7 @@ package moe.lymia.multiverse.core.data
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
-import scala.Predef.{Manifest => _} // shut up compiler warning
+import scala.Predef.{Manifest => _, _} // shut up compiler warning
 
 import moe.lymia.multiverse.util.IOUtils
 

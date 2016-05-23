@@ -48,5 +48,5 @@ object DLCDataReader {
                 readDlcNameField(uuid, dlcData, "Name"),
                 readDlcNameField(uuid, dlcData, "Description"))
   }
-  def readDlcManifest(dlcData: Path) = readDlcManifest(IOUtils.readXML(dlcData))
+  def readDlcManifest(dlcData: Path): DLCManifest = readDlcManifest(IOUtils.readXML(dlcData))
 }
