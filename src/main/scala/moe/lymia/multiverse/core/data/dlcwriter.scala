@@ -29,26 +29,26 @@ import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.{Crypto, IOUtils}
 
 object DLCKey {
-  val staticInterlace =
+  private val staticInterlace =
     Seq(0x1f, 0x33, 0x93, 0xfb, 0x35, 0x0f, 0x42, 0xc7,
       0xbd, 0x50, 0xbe, 0x7a, 0xa5, 0xc2, 0x61, 0x81) map (_.toByte)
-  val staticInterlaceStream = Stream.from(0) map (x => staticInterlace(x%staticInterlace.length))
-  def interlaceData(data: Seq[Byte]) =
+  private val staticInterlaceStream = Stream.from(0) map (x => staticInterlace(x%staticInterlace.length))
+  private def interlaceData(data: Seq[Byte]) =
     data.zip(staticInterlaceStream).flatMap(x => Seq(x._1, x._2))
 
-  def encodeLe32(i: Int) =
+  private def encodeLe32(i: Int) =
     Seq(i&0xFF, (i>>8)&0xFF, (i>>16)&0xFF, (i>>24)&0xFF)
-  def encodeBe32(i: Int) = encodeLe32(i).reverse
-  def encodeLe16(i: Int) =
+  private def encodeBe32(i: Int) = encodeLe32(i).reverse
+  private def encodeLe16(i: Int) =
     Seq(i&0xFF, (i>>8)&0xFF)
-  def encodeUUID(u: UUID) =
+  private def encodeUUID(u: UUID) =
     (encodeLe32(((u.getMostSignificantBits >>32) & 0xFFFFFFFF).toInt) ++
       encodeLe16(((u.getMostSignificantBits >>16) &     0xFFFF).toInt) ++
       encodeLe16(((u.getMostSignificantBits >> 0) &     0xFFFF).toInt) ++
       encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
       encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
+  private def encodeNumber(i: Int) = i.toString.getBytes("UTF8").toSeq
 
-  def encodeNumber(i: Int) = i.toString.getBytes("UTF8").toSeq
   def key(u: UUID, sid: Seq[Int], ptags: String*) = {
     val data = sid.map(encodeNumber) ++ ptags.map(_.getBytes("UTF8").toSeq)
     Crypto.md5_hex(interlaceData(encodeUUID(u) ++ data.fold(Seq())(_ ++ _)))
