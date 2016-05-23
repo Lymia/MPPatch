@@ -59,7 +59,6 @@ class CLI(locale: Locale) {
       .valueName(i18n("cli.param.args.directory")).text(i18n("cli.param.user-path"  ))
 
     cmd2("status").action((_, args) => args.copy(command = cmd_status))
-    cmd2("list").action((_, args) => args.copy(command = cmd_list))
     cmd2("writeDLCData").action((_, args) => args.copy(command = cmd_write)).children(
       arg[String](i18n("cli.cmd.writeDLCData.args.source")).action((u, args) => args.copy(uuid   = u)).hidden,
       arg[File  ](i18n("cli.cmd.writeDLCData.args.target")).action((f, args) => args.copy(target = f)).hidden
@@ -89,9 +88,7 @@ class CLI(locale: Locale) {
     val status = installer.patchInstaller.checkPatchStatus()
     println(i18n("cli.cmd.status.patchStatus", status, installer.patchInstaller.actionStatus(false)
                                                      , installer.patchInstaller.actionStatus(true )))
-  }
 
-  private def cmd_list(args: CLIArguments, platform: Platform, installer: Installer) = {
     def printManifestList[T <: ManifestCommon](entries: ManifestList[T]): Unit = {
       if(entries.manifestList.isEmpty) println(s"  - ${i18n("cli.cmd.list.noEntries")}")
       else for(entry <- entries.manifestList) {
