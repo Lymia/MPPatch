@@ -24,7 +24,7 @@ package moe.lymia.multiverse.core.data
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
-import java.util.UUID
+import java.util.{Locale, UUID}
 
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.{Crypto, IOUtils}
@@ -33,6 +33,8 @@ import moe.lymia.multiverse.util.XMLUtils._
 import scala.xml.{Node, NodeSeq, XML}
 
 object ModDataReader {
+  private def normalizeName(name: String) = name.toLowerCase(Locale.ENGLISH)
+
   // Mod manifest reader
   private def readModReferenceList(n: NodeSeq) = n.flatMap(_.child).collect {
     case game if game.label == "Game" => ModGameVersion(getAttribute(game, "minversion"), getAttribute(game, "maxversion"))
@@ -71,8 +73,8 @@ object ModDataReader {
 
   // Mod gameplay reader
   private def loadScriptFile(fileName: String, string: String) =
-    if(fileName.endsWith(".xml")) Some(ModXmlSource(XML.loadString(string)))
-    else if(fileName.endsWith(".sql")) Some(ModSqlSource(string))
+    if(normalizeName(fileName).endsWith(".xml")) Some(ModXmlSource(XML.loadString(string)))
+    else if(normalizeName(fileName).endsWith(".sql")) Some(ModSqlSource(string))
     else None
   private def readFile(modBasePath: Path, path: String, platform: Platform) =
     Files.readAllBytes(platform.resolve(modBasePath, path))
@@ -97,20 +99,20 @@ object ModDataReader {
   private def readFileList(modBasePath: Path, n: NodeSeq, p: Platform): Map[String, FileListEntry] =
     n.flatMap(_.child).collect {
       case file if file.label == "File" =>
-        file.text.toLowerCase ->
+        normalizeName(file.text) ->
           FileListEntry(file.text, getAttribute(file, "import") == "1", getAttribute(file, "md5"),
                         p.resolve(modBasePath, file.text))
     }.toMap
   private def loadFileList(modBasePath: Path, files: Map[String, (String, Boolean, String)], platform: Platform) =
     for((_, (name, doImport, md5)) <- files if doImport) yield
       (name, platform.resolve(modBasePath, name))
-  private def lookupFile(files: Map[String, FileListEntry], path: String) = files.get(path.toLowerCase)
+  private def lookupFile(files: Map[String, FileListEntry], path: String) = files.get(normalizeName(path))
   private def extractImportedFiles(files: Map[String, FileListEntry]) =
     files.filter(_._2.isImported).map(x => (x._1, ImportFromPath(x._2.path)))
 
   private def readModEntryPoints(uuid: UUID, modBasePath: Path, n: NodeSeq,
                                  fileList: Map[String, FileListEntry], platform: Platform) = {
-    val uuidStr    = uuid.toString.toLowerCase.replace("-", "")
+    val uuidStr    = normalizeName(uuid.toString).replace("-", "")
     val out        = n.flatMap(_.child).collect {
       case ep if ep.label == "EntryPoint" =>
         val fileName  = getAttribute(ep, "file")

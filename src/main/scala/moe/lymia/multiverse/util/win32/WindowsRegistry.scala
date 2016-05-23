@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.util.win32
 
+import java.util.Locale
 import java.util.prefs.Preferences
 
 object WindowsRegistry {
@@ -62,7 +63,8 @@ object WindowsRegistry {
                                             private[WindowsRegistry] val hrName: String,
                                             private[WindowsRegistry] val h: Dynamic) {
 
-    assert(System.getProperty("os.name").toLowerCase.contains("windows"), "Windows registry not available.")
+    assert(System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"),
+           "Windows registry not available.")
 
     def readKey[T: RegistryKeyType](key: String, value: String) =
       implicitly[RegistryKeyType[T]].readKey(this, key, value)
