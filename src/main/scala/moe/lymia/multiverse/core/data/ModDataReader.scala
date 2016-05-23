@@ -90,7 +90,7 @@ object ModDataReader {
 
   private case class FileListEntry(name: String, isImported: Boolean, md5: String, path0: Path) {
     lazy val path = {
-      if(!Files.exists(path0)) sys.error("file "+name+" could not be found!")
+      if(!Files.exists(path0)) sys.error(s"file $name could not be found!")
       path0
     }
   }
@@ -118,7 +118,7 @@ object ModDataReader {
 
         val filteredFileName = fileName.split(raw"[/\\]").last
         val outputName = if(fileEntry.isImported) fileName
-        else "mvmm_entrypoint_noexport_"+uuidStr+"_"+fileEntry.md5+"_"+filteredFileName
+        else s"mvmm_entrypoint_noexport_${uuidStr}_${fileEntry.md5}_$filteredFileName"
 
         val entryPoint = ModEntryPoint(getAttribute(ep, "type"), getNodeText(ep, "Name"),
                                        getNodeText(ep, "Description"), outputName)
