@@ -52,7 +52,7 @@ object ModTranslator {
   private def translateDataSource(d: ModDataSource, platform: Platform) = d match {
     case ModSqlSource(sql) => Seq(
       <__MVMM_PATCH_IGNORE>
-        <!-- This (hopefully) triggers an error for players who have an unmodded CvGameDatabase file -->
+        <!-- This (hopefully) triggers an error for players who have an unpatched game binary -->
         <Please_install_the_CvGameDatabase_patch_for_Multiverse_Mod_Manager>
         </Please_install_the_CvGameDatabase_patch_for_Multiverse_Mod_Manager>
       </__MVMM_PATCH_IGNORE>,

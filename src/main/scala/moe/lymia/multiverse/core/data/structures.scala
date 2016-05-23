@@ -22,17 +22,50 @@
 
 package moe.lymia.multiverse.core.data
 
+import java.nio.file.Path
 import java.util.UUID
 
 import scala.xml.Node
 
-case class ModAuthorshipInformation(authors: String, specialThanks: String, homepage: String)
+// Common components
+trait ManifestCommon {
+  val uuid   : UUID
+  val version: Int
+  val name   : String
+}
 
+sealed trait ImportedFile
+case class ImportFromPath(path: Path) extends ImportedFile
+case class ImportFromMemory(data: Array[Byte]) extends ImportedFile
+
+// DLC data structures
+case class DLCUISkin(name: String, set: String, platform: String, includeImports: Boolean,
+                     skinSpecificDirectory: Map[String, ImportedFile])
+case class DLCInclude(event: String, fileData: Node)
+case class DLCMap(extension: String, data: ImportedFile)
+
+case class DLCGameplay(gameplayIncludes: Seq[DLCInclude], globalIncludes: Seq[DLCInclude], mapEntries: Seq[DLCMap],
+                       importFileList: Map[String, ImportedFile], uiSkins: Seq[DLCUISkin])
+case class DLCManifest(uuid: UUID, version: Int, priority: Int, shortName: String, name: String)
+  extends ManifestCommon
+
+case class DLCData(manifest: DLCManifest, data: DLCGameplay)
+
+// Mod manifest data structures
 sealed trait ModReference
 case class ModToModReference(id: UUID, minVersion: Int, maxVersion: Int, title: String) extends ModReference
 case class ModGameVersion(minVersion: String, maxVersion: String) extends ModReference
 case class ModDlcDependency(id: UUID, minVersion: Int, maxVersion: Int) extends ModReference
 
+case class ModAuthorshipInformation(authors: String, specialThanks: String, homepage: String)
+case class ModManifest(uuid: UUID, version: Int, name: String, teaser: String, description: String,
+                       authorship: ModAuthorshipInformation, rawProperties: Map[String, String],
+                       dependencies: Seq[ModReference], references: Seq[ModReference], blocks: Seq[ModReference],
+                       manifestChecksum: String, manifestData: Node,
+                       modDataPath: Option[Path] = None)
+  extends ManifestCommon
+
+// Mod gameplay data structures
 sealed trait ModDataSource
 case class ModSqlSource(sql: String) extends ModDataSource
 case class ModXmlSource(xml: Node) extends ModDataSource
@@ -43,12 +76,9 @@ case class ModUpdateUserDataAction(data: ModDataSource) extends ModAction
 case class ModExecuteScriptAction (data: String) extends ModAction
 
 case class ModEntryPoint(event: String, name: String, description: String, file: String)
-case class ModManifest(uuid: UUID, version: Int, name: String, teaser: String, description: String,
-                       authorship: ModAuthorshipInformation, rawProperties: Map[String, String],
-                       dependencies: Seq[ModReference], references: Seq[ModReference], blocks: Seq[ModReference])
-  extends ManifestCommon
-case class ModGameplay(fileList: Map[String, Array[Byte]], entryPoints: Seq[ModEntryPoint],
+case class ModGameplay(importedFiles: Map[String, ImportedFile], entryPoints: Seq[ModEntryPoint],
                        onModActivated: Seq[ModAction], onCreateUserData: Seq[ModAction],
-                       dllOverride: Option[Array[Byte]])
-case class ModData(manifest: ModManifest, data: ModGameplay)
+                       dllOverride: Option[ImportedFile])
 
+// Combined data structure
+case class ModData(manifest: ModManifest, data: ModGameplay)

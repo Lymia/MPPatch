@@ -22,9 +22,12 @@
 
 package moe.lymia.multiverse.core.data
 
+import java.nio.file.Path
 import java.util.UUID
-import scala.xml.Node
 
+import moe.lymia.multiverse.util.IOUtils
+
+import scala.xml.Node
 import moe.lymia.multiverse.util.XMLUtils._
 
 object DLCDataReader {
@@ -37,7 +40,7 @@ object DLCDataReader {
       else                     node.head.text
     }
   }
-  def readDlcManifest(dlcData: Node) = {
+  def readDlcManifest(dlcData: Node): DLCManifest = {
     val uuid = UUID.fromString(getNodeText(dlcData, "GUID").replaceAll("[{}]", ""))
     DLCManifest(uuid,
                 getNodeText(dlcData, "Version").toInt,
@@ -45,4 +48,5 @@ object DLCDataReader {
                 readDlcNameField(uuid, dlcData, "Name"),
                 readDlcNameField(uuid, dlcData, "Description"))
   }
+  def readDlcManifest(dlcData: Path) = readDlcManifest(IOUtils.readXML(dlcData))
 }

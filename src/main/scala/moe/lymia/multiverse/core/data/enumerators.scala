@@ -25,6 +25,8 @@ package moe.lymia.multiverse.core.data
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
+import scala.Predef.{Manifest => _} // shut up compiler warning
+
 import moe.lymia.multiverse.util.IOUtils
 
 case class ManifestEntry[Manifest <: ManifestCommon](path: Path, manifest: Manifest)
@@ -78,7 +80,7 @@ object ModEnumerator {
   }
 
   def loadEnumeratedMods(paths: Seq[Path]) =
-    paths.map(x => ManifestEntry(x, ModDataReader.readModManifest(IOUtils.readXML(x))))
+    paths.map(x => ManifestEntry(x, ModDataReader.readModManifest(x)))
   def loadEnumeratedDLC(paths: Seq[Path]) =
-    paths.map(x => ManifestEntry(x, DLCDataReader.readDlcManifest(IOUtils.readXML(x))))
+    paths.map(x => ManifestEntry(x, DLCDataReader.readDlcManifest(x)))
 }
