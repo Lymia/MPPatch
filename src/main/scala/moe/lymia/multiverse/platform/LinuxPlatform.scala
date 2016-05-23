@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.platform
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Path, Paths}
 import java.util.Locale
 
@@ -43,7 +44,7 @@ object LinuxPlatform extends Platform {
   def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n")
 
   private def shellScript(name: String, text: String) =
-    PatchInstalledFile(name, ("#!/bin/bash\n"+text).getBytes("UTF-8"), executable = true)
+    PatchInstalledFile(name, ("#!/bin/bash\n"+text).getBytes(StandardCharsets.UTF_8), executable = true)
 
   def patchInfo = new PatchPlatformInfo {
     val replacementTarget = "Civ5XP"

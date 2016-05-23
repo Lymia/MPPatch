@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.core.data
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.util.UUID
 
@@ -43,6 +44,9 @@ case class ImportFromPath(path: Path) extends ImportedFile {
   lazy val data = IOUtils.readFileAsBytes(path)
 }
 case class ImportFromMemory(data: Array[Byte]) extends ImportedFile
+object ImportFromMemory extends (Array[Byte] => ImportFromMemory) {
+  def apply(data: String): ImportFromMemory = ImportFromMemory(data.getBytes(StandardCharsets.UTF_8))
+}
 
 // DLC data structures
 case class DLCUISkin(name: String, set: String, platform: String, includeImports: Boolean,

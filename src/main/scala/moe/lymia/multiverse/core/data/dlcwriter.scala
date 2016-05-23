@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.core.data
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
@@ -47,10 +48,10 @@ object DLCKey {
      encodeLe16(((u.getMostSignificantBits >> 0) &     0xFFFF).toInt) ++
      encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
      encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
-  private def encodeNumber(i: Int) = i.toString.getBytes("UTF8").toSeq
+  private def encodeNumber(i: Int) = i.toString.getBytes(StandardCharsets.US_ASCII).toSeq
 
   def key(u: UUID, sid: Seq[Int], ptags: String*) = {
-    val data = sid.map(encodeNumber) ++ ptags.map(_.getBytes("UTF8").toSeq)
+    val data = sid.map(encodeNumber) ++ ptags.map(_.getBytes(StandardCharsets.UTF_16).toSeq)
     Crypto.md5_hex(interlaceData(encodeUUID(u) ++ data.fold(Seq())(_ ++ _)))
   }
 }

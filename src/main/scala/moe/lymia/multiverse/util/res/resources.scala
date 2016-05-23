@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.util.res
 
+import java.nio.charset.StandardCharsets
 import java.util.Properties
 
 import moe.lymia.multiverse.util.Crypto
@@ -68,7 +69,7 @@ object LuaCode {
     "}\n" +
     "_mvmm.loadedModules.version = true\n"
   lazy val core_library_generated =
-    Map("mvmm_mod_version.lua" -> core_library_version_contents.getBytes("UTF-8"))
+    Map("mvmm_mod_version.lua" -> core_library_version_contents.getBytes(StandardCharsets.UTF_8))
   lazy val core_library =
     core_library_files.map(x => x -> loadBinaryResource("lua/"+x)).toMap ++ core_library_generated
 }

@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.core.generator
 
+import java.nio.charset.StandardCharsets
 import java.util.Locale
 import javax.xml.bind.DatatypeConverter
 
@@ -104,7 +105,7 @@ private object ActionProcessor {
         </Please_install_the_CvGameDatabase_patch_for_Multiverse_Mod_Manager>
       </__MVMM_PATCH_IGNORE>,
       <__MVMM_PATCH_RAWSQL> {
-        DatatypeConverter.printBase64Binary(sql.replace("\r\n","\n").getBytes("UTF-8"))
+        DatatypeConverter.printBase64Binary(sql.replace("\r\n","\n").getBytes(StandardCharsets.UTF_8))
       } </__MVMM_PATCH_RAWSQL>
     )
     case ModXmlSource(xml) => xml.child.filter(_.isInstanceOf[Elem])
@@ -168,7 +169,7 @@ object ModTranslator {
     val mapEntryPoints =
       modData.data.entryPoints.filter(_.event.equalsIgnoreCase("MapScript")).map(x => normalizeName(x.file))
     val mapScripts = mapEntryPoints.map(x =>
-      DLCMap("lua", ImportFromMemory(("include "+quoteLuaString(x)).getBytes("UTF8"))))
+      DLCMap("lua", ImportFromMemory("include "+quoteLuaString(x))))
 
     val manifest = {
       val out = new StringBuilder()
@@ -205,7 +206,7 @@ object ModTranslator {
       out.append("end\n")
 
       Map("mvmm_modmanifest_"+translatedUUID.toString.replace("-", "")+".lua" ->
-          ImportFromMemory(out.toString().getBytes("UTF8")))
+          ImportFromMemory(out.toString))
     }
 
     // Weird consideration... could we write values into ModEntryPoints/etc in an XML file, instead of the manifest?
@@ -214,7 +215,7 @@ object ModTranslator {
 
     val fileList = modData.data.importedFiles.map(x => x.copy(_1 = baseName(x._1), _2 =
       if(x._1.toLowerCase(Locale.ENGLISH).endsWith(".lua")) {
-        ImportFromMemory(LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ x._2.data)
+        ImportFromMemory(LuaCode.core_entrypoint_hook.getBytes(StandardCharsets.UTF_8) ++ x._2.data)
       } else x._2)) ++ manifest
 
     DLCData(DLCManifest(translatedUUID, modData.manifest.version, 350 + priority,

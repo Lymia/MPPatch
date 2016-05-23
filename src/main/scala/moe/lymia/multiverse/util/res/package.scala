@@ -24,6 +24,8 @@ package moe.lymia.multiverse.util
 
 import java.io.InputStream
 
+import scala.io.Codec
+
 package object res {
   private val base = "/moe/lymia/multiverse/data/"
 
@@ -36,7 +38,7 @@ package object res {
     getClass.getResourceAsStream(base + s)
 
   private[res] def loadFromStream(s: InputStream) =
-    io.Source.fromInputStream(s, "UTF-8").mkString
+    io.Source.fromInputStream(s)(Codec.UTF8).mkString
   private[res] def loadBinaryResourceFromStream(s: InputStream) =
     Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
 

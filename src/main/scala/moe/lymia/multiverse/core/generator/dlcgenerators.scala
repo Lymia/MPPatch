@@ -22,6 +22,7 @@
 
 package moe.lymia.multiverse.core.generator
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.UUID
 
@@ -42,7 +43,8 @@ object BaseDLC {
   def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
     val patchedFileList = (for((file, realPath) <- patchList) yield {
       val targetPath = platform.resolve(civBaseDirectory, platform.assetsPath, realPath)
-      (file, ImportFromMemory(LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath)))
+      (file, ImportFromMemory(LuaCode.core_entrypoint_hook.getBytes(StandardCharsets.UTF_8) ++
+                              Files.readAllBytes(targetPath)))
     }).toMap
     DLCData(DLCManifest(DlcUUID.BASE_DLC_UUID, 1, 300,
                         "Multiverse - Base DLC", "Multiverse - Base DLC"),
