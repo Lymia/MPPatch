@@ -56,7 +56,7 @@ object LinuxPlatform extends Platform {
         """path="`dirname "$0"`"
           |export LD_LIBRARY_PATH="$path:$LD_LIBRARY_PATH"
           |export LD_PRELOAD="mvmm_patch_$version.so"
-          |"$path/Civ5XP.orig.$version" $*
+          |exec -a Civ5XP "$path/Civ5XP.orig.$version" $*
           |""".stripMargin))
 
     def additionalFiles(versionName: String) = Seq(
@@ -66,7 +66,7 @@ object LinuxPlatform extends Platform {
           |export LD_PRELOAD="$path/mvmm_patch_$version.so"
           |export SteamAppId=8930
           |export LD_LIBRARY_PATH="$HOME/.steam/bin32/steam-runtime/i386/lib/i386-linux-gnu/:$HOME/.steam/bin32/steam-runtime/i386/usr/lib/i386-linux-gnu/"
-          |"$path/Civ5XP.orig.$version" $*
+          |exec -a Civ5XP "$path/Civ5XP.orig.$version" $*
           |""".stripMargin)
     )
 
