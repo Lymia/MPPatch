@@ -217,7 +217,7 @@ object ModTranslator {
         ImportFromMemory(LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ x._2.data)
       } else x._2)) ++ manifest
 
-    DLCData(DLCManifest(translatedUUID, modData.manifest.version, 300 + priority,
+    DLCData(DLCManifest(translatedUUID, modData.manifest.version, 350 + priority,
                         modData.manifest.name, modData.manifest.name),
             DLCGameplay(data.gameplayIncludes, data.globalIncludes,
                         mapScripts, fileList, Seq(targetUISkin)))

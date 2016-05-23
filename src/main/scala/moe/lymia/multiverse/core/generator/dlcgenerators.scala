@@ -44,7 +44,7 @@ object BaseDLC {
       val targetPath = platform.resolve(civBaseDirectory, platform.assetsPath, realPath)
       (file, ImportFromMemory(LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath)))
     }).toMap
-    DLCData(DLCManifest(DlcUUID.BASE_DLC_UUID, 1, 250,
+    DLCData(DLCManifest(DlcUUID.BASE_DLC_UUID, 1, 300,
                         "Multiverse - Base DLC", "Multiverse - Base DLC"),
             DLCGameplay(Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library.mapValues(ImportFromMemory), Nil))
   }
