@@ -25,6 +25,8 @@ package moe.lymia.multiverse.core.data
 import java.nio.file.Path
 import java.util.UUID
 
+import moe.lymia.multiverse.util.IOUtils
+
 import scala.xml.Node
 
 // Common components
@@ -34,8 +36,12 @@ trait ManifestCommon {
   val name   : String
 }
 
-sealed trait ImportedFile
-case class ImportFromPath(path: Path) extends ImportedFile
+sealed trait ImportedFile {
+  def data: Array[Byte]
+}
+case class ImportFromPath(path: Path) extends ImportedFile {
+  lazy val data = IOUtils.readFileAsBytes(path)
+}
 case class ImportFromMemory(data: Array[Byte]) extends ImportedFile
 
 // DLC data structures

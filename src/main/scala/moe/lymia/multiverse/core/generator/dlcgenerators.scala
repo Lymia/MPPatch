@@ -42,10 +42,10 @@ object BaseDLC {
   def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
     val patchedFileList = (for((file, realPath) <- patchList) yield {
       val targetPath = platform.resolve(civBaseDirectory, platform.assetsPath, realPath)
-      (file, LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath))
+      (file, ImportFromMemory(LuaCode.core_entrypoint_hook.getBytes("UTF8") ++ Files.readAllBytes(targetPath)))
     }).toMap
     DLCData(DLCManifest(DlcUUID.BASE_DLC_UUID, 1, 250,
                         "Multiverse - Base DLC", "Multiverse - Base DLC"),
-            DLCGameplay(Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library, Nil))
+            DLCGameplay(Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library.mapValues(ImportFromMemory), Nil))
   }
 }
