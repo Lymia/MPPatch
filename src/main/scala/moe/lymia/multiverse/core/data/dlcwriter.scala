@@ -43,10 +43,10 @@ object DLCKey {
     Seq(i&0xFF, (i>>8)&0xFF)
   private def encodeUUID(u: UUID) =
     (encodeLe32(((u.getMostSignificantBits >>32) & 0xFFFFFFFF).toInt) ++
-      encodeLe16(((u.getMostSignificantBits >>16) &     0xFFFF).toInt) ++
-      encodeLe16(((u.getMostSignificantBits >> 0) &     0xFFFF).toInt) ++
-      encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
-      encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
+     encodeLe16(((u.getMostSignificantBits >>16) &     0xFFFF).toInt) ++
+     encodeLe16(((u.getMostSignificantBits >> 0) &     0xFFFF).toInt) ++
+     encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
+     encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
   private def encodeNumber(i: Int) = i.toString.getBytes("UTF8").toSeq
 
   def key(u: UUID, sid: Seq[Int], ptags: String*) = {
