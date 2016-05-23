@@ -112,7 +112,7 @@ class CLI(locale: Locale) {
       else try {
         installer.listMods().byUUID.get(UUID.fromString(args.uuid)) match {
           case Some(x) =>
-            val mod = ModDataReader.loadMod(x.path.getParent, IOUtils.readXML(x.path), platform)
+            val mod = ModDataReader.loadMod(x.path.getParent, x.path, platform)
             ModTranslator.translateModToDLC(mod, 0, ModTranslator.UISkin_BraveNewWorld, platform)
           case None    =>
             fatal(i18n("cli.cmd.writeDLCData.notFound", args.uuid))
