@@ -45,18 +45,18 @@ case class ManifestList [Manifest <: ManifestCommon](manifestList: Seq[ManifestE
     (byUUID.toMap, uuidConflicts.toSet)
   }
 }
+
 class GenericListWrapper[Manifest <: ManifestCommon](defaultExtension: String,
                                                      loader: Seq[Path] => Seq[ManifestEntry[Manifest]]) {
-  def apply(path: Path, extension: String = defaultExtension) = {
-    val enumeratedFiles = ModEnumerator.enumerateFiles(path, extension)
+  def apply(path: Path, extension: String = defaultExtension, filter: Path => Boolean = _ => true) = {
+    val enumeratedFiles = DirectoryEnumerator.enumerateFiles(path, extension, filter)
     new ManifestList[Manifest](loader(enumeratedFiles.foundFiles ++ enumeratedFiles.conflictingFiles))
   }
 }
+object ModList extends GenericListWrapper(".modinfo", DirectoryEnumerator.loadEnumeratedMods)
+object DLCList extends GenericListWrapper(".civ5pkg", DirectoryEnumerator.loadEnumeratedDLC )
 
-object ModList extends GenericListWrapper(".modinfo", ModEnumerator.loadEnumeratedMods)
-object DLCList extends GenericListWrapper(".civ5pkg", ModEnumerator.loadEnumeratedDLC )
-
-object ModEnumerator {
+object DirectoryEnumerator {
   case class EnumeratedFilesList(foundFiles: Seq[Path] = Seq(), conflictingFiles: Seq[Path] = Seq()) {
     lazy val files = foundFiles ++ conflictingFiles
 
@@ -65,19 +65,21 @@ object ModEnumerator {
       EnumeratedFilesList(foundFiles ++ fl.foundFiles, conflictingFiles ++ fl.conflictingFiles)
   }
 
-  def enumerateFiles(base: Path, extension: String, pFoundConflict: Boolean = false): EnumeratedFilesList = {
-    val files = IOUtils.listFiles(base)
-    val foundModFiles = files.filter(_.getFileName.toString.toLowerCase(Locale.ENGLISH).endsWith(extension))
-    val foundConflict = pFoundConflict || foundModFiles.nonEmpty
+  def enumerateFiles(base: Path, extension: String, filter: Path => Boolean = _ => true,
+                     pFoundConflict: Boolean = false): EnumeratedFilesList =
+    if(filter(base)) {
+      val files = IOUtils.listFiles(base)
+      val foundModFiles = files.filter(_.getFileName.toString.toLowerCase(Locale.ENGLISH).endsWith(extension))
+      val foundConflict = pFoundConflict || foundModFiles.nonEmpty
 
-    val current =
-      if     (foundModFiles.isEmpty)     EnumeratedFilesList()
-      else if(foundModFiles.length == 1) EnumeratedFilesList(foundFiles       = foundModFiles)
-      else                               EnumeratedFilesList(conflictingFiles = foundModFiles)
+      val current =
+        if     (foundModFiles.isEmpty)     EnumeratedFilesList()
+        else if(foundModFiles.length == 1) EnumeratedFilesList(foundFiles       = foundModFiles)
+        else                               EnumeratedFilesList(conflictingFiles = foundModFiles)
 
-    files.filter(x => Files.isDirectory(x))
-         .map(x => enumerateFiles(x, extension, foundConflict)).fold(current)(_ ++ _)
-  }
+      files.filter(x => Files.isDirectory(x))
+           .map(x => enumerateFiles(x, extension, filter, foundConflict)).fold(current)(_ ++ _)
+    } else EnumeratedFilesList()
 
   def loadEnumeratedMods(paths: Seq[Path]) =
     paths.map(x => ManifestEntry(x, ModDataReader.readModManifest(x)))
