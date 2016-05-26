@@ -31,7 +31,7 @@ import moe.lymia.multiverse.util.res.{I18N, VersionInfo}
 import moe.lymia.multiverse.platform.Platform
 
 case class CLIArguments(command: (CLIArguments, Platform, Installer) => Unit,
-                        systemPath: Option[Path], userPath: Option[Path],
+                        systemPath: Option[Path],
                         // patch options
                         debug: Boolean = false)
 
@@ -49,8 +49,6 @@ class CLI(locale: Locale) {
 
     opt[File]("system-path").action((f, args) => args.copy(systemPath = Some(f.toPath)))
       .valueName(i18n("cli.param.args.directory")).text(i18n("cli.param.system-path"))
-    opt[File]("user-path"  ).action((f, args) => args.copy(userPath   = Some(f.toPath)))
-      .valueName(i18n("cli.param.args.directory")).text(i18n("cli.param.user-path"  ))
 
     cmd2("status").action((_, args) => args.copy(command = cmd_status))
     cmd2("updatePatch").action((_, args) => args.copy(command = cmd_update)).children(
@@ -68,7 +66,7 @@ class CLI(locale: Locale) {
 
   private def resolvePaths(paths: Seq[Path]) = paths.find(x => Files.exists(x) && Files.isDirectory(x))
   private def loadInstaller(args: CLIArguments, platform: Platform) =
-    new Installer(args.systemPath.get, args.userPath.get, platform)
+    new Installer(args.systemPath.get, platform)
 
   private def cmd_unknown(args: CLIArguments, platform: Platform, installer: Installer) = {
     println(i18n("cli.cmd.unknown"))
@@ -90,8 +88,7 @@ class CLI(locale: Locale) {
   def executeCommand(args: Seq[String]) = {
     val platform = Platform.currentPlatform.getOrElse(sys.error("Unknown platform."))
     val systemPath = resolvePaths(platform.defaultSystemPaths)
-    val userPath   = resolvePaths(platform.defaultUserPaths)
-    parser.parse(args, CLIArguments(cmd_unknown, systemPath, userPath)) match {
+    parser.parse(args, CLIArguments(cmd_unknown, systemPath)) match {
       case Some(command) => command.command(command, platform, loadInstaller(command, platform))
       case None => System.exit(-1)
     }

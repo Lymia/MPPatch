@@ -35,8 +35,6 @@ object LinuxPlatform extends Platform {
   private val home = Paths.get(System.getProperty("user.home"))
   def defaultSystemPaths: Seq[Path] =
     Steam.loadLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
-  def defaultUserPaths  : Seq[Path] =
-    Seq(home.resolve(".local/share/Aspyr/Sid Meier's Civilization 5"))
 
   def assetsPath = "steamassets/assets"
   override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)

@@ -50,7 +50,6 @@ trait Platform {
   val platformName: String
 
   def defaultSystemPaths: Seq[Path]
-  def defaultUserPaths  : Seq[Path]
 
   def assetsPath: String
   def mapPath(name: String): String = name

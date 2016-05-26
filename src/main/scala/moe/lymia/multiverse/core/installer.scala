@@ -26,7 +26,7 @@ import java.nio.file.Path
 
 import moe.lymia.multiverse.platform.Platform
 
-class Installer(systemPath: Path, userPath: Path, platform: Platform,
+class Installer(systemPath: Path, platform: Platform,
                 log: String => Unit = println _) {
   val patchInstaller = new PatchInstaller(systemPath, platform)
 }
