@@ -20,20 +20,15 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core.installer
+package moe.lymia.multiverse.core
 
 import java.nio.file.Path
 
-import moe.lymia.multiverse.core.data.{DLCList, ModList}
 import moe.lymia.multiverse.platform.Platform
 
 class Installer(systemPath: Path, userPath: Path, platform: Platform,
                 log: String => Unit = println _) {
   val patchInstaller = new PatchInstaller(systemPath, platform)
-
-  def listMods() = ModList(userPath.resolve("MODS"))
-  def listDLC () = DLCList(systemPath.resolve(platform.mapPath(platform.assetsPath))
-                                     .resolve(platform.mapPath("DLC")))
 }
 
 object PathNames {

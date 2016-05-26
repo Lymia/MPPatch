@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core.data
+package moe.lymia.multiverse.core
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
@@ -28,6 +28,19 @@ import java.util.{Locale, UUID}
 
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.{Crypto, IOUtils}
+
+import scala.xml.Node
+
+case class DLCUISkin(name: String, set: String, platform: String, includeImports: Boolean,
+                     skinSpecificDirectory: Map[String, Array[Byte]])
+case class DLCInclude(event: String, fileData: Node)
+case class DLCMap(extension: String, data: Array[Byte])
+
+case class DLCGameplay(gameplayIncludes: Seq[DLCInclude], globalIncludes: Seq[DLCInclude], mapEntries: Seq[DLCMap],
+                       importFileList: Map[String, Array[Byte]], uiSkins: Seq[DLCUISkin])
+case class DLCManifest(uuid: UUID, version: Int, priority: Int, shortName: String, name: String)
+
+case class DLCData(manifest: DLCManifest, data: DLCGameplay)
 
 object DLCKey {
   private val staticInterlace =
@@ -60,11 +73,6 @@ object DLCDataWriter {
   private val languageList = Seq("en_US","fr_FR","de_DE","es_ES","it_IT","ru_RU","ja_JP","pl_PL","ko_KR","zh_Hant_HK")
   private def languageValues(string: String) = languageList.map { x =>
     <Value language={x}>{string}</Value>
-  }
-
-  private def writeImportedFile(target: Path, source: ImportedFile) = source match {
-    case ImportFromMemory(data) => IOUtils.writeFile(target, data)
-    case ImportFromPath  (path) => Files.copy(path, target)
   }
 
   private def commonHeader(name: String, id: UUID, version: Int) =
@@ -103,7 +111,7 @@ object DLCDataWriter {
         val dirName = s"UISkin_${name}_${set}_$skinPlatform"
         val dirPath = platform.resolve(dlcBasePath, dirName)
         if(files.nonEmpty) Files.createDirectories(dirPath)
-        for((name, file) <- files) writeImportedFile(platform.resolve(dirPath, name), file)
+        for((name, file) <- files) IOUtils.writeFile(platform.resolve(dirPath, name), file)
         <UISkin name={name} set={set} platform={skinPlatform}>
           <Skin>
             { if(files.nonEmpty) Seq(<Directory>{dirName}</Directory>) else Seq() }
@@ -116,13 +124,13 @@ object DLCDataWriter {
       val mapDirectory = platform.resolve(dlcBasePath, "Maps")
       Files.createDirectories(mapDirectory)
       for (DLCMap(extension, data) <- dlcData.data.mapEntries)
-        writeImportedFile(mapDirectory.resolve(s"mvmm_map_${nameString}_${newId()}.$extension"), data)
+        IOUtils.writeFile(mapDirectory.resolve(s"mvmm_map_${nameString}_${newId()}.$extension"), data)
     }
     val mapsTag = if(dlcData.data.mapEntries.nonEmpty) Seq(<MapDirectory>Maps</MapDirectory>) else Seq()
 
     val filesDirectory = platform.resolve(dlcBasePath, "Files")
     Files.createDirectories(filesDirectory)
-    for((name, file) <- dlcData.data.importFileList) writeImportedFile(platform.resolve(filesDirectory, name), file)
+    for((name, file) <- dlcData.data.importFileList) IOUtils.writeFile(platform.resolve(filesDirectory, name), file)
 
     IOUtils.writeXML(platform.resolve(dlcBasePath, s"$nameString.Civ5Pkg"), <Civ5Package>
       {commonHeader(dlcData.manifest.name, dlcData.manifest.uuid, dlcData.manifest.version)}

@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, StandardOpenOption}
 
 import scala.xml.{Node, NodeSeq, PrettyPrinter, XML}
+import scala.annotation.tailrec
 import play.api.libs.json._
 
 object XMLUtils {
@@ -65,6 +66,11 @@ object IOUtils {
 
   def writeJson(path: Path, json: JsValue) = writeFile(path, Json.prettyPrint(json))
   def readJson(path: Path) = Json.parse(readFileAsString(path))
+
+  @tailrec def isSubdirectory(parent: Path, child: Path): Boolean =
+    if(parent == null) false
+    else if(Files.isSameFile(parent, child)) true
+    else isSubdirectory(parent.getParent, child)
 
   def withLock[T](lockFile: Path)(f: => T) = {
     val lock = new FileLock(lockFile)

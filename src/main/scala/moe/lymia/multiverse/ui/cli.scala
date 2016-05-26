@@ -26,9 +26,9 @@ import java.io.File
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
+import moe.lymia.multiverse.core.{BaseDLC, DLCDataWriter, Installer}
 import moe.lymia.multiverse.core.data._
 import moe.lymia.multiverse.core.generator._
-import moe.lymia.multiverse.core.installer.Installer
 import moe.lymia.multiverse.util.res.{I18N, VersionInfo}
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.IOUtils

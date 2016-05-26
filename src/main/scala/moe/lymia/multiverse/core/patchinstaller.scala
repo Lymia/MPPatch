@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core.installer
+package moe.lymia.multiverse.core
 
 import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}

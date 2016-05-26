@@ -20,20 +20,17 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core.generator
+package moe.lymia.multiverse.core
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.UUID
 
-import moe.lymia.multiverse.core.data._
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.res.LuaCode
 
 object DlcUUID {
-  val BASE_DLC_UUID           = UUID.fromString("aa75946c-7fca-4166-874c-de18ecd39162")
-  val MOD_UUID_NAMESPACE      = UUID.fromString("28b620c3-93a8-4b4d-9cee-58bc71640a58")
-  val MOD_PACK_UUID_NAMESPACE = UUID.fromString("0b3e3322-2dee-45c1-9f4c-091136c7cf29")
+  val BASE_DLC_UUID = UUID.fromString("df74f698-2343-11e6-89c4-8fef6d8f889e")
 }
 
 object BaseDLC {
@@ -43,11 +40,10 @@ object BaseDLC {
   def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
     val patchedFileList = (for((file, realPath) <- patchList) yield {
       val targetPath = platform.resolve(civBaseDirectory, platform.assetsPath, realPath)
-      (file, ImportFromMemory(LuaCode.core_entrypoint_hook.getBytes(StandardCharsets.UTF_8) ++
-                              Files.readAllBytes(targetPath)))
+      (file, LuaCode.core_entrypoint_hook.getBytes(StandardCharsets.UTF_8) ++ Files.readAllBytes(targetPath))
     }).toMap
     DLCData(DLCManifest(DlcUUID.BASE_DLC_UUID, 1, 300,
                         "Multiverse - Base DLC", "Multiverse - Base DLC"),
-            DLCGameplay(Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library.mapValues(ImportFromMemory), Nil))
+            DLCGameplay(Nil, Nil, Nil, patchedFileList ++ LuaCode.core_library, Nil))
   }
 }
