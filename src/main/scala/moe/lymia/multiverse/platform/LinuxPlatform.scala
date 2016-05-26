@@ -68,6 +68,13 @@ object LinuxPlatform extends Platform {
           |export SteamAppId=8930
           |export LD_LIBRARY_PATH="$HOME/.steam/bin32/steam-runtime/i386/lib/i386-linux-gnu/:$HOME/.steam/bin32/steam-runtime/i386/usr/lib/i386-linux-gnu/"
           |exec -a Civ5XP "$path/Civ5XP.orig.$version" $*
+          |""".stripMargin),
+      shellScript("Civ5XP.launch.dbg",
+        "version=\""+versionName+"\"\n"+
+        """path="`dirname "$0"`"
+          |export SteamAppId=8930
+          |export LD_LIBRARY_PATH="$HOME/.steam/bin32/steam-runtime/i386/lib/i386-linux-gnu/:$HOME/.steam/bin32/steam-runtime/i386/usr/lib/i386-linux-gnu/"
+          |gdb --init-eval-command="set env LD_PRELOAD=$path/mvmm_patch_$version.so" --args "$path/Civ5XP.orig.$version" $*
           |""".stripMargin)
     )
 
