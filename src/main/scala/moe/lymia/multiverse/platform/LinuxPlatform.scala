@@ -77,7 +77,7 @@ object LinuxPlatform extends Platform {
     )
 
     def findInstalledFiles(list: Seq[String]) = list.filter(x =>
-      x == "Civ5XP.launch" ||
+      x == "Civ5XP.launch" || x == "Civ5XP.launch.dbg" ||
       x.matches("Civ5XP\\.orig\\.[0-9a-f]+") ||
       x.matches("mvmm_patch_[0-9a-f]+\\.so")
     )
