@@ -51,7 +51,6 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
     resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
     libraryDependencies += "com.github.scopt" %% "scopt" % "3.4.0",
-    libraryDependencies += "com.typesafe.play" %% "play-json" % "2.5.2",
 
     // Build distribution file
     buildDist := {

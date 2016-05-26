@@ -27,10 +27,10 @@ import java.nio.file.{Files, Path}
 
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.res.{PatchData, PatchVersion}
-import moe.lymia.multiverse.util.{Crypto, IOUtils}
-import play.api.libs.json._
+import moe.lymia.multiverse.util.{Crypto, IOUtils, XMLUtils}
 
 import scala.collection.JavaConversions._
+import scala.xml.Node
 
 sealed trait PatchStatus
 object PatchStatus {
@@ -59,17 +59,22 @@ private case class PatchState(patchVersionSha1: String,
 private object PatchState {
   private val formatVersion = 1
 
-  implicit val patchFileFormat: Format[PatchFile] = Json.format[PatchFile]
-  implicit val patchStateFormat: Format[PatchState] = Json.format[PatchState]
+  def serializePatchFile(file: PatchFile) = <PatchFile path={file.path} expectedSha1={file.expectedSha1}/>
+  def serialize(state: PatchState) = <PatchState version={formatVersion.toString}>
+    <PatchVersionSha1>{state.patchVersionSha1}</PatchVersionSha1>
+    <ReplacementTarget>{serializePatchFile(state.replacementTarget)}</ReplacementTarget>
+    <OriginalFile>{serializePatchFile(state.originalFile)}</OriginalFile>
+    <AdditionalFiles>{state.additionalFiles.map(serializePatchFile)}</AdditionalFiles>
+  </PatchState>
 
-  def serialize(state: PatchState) = Json.obj(
-    "version" -> formatVersion,
-    "data"    -> Json.toJson(state)
-  )
-  def unserialize(json: JsValue) = {
-    if((json \ "version").as[Int] != formatVersion) None
-    else (json \ "data").asOpt[PatchState]
-  }
+  def unserializePatchFile(node: Node) =
+    PatchFile(XMLUtils.getAttribute(node, "path"), XMLUtils.getAttribute(node, "expectedSha1"))
+  def unserialize(xml: Node) =
+    if(XMLUtils.getAttribute(xml, "version").toInt != formatVersion) None
+    else Some(PatchState(XMLUtils.getNodeText(xml, "PatchVersionSha1"),
+                         unserializePatchFile((xml \ "ReplacementTarget" \ "PatchFile").head),
+                         unserializePatchFile((xml \ "OriginalFile"      \ "PatchFile").head),
+                         (xml \ "AdditionalFiles" \ "PatchFile").map(unserializePatchFile)))
 }
 
 sealed trait PatchActionStatus
@@ -115,7 +120,7 @@ class PatchInstaller(basePath: Path, platform: Platform) {
   private def getVersion(path: String) =
     PatchVersion.get(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
   private def loadPatchState() = try {
-    PatchState.unserialize(IOUtils.readJson(patchStatePath))
+    PatchState.unserialize(IOUtils.readXML(patchStatePath))
   } catch {
     case e: Exception =>
       System.err.println("Error encountered while deserializing patch state.")
@@ -196,7 +201,7 @@ class PatchInstaller(basePath: Path, platform: Platform) {
         val state = PatchState(patchData.sha1, replacementTarget,
                                PatchFile(platformInfo.replacementNewName(version.version), version.version),
                                additional)
-        IOUtils.writeJson(patchStatePath, PatchState.serialize(state))
+        IOUtils.writeXML(patchStatePath, PatchState.serialize(state))
       }
   }
 

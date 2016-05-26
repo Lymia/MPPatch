@@ -28,7 +28,6 @@ import java.nio.file.{Files, Path, StandardOpenOption}
 
 import scala.xml.{Node, NodeSeq, PrettyPrinter, XML}
 import scala.annotation.tailrec
-import play.api.libs.json._
 
 object XMLUtils {
   def getOptional(nodes: NodeSeq) =
@@ -63,9 +62,6 @@ object IOUtils {
     writeFile(path, xmlString)
   }
   def readXML(path: Path) = XML.load(Files.newInputStream(path))
-
-  def writeJson(path: Path, json: JsValue) = writeFile(path, Json.prettyPrint(json))
-  def readJson(path: Path) = Json.parse(readFileAsString(path))
 
   @tailrec def isSubdirectory(parent: Path, child: Path): Boolean =
     if(parent == null) false

@@ -32,6 +32,6 @@ class Installer(systemPath: Path, platform: Platform,
 }
 
 object PathNames {
-  val PATCH_STATE_FILENAME = "mvmm_patch_state.json"
+  val PATCH_STATE_FILENAME = "mvmm_patch_state.xml"
   val PATCH_LOCK_FILENAME  = ".mvmm_patch_dirty"
 }
