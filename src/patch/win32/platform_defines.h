@@ -24,7 +24,9 @@
 #define PLATFORM_DEFINES_H
 
 #define DEBUG_TIME_STR "%I64d"
-#define SetActiveDLCAndMods_signature char __thiscall
+
+#define SetActiveDLCAndMods_return char
+#define SetActiveDLCAndMods_signature SetActiveDLCAndMods_return __thiscall
 
 #define switchOnType(type, name) ((type) == BIN_DX9    ? name##_BIN_DX9    : \
                                   (type) == BIN_DX11   ? name##_BIN_DX11   : \

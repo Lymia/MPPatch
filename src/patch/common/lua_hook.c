@@ -35,6 +35,8 @@
 #include "extern_defines.h"
 #include "version.h"
 
+#include "net_hook.h"
+
 // Setup new Lua tables
 #define LuaTableHook_REGINDEX "2c11892f-7ad1-4ea1-bc4e-770a86c387e6"
 #define LuaTableHook_SENTINAL "216f0090-85dd-4061-8371-3d8ba2099a70"
@@ -62,10 +64,26 @@ static void table_setCFunction(lua_State *L, int table, const char* name, lua_CF
     lua_rawset(L, table);
 }
 
+static int luaHook_NetPatch_pushMod(lua_State *L) {
+    NetPatch_pushMod(luaL_checkstring(L, 1), luaL_checkinteger(L, 2));
+    return 0;
+}
+static int luaHook_NetPatch_activateOverride(lua_State *L) {
+    NetPatch_activateOverride();
+    return 0;
+}
+static int luaHook_NetPatch_reset(lua_State *L) {
+    NetPatch_reset();
+    return 0;
+}
+static void luaTable_NetPatch(lua_State *L, int table) {
+    table_setCFunction(L, table, "pushMod"         , luaHook_NetPatch_pushMod         );
+    table_setCFunction(L, table, "activateOverride", luaHook_NetPatch_activateOverride);
+    table_setCFunction(L, table, "reset"           , luaHook_NetPatch_reset           );
+}
+
 static int luaHook_panic(lua_State *L) {
-    char buffer[1024];
-    snprintf(buffer, 1024, "[Multiverse Mod Manager] Critical error in Lua code:\n%s", luaL_checkstring(L, 1));
-    fatalError(buffer);
+    fatalError("[Multiverse Mod Manager] Critical error in Lua code:\n%s", luaL_checkstring(L, 1));
 }
 static void luaTable_versioninfo(lua_State *L, int table) {
     table_setInteger(L, table, "major", patchVersionMajor);
@@ -101,6 +119,7 @@ static int luaHook_loadMainLibrary(lua_State *L) {
     int table = lua_gettop(L);
 
     table_setTable(L, table, "version", luaTable_versioninfo);
+    table_setTable(L, table, "NetPatch", luaTable_NetPatch);
     table_setString(L, table, "credits", patchMarkerString);
     table_setCFunction(L, table, "panic", luaHook_panic);
 

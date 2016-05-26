@@ -1,4 +1,4 @@
-symbol:Database_ExecuteMultiple:__attribute__((cdecl)):bool:class_Database* this, const char* string, int length:CV_GAME_DATABASE:?ExecuteMultiple@Connection@Database@@QBE_NPBDH@Z
-symbol:Database_LogMessage:__attribute__((cdecl)):bool:class_Database* this, const char* string:CV_GAME_DATABASE:?LogMessage@Connection@Database@@QBEXPBD@Z
+symbol:Database_ExecuteMultiple:__thiscall:bool:class_Database* this, const char* string, int length:CV_GAME_DATABASE:?ExecuteMultiple@Connection@Database@@QBE_NPBDH@Z
+symbol:Database_LogMessage:__thiscall:bool:class_Database* this, const char* string:CV_GAME_DATABASE:?LogMessage@Connection@Database@@QBEXPBD@Z
 offset:XmlNode_GetValUtf8:__thiscall:void:class_XmlNode* this, char** string_out, size_t* length_out:CV_GAME_DATABASE:*
 offset:XmlNode_NameMatches:__thiscall:bool:class_XmlNode* this, const char* string, size_t* tagSize:CV_GAME_DATABASE:*

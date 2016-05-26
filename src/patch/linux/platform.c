@@ -34,7 +34,7 @@
 #include "c_defines.h"
 #include "platform.h"
 
-__attribute__((noreturn)) void fatalError(const char* message) {
+__attribute__((noreturn)) void fatalError_fn(const char* message) {
   fputs(message, stderr);
   debug_print("%s", message);
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Multiverse Mod Manager", message, 0);
@@ -61,10 +61,8 @@ BinaryType getBinaryType() {
 
 // Symbol & address resolution
 static void checkDomain(AddressDomain domain, const char* fn) {
-    char buffer[256];
-    snprintf(buffer, 256, "%s in unknown domain %d", fn, domain);
     if(domain != CV_BINARY && domain != CV_GAME_DATABASE && domain != CV_MERGED_BINARY)
-        fatalError(buffer);
+        fatalError("%s in unknown domain %d", fn, domain);
 }
 
 static void* dlsymHandle;
@@ -99,9 +97,11 @@ CppList* CppList_alloc() {
 }
 void CppList_insert(CppList* list, void* obj) {
     CppListLink_insert(list, obj);
+    list->length++;
 }
 void CppList_clear(CppList* list) {
     CppListLink_clear(list);
+    list->length = 0;
 }
 void CppList_free(CppList* list) {
     CppListLink_free(list);

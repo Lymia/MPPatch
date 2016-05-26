@@ -20,7 +20,8 @@
     SOFTWARE.
 */
 
-#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "c_rt.h"
@@ -28,15 +29,45 @@
 #include "extern_defines.h"
 #include "platform.h"
 
+typedef struct ModInfo {
+    char modId[64];
+    int version;
+} ModInfo;
+
+static CppList* overrideModList = NULL;
+static bool overrideModsActive = false;
+
+void NetPatch_pushMod(const char* modId, int version) {
+    ModInfo* info = (ModInfo*) malloc(sizeof(ModInfo));
+    strncpy(info->modId, modId, 64);
+    info->version = version;
+    CppList_insert(overrideModList, info);
+}
+void NetPatch_activateOverride() {
+    overrideModsActive = true;
+}
+void NetPatch_reset() {
+    overrideModsActive = false;
+    CppList_clear(overrideModList);
+}
+
 typedef SetActiveDLCAndMods_signature (*SetActiveDLCAndMods_type)(void*, CppList*, CppList*, char, char);
 static SetActiveDLCAndMods_type SetActiveDLCAndMods_ptr;
 static ENTRY SetActiveDLCAndMods_signature SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
                                                                     char reloadDlc, char reloadMods) {
-    return SetActiveDLCAndMods_ptr(this, dlcList, modList, reloadDlc, reloadMods);
+    debug_print("In SetActiveDLCAndModsProxy. (overriding mod list: %s)", overrideModsActive ? "yes" : "no");
+    if(overrideModsActive) {
+        modList    = overrideModList;
+        reloadMods = 1;
+    }
+    SetActiveDLCAndMods_return ret = SetActiveDLCAndMods_ptr(this, dlcList, modList, reloadDlc, reloadMods);
+    NetPatch_reset();
+    return ret;
 }
 
 UnpatchData* NetPatch;
 __attribute__((constructor(500))) static void installNetHook() {
+    overrideModList = CppList_alloc();
     SetActiveDLCAndMods_ptr = (SetActiveDLCAndMods_type) SetActiveDLCAndMods_resolve(getBinaryType());
     int hookOffset = NetGameStartHook_offset_resolve(getBinaryType());
     if(SetActiveDLCAndMods_ptr == 0 || hookOffset == 0) fatalError("Failed to get NetStartLaunchHook offsets.");

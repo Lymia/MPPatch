@@ -28,7 +28,7 @@
 #include "c_defines.h"
 #include "platform.h"
 
-__attribute__((noreturn)) void fatalError(const char* message) {
+__attribute__((noreturn)) void fatalError_fn(const char* message) {
     debug_print("%s", message);
     FatalAppExit(0, message);
     exit(1);
@@ -48,18 +48,18 @@ BinaryType getBinaryType() {
 }
 __attribute__((constructor(201))) static void initializeBinaryType() {
     debug_print("Finding binary type");
+
     char moduleName[1024];
-    if(GetModuleFileName(NULL, moduleName, sizeof(moduleName)) != ERROR_SUCCESS)
-        fatalError("Could not get main executable binary name.");
+    if(!GetModuleFileName(NULL, moduleName, sizeof(moduleName)))
+        fatalError("Could not get main executable binary name. (Error code: %d)", GetLastError());
+    debug_print("Binary name: %s", moduleName);
 
     if     (endsWith(moduleName, "CivilizationV.exe"       )) detectedBinaryType = BIN_DX9   ;
     else if(endsWith(moduleName, "CivilizationV_DX11.exe"  )) detectedBinaryType = BIN_DX11  ;
     else if(endsWith(moduleName, "CivilizationV_Tablet.exe")) detectedBinaryType = BIN_TABLET;
-    else {
-        char buffer[1024];
-        snprintf(buffer, 1024, "Unknown main executable type! (executable path: %s)", moduleName);
-        fatalError(buffer);
-    }
+    else fatalError("Unknown main executable type! (executable path: %s)", moduleName);
+
+    debug_print("Detected binary type: %d", detectedBinaryType)
 }
 
 // Runtime for DLL proxying
@@ -69,21 +69,14 @@ static bool checkFileExists(LPCTSTR szPath) {
   return (attrib != INVALID_FILE_ATTRIBUTES &&
          !(attrib & FILE_ATTRIBUTE_DIRECTORY));
 }
-static void fatalProxyFailure(const char* error) {
-    char buffer[1024];
-    snprintf(buffer, 1024, "Cannot proxy CvGameDatabase!\n%s", error);
-    FatalAppExit(0, buffer);
-}
 #define TARGET_LIBRARY_NAME "CvGameDatabase_orig_" CV_CHECKSUM ".dll"
 __attribute__((constructor(200))) static void initializeProxy() {
     debug_print("Loading original CvGameDatabase");
-    char buffer[1024];
     if(!checkFileExists(TARGET_LIBRARY_NAME))
-        fatalProxyFailure("Original .dll file not found.");
+        fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.");
     baseDll = LoadLibrary(TARGET_LIBRARY_NAME);
     if(baseDll == NULL) {
-        snprintf(buffer, 1024, "Could not load original .dll file. (code: 0x%08x)", GetLastError());
-        fatalProxyFailure(buffer);
+        fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08x)", GetLastError());
     }
 }
 __attribute__((destructor(200))) static void deinitializeProxy() {
@@ -96,11 +89,7 @@ void* resolveSymbol(AddressDomain domain, const char* symbol) {
     if(domain != CV_GAME_DATABASE) fatalError("resolveSymbol only supported in CV_GAME_DATABASE on win32");
 
     void* procAddress = GetProcAddress(baseDll, symbol);
-    if(!procAddress) {
-        char buffer[1024];
-        snprintf(buffer, 1024, "Failed to load symbol %s.", symbol);
-        fatalError(buffer);
-    }
+    if(!procAddress) fatalError("Failed to load symbol %s.", symbol);
 
     debug_print("Resolving symbol - %s = %p", symbol, procAddress);
 

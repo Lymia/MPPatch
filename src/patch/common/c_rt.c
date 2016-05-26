@@ -71,7 +71,10 @@ void CppListLink_clear(CppListLink* list) {
         if(link->data != NULL) free(link->data);
         free(link);
         link = nextLink;
-    };
+    }
+
+    list->prev = list;
+    list->next = list;
 }
 void CppListLink_free(CppListLink* list) {
     CppListLink_clear(list);
@@ -96,16 +99,18 @@ static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, boo
 
     return unpatch;
 }
-UnpatchData* doPatch(AddressDomain domain, int address, void* hookAddress, bool isCall, const char* reason) {
-    void* targetAddress = resolveAddress(domain, address);
-    char reason_buf[256];
-    snprintf(reason_buf, 256, "patch: %s", reason);
-
+static UnpatchData* patchAddress(void* targetAddress, void* hookAddress, bool isCall, const char* reason) {
     memory_oldProtect protectFlags;
     unprotectMemoryRegion(targetAddress, 5, &protectFlags);
-    UnpatchData* unpatch = writeRelativeJmp(targetAddress, hookAddress, isCall, reason_buf);
+    UnpatchData* unpatch = writeRelativeJmp(targetAddress, hookAddress, isCall, reason);
     protectMemoryRegion(targetAddress, 5, &protectFlags);
     return unpatch;
+}
+UnpatchData* doPatch(AddressDomain domain, int address, void* hookAddress, bool isCall, const char* reason) {
+    void* targetAddress = resolveAddress(domain, address);
+    char reason_buf[1024];
+    snprintf(reason_buf, 1024, "patch: %s", reason);
+    return patchAddress(targetAddress, hookAddress, isCall, reason_buf);
 }
 void unpatch(UnpatchData* data) {
     memory_oldProtect protectFlags;
@@ -128,12 +133,13 @@ extern jmplist_type jmplist_CV_BINARY       [] __asm__("cif_jmplist_CV_BINARY"  
 extern jmplist_type jmplist_CV_GAME_DATABASE[] __asm__("cif_jmplist_CV_GAME_DATABASE");
 
 static void doJmplist(AddressDomain domain, const char* domainName, jmplist_type* jmplist) {
+    debug_print("Initializing jmplist for %s", domainName);
     for(jmplist_type* t = jmplist; t->exists; t++) {
         void* targetAddress = !t->isSymbol ? resolveAddress(domain, t->target              ) :
                                              resolveSymbol (domain, (const char*) t->target);
-        char buffer[128];
-        snprintf(buffer, 128, "jmplist initialization for %s (%s)", domainName, t->string);
-        free(doPatch(domain, (int) t->addr, targetAddress, false, buffer));
+        char buffer[1024];
+        snprintf(buffer, 1024, "jmplist initialization for %s (%s)", domainName, t->string);
+        free(patchAddress((void*) t->addr, targetAddress, false, buffer));
     }
 }
 __attribute__((constructor(250))) static void initJmps() {

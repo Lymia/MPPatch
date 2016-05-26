@@ -26,7 +26,12 @@
 #include <stddef.h>
 #include "platform_defines.h"
 
-__attribute__((noreturn)) void fatalError(const char* message);
+__attribute__((noreturn)) void fatalError_fn(const char* message);
+#define fatalError(format, arg...) { \
+    char buffer[1024]; \
+    snprintf(buffer, 1024, format, ##arg); \
+    fatalError_fn(buffer); \
+}
 
 typedef enum AddressDomain { CV_MERGED_BINARY /* linux */, CV_BINARY, CV_GAME_DATABASE } AddressDomain;
 void* resolveAddress(AddressDomain domain, int offset);
