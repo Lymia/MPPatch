@@ -27,17 +27,11 @@ import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
 import moe.lymia.multiverse.core.{BaseDLC, DLCDataWriter, Installer}
-import moe.lymia.multiverse.core.data._
-import moe.lymia.multiverse.core.generator._
 import moe.lymia.multiverse.util.res.{I18N, VersionInfo}
 import moe.lymia.multiverse.platform.Platform
-import moe.lymia.multiverse.util.IOUtils
 
 case class CLIArguments(command: (CLIArguments, Platform, Installer) => Unit,
                         systemPath: Option[Path], userPath: Option[Path],
-                        // write data options
-                        uuid  : String = "",
-                        target: File   = null,
                         // patch options
                         debug: Boolean = false)
 
@@ -59,10 +53,6 @@ class CLI(locale: Locale) {
       .valueName(i18n("cli.param.args.directory")).text(i18n("cli.param.user-path"  ))
 
     cmd2("status").action((_, args) => args.copy(command = cmd_status))
-    cmd2("writeDLCData").action((_, args) => args.copy(command = cmd_write)).children(
-      arg[String](i18n("cli.cmd.writeDLCData.args.source")).action((u, args) => args.copy(uuid   = u)).hidden,
-      arg[File  ](i18n("cli.cmd.writeDLCData.args.target")).action((f, args) => args.copy(target = f)).hidden
-    )
     cmd2("updatePatch").action((_, args) => args.copy(command = cmd_update)).children(
       opt[Unit]('d', "debug").action((_, args) => args.copy(debug = true))
         .text(i18n("cli.cmd.updatePatch.param.debug"))
@@ -88,38 +78,6 @@ class CLI(locale: Locale) {
     val status = installer.patchInstaller.checkPatchStatus()
     println(i18n("cli.cmd.status.patchStatus", status, installer.patchInstaller.actionStatus(false)
                                                      , installer.patchInstaller.actionStatus(true )))
-
-    def printManifestList[T <: ManifestCommon](entries: ManifestList[T]): Unit = {
-      if(entries.manifestList.isEmpty) println(s"  - ${i18n("cli.cmd.list.noEntries")}")
-      else for(entry <- entries.manifestList) {
-        println(s"  - ${entry.manifest.uuid}: ${entry.manifest.name}")
-      }
-    }
-
-    println(i18n("cli.cmd.list.mods"))
-    printManifestList(installer.listMods())
-
-    println(i18n("cli.cmd.list.dlc"))
-    printManifestList(installer.listDLC())
-  }
-
-  private def cmd_write(args: CLIArguments, platform: Platform, installer: Installer) = {
-    val dlc =
-      if(args.uuid == "base") BaseDLC.generateBaseDLC(args.systemPath.get, platform)
-      else try {
-        installer.listMods().byUUID.get(UUID.fromString(args.uuid)) match {
-          case Some(x) =>
-            val mod = ModDataReader.loadMod(x.path.getParent, x.path, platform)
-            ModTranslator.translateModToDLC(mod, 0, ModTranslator.UISkin_BraveNewWorld, platform)
-          case None    =>
-            fatal(i18n("cli.cmd.writeDLCData.notFound", args.uuid))
-        }
-      } catch {
-        case t: IllegalArgumentException =>
-          fatal(i18n("cli.cmd.writeDLCData.notUUID", args.uuid))
-      }
-    if(args.target.exists) fatal(i18n("cli.cmd.writeDLCData.targetExists", args.target))
-    DLCDataWriter.writeDLC(args.target.toPath, None, dlc, platform)
   }
 
   private def cmd_update(args: CLIArguments, platform: Platform, installer: Installer) = {
