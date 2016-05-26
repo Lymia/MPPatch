@@ -36,6 +36,7 @@
 
 __attribute__((noreturn)) void fatalError(const char* message) {
   fputs(message, stderr);
+  debug_print("%s", message);
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Multiverse Mod Manager", message, 0);
   exit(1);
 }
@@ -52,6 +53,10 @@ void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old) {
 }
 void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old) {
   protectRange((size_t) start, length, PROT_READ | PROT_EXEC);
+}
+
+BinaryType getBinaryType() {
+    return BIN_GENERIC;
 }
 
 // Symbol & address resolution

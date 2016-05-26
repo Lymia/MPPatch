@@ -29,15 +29,37 @@
 #include "platform.h"
 
 __attribute__((noreturn)) void fatalError(const char* message) {
-  FatalAppExit(0, message);
-  exit(1);
+    debug_print("%s", message);
+    FatalAppExit(0, message);
+    exit(1);
 }
 
 void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old) {
-  VirtualProtect(start, length, PAGE_EXECUTE_READWRITE, old);
+    VirtualProtect(start, length, PAGE_EXECUTE_READWRITE, old);
 }
 void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old) {
-  VirtualProtect(start, length, *old, old);
+    VirtualProtect(start, length, *old, old);
+}
+
+// Get executable type
+static BinaryType detectedBinaryType;
+BinaryType getBinaryType() {
+    return detectedBinaryType;
+}
+__attribute__((constructor(201))) static void initializeBinaryType() {
+    debug_print("Finding binary type");
+    char moduleName[1024];
+    if(GetModuleFileName(NULL, moduleName, sizeof(moduleName)) != ERROR_SUCCESS)
+        fatalError("Could not get main executable binary name.");
+
+    if     (endsWith(moduleName, "CivilizationV.exe"       )) detectedBinaryType = BIN_DX9   ;
+    else if(endsWith(moduleName, "CivilizationV_DX11.exe"  )) detectedBinaryType = BIN_DX11  ;
+    else if(endsWith(moduleName, "CivilizationV_Tablet.exe")) detectedBinaryType = BIN_TABLET;
+    else {
+        char buffer[1024];
+        snprintf(buffer, 1024, "Unknown main executable type! (executable path: %s)", moduleName);
+        fatalError(buffer);
+    }
 }
 
 // Runtime for DLL proxying

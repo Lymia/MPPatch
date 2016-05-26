@@ -24,5 +24,6 @@
 #define PLATFORM_DEFINES_H
 
 #define DEBUG_TIME_STR "%I64d"
+#define SetActiveDLCandMods_signature char __thiscall
 
 #endif /* PLATFORM_DEFINES_H */

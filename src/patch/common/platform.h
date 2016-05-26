@@ -32,6 +32,9 @@ typedef enum AddressDomain { CV_MERGED_BINARY /* linux */, CV_BINARY, CV_GAME_DA
 void* resolveAddress(AddressDomain domain, int offset);
 void* resolveSymbol (AddressDomain domain, const char* symbol);
 
+typedef enum BinaryType { BIN_GENERIC, BIN_DX9, BIN_DX11, BIN_TABLET } BinaryType;
+BinaryType getBinaryType();
+
 typedef unsigned long int memory_oldProtect; // used on Windows since we can easily get the memory protection status.
 void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old);
 void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old);

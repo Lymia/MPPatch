@@ -45,6 +45,8 @@
 // attribute fixes this by forcing the C part of the hooks to fix the stack alignment when they are called.
 #define ASM_ENTRY __attribute__((stdcall, force_align_arg_pointer))
 
+bool endsWith(const char* str, const char* ending);
+
 typedef struct UnpatchData {
     void* offset;
     char oldData[5];

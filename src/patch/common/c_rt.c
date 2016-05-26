@@ -40,6 +40,12 @@
     #define debug_print(format, ...)
 #endif
 
+// String manipulation
+bool endsWith(const char* str, const char* ending) {
+    size_t str_len = strlen(str), ending_len = strlen(ending);
+    return str_len >= ending_len && !strcmp(str + str_len - ending_len, ending);
+}
+
 // Actual patch code!
 static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, bool isCall, const char* reason) {
     // Register the patch for unpatching
