@@ -48,6 +48,11 @@
 
 bool endsWith(const char* str, const char* ending);
 
+CppListLink* CppListLink_alloc();
+void CppListLink_insert(CppListLink* list, void* obj);
+void CppListLink_clear(CppListLink* list);
+void CppListLink_free(CppListLink* list);
+
 typedef struct UnpatchData {
     void* offset;
     char oldData[5];

@@ -34,4 +34,17 @@
 #define SetActiveDLCAndMods_resolve(type)     (resolveAddress(CV_BINARY, switchOnType(type, SetActiveDLCAndMods_offset)))
 #define NetGameStartHook_offset_resolve(type) (switchOnType(type, NetGameStartHook_offset))
 
+// std::list data structure
+typedef struct CppListLink {
+    struct CppListLink* next;
+    struct CppListLink* prev;
+    void* data;
+} CppListLink;
+
+typedef struct CppList {
+    uint32_t unk0; // refcount?
+    CppListLink* head;
+    int length;
+} CppList;
+
 #endif /* PLATFORM_DEFINES_H */

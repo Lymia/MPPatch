@@ -46,6 +46,38 @@ bool endsWith(const char* str, const char* ending) {
     return str_len >= ending_len && !strcmp(str + str_len - ending_len, ending);
 }
 
+// std::list implementation
+CppListLink* CppListLink_alloc() {
+    CppListLink* link = (CppListLink*) malloc(sizeof(CppListLink));
+    link->next = link;
+    link->prev = link;
+    link->data = NULL;
+    return link;
+}
+void CppListLink_insert(CppListLink* list, void* obj) {
+    CppListLink* link = CppListLink_alloc();
+    link->data = obj;
+
+    link->prev = list->prev;
+    link->next = list;
+
+    list->prev->next = link;
+    list->prev       = link;
+}
+void CppListLink_clear(CppListLink* list) {
+    CppListLink* link = list->next;
+    while(link != list) {
+        CppListLink* nextLink = link->next;
+        if(link->data != NULL) free(link->data);
+        free(link);
+        link = nextLink;
+    };
+}
+void CppListLink_free(CppListLink* list) {
+    CppListLink_clear(list);
+    free(list);
+}
+
 // Actual patch code!
 static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, bool isCall, const char* reason) {
     // Register the patch for unpatching
@@ -84,6 +116,7 @@ void unpatch(UnpatchData* data) {
     free(data);
 }
 
+// Jmplist code
 typedef struct jmplist_type {
     int32_t exists;
     int32_t addr;

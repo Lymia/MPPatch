@@ -126,70 +126,21 @@ __attribute__((constructor(201))) static void initializeConstantSymbol() {
 }
 
 // std::list implementation
-typedef struct CppListLink {
-    struct CppListLink* next;
-    struct CppListLink* prev;
-    void* data;
-} CppListLink;
-
-struct CppList {
-    uint32_t unk0; // refcount?
-    void* head;
-    int length;
-};
-
-static CppListLink* CppListLink_alloc() {
-    CppListLink* link = (CppListLink*) malloc(sizeof(CppListLink));
-    link->next = link;
-    link->prev = link;
-    link->data = NULL;
-    return link;
-}
 CppList* CppList_alloc() {
     CppList* list = (CppList*) malloc(sizeof(CppList));
-    list->unk0   = 0;
-    list->head   = list;
-    list->length = 0;
+    list->unk0    = 0;
+    list->head    = CppListLink_alloc();
+    list->length  = 0;
     return list;
 }
-static CppListLink* CppList_getHead(CppList* list) {
-    if(list->head == list) return NULL;
-    else return (CppListLink*) list->head;
-}
 void CppList_insert(CppList* list, void* obj) {
-    CppListLink* head = CppList_getHead(list);
-    if(head == NULL) {
-        head = CppListLink_alloc();
-        head->data = obj;
-        list->head = obj;
-    } else {
-        CppListLink* link = CppListLink_alloc();
-
-        link->prev = head->prev;
-        link->next = head;
-
-        head->prev->next = link;
-        head->prev       = link;
-    }
-
+    CppListLink_insert(list->head, obj);
     list->length++;
 }
 void CppList_clear(CppList* list) {
-    CppListLink* head = CppList_getHead(list);
-    if(head != NULL) {
-        CppListLink* link = head;
-        do {
-            CppListLink* nextLink = link->next;
-            if(link->data != NULL) free(link->data);
-            free(link);
-            link = nextLink;
-        } while(link != head);
-    }
-
-    list->head   = list;
-    list->length = 0;
+    CppListLink_clear(list->head);
 }
 void CppList_free(CppList* list) {
-    CppList_clear(list);
+    CppListLink_free(list->head);
     free(list);
 }

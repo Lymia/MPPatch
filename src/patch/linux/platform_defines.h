@@ -26,4 +26,16 @@
 #define DEBUG_TIME_STR "%lld"
 #define SetActiveDLCAndMods_signature signed int __attribute__((cdecl))
 
+// std::list data structure
+typedef struct CppListLink {
+    struct CppListLink* prev;
+    struct CppListLink* next;
+    union {
+        void* data;
+        int length;
+    };
+} CppListLink;
+
+typedef CppListLink CppList;
+
 #endif /* PLATFORM_DEFINES_H */

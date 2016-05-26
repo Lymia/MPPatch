@@ -39,7 +39,6 @@ typedef unsigned long int memory_oldProtect; // used on Windows since we can eas
 void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old);
 void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old);
 
-typedef struct CppList CppList;
 CppList* CppList_alloc();
 void CppList_insert(CppList* list, void* obj);
 void CppList_clear(CppList* list);
