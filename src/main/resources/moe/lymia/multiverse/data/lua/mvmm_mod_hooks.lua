@@ -18,22 +18,22 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-function _mvmm.panic(s)
-    print(s)
-    patch.panic(s)
-end
-function _mvmm.versionString(versioninfo)
-    if versioninfo.string then return versioninfo.string end
-    return "v" .. versioninfo.major .. "." .. versioninfo.minor
+function _mvmm.installModdingHook()
+    local oldModding = Modding
+
+    local hooks = {
+        __mvmm_marker = true,
+    }
+
+    Modding = setmetatable({}, {
+        __index = function(_, k)
+            if hooks[k] then
+                return hooks[k]
+            else
+                return oldModding[k]
+            end
+        end
+    })
 end
 
-function _mvmm.print(s)
-    print("[Multiverse Mod Manager] "..s)
-end
-function _mvmm.debugPrint(s)
-    if _mvmm.patch.debug then
-        _mvmm.print(s)
-    end
-end
-
-_mvmm.loadedModules.utils = true
+_mvmm.loadedModules.moddinghook = true

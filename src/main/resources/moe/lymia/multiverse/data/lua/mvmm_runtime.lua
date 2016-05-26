@@ -61,8 +61,7 @@ if not patch.shared.printedInit then
     end
 end
 
-loadModule("mods")
-loadModule("moddinghook")
+loadModule("hooks")
 
 function _mvmm.installHooks()
     if not _mvmm.hooksInstalled then
