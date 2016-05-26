@@ -28,8 +28,9 @@
 
 __attribute__((noreturn)) void fatalError(const char* message);
 
-void* resolveAddress(int offset);
-void* resolveSymbol (const char* symbol);
+typedef enum AddressDomain { CV_MERGED_BINARY /* linux */, CV_BINARY, CV_GAME_DATABASE } AddressDomain;
+void* resolveAddress(AddressDomain domain, int offset);
+void* resolveSymbol (AddressDomain domain, const char* symbol);
 
 typedef unsigned long int memory_oldProtect; // used on Windows since we can easily get the memory protection status.
 void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old);

@@ -18,8 +18,6 @@
 ; OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ; SOFTWARE.
 
-extern cif_resolveSymbol
-
 %include "symbols.s"
 
 %macro generate_variables 1
@@ -31,6 +29,6 @@ extern cif_resolveSymbol
         export %1
     segment .text
 
-    jmplist_add _%1, 1, %1_name, %1_name
+    jmplist_add CV_GAME_DATABASE, _%1, 1, %1_name, %1_name
 %endmacro
 proxy_symbols generate_variables

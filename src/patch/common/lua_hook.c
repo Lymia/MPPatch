@@ -27,6 +27,7 @@
 // Like throwing a fatal error. :|
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include "c_rt.h"
@@ -123,7 +124,7 @@ ASM_ENTRY void LuaTableHookCore(lua_State *L, int table) {
 extern void LuaTableHook() __asm__("cif_LuaTableHook");
 UnpatchData* LuaTablePatch;
 __attribute__((constructor(500))) static void installLuaHook() {
-    LuaTablePatch = doPatch(LuaTableHook_offset, LuaTableHook, "LuaTableHook");
+    LuaTablePatch = doPatch(CV_GAME_DATABASE, LuaTableHook_offset, LuaTableHook, false, "LuaTableHook");
 }
 __attribute__((destructor(500))) static void destroyLuaHook() {
     unpatch(LuaTablePatch);

@@ -55,13 +55,22 @@ void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old) {
 }
 
 // Symbol & address resolution
+static void checkDomain(AddressDomain domain, const char* fn) {
+    char buffer[256];
+    snprintf(buffer, 256, "%s in unknown domain %d", fn, domain);
+    if(domain != CV_BINARY && domain != CV_GAME_DATABASE && domain != CV_MERGED_BINARY)
+        fatalError(buffer);
+}
+
 static void* dlsymHandle;
-void* resolveSymbol (const char* symbol) {
+void* resolveSymbol(AddressDomain domain, const char* symbol) {
+    checkDomain(domain, "resolveSymbol");
     return dlsym(dlsymHandle, symbol);
 }
 
 static unsigned base_offset;
-void* resolveAddress(int address) {
+void* resolveAddress(AddressDomain domain, int address) {
+    checkDomain(domain, "resolveAddress");
     return (void*) (base_offset + address);
 }
 

@@ -52,12 +52,6 @@ static void fatalProxyFailure(const char* error) {
     snprintf(buffer, 1024, "Cannot proxy CvGameDatabase!\n%s", error);
     FatalAppExit(0, buffer);
 }
-extern __stdcall void* asm_resolveSymbol(const char* symbol) __asm__("cif_resolveSymbol");
-__stdcall void* asm_resolveSymbol(const char* symbol) /*   */ {
-    return resolveSymbol(symbol);
-}
-
-// Symbol resolution
 #define TARGET_LIBRARY_NAME "CvGameDatabase_orig_" CV_CHECKSUM ".dll"
 __attribute__((constructor(200))) static void initializeProxy() {
     debug_print("Loading original CvGameDatabase");
@@ -75,12 +69,15 @@ __attribute__((destructor(200))) static void deinitializeProxy() {
     FreeLibrary(baseDll);
 }
 
-void* resolveSymbol(const char* symbol) {
+// Symbol resolution
+void* resolveSymbol(AddressDomain domain, const char* symbol) {
+    if(domain != CV_GAME_DATABASE) fatalError("resolveSymbol only supported in CV_GAME_DATABASE on win32");
+
     void* procAddress = GetProcAddress(baseDll, symbol);
     if(!procAddress) {
         char buffer[1024];
         snprintf(buffer, 1024, "Failed to load symbol %s.", symbol);
-        fatalProxyFailure(buffer);
+        fatalError(buffer);
     }
 
     debug_print("Resolving symbol - %s = %p", symbol, procAddress);
@@ -89,13 +86,21 @@ void* resolveSymbol(const char* symbol) {
 }
 
 // Address resolution
-static void* constant_symbol_addr;
-void* resolveAddress(int address) {
-    return constant_symbol_addr + (address - WIN32_REF_SYMBOL_ADDR);
+static void* binary_base_addr;
+static void* database_constant_symbol_addr;
+void* resolveAddress(AddressDomain domain, int address) {
+    if(domain == CV_GAME_DATABASE) return database_constant_symbol_addr + (address - WIN32_REF_SYMBOL_ADDR);
+    if(domain == CV_BINARY       ) return binary_base_addr              + (address - WIN32_BINARY_BASE    );
+    fatalError("resolveAddress in unknown domain");
+}
+
+__attribute__((constructor(201))) static void initializeBinaryBase() {
+    debug_print("Finding Civ V binary base address (to deal with ASLR)");
+    binary_base_addr = GetModuleHandle(NULL);
 }
 __attribute__((constructor(201))) static void initializeConstantSymbol() {
     debug_print("Loading constant symbol (to deal with ASLR/general .dll rebasing)");
-    constant_symbol_addr = resolveSymbol(WIN32_REF_SYMBOL_NAME);
+    database_constant_symbol_addr = resolveSymbol(CV_GAME_DATABASE, WIN32_REF_SYMBOL_NAME);
 }
 
 // std::list implementation

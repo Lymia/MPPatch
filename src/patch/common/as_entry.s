@@ -30,4 +30,5 @@ __start:
 %include "platform.s"
 %include "hooks.s"
 
-jmplist_end
+jmplist_end CV_BINARY
+jmplist_end CV_GAME_DATABASE

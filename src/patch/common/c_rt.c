@@ -22,6 +22,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
@@ -40,7 +41,7 @@
 #endif
 
 // Actual patch code!
-static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, const char* reason) {
+static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, bool isCall, const char* reason) {
     // Register the patch for unpatching
     UnpatchData* unpatch = malloc(sizeof(UnpatchData));
     unpatch->offset = targetAddress;
@@ -48,21 +49,23 @@ static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, con
 
     // Actually generate the patch opcode.
     int offsetDiff = (int) hookAddress - (int) targetAddress - 5;
-    debug_print("Writing JMP (%s) - %p => %p (diff: 0x%08x)",
-        reason, targetAddress, hookAddress, offsetDiff);
-    *((char*)(targetAddress    )) = 0xe9; // jmp opcode
+    debug_print("Writing %s (%s) - %p => %p (diff: 0x%08x)",
+        isCall ? "CALL" : "JMP", reason, targetAddress, hookAddress, offsetDiff);
+
+    char opcode = isCall ? 0xe8 : 0xe9;
+    *((char*)(targetAddress    )) = opcode;
     *((int *)(targetAddress + 1)) = offsetDiff;
 
     return unpatch;
 }
-UnpatchData* doPatch(int address, void* hookAddress, const char* reason) {
-    void* targetAddress = resolveAddress(address);
+UnpatchData* doPatch(AddressDomain domain, int address, void* hookAddress, bool isCall, const char* reason) {
+    void* targetAddress = resolveAddress(domain, address);
     char reason_buf[256];
     snprintf(reason_buf, 256, "patch: %s", reason);
 
     memory_oldProtect protectFlags;
     unprotectMemoryRegion(targetAddress, 5, &protectFlags);
-    UnpatchData* unpatch = writeRelativeJmp(targetAddress, hookAddress, reason_buf);
+    UnpatchData* unpatch = writeRelativeJmp(targetAddress, hookAddress, isCall, reason_buf);
     protectMemoryRegion(targetAddress, 5, &protectFlags);
     return unpatch;
 }
@@ -82,12 +85,19 @@ typedef struct jmplist_type {
     int32_t target;
     const char* string;
 } __attribute__((packed)) jmplist_type;
-extern jmplist_type jmplist[] __asm__("cif_jmplist");
-__attribute__((constructor(250))) static void initJmps() {
+extern jmplist_type jmplist_CV_BINARY       [] __asm__("cif_jmplist_CV_BINARY"       );
+extern jmplist_type jmplist_CV_GAME_DATABASE[] __asm__("cif_jmplist_CV_GAME_DATABASE");
+
+static void doJmplist(AddressDomain domain, const char* domainName, jmplist_type* jmplist) {
     for(jmplist_type* t = jmplist; t->exists; t++) {
-        void* targetAddress = !t->isSymbol ? resolveAddress(t->target) : resolveSymbol((const char*) t->target);
+        void* targetAddress = !t->isSymbol ? resolveAddress(domain, t->target              ) :
+                                             resolveSymbol (domain, (const char*) t->target);
         char buffer[128];
-        snprintf(buffer, 128, "jmplist initialization (%s)", t->string);
-        free(doPatch((int) t->addr, targetAddress, buffer));
+        snprintf(buffer, 128, "jmplist initialization for %s (%s)", domainName, t->string);
+        free(doPatch(domain, (int) t->addr, targetAddress, false, buffer));
     }
+}
+__attribute__((constructor(250))) static void initJmps() {
+    doJmplist(CV_BINARY       , "CV_BINARY"       , jmplist_CV_BINARY       );
+    doJmplist(CV_GAME_DATABASE, "CV_GAME_DATABASE", jmplist_CV_GAME_DATABASE);
 }

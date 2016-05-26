@@ -38,19 +38,21 @@ trait PatchBuild { this: Build =>
     // Codegen for the proxy files.
     def generateProxyDefine(file: File, target: File) {
       val lines = IO.readLines(file).filter(_.nonEmpty)
-      val proxies = for(Array(t, name, attr, ret, signature, sym) <- lines.map(_.trim.split(":"))) yield {
-        val paramNames = signature.split(",").map(_.trim.split(" ").last).mkString(", ")
-        val rsymbol = if(sym == "*") name else sym
-        val resolveBody =
-          if(t == "offset") "resolveAddress(" + name + "_offset);"
-          else if(t == "symbol") "resolveSymbol(\"" + rsymbol + "\");"
-          else sys.error("Unknown proxy type "+t)
-        ("// Proxy for " + name + "\n" +
-          "typedef " + attr + " " + ret + " (*" + name + "_fn) (" + signature + ");\n" +
-          "static " + name + "_fn " + name + "_ptr;\n" +
-          ret + " " + name + "(" + signature + ") {\n" +
-          "  return " + name + "_ptr(" + paramNames + ");\n" +
-          "}\n", "  " + name + "_ptr = (" + name + "_fn) "+resolveBody)
+      val proxies = for(Array(t, name, attr, ret, signature, domain, sym) <- lines.map(_.trim.split(":"))) yield {
+        val functionDef =
+          s"""// Proxy for $name
+             |typedef $attr $ret (*${name}_fn) ($signature);
+             |static ${name}_fn ${name}_ptr;
+             |$ret $name($signature) {
+             |  return ${name}_ptr(${signature.split(",").map(_.trim.split(" ").last).mkString(", ")});
+             |}
+          """.stripMargin
+        val initString = s"  ${name}_ptr = (${name}_fn) ${
+          if(t == "offset") s"resolveAddress($domain, ${name}_offset);"
+          else if(t == "symbol") s"""resolveSymbol($domain, "${if(sym == "*") name else sym}");"""
+          else sys.error(s"Unknown proxy type $t")
+        }"
+        (functionDef, initString)
       }
 
       IO.write(target, "#include \"c_rt.h\"\n"+

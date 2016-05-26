@@ -77,7 +77,7 @@ ASM_ENTRY bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connect
 extern void XmlParserHook() __asm__("cif_XmlParserHook");
 UnpatchData* XmlParserPatch;
 __attribute__((constructor(500))) static void installXmlHook() {
-    XmlParserPatch = doPatch(XmlParserHook_offset, XmlParserHook, "XmlParserHook");
+    XmlParserPatch = doPatch(CV_GAME_DATABASE, XmlParserHook_offset, XmlParserHook, false, "XmlParserHook");
 }
 __attribute__((destructor(500))) static void destroyXmlHook() {
     unpatch(XmlParserPatch);

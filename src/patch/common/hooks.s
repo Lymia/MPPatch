@@ -28,7 +28,7 @@ cif_LuaTableHook:
     call cif_LuaTableHookCore
     pop_all
 
-    dynamic_jmp LuaTableHook_ReturnAddr
+    dynamic_jmp CV_GAME_DATABASE, LuaTableHook_ReturnAddr
 
 extern cif_XmlParserHookCore
 global cif_XmlParserHook
@@ -55,11 +55,11 @@ cif_XmlParserHook:
         pop_all
         pop XMLParserHook_ContinueStatusRegister
 
-        dynamic_jmp XMLParserHook_ContinueAddr
+        dynamic_jmp CV_GAME_DATABASE, XMLParserHook_ContinueAddr
 
     .proceedExit:
         pop_all
         add esp, 4
 
-        dynamic_jmp XMLParserHook_ReturnAddr
+        dynamic_jmp CV_GAME_DATABASE, XMLParserHook_ReturnAddr
 

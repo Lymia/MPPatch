@@ -24,6 +24,7 @@
 #define C_RT_H
 
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
@@ -49,7 +50,7 @@ typedef struct UnpatchData {
     char oldData[5];
 } UnpatchData;
 
-UnpatchData* doPatch(int address, void* hookAddress, const char* reason);
+UnpatchData* doPatch(AddressDomain domain, int address, void* hookAddress, bool isCall, const char* reason);
 void unpatch(UnpatchData* data);
 
 #endif /* C_RT_H */

@@ -37,34 +37,40 @@
 %endmacro
 
 ; Generate jump target symbol
-segment .rdata_jmplist
-global cif_jmplist
-cif_jmplist:
-segment .text
+
+%macro init_jmplist 1
+    segment .rdata_jmplist_%1
+    global cif_jmplist_%1
+    cif_jmplist_%1:
+    segment .text
+%endmacro
+
+init_jmplist CV_BINARY
+init_jmplist CV_GAME_DATABASE
 
 %macro jmptarget 1
     %1: dd 0, 0
 %endmacro
 
-%macro jmplist_add 4
-    segment .rdata_jmplist
-        dd 1, %1, %2, %3, %4
+%macro jmplist_add 5
+    segment .rdata_jmplist_%1
+        dd 1, %2, %3, %4, %5
     segment .text
 %endmacro
-%macro jmplist_end 0
-    segment .rdata_jmplist
+%macro jmplist_end 1
+    segment .rdata_jmplist_%1
         dd 0, 0, 0, 0, 0
     segment .text
 %endmacro
 
-%macro dynamic_jmp 1
-    symbol_toString .%1_name, %1
+%macro dynamic_jmp 2
+    symbol_toString .%2_name, %2
 
     segment .text_jmplist
-        jmptarget .%1_jmp
+        jmptarget .%2_jmp
 
-    jmplist_add .%1_jmp, 0, %1, .%1_name
+    jmplist_add %1, .%2_jmp, 0, %2, .%2_name
 
     segment .text
-        jmp .%1_jmp
+        jmp .%2_jmp
 %endmacro

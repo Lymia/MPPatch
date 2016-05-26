@@ -32,5 +32,7 @@
 #define WIN32_REF_SYMBOL_NAME "??0BinaryIO@Database@@QAE@PBD@Z"
 #define WIN32_REF_SYMBOL_ADDR 0x100062D0
 
+#define WIN32_BINARY_BASE 0x00400000
+
 #endif /* C_DEFINES_H */
 
