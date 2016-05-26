@@ -33,11 +33,7 @@
 #include "c_rt.h"
 #include "c_defines.h"
 #include "extern_defines.h"
-#include "platform.h"
 #include "version.h"
-
-// Hook NetStartLaunch::Execute
-
 
 // Setup new Lua tables
 #define LuaTableHook_REGINDEX "2c11892f-7ad1-4ea1-bc4e-770a86c387e6"

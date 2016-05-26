@@ -24,6 +24,14 @@
 #define PLATFORM_DEFINES_H
 
 #define DEBUG_TIME_STR "%I64d"
-#define SetActiveDLCandMods_signature char __thiscall
+#define SetActiveDLCAndMods_signature char __thiscall
+
+#define switchOnType(type, name) ((type) == BIN_DX9    ? name##_BIN_DX9    : \
+                                  (type) == BIN_DX11   ? name##_BIN_DX11   : \
+                                  (type) == BIN_TABLET ? name##_BIN_TABLET : \
+                                  0)
+
+#define SetActiveDLCAndMods_resolve(type)     (resolveAddress(CV_BINARY, switchOnType(type, SetActiveDLCAndMods_offset)))
+#define NetGameStartHook_offset_resolve(type) (switchOnType(type, NetGameStartHook_offset))
 
 #endif /* PLATFORM_DEFINES_H */

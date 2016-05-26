@@ -26,5 +26,8 @@
 #define XmlParserHook_offset            0x08B9C012
 #define LuaTableHook_offset             0x08B9AE76
 
+#define SetActiveDLCAndMods_resolve(type)     (resolveSymbol(CV_MERGED_BINARY, "_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb"))
+#define NetGameStartHook_offset_resolve(type) 0x08711C6B
+
 #endif /* C_DEFINES_H */
 

@@ -29,6 +29,15 @@
 #define XmlParserHook_offset  0x100764A0
 #define LuaTableHook_offset   0x1000B499
 
+#define SetActiveDLCAndMods_offset_BIN_DX9    0x006CD160
+#define NetGameStartHook_offset_BIN_DX9       0x0077B17B
+
+#define SetActiveDLCAndMods_offset_BIN_DX11   0x006B8E50
+#define NetGameStartHook_offset_BIN_DX11      0x00548DDB
+
+#define SetActiveDLCAndMods_offset_BIN_TABLET 0x0065DC10
+#define NetGameStartHook_offset_BIN_TABLET    0x00582B5B
+
 #define WIN32_REF_SYMBOL_NAME "??0BinaryIO@Database@@QAE@PBD@Z"
 #define WIN32_REF_SYMBOL_ADDR 0x100062D0
 

@@ -24,6 +24,6 @@
 #define PLATFORM_DEFINES_H
 
 #define DEBUG_TIME_STR "%lld"
-#define SetActiveDLCandMods_signature signed int __cdecl
+#define SetActiveDLCAndMods_signature signed int __attribute__((cdecl))
 
 #endif /* PLATFORM_DEFINES_H */
