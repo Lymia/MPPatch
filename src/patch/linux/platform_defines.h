@@ -1,4 +1,4 @@
-/**
+ /**
     Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -20,25 +20,9 @@
     SOFTWARE.
 */
 
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#ifndef PLATFORM_DEFINES_H
+#define PLATFORM_DEFINES_H
 
-#include <stddef.h>
-#include "platform_defines.h"
+#define DEBUG_TIME_STR "%lld"
 
-__attribute__((noreturn)) void fatalError(const char* message);
-
-void* resolveAddress(int offset);
-void* resolveSymbol (const char* symbol);
-
-typedef unsigned long int memory_oldProtect; // used on Windows since we can easily get the memory protection status.
-void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old);
-void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old);
-
-typedef struct CppList CppList;
-CppList* CppList_alloc();
-void CppList_insert(CppList* list, void* obj);
-void CppList_clear(CppList* list);
-void CppList_free(CppList* list);
-
-#endif /* PLATFORM_H */
+#endif /* PLATFORM_DEFINES_H */

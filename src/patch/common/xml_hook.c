@@ -50,8 +50,8 @@ ASM_ENTRY bool XmlParserHookCore(class_XmlNode* xmlNode, class_Database* connect
     if(checkXmlNodeTag(xmlNode, "__MVMM_PATCH_IGNORE")) {
         return true;
     } else if(checkXmlNodeTag(xmlNode, "__MVMM_PATCH_RAWSQL")) {
-        char* string;
-        int   length;
+        char*  string;
+        size_t length;
         XmlNode_GetValUtf8(xmlNode, &string, &length);
 
         size_t targetLength = base64OutputSize(length);

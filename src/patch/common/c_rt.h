@@ -24,6 +24,7 @@
 #define C_RT_H
 
 #include <stdio.h>
+#include <stdint.h>
 #include <string.h>
 #include <time.h>
 #include "platform.h"
@@ -31,8 +32,8 @@
 #ifdef DEBUG
     extern FILE* debug_log_file;
     #define debug_print(format, arg...) \
-        fprintf(debug_log_file, "[%lld] %s at %s:%u - " format "\n", \
-            (long long) time(NULL), __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg); \
+        fprintf(debug_log_file, "[" DEBUG_TIME_STR "] %s at %s:%u - " format "\n", \
+            (int64_t) time(NULL), __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg); \
         fflush(debug_log_file);
 #else
     #define debug_print(format, ...)

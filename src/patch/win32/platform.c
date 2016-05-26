@@ -83,7 +83,7 @@ void* resolveSymbol(const char* symbol) {
         fatalProxyFailure(buffer);
     }
 
-    debug_print("Resolving symbol - %s = 0x%08x", symbol, procAddress);
+    debug_print("Resolving symbol - %s = %p", symbol, procAddress);
 
     return procAddress;
 }

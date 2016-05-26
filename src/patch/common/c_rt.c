@@ -48,7 +48,7 @@ static UnpatchData* writeRelativeJmp(void* targetAddress, void* hookAddress, con
 
     // Actually generate the patch opcode.
     int offsetDiff = (int) hookAddress - (int) targetAddress - 5;
-    debug_print("Writing JMP (%s) - 0x%08x => 0x%08x (diff: 0x%08x)",
+    debug_print("Writing JMP (%s) - %p => %p (diff: 0x%08x)",
         reason, targetAddress, hookAddress, offsetDiff);
     *((char*)(targetAddress    )) = 0xe9; // jmp opcode
     *((int *)(targetAddress + 1)) = offsetDiff;
@@ -68,7 +68,7 @@ UnpatchData* doPatch(int address, void* hookAddress, const char* reason) {
 }
 void unpatch(UnpatchData* data) {
     memory_oldProtect protectFlags;
-    debug_print("Unpatching at 0x%08x", data->offset);
+    debug_print("Unpatching at %p", data->offset);
     unprotectMemoryRegion(data->offset, 5, &protectFlags);
     memcpy(data->offset, data->oldData, 5);
     protectMemoryRegion(data->offset, 5, &protectFlags);
