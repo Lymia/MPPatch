@@ -19,23 +19,7 @@
 ; SOFTWARE.
 
 ; Return addresses
-XMLParserHook_ReturnAddr  : equ 0x100764A5
-XMLParserHook_ContinueAddr: equ 0x1007652C
 LuaTableHook_ReturnAddr   : equ 0x1000B49E
-
-%macro XMLParserHook_LoadVariables 0
-    mov edi, esi              ; this
-    lea esi, [esp+0x10+8*4+8] ; name_node
-    mov edi, [edi + 768]      ; connection
-%endmacro
-%define XMLParserHook_ContinueStatusRegister eax
-%macro XMLParserHook_ContinuePatchInstructions 0
-    ; Nothing here!
-%endmacro
-%macro XMLParserHook_PatchInstructions 0
-    lea edx, [esp+0x20-0x14]
-    push edx
-%endmacro
 
 %macro LuaTableHook_LoadVariables 0
     mov edi, esi ; Lua state

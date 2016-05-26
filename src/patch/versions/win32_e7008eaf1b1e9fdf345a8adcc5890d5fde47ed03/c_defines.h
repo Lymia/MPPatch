@@ -23,10 +23,6 @@
 #ifndef C_DEFINES_H
 #define C_DEFINES_H
 
-#define XmlNode_NameMatches_offset 0x100084F0
-#define XmlNode_GetValUtf8_offset  0x100084D0
-
-#define XmlParserHook_offset  0x100764A0
 #define LuaTableHook_offset   0x1000B499
 
 #define SetActiveDLCAndMods_offset_BIN_DX9    0x006CD160

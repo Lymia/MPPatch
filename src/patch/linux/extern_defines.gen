@@ -1,7 +1,3 @@
-symbol:Database_ExecuteMultiple:__attribute__((cdecl)):bool:class_Database* this, const char* string, int length:CV_MERGED_BINARY:_ZNK8Database10Connection15ExecuteMultipleEPKci
-symbol:Database_LogMessage:__attribute__((cdecl)):bool:class_Database* this, const char* string:CV_MERGED_BINARY:_ZNK8Database10Connection10LogMessageEPKc
-symbol:XmlNode_GetValUtf8:__attribute__((cdecl)):void:class_XmlNode* this, char** string_out, size_t* length_out:CV_MERGED_BINARY:_ZNK8Database10FXmlNVPair10GetValUtf8ERPKcRj
-symbol:XmlNode_NameMatches:__attribute__((cdecl)):bool:class_XmlNode* this, const char* string, size_t* tagSize:CV_MERGED_BINARY:_ZNK8Database10FXmlNVPair11NameMatchesEPKcRKj
 symbol:lua_gettop:__attribute__((cdecl)):int:lua_State* L:CV_MERGED_BINARY:*
 symbol:lua_createtable:__attribute__((cdecl)):void:lua_State* L, int narr, int nrec:CV_MERGED_BINARY:*
 symbol:lua_rawset:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*

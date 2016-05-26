@@ -30,39 +30,3 @@ cif_LuaTableHook:
 
     LuaTableHook_PatchInstructions
     dynamic_jmp CV_GAME_DATABASE, LuaTableHook_ReturnAddr
-
-extern cif_XmlParserHookCore
-global cif_XmlParserHook
-cif_XmlParserHook:
-        sub esp, 4
-        push_all
-
-        XMLParserHook_LoadVariables
-
-        sub esp, 4
-        mov eax, esp
-
-        push eax ; failure_value
-        push edi ; connection
-        push esi ; xml_node
-        call cif_XmlParserHookCore
-
-        pop ebx
-
-        test al, al
-        jz .proceedExit
-
-        mov [esp+4+4*8], ebx
-        pop_all
-        pop XMLParserHook_ContinueStatusRegister
-
-        XMLParserHook_ContinuePatchInstructions
-        dynamic_jmp CV_GAME_DATABASE, XMLParserHook_ContinueAddr
-
-    .proceedExit:
-        pop_all
-        add esp, 4
-
-        XMLParserHook_PatchInstructions
-        dynamic_jmp CV_GAME_DATABASE, XMLParserHook_ReturnAddr
-

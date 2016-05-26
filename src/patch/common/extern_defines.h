@@ -26,16 +26,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-// Database library components
-typedef struct class_Database class_Database;
-bool Database_ExecuteMultiple(class_Database* this, const char* string, int length);
-bool Database_LogMessage     (class_Database* this, const char* string);
-
-// XML library components
-typedef struct class_XmlNode class_XmlNode;
-bool XmlNode_NameMatches(class_XmlNode* this, const char* string, size_t* tagSize);
-void XmlNode_GetValUtf8 (class_XmlNode* this, char** string_out, size_t* length_out);
-
 // Lua library components
 typedef struct lua_State lua_State;
 typedef ptrdiff_t lua_Integer;
