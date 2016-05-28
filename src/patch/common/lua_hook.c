@@ -27,6 +27,7 @@
 // Like throwing a fatal error. :|
 
 #include <stdio.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -79,7 +80,7 @@ static int luaHook_NetPatch_overrideModList(lua_State *L) {
 
 static int luaHook_NetPatch_pushDLC(lua_State *L) {
     NetPatch_pushDLC(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2), luaL_checkinteger(L, 3),
-                     ((luaL_checkinteger(L, 4) << 32) & 0xFFFFFFFF) | (luaL_checkinteger(L, 5) & 0xFFFFFFFF));
+                     (((uint64_t) luaL_checkinteger(L, 4) << 32) & 0xFFFFFFFF) | (luaL_checkinteger(L, 5) & 0xFFFFFFFF));
     return 0;
 }
 static int luaHook_NetPatch_overrideReloadDLC(lua_State *L) {
