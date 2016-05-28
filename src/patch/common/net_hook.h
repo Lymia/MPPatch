@@ -27,7 +27,13 @@
 #include "platform.h"
 
 void NetPatch_pushMod(const char* modId, int version);
-void NetPatch_activateOverride();
+void NetPatch_overrideReloadMods(bool val);
+void NetPatch_overrideModList();
+
+void NetPatch_pushDLC(int data1, int data2, int data3, int data4);
+void NetPatch_overrideReloadDLC(bool val);
+void NetPatch_overrideDLCList();
+
 void NetPatch_reset();
 
 ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,

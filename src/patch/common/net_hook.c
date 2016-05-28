@@ -41,9 +41,12 @@ typedef struct ModInfo {
     int version;
 } ModInfo;
 
+static CppList* overrideDLCList = NULL;
 static CppList* overrideModList = NULL;
-static bool overrideModsActive = false;
+static bool overrideDLCActive  = false, overrideReloadDLC  = false, reloadDLC ;
+static bool overrideModsActive = false, overrideReloadMods = false, reloadMods;
 __attribute__((constructor(499))) static void initNetHook() {
+    overrideDLCList = CppList_alloc();
     overrideModList = CppList_alloc();
 }
 
@@ -53,11 +56,35 @@ void NetPatch_pushMod(const char* modId, int version) {
     info->modId[63] = '\0';
     info->version = version;
 }
-void NetPatch_activateOverride() {
+void NetPatch_overrideReloadMods(bool val) {
+    overrideReloadMods = true;
+    reloadMods = val;
+}
+void NetPatch_overrideModList() {
     overrideModsActive = true;
 }
+
+void NetPatch_pushDLC(int data1, int data2, int data3, int data4) {
+    GUID* guid = (GUID*) CppList_newLink(overrideDLCList, sizeof(GUID));
+    guid->data1 = data1;
+    guid->data2 = data2;
+    guid->data3 = data3;
+    guid->data4 = data4;
+}
+void NetPatch_overrideReloadDLC(bool val) {
+    overrideReloadDLC = true;
+    reloadDLC = val;
+}
+void NetPatch_overrideDLCList() {
+    overrideDLCActive = true;
+}
+
 void NetPatch_reset() {
+    overrideDLCActive  = false;
     overrideModsActive = false;
+    overrideReloadDLC  = false;
+    overrideReloadMods = false;
+    CppList_clear(overrideDLCList);
     CppList_clear(overrideModList);
 }
 
@@ -87,20 +114,37 @@ void NetPatch_reset() {
 
 SetActiveDLCAndMods_t SetActiveDLCAndMods;
 ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
-                                                                  char reloadDlc, char reloadMods) {
+                                                                  char pReloadDlc, char pReloadMods) {
     #ifdef DEBUG
-        debug_print("In SetActiveDLCAndModsProxy. (reloadDlc = %d, reloadMods = %d, overrideModsAcive = %s)",
-                    reloadDlc, reloadMods, overrideModsActive ? "true" : "false")
+        debug_print("In SetActiveDLCAndModsProxy. (reloadDlc = %d, reloadMods = %d)", pReloadDlc, pReloadMods)
         debugPrintList(dlcList, "Original DLC GUID List", printGUID);
         debugPrintList(modList, "Original Mod List", printMod);
-        debugPrintList(overrideModList, "Override Mod List", printMod);
     #endif
 
-    if(overrideModsActive) {
-        modList    = overrideModList;
-        reloadMods = 1;
+    if(overrideDLCActive ) {
+        debug_print("Overriding DLC list.")
+        #ifdef DEBUG
+            debugPrintList(overrideDLCList, "Override DLC List", printGUID);
+        #endif
+        dlcList = overrideDLCList;
     }
-    int ret = SetActiveDLCAndMods(this, dlcList, modList, reloadDlc, reloadMods);
+    if(overrideModsActive) {
+        debug_print("Overriding mods list.")
+        #ifdef DEBUG
+            debugPrintList(overrideModList, "Override Mod List", printMod);
+        #endif
+        modList = overrideModList;
+    }
+    if(overrideReloadDLC ) {
+        debug_print("Overriding reload DLCs flag (new value: %s)", reloadDLC ? "true" : "false")
+        pReloadDlc  = reloadDLC;
+    }
+    if(overrideReloadMods) {
+        debug_print("Overriding reload mods flag (new value: %s)", reloadMods ? "true" : "false")
+        pReloadMods = reloadMods;
+    }
+
+    int ret = SetActiveDLCAndMods(this, dlcList, modList, pReloadDlc, pReloadMods);
     NetPatch_reset();
     return ret;
 }

@@ -68,18 +68,43 @@ static int luaHook_NetPatch_pushMod(lua_State *L) {
     NetPatch_pushMod(luaL_checkstring(L, 1), luaL_checkinteger(L, 2));
     return 0;
 }
-static int luaHook_NetPatch_activateOverride(lua_State *L) {
-    NetPatch_activateOverride();
+static int luaHook_NetPatch_overrideReloadMods(lua_State *L) {
+    NetPatch_overrideReloadMods(luaL_checkinteger(L, 1) != 0);
     return 0;
 }
+static int luaHook_NetPatch_overrideModList(lua_State *L) {
+    NetPatch_overrideModList();
+    return 0;
+}
+
+static int luaHook_NetPatch_pushDLC(lua_State *L) {
+    NetPatch_pushDLC(luaL_checkinteger(L, 1), luaL_checkinteger(L, 2),
+                     luaL_checkinteger(L, 3), luaL_checkinteger(L, 4));
+    return 0;
+}
+static int luaHook_NetPatch_overrideReloadDLC(lua_State *L) {
+    NetPatch_overrideReloadDLC(luaL_checkinteger(L, 1) != 0);
+    return 0;
+}
+static int luaHook_NetPatch_overrideDLCList(lua_State *L) {
+    NetPatch_overrideDLCList();
+    return 0;
+}
+
 static int luaHook_NetPatch_reset(lua_State *L) {
     NetPatch_reset();
     return 0;
 }
 static void luaTable_NetPatch(lua_State *L, int table) {
-    table_setCFunction(L, table, "pushMod"         , luaHook_NetPatch_pushMod         );
-    table_setCFunction(L, table, "activateOverride", luaHook_NetPatch_activateOverride);
-    table_setCFunction(L, table, "reset"           , luaHook_NetPatch_reset           );
+    table_setCFunction(L, table, "pushMod"           , luaHook_NetPatch_pushMod           );
+    table_setCFunction(L, table, "overrideReloadMods", luaHook_NetPatch_overrideReloadMods);
+    table_setCFunction(L, table, "overrideModList"   , luaHook_NetPatch_overrideModList   );
+
+    table_setCFunction(L, table, "pushDLC"           , luaHook_NetPatch_pushDLC           );
+    table_setCFunction(L, table, "overrideReloadDLC" , luaHook_NetPatch_overrideReloadDLC );
+    table_setCFunction(L, table, "overrideDLCList"   , luaHook_NetPatch_overrideDLCList   );
+
+    table_setCFunction(L, table, "reset"             , luaHook_NetPatch_reset             );
 }
 
 static int luaHook_panic(lua_State *L) {
