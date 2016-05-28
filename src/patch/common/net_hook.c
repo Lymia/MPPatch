@@ -64,7 +64,7 @@ void NetPatch_overrideModList() {
     overrideModsActive = true;
 }
 
-void NetPatch_pushDLC(int data1, int data2, int data3, int data4) {
+void NetPatch_pushDLC(uint32_t data1, uint16_t data2, uint16_t data3, uint64_t data4) {
     GUID* guid = (GUID*) CppList_newLink(overrideDLCList, sizeof(GUID));
     guid->data1 = data1;
     guid->data2 = data2;
