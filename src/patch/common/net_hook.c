@@ -21,6 +21,7 @@
 */
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
 
@@ -29,6 +30,12 @@
 #include "extern_defines.h"
 #include "platform.h"
 
+typedef struct GUID {
+    uint32_t data1;
+    uint16_t data2;
+    uint16_t data3;
+    uint64_t data4;
+} GUID;
 typedef struct ModInfo {
     char modId[64];
     int version;
@@ -38,10 +45,10 @@ static CppList* overrideModList = NULL;
 static bool overrideModsActive = false;
 
 void NetPatch_pushMod(const char* modId, int version) {
-    ModInfo* info = (ModInfo*) malloc(sizeof(ModInfo));
+    ModInfo* info = (ModInfo*) CppList_newLink(overrideModList, sizeof(ModInfo));
     strncpy(info->modId, modId, 64);
+    info->modId[63] = '\0';
     info->version = version;
-    CppList_insert(overrideModList, info);
 }
 void NetPatch_activateOverride() {
     overrideModsActive = true;
@@ -51,11 +58,39 @@ void NetPatch_reset() {
     CppList_clear(overrideModList);
 }
 
+#ifdef DEBUG
+    static void printGUID(void* ptr) {
+        GUID* m = (GUID*) ptr;
+        uint64_t data4_le = __builtin_bswap64(m->data4);
+        debug_print_raw(" - {%08x-%04x-%04x-%04x-%04x%08x}",
+                        m->data1, m->data2, m->data3,
+                        (uint32_t) (data4_le >> 48) & 0xFFFF,
+                        (uint32_t) (data4_le >> 32) & 0xFFFF,
+                        (uint32_t) data4_le);
+    }
+    static void printMod(void* ptr) {
+        ModInfo* m = (ModInfo*) ptr;
+        debug_print_raw(" - {id = \"%s\", version = %d}", m->modId, m->version);
+    }
+    static void debugPrintList(CppList* list, const char* header, void (*printFn)(void*)) {
+        debug_print_raw("%s (stored length: %d):", header, CppList_size(list));
+        if(CppList_size(list) == 0) { debug_print_raw(" - <no entries>"); }
+        else for(CppListLink* i = CppList_begin(list); i != CppList_end(list); i = i->next) printFn(i->data);
+    }
+#endif
+
 typedef SetActiveDLCAndMods_signature (*SetActiveDLCAndMods_type)(void*, CppList*, CppList*, char, char);
 static SetActiveDLCAndMods_type SetActiveDLCAndMods_ptr;
 static ENTRY SetActiveDLCAndMods_signature SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
                                                                     char reloadDlc, char reloadMods) {
-    debug_print("In SetActiveDLCAndModsProxy. (overriding mod list: %s)", overrideModsActive ? "yes" : "no");
+    #ifdef DEBUG
+        debug_print("In SetActiveDLCAndModsProxy. (reloadDlc = %d, reloadMods = %d, overrideModsAcive = %s)",
+                    reloadDlc, reloadMods, overrideModsActive ? "true" : "false")
+        debugPrintList(dlcList, "Original DLC GUID List", printGUID);
+        debugPrintList(modList, "Original Mod List", printMod);
+        debugPrintList(overrideModList, "Override Mod List", printMod);
+    #endif
+
     if(overrideModsActive) {
         modList    = overrideModList;
         reloadMods = 1;

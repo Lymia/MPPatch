@@ -32,11 +32,14 @@
 
 #ifdef DEBUG
     extern FILE* debug_log_file;
+    #define debug_print_raw(format, arg...) { \
+        fprintf(debug_log_file, "[" DEBUG_TIME_STR "] " format "\n", (int64_t) time(NULL), ##arg); \
+        fflush(debug_log_file); \
+    }
     #define debug_print(format, arg...) \
-        fprintf(debug_log_file, "[" DEBUG_TIME_STR "] %s at %s:%u - " format "\n", \
-            (int64_t) time(NULL), __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg); \
-        fflush(debug_log_file);
+        debug_print_raw("%s at %s:%u - " format, __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg)
 #else
+    #define debug_print_raw(format, ...)
     #define debug_print(format, ...)
 #endif
 
@@ -48,8 +51,8 @@
 
 bool endsWith(const char* str, const char* ending);
 
-CppListLink* CppListLink_alloc();
-void CppListLink_insert(CppListLink* list, void* obj);
+CppListLink* CppListLink_alloc(int length);
+void* CppListLink_newLink(CppListLink* list, int length);
 void CppListLink_clear(CppListLink* list);
 void CppListLink_free(CppListLink* list);
 

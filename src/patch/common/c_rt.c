@@ -47,28 +47,27 @@ bool endsWith(const char* str, const char* ending) {
 }
 
 // std::list implementation
-CppListLink* CppListLink_alloc() {
-    CppListLink* link = (CppListLink*) malloc(sizeof(CppListLink));
+CppListLink* CppListLink_alloc(int length) {
+    CppListLink* link = (CppListLink*) malloc(sizeof(CppListLink) + length);
     link->next = link;
     link->prev = link;
-    link->data = NULL;
     return link;
 }
-void CppListLink_insert(CppListLink* list, void* obj) {
-    CppListLink* link = CppListLink_alloc();
-    link->data = obj;
+void* CppListLink_newLink(CppListLink* list, int length) {
+    CppListLink* link = CppListLink_alloc(length);
 
     link->prev = list->prev;
     link->next = list;
 
     list->prev->next = link;
     list->prev       = link;
+
+    return link->data;
 }
 void CppListLink_clear(CppListLink* list) {
     CppListLink* link = list->next;
     while(link != list) {
         CppListLink* nextLink = link->next;
-        if(link->data != NULL) free(link->data);
         free(link);
         link = nextLink;
     }

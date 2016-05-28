@@ -32,10 +32,7 @@
 typedef struct CppListLink {
     struct CppListLink* prev;
     struct CppListLink* next;
-    union {
-        void* data;
-        int length;
-    };
+    char data[];
 } CppListLink;
 
 typedef CppListLink CppList;

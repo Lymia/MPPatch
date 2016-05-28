@@ -90,18 +90,28 @@ __attribute__((destructor(201))) static void closeDysymHandle() {
 }
 
 // std::list implementation
+#define CppList_length(list) ((int*) list->data)[0]
 CppList* CppList_alloc() {
-    CppList* list = CppListLink_alloc();
-    list->length = 0;
+    CppList* list = CppListLink_alloc(sizeof(int));
+    CppList_length(list) = 0;
     return list;
 }
-void CppList_insert(CppList* list, void* obj) {
-    CppListLink_insert(list, obj);
-    list->length++;
+void* CppList_newLink(CppList* list, int length) {
+    CppList_length(list)++;
+    return CppListLink_newLink(list, length);
+}
+CppListLink* CppList_begin(CppList* list) {
+    return list->next;
+}
+CppListLink* CppList_end(CppList* list) {
+    return list;
+}
+int CppList_size(CppList* list) {
+    return CppList_length(list);
 }
 void CppList_clear(CppList* list) {
     CppListLink_clear(list);
-    list->length = 0;
+    CppList_length(list) = 0;
 }
 void CppList_free(CppList* list) {
     CppListLink_free(list);

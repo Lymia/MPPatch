@@ -45,7 +45,10 @@ void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old);
 void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old);
 
 CppList* CppList_alloc();
-void CppList_insert(CppList* list, void* obj);
+void* CppList_newLink(CppList* list, int length);
+CppListLink* CppList_begin(CppList* list);
+CppListLink* CppList_end(CppList* list);
+int CppList_size(CppList* list);
 void CppList_clear(CppList* list);
 void CppList_free(CppList* list);
 

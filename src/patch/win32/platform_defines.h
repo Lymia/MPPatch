@@ -40,7 +40,7 @@
 typedef struct CppListLink {
     struct CppListLink* next;
     struct CppListLink* prev;
-    void* data;
+    char data[];
 } CppListLink;
 
 typedef struct CppList {

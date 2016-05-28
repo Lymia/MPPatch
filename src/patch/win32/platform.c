@@ -118,13 +118,22 @@ __attribute__((constructor(201))) static void initializeConstantSymbol() {
 CppList* CppList_alloc() {
     CppList* list = (CppList*) malloc(sizeof(CppList));
     list->unk0    = 0;
-    list->head    = CppListLink_alloc();
+    list->head    = CppListLink_alloc(0);
     list->length  = 0;
     return list;
 }
-void CppList_insert(CppList* list, void* obj) {
-    CppListLink_insert(list->head, obj);
+void* CppList_newLink(CppList* list, int length) {
     list->length++;
+    return CppListLink_newLink(list->head, length);
+}
+CppListLink* CppList_begin(CppList* list) {
+    return list->head->next;
+}
+CppListLink* CppList_end(CppList* list) {
+    return list->head;
+}
+int CppList_size(CppList* list) {
+    return list->length;
 }
 void CppList_clear(CppList* list) {
     CppListLink_clear(list->head);
