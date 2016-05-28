@@ -36,7 +36,11 @@
         time_t time_val = time(NULL); \
         char* time_str_tmp = asctime(localtime(&time_val)); \
         time_str_tmp[strlen(time_str_tmp) - 1] = 0; \
-        fprintf(debug_log_file, "[%s] " format "\n", time_str_tmp, ##arg); \
+        char debug_print_buffer[2048]; \
+        snprintf(debug_print_buffer, 2048, "[%s] " format "\n", time_str_tmp, ##arg); \
+        debug_print_buffer[2047] = '\0'; \
+        fprintf(stderr, "[Multiverse Mod Manager] %s", debug_print_buffer); \
+        fprintf(debug_log_file, "%s", debug_print_buffer); \
         fflush(debug_log_file); \
     }
     #define debug_print(format, arg...) \
