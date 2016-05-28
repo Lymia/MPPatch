@@ -25,8 +25,6 @@
 
 #include "c_defines.h"
 
-#define DEBUG_TIME_STR "%lld"
-
 #define lGetMemoryUsage_attributes     __attribute__((cdecl))
 #define SetActiveDLCAndMods_attributes __attribute__((cdecl))
 

@@ -33,7 +33,10 @@
 #ifdef DEBUG
     extern FILE* debug_log_file;
     #define debug_print_raw(format, arg...) { \
-        fprintf(debug_log_file, "[" DEBUG_TIME_STR "] " format "\n", (int64_t) time(NULL), ##arg); \
+        time_t time_val = time(NULL); \
+        char* time_str_tmp = asctime(localtime(&time_val)); \
+        time_str_tmp[strlen(time_str_tmp) - 1] = 0; \
+        fprintf(debug_log_file, "[%s] " format "\n", time_str_tmp, ##arg); \
         fflush(debug_log_file); \
     }
     #define debug_print(format, arg...) \

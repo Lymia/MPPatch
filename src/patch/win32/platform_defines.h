@@ -23,8 +23,6 @@
 #ifndef PLATFORM_DEFINES_H
 #define PLATFORM_DEFINES_H
 
-#define DEBUG_TIME_STR "%I64d"
-
 #define lGetMemoryUsage_attributes     __cdecl
 #define SetActiveDLCAndMods_attributes __thiscall
 
