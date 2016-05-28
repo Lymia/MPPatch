@@ -143,9 +143,12 @@ static void luaTable_pushSharedState(lua_State *L) {
 lGetMemoryUsage_t lGetMemoryUsage;
 ENTRY int lGetMemoryUsageProxy(lua_State *L) {
     if(lua_type(L, 1) == LUA_TSTRING && !strcmp(luaL_checkstring(L, 1), LuaTableHook_SENTINAL)) {
+        debug_print("Found sentinal value, returning MVMM table.")
+
         lua_createtable(L, 0, 0);
         int table = lua_gettop(L);
 
+        table_setInteger(L, table, "__mvmm_marker", 1);
         table_setTable(L, table, "version", luaTable_versioninfo);
         table_setTable(L, table, "NetPatch", luaTable_NetPatch);
         table_setString(L, table, "credits", patchMarkerString);
@@ -160,5 +163,8 @@ ENTRY int lGetMemoryUsageProxy(lua_State *L) {
         #endif
 
         return 1;
-    } else return lGetMemoryUsage(L);
+    } else {
+        debug_print("lGetMemoryUsage called, but sentinal value not found. Calling original function.")
+        return lGetMemoryUsage(L);
+    }
 }
