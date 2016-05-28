@@ -4,15 +4,14 @@ Multiverse Mod Manager
 [![Build Status](https://lymia.moe/jenkins/job/MultiverseModManager/badge/icon)]
 (https://lymia.moe/jenkins/job/MultiverseModManager/)
 
-Multiverse Mod Manager allows Civilization V mods to be used in multiplayer by rewriting mods so that the game
-treats them as official DLCs. To allow mods that use .sql scripts to work, Multiverse Mod Manager installs a patch
-that modifies some of Civilization's V code to allow .xml files to directly run SQL code.
-
-In short, this program is an attempt to combine the simplicity of using JdH's CiV MP Mod Manager, and MPMPM's ability
-to actually support the majority of mods out there.
+Multiverse Mod Manager allows Civilization V mods to be used in multiplayer by patching out some of the code in the
+Civilization V binary that deactivates mods when a multiplayer game is started, and reactivating the dummied out
+modded multiplayer menus in its GUI.
 
 Currently, Multiverse Mod Manager supports Windows and Linux. Mac support is planned "eventually", but, as I don't
 have a Mac, this will take a while. 
+
+This project is obviously pending a rename, as it is no longer a mod manager of any kind.
 
 Compiling
 ---------
