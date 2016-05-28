@@ -55,6 +55,19 @@ void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old) {
   protectRange((size_t) start, length, PROT_READ | PROT_EXEC);
 }
 
+ExecutableMemory* executable_malloc(int length) {
+    ExecutableMemory* memory = (ExecutableMemory*) mmap(NULL, sizeof(ExecutableMemory) + length,
+                                                        PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    memory->length = length;
+    return memory;
+}
+void executable_prepare(ExecutableMemory* memory) {
+    protectMemoryRegion(memory, memory->length, NULL);
+}
+void executable_free(ExecutableMemory* memory) {
+    munmap(memory, memory->length);
+}
+
 BinaryType getBinaryType() {
     return BIN_GENERIC;
 }

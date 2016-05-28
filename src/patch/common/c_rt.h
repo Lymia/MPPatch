@@ -43,11 +43,7 @@
     #define debug_print(format, ...)
 #endif
 
-// Linux's ABI requires the stack to always be 16-byte aligned so SSE operations can be run more efficiently. This
-// used to cause a crash on Linux, as our ASM hooks do not preserve stack alignment. gcc's force_align_arg_pointer
-// attribute fixes this by forcing the C part of the hooks to fix the stack alignment when they are called.
 #define ENTRY __attribute__((force_align_arg_pointer))
-#define ASM_ENTRY __attribute__((stdcall)) ENTRY
 
 bool endsWith(const char* str, const char* ending);
 
@@ -56,13 +52,15 @@ void* CppListLink_newLink(CppListLink* list, int length);
 void CppListLink_clear(CppListLink* list);
 void CppListLink_free(CppListLink* list);
 
-typedef struct UnpatchData {
+typedef struct PatchInformation {
     void* offset;
     char oldData[5];
-} UnpatchData;
+    ExecutableMemory* functionFragment;
+} PatchInformation;
 
-UnpatchData* doPatch(AddressDomain domain, int address, void* hookAddress, bool isCall, const char* reason);
-void unpatch(UnpatchData* data);
+void patchJmpInstruction(void* fromAddress, void* toAddress, const char* logReason);
+PatchInformation* proxyFunction(void* fromAddress, void* toAddress, int patchBytes, const char* logReason);
+void unpatch(PatchInformation* data);
 
 #endif /* C_RT_H */
 

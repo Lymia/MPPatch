@@ -26,9 +26,9 @@
 #include <string.h>
 
 #include "c_rt.h"
-#include "c_defines.h"
 #include "extern_defines.h"
 #include "platform.h"
+#include "net_hook.h"
 
 typedef struct GUID {
     uint32_t data1;
@@ -79,10 +79,9 @@ void NetPatch_reset() {
     }
 #endif
 
-typedef SetActiveDLCAndMods_signature (*SetActiveDLCAndMods_type)(void*, CppList*, CppList*, char, char);
-static SetActiveDLCAndMods_type SetActiveDLCAndMods_ptr;
-static ENTRY SetActiveDLCAndMods_signature SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
-                                                                    char reloadDlc, char reloadMods) {
+SetActiveDLCAndMods_t SetActiveDLCAndMods;
+ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
+                                                                  char reloadDlc, char reloadMods) {
     #ifdef DEBUG
         debug_print("In SetActiveDLCAndModsProxy. (reloadDlc = %d, reloadMods = %d, overrideModsAcive = %s)",
                     reloadDlc, reloadMods, overrideModsActive ? "true" : "false")
@@ -95,19 +94,7 @@ static ENTRY SetActiveDLCAndMods_signature SetActiveDLCAndModsProxy(void* this, 
         modList    = overrideModList;
         reloadMods = 1;
     }
-    SetActiveDLCAndMods_return ret = SetActiveDLCAndMods_ptr(this, dlcList, modList, reloadDlc, reloadMods);
+    int ret = SetActiveDLCAndMods(this, dlcList, modList, reloadDlc, reloadMods);
     NetPatch_reset();
     return ret;
-}
-
-UnpatchData* NetPatch;
-__attribute__((constructor(500))) static void installNetHook() {
-    overrideModList = CppList_alloc();
-    SetActiveDLCAndMods_ptr = (SetActiveDLCAndMods_type) SetActiveDLCAndMods_resolve(getBinaryType());
-    int hookOffset = NetGameStartHook_offset_resolve(getBinaryType());
-    if(SetActiveDLCAndMods_ptr == 0 || hookOffset == 0) fatalError("Failed to get NetStartLaunchHook offsets.");
-    NetPatch = doPatch(CV_BINARY, hookOffset, SetActiveDLCAndModsProxy, true, "NetStartLaunchHook");
-}
-__attribute__((destructor(500))) static void uninstallNetHook() {
-    unpatch(NetPatch);
 }

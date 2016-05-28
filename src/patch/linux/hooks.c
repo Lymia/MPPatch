@@ -20,21 +20,30 @@
     SOFTWARE.
 */
 
-#ifndef NET_HOOK_H
-#define NET_HOOK_H
-
 #include "c_rt.h"
 #include "platform.h"
+#include "c_defines.h"
+#include "extern_defines.h"
 
-void NetPatch_pushMod(const char* modId, int version);
-void NetPatch_activateOverride();
-void NetPatch_reset();
+#include "net_hook.h"
+#include "lua_hook.h"
 
-ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
-                                                                  char reloadDlc, char reloadMods);
+static PatchInformation* lGetMemoryUsage_patchInfo;
+static PatchInformation* SetActiveDLCAndMods_patchInfo;
 
-typedef int SetActiveDLCAndMods_attributes (*SetActiveDLCAndMods_t)(void*, CppList*, CppList*, char, char);
-extern SetActiveDLCAndMods_t SetActiveDLCAndMods;
+__attribute__((constructor(500))) static void installHooks() {
+    // Lua hook
+    lGetMemoryUsage_patchInfo = proxyFunction(resolveSymbol(CV_MERGED_BINARY, lGetMemoryUsage_symbol),
+                                             lGetMemoryUsageProxy, lGetMemoryUsage_hook_length, "lGetMemoryUsage");
+    lGetMemoryUsage = (lGetMemoryUsage_t) lGetMemoryUsage_patchInfo->functionFragment->data;
 
-#endif /* NET_HOOK_H */
-
+    // DLC/Mod hook
+    SetActiveDLCAndMods_patchInfo = proxyFunction(resolveSymbol(CV_MERGED_BINARY, SetActiveDLCAndMods_symbol),
+                                                  SetActiveDLCAndModsProxy, SetActiveDLCAndMods_hook_length,
+                                                  "SetActiveDLCAndMods");
+    SetActiveDLCAndMods = (SetActiveDLCAndMods_t) SetActiveDLCAndMods_patchInfo->functionFragment->data;
+}
+__attribute__((destructor(500))) static void destroyHooks() {
+    unpatch(lGetMemoryUsage_patchInfo);
+    unpatch(SetActiveDLCAndMods_patchInfo);
+}

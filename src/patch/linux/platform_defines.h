@@ -23,10 +23,12 @@
 #ifndef PLATFORM_DEFINES_H
 #define PLATFORM_DEFINES_H
 
+#include "c_defines.h"
+
 #define DEBUG_TIME_STR "%lld"
 
-#define SetActiveDLCAndMods_return signed int
-#define SetActiveDLCAndMods_signature SetActiveDLCAndMods_return __attribute__((cdecl))
+#define lGetMemoryUsage_attributes     __attribute__((cdecl))
+#define SetActiveDLCAndMods_attributes __attribute__((cdecl))
 
 // std::list data structure
 typedef struct CppListLink {

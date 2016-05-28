@@ -23,9 +23,6 @@
 #ifndef EXTERN_DEFINES_H
 #define EXTERN_DEFINES_H
 
-#include <stddef.h>
-#include <stdbool.h>
-
 // Lua library components
 typedef struct lua_State lua_State;
 typedef ptrdiff_t lua_Integer;

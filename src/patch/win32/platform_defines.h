@@ -25,16 +25,10 @@
 
 #define DEBUG_TIME_STR "%I64d"
 
-#define SetActiveDLCAndMods_return char
-#define SetActiveDLCAndMods_signature SetActiveDLCAndMods_return __thiscall
+#define lGetMemoryUsage_attributes     __cdecl
+#define SetActiveDLCAndMods_attributes __thiscall
 
-#define switchOnType(type, name) ((type) == BIN_DX9    ? name##_BIN_DX9    : \
-                                  (type) == BIN_DX11   ? name##_BIN_DX11   : \
-                                  (type) == BIN_TABLET ? name##_BIN_TABLET : \
-                                  0)
-
-#define SetActiveDLCAndMods_resolve(type)     (resolveAddress(CV_BINARY, switchOnType(type, SetActiveDLCAndMods_offset)))
-#define NetGameStartHook_offset_resolve(type) (switchOnType(type, NetGameStartHook_offset))
+void* filterProxySymbol(const char* name, void* target);
 
 // std::list data structure
 typedef struct CppListLink {

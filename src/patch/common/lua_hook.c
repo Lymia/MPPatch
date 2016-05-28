@@ -34,7 +34,7 @@
 #include "c_defines.h"
 #include "extern_defines.h"
 #include "version.h"
-
+#include "lua_hook.h"
 #include "net_hook.h"
 
 // Setup new Lua tables
@@ -114,38 +114,26 @@ static void luaTable_pushSharedState(lua_State *L) {
         lua_settable(L, LUA_REGISTRYINDEX);
     }
 }
-static int luaHook_loadMainLibrary(lua_State *L) {
-    lua_createtable(L, 0, 0);
-    int table = lua_gettop(L);
 
-    table_setTable(L, table, "version", luaTable_versioninfo);
-    table_setTable(L, table, "NetPatch", luaTable_NetPatch);
-    table_setString(L, table, "credits", patchMarkerString);
-    table_setCFunction(L, table, "panic", luaHook_panic);
-
-    lua_pushstring(L, "shared");
-    luaTable_pushSharedState(L);
-    lua_rawset(L, table);
-
-    #ifdef DEBUG
-        table_setTable(L, table, "debug", luaTable_debug);
-    #endif
-
-    return 1;
-}
-
-extern ASM_ENTRY void LuaTableHookCore(lua_State *L, int table) __asm__("cif_LuaTableHookCore");
-ASM_ENTRY void LuaTableHookCore(lua_State *L, int table) {
+lGetMemoryUsage_t lGetMemoryUsage;
+ENTRY int lGetMemoryUsageProxy(lua_State *L) {
     if(lua_type(L, 1) == LUA_TSTRING && !strcmp(luaL_checkstring(L, 1), LuaTableHook_SENTINAL)) {
-        table_setCFunction(L, table, "__mvmm_load_patch", luaHook_loadMainLibrary);
-    }
-}
+        lua_createtable(L, 0, 0);
+        int table = lua_gettop(L);
 
-extern void LuaTableHook() __asm__("cif_LuaTableHook");
-UnpatchData* LuaTablePatch;
-__attribute__((constructor(500))) static void installLuaHook() {
-    LuaTablePatch = doPatch(CV_GAME_DATABASE, LuaTableHook_offset, LuaTableHook, false, "LuaTableHook");
-}
-__attribute__((destructor(500))) static void destroyLuaHook() {
-    unpatch(LuaTablePatch);
+        table_setTable(L, table, "version", luaTable_versioninfo);
+        table_setTable(L, table, "NetPatch", luaTable_NetPatch);
+        table_setString(L, table, "credits", patchMarkerString);
+        table_setCFunction(L, table, "panic", luaHook_panic);
+
+        lua_pushstring(L, "shared");
+        luaTable_pushSharedState(L);
+        lua_rawset(L, table);
+
+        #ifdef DEBUG
+            table_setTable(L, table, "debug", luaTable_debug);
+        #endif
+
+        return 1;
+    } else return lGetMemoryUsage(L);
 }

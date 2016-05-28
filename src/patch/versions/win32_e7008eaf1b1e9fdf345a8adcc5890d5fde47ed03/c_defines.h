@@ -23,16 +23,16 @@
 #ifndef C_DEFINES_H
 #define C_DEFINES_H
 
-#define LuaTableHook_offset   0x1000B499
+#define lGetMemoryUsage_symbol                     "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z"
 
-#define SetActiveDLCAndMods_offset_BIN_DX9    0x006CD160
-#define NetGameStartHook_offset_BIN_DX9       0x0077B17B
+#define SetActiveDLCAndMods_offset_BIN_DX9         0x006CD160
+#define SetActiveDLCAndMods_hook_length_BIN_DX9    6
 
-#define SetActiveDLCAndMods_offset_BIN_DX11   0x006B8E50
-#define NetGameStartHook_offset_BIN_DX11      0x00548DDB
+#define SetActiveDLCAndMods_offset_BIN_DX11        0x006B8E50
+#define SetActiveDLCAndMods_hook_length_BIN_DX11   6
 
-#define SetActiveDLCAndMods_offset_BIN_TABLET 0x0065DC10
-#define NetGameStartHook_offset_BIN_TABLET    0x00582B5B
+#define SetActiveDLCAndMods_offset_BIN_TABLET      0x0065DC10
+#define SetActiveDLCAndMods_hook_length_BIN_TABLET 6
 
 #define WIN32_REF_SYMBOL_NAME "??0BinaryIO@Database@@QAE@PBD@Z"
 #define WIN32_REF_SYMBOL_ADDR 0x100062D0

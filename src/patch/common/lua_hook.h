@@ -20,21 +20,16 @@
     SOFTWARE.
 */
 
-#ifndef NET_HOOK_H
-#define NET_HOOK_H
+#ifndef LUA_HOOK_H
+#define LUA_HOOK_H
 
-#include "c_rt.h"
 #include "platform.h"
+#include "extern_defines.h"
 
-void NetPatch_pushMod(const char* modId, int version);
-void NetPatch_activateOverride();
-void NetPatch_reset();
+int lGetMemoryUsageProxy(lua_State *L);
 
-ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
-                                                                  char reloadDlc, char reloadMods);
+typedef int lGetMemoryUsage_attributes (*lGetMemoryUsage_t)(lua_State *L);
+extern lGetMemoryUsage_t lGetMemoryUsage;
 
-typedef int SetActiveDLCAndMods_attributes (*SetActiveDLCAndMods_t)(void*, CppList*, CppList*, char, char);
-extern SetActiveDLCAndMods_t SetActiveDLCAndMods;
-
-#endif /* NET_HOOK_H */
+#endif /* LUA_HOOK_H */
 

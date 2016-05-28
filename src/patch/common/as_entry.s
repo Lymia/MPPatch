@@ -19,16 +19,4 @@
 ; SOFTWARE.
 
 bits 32
-segment .data
-__data_start:
-segment .text
-__start:
-
-%include "as_rt.s"
-
-%include "as_defines.s"
 %include "platform.s"
-%include "hooks.s"
-
-jmplist_end CV_BINARY
-jmplist_end CV_GAME_DATABASE

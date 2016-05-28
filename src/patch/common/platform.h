@@ -33,16 +33,24 @@ __attribute__((noreturn)) void fatalError_fn(const char* message);
     fatalError_fn(buffer); \
 }
 
-typedef enum AddressDomain { CV_MERGED_BINARY /* linux */, CV_BINARY, CV_GAME_DATABASE } AddressDomain;
+typedef enum AddressDomain { /* linux */ CV_MERGED_BINARY, /* win32 */ CV_BINARY, CV_GAME_DATABASE } AddressDomain;
 void* resolveAddress(AddressDomain domain, int offset);
 void* resolveSymbol (AddressDomain domain, const char* symbol);
 
-typedef enum BinaryType { BIN_GENERIC, BIN_DX9, BIN_DX11, BIN_TABLET } BinaryType;
+typedef enum BinaryType { /* linux */ BIN_GENERIC, /* win32 */ BIN_DX9, BIN_DX11, BIN_TABLET } BinaryType;
 BinaryType getBinaryType();
 
 typedef unsigned long int memory_oldProtect; // used on Windows since we can easily get the memory protection status.
 void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old);
 void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old);
+
+typedef struct ExecutableMemory {
+    int length;
+    char data[];
+} ExecutableMemory;
+ExecutableMemory* executable_malloc(int length);
+void executable_prepare(ExecutableMemory* memory);
+void executable_free(ExecutableMemory* memory);
 
 CppList* CppList_alloc();
 void* CppList_newLink(CppList* list, int length);

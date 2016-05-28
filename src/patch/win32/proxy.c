@@ -20,21 +20,22 @@
     SOFTWARE.
 */
 
-#ifndef NET_HOOK_H
-#define NET_HOOK_H
-
 #include "c_rt.h"
 #include "platform.h"
 
-void NetPatch_pushMod(const char* modId, int version);
-void NetPatch_activateOverride();
-void NetPatch_reset();
+typedef struct symbolTable_type {
+    int32_t exists;
+    int32_t addr;
+    const char* target;
+} __attribute__((packed)) symbolTable_type;
+extern symbolTable_type proxy_symbolTable[] __asm__("cif_symbolTable");
 
-ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
-                                                                  char reloadDlc, char reloadMods);
-
-typedef int SetActiveDLCAndMods_attributes (*SetActiveDLCAndMods_t)(void*, CppList*, CppList*, char, char);
-extern SetActiveDLCAndMods_t SetActiveDLCAndMods;
-
-#endif /* NET_HOOK_H */
-
+__attribute__((constructor(250))) static void initProxy() {
+    debug_print("Initializing CvGameDatabase proxy.");
+    for(symbolTable_type* t = proxy_symbolTable; t->exists; t++) {
+        void* target = filterProxySymbol(t->target, resolveSymbol(CV_GAME_DATABASE, t->target));
+        char buffer[1024];
+        snprintf(buffer, 1024, "proxy initialization: %s", t->target);
+        patchJmpInstruction((void*) t->addr, target, buffer);
+    }
+}

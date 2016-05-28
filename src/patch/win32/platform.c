@@ -41,6 +41,17 @@ void protectMemoryRegion  (void* start, size_t length, memory_oldProtect* old) {
     VirtualProtect(start, length, *old, old);
 }
 
+ExecutableMemory* executable_malloc(int length) {
+    ExecutableMemory* memory = (ExecutableMemory*) VirtualAlloc(NULL, sizeof(ExecutableMemory) + length,
+                                                                MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+    memory->length = length;
+    return memory;
+}
+void executable_prepare(ExecutableMemory* memory) {}
+void executable_free(ExecutableMemory* memory) {
+    VirtualFree(memory, memory->length, MEM_RELEASE);
+}
+
 // Get executable type
 static BinaryType detectedBinaryType;
 BinaryType getBinaryType() {
@@ -51,7 +62,7 @@ __attribute__((constructor(201))) static void initializeBinaryType() {
 
     char moduleName[1024];
     if(!GetModuleFileName(NULL, moduleName, sizeof(moduleName)))
-        fatalError("Could not get main executable binary name. (Error code: %d)", GetLastError());
+        fatalError("Could not get main executable binary name. (code: 0x%08x)", GetLastError());
     debug_print("Binary name: %s", moduleName);
 
     if     (endsWith(moduleName, "CivilizationV.exe"       )) detectedBinaryType = BIN_DX9   ;
@@ -75,9 +86,8 @@ __attribute__((constructor(200))) static void initializeProxy() {
     if(!checkFileExists(TARGET_LIBRARY_NAME))
         fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.");
     baseDll = LoadLibrary(TARGET_LIBRARY_NAME);
-    if(baseDll == NULL) {
+    if(baseDll == NULL)
         fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08x)", GetLastError());
-    }
 }
 __attribute__((destructor(200))) static void deinitializeProxy() {
     debug_print("Unloading original CvGameDatabase");
