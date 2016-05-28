@@ -117,15 +117,17 @@ trait PatchBuild { this: Build =>
     },
     linuxDirectory := simplePrepareDirectory(patchBuildDir.value / "linux"),
 
-    // Download libSDL from the Steam runtime.
+    // Extract Steam runtime libSDL files.
     steamrtSDL :=
-      downloadSteamRuntime(config_steam_sdlbin_path, patchBuildDir.value / config_steam_sdlbin_name,
-                           streams.value.log.info("Downloading "+config_steam_sdlbin_name+"...")) { (dir, target) =>
+      extractSteamRuntime(baseDirectory.value / "project" / "contrib_bin" / config_steam_sdlbin_path,
+                          patchBuildDir.value / config_steam_sdlbin_name,
+                          streams.value.log.info("Extracting "+config_steam_sdlbin_name+"...")) { (dir, target) =>
         IO.copyFile(dir / "usr" / "lib" / "i386-linux-gnu" / config_steam_sdlbin_name, target)
       },
     steamrtSDLDev :=
-      downloadSteamRuntime(config_steam_sdldev_path, patchBuildDir.value / "SDL2_include",
-        streams.value.log.info("Downloading SDL2 headers...")) { (dir, target) =>
+      extractSteamRuntime(baseDirectory.value / "project" / "contrib_bin" / config_steam_sdldev_path,
+                          patchBuildDir.value / "SDL2_include",
+                          streams.value.log.info("Extracting SDL2 headers...")) { (dir, target) =>
         IO.copyDirectory(dir / "usr" / "include" / "SDL2", target)
       },
 

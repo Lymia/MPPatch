@@ -47,12 +47,11 @@ object Utils {
   def simplePrepareDirectory(path: File) = prepareDirectory(path){ dir => }
 
   // Steam runtime helper functions
-  def downloadSteamRuntime[T](url: String, target: File, beforeLog: => T = null)(fn: (File, File) => Unit) =
+  def extractSteamRuntime[T](source: File, target: File, beforeLog: => T = null)(fn: (File, File) => Unit) =
     if(target.exists) target else {
       beforeLog
       IO.withTemporaryDirectory { temp =>
-        IO.download(new URL(url), temp / "steam_runtime_package.deb")
-        runProcess(Seq("ar", "xv", temp / "steam_runtime_package.deb"), temp)
+        runProcess(Seq("ar", "xv", source), temp)
         runProcess(Seq("tar", "xvf", temp / "data.tar.gz"), temp)
         fn(temp, target)
       }

@@ -32,7 +32,7 @@ object Config {
   val version_baseVersion  = "0.0.0"
   val version_patchCompat  = 1
 
-  val config_steam_sdlbin_path = "http://repo.steamstatic.com/steamrt/pool/main/libs/libsdl2/libsdl2_2.0.3+steamrt1+srt4_i386.deb"
-  val config_steam_sdldev_path = "http://repo.steamstatic.com/steamrt/pool/main/libs/libsdl2/libsdl2-dev_2.0.3+steamrt1+srt4_i386.deb"
+  val config_steam_sdlbin_path = "libsdl2_2.0.3+steamrt1+srt4_i386.deb"
+  val config_steam_sdldev_path = "libsdl2-dev_2.0.3+steamrt1+srt4_i386.deb"
   val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
 }
