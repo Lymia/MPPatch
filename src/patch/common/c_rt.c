@@ -102,11 +102,12 @@ PatchInformation* proxyFunction(void* fromAddress, void* toAddress, int patchByt
 
     info->functionFragment = executable_malloc(patchBytes + 5);
     memcpy(info->functionFragment->data, fromAddress, patchBytes);
-    executable_prepare(info->functionFragment);
 
     char buffer[1024];
     snprintf(buffer, 1024, "function fragment epilogue for %s", logReason);
-    writeJmpInstruction(info->functionFragment->data + patchBytes, toAddress + patchBytes, buffer);
+    writeJmpInstruction(info->functionFragment->data + patchBytes, fromAddress + patchBytes, buffer);
+
+    executable_prepare(info->functionFragment);
 
     snprintf(buffer, 1024, "hook for %s", logReason);
     patchJmpInstruction(fromAddress, toAddress, buffer);

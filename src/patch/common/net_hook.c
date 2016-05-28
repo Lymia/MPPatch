@@ -43,6 +43,9 @@ typedef struct ModInfo {
 
 static CppList* overrideModList = NULL;
 static bool overrideModsActive = false;
+__attribute__((constructor(499))) static void initNetHook() {
+    overrideModList = CppList_alloc();
+}
 
 void NetPatch_pushMod(const char* modId, int version) {
     ModInfo* info = (ModInfo*) CppList_newLink(overrideModList, sizeof(ModInfo));
@@ -73,9 +76,12 @@ void NetPatch_reset() {
         debug_print_raw(" - {id = \"%s\", version = %d}", m->modId, m->version);
     }
     static void debugPrintList(CppList* list, const char* header, void (*printFn)(void*)) {
-        debug_print_raw("%s (stored length: %d):", header, CppList_size(list));
-        if(CppList_size(list) == 0) { debug_print_raw(" - <no entries>"); }
-        else for(CppListLink* i = CppList_begin(list); i != CppList_end(list); i = i->next) printFn(i->data);
+        if(list == NULL) { debug_print_raw("%s (is null)", header); }
+        else {
+            debug_print_raw("%s (stored length: %d):", header, CppList_size(list));
+            if(CppList_size(list) == 0) { debug_print_raw(" - <no entries>"); }
+            else for(CppListLink* i = CppList_begin(list); i != CppList_end(list); i = i->next) printFn(i->data);
+        }
     }
 #endif
 
