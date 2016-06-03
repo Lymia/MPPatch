@@ -37,7 +37,8 @@ case class DLCInclude(event: String, fileData: Node)
 case class DLCMap(extension: String, data: Array[Byte])
 
 case class DLCGameplay(gameplayIncludes: Seq[DLCInclude], globalIncludes: Seq[DLCInclude], mapEntries: Seq[DLCMap],
-                       importFileList: Map[String, Array[Byte]], uiSkins: Seq[DLCUISkin])
+                       importFileList: Map[String, Array[Byte]], uiOnlyFiles: Map[String, Array[Byte]],
+                       uiSkins: Seq[DLCUISkin])
 case class DLCManifest(uuid: UUID, version: Int, priority: Int, shortName: String, name: String)
 
 case class DLCData(manifest: DLCManifest, data: DLCGameplay)
@@ -45,7 +46,7 @@ case class DLCData(manifest: DLCManifest, data: DLCGameplay)
 object DLCKey {
   private val staticInterlace =
     Seq(0x1f, 0x33, 0x93, 0xfb, 0x35, 0x0f, 0x42, 0xc7,
-      0xbd, 0x50, 0xbe, 0x7a, 0xa5, 0xc2, 0x61, 0x81) map (_.toByte)
+        0xbd, 0x50, 0xbe, 0x7a, 0xa5, 0xc2, 0x61, 0x81) map (_.toByte)
   private val staticInterlaceStream = Stream.from(0) map (x => staticInterlace(x%staticInterlace.length))
   private def interlaceData(data: Seq[Byte]) =
     data.zip(staticInterlaceStream).flatMap(x => Seq(x._1, x._2))
@@ -64,7 +65,7 @@ object DLCKey {
   private def encodeNumber(i: Int) = i.toString.getBytes(StandardCharsets.US_ASCII).toSeq
 
   def key(u: UUID, sid: Seq[Int], ptags: String*) = {
-    val data = sid.map(encodeNumber) ++ ptags.map(_.getBytes(StandardCharsets.UTF_16).toSeq)
+    val data = sid.map(encodeNumber) ++ ptags.map(_.getBytes(StandardCharsets.UTF_8).toSeq)
     Crypto.md5_hex(interlaceData(encodeUUID(u) ++ data.fold(Seq())(_ ++ _)))
   }
 }
@@ -114,6 +115,7 @@ object DLCDataWriter {
         for((name, file) <- files) IOUtils.writeFile(platform.resolve(dirPath, name), file)
         <UISkin name={name} set={set} platform={skinPlatform}>
           <Skin>
+            <Directory>UI_Files</Directory>
             { if(files.nonEmpty) Seq(<Directory>{dirName}</Directory>) else Seq() }
             { if(includeImports) Seq(<Directory>Files</Directory>) else Seq() }
           </Skin>
@@ -131,6 +133,10 @@ object DLCDataWriter {
     val filesDirectory = platform.resolve(dlcBasePath, "Files")
     Files.createDirectories(filesDirectory)
     for((name, file) <- dlcData.data.importFileList) IOUtils.writeFile(platform.resolve(filesDirectory, name), file)
+
+    val uiFilesDirectory = platform.resolve(dlcBasePath, "UI_Files")
+    Files.createDirectories(uiFilesDirectory)
+    for((name, file) <- dlcData.data.uiOnlyFiles) IOUtils.writeFile(platform.resolve(uiFilesDirectory, name), file)
 
     IOUtils.writeXML(platform.resolve(dlcBasePath, s"$nameString.Civ5Pkg"), <Civ5Package>
       {commonHeader(dlcData.manifest.name, dlcData.manifest.uuid, dlcData.manifest.version)}

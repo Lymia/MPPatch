@@ -24,9 +24,9 @@ package moe.lymia.multiverse.ui
 
 import java.io.File
 import java.nio.file.{Files, Path}
-import java.util.{Locale, UUID}
+import java.util.Locale
 
-import moe.lymia.multiverse.core.{BaseDLC, DLCDataWriter, Installer}
+import moe.lymia.multiverse.core.Installer
 import moe.lymia.multiverse.util.res.{I18N, VersionInfo}
 import moe.lymia.multiverse.platform.Platform
 

@@ -42,6 +42,6 @@ package object res {
   private[res] def loadBinaryResourceFromStream(s: InputStream) =
     Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
 
-  private[res] def loadResource(s: String) = loadFromStream(getResource(s))
-  private[res] def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
+  def loadResource(s: String) = loadFromStream(getResource(s))
+  def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
 }
