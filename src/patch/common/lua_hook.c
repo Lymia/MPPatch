@@ -117,9 +117,23 @@ static void luaTable_versioninfo(lua_State *L, int table) {
     table_setInteger(L, table, "compatVersion", patchCompatVersion);
     table_setString (L, table, "versionString", patchFullVersion);
 }
+
+static void lua_pushGlobals(lua_State *L) {
+    lua_pushstring(L, ""); // S
+    lua_pushstring(L, "gsub"); // S S
+    lua_gettable(L, -2);
+    lua_getfenv(L, -1);
+    lua_insert(L, -3);
+    lua_pop(L, 2);
+}
+
 #ifdef DEBUG
     static void luaTable_debug(lua_State *L, int table) {
         lua_pushstring(L, "globals");
+        lua_pushGlobals(L);
+        lua_rawset(L, table);
+
+        lua_pushstring(L, "_G");
         lua_pushvalue(L, LUA_GLOBALSINDEX);
         lua_rawset(L, table);
 
@@ -142,6 +156,20 @@ static void luaTable_pushSharedState(lua_State *L) {
     }
 }
 
+static const char* copyList[] = {"rawset", "rawget", NULL};
+static void luaTable_globals(lua_State *L, int table) {
+    lua_pushGlobals(L);
+    int globals = lua_gettop(L);
+    for(int i=0; copyList[i] != NULL; i++) {
+        const char* name = copyList[i];
+        lua_pushstring(L, name);
+        lua_pushstring(L, name);
+        lua_gettable(L, globals);
+        lua_rawset(L, table);
+    }
+    lua_pop(L, 1);
+}
+
 lGetMemoryUsage_t lGetMemoryUsage;
 ENTRY int lGetMemoryUsageProxy(lua_State *L) {
     if(lua_type(L, 1) == LUA_TSTRING && !strcmp(luaL_checkstring(L, 1), LuaTableHook_SENTINEL)) {
@@ -150,9 +178,10 @@ ENTRY int lGetMemoryUsageProxy(lua_State *L) {
         lua_createtable(L, 0, 0);
         int table = lua_gettop(L);
 
-        table_setInteger(L, table, "__mvmm_marker", 1);
+        table_setInteger(L, table, "__mppatch_marker", 1);
         table_setTable(L, table, "version", luaTable_versioninfo);
         table_setTable(L, table, "NetPatch", luaTable_NetPatch);
+        table_setTable(L, table, "globals", luaTable_globals);
         table_setString(L, table, "credits", patchMarkerString);
         table_setCFunction(L, table, "panic", luaHook_panic);
 

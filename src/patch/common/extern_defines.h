@@ -27,6 +27,7 @@
 typedef struct lua_State lua_State;
 typedef ptrdiff_t lua_Integer;
 
+void lua_insert (lua_State *L, int index);
 int lua_gettop (lua_State *L);
 void  lua_settop (lua_State *L, int index);
 void  lua_pushvalue (lua_State *L, int index);
@@ -39,6 +40,7 @@ void lua_settable (lua_State *L, int index);
 
 void lua_createtable (lua_State *L, int narr, int nrec);
 void lua_rawset (lua_State *L, int index);
+void lua_getfenv (lua_State *L, int index);
 
 const char *luaL_checklstring (lua_State *L, int narg, size_t *len);
 #define luaL_checkstring(L,n)   (luaL_checklstring(L, (n), NULL))

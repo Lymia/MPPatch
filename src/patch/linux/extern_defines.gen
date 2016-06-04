@@ -11,3 +11,5 @@ symbol:lua_pushvalue:__attribute__((cdecl)):void :lua_State* L, int index:CV_MER
 symbol:lua_gettable:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*
 symbol:lua_settable:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*
 symbol:lua_type:__attribute__((cdecl)):int:lua_State* L, int index:CV_MERGED_BINARY:*
+symbol:lua_getfenv:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*
+symbol:lua_insert:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*

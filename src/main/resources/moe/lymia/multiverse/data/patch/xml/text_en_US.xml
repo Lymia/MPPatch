@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GameData>
+    <Language_en_US>
+        <!-- These text strings are displayed on the main menu next to the version when an error occurs. -->
+        <Row Tag="TXT_KEY_MPPATCH_DISABLED">
+            <!-- Used when the MpPatch DLC is disabled. -->
+            <Text>MpPatch disabled</Text>
+        </Row>
+        <Row Tag="TXT_KEY_MPPATCH_BINARY_NOT_PATCHED">
+            <!-- Used when the MpPatch .dll/.so patch isn't installed. -->
+            <Text>MpPatch binary patch not installed</Text>
+        </Row>
+        <Row Tag="TXT_KEY_MPPATCH_UNKNOWN_FAILURE">
+            <!-- Used when MpPatch isn't loaded, but the source of the failure could not be determined. -->
+            <Text>MpPatch failed to load</Text>
+        </Row>
+    </Language_en_US>
+</GameData>

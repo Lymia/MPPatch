@@ -34,7 +34,7 @@ package object res {
     if(res != null) res.close()
     res != null
   }
-  private[res] def getResource(s: String) =
+  def getResource(s: String) =
     getClass.getResourceAsStream(base + s)
 
   private[res] def loadFromStream(s: InputStream) =

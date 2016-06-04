@@ -29,40 +29,43 @@ import java.util.{Locale, UUID}
 import moe.lymia.multiverse.platform.Platform
 import moe.lymia.multiverse.util.{IOUtils, res}
 
-object DlcUUID {
-  val BASE_DLC_UUID = UUID.fromString("df74f698-2343-11e6-89c4-8fef6d8f889e")
-}
+import scala.xml.XML
 
-case class MPPatchLuaOverride(libraries: Seq[String] = Seq(),
-                              injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq()) {
-  lazy val beforePaths = libraries.map("lib/"+_) ++ injectBefore.map("ui/"+_)
-  lazy val afterPaths  = injectAfter.map("ui/"+_)
-}
-object MPPatch {
-  private val UISkin_BaseGame      = DLCUISkin("BaseGame"         , "BaseGame"  , "Common", false, Map())
-  private val UISkin_GodsAndKings  = DLCUISkin("Expansion1Primary", "Expansion1", "Common", false, Map())
-  private val UISkin_BraveNewWorld = DLCUISkin("Expansion2Primary", "Expansion2", "Common", false, Map())
+case class MPPatchLuaOverride(injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
+object MPPatchDLC {
+  val DLC_UUID      = UUID.fromString("df74f698-2343-11e6-89c4-8fef6d8f889e")
+  val DLC_VERSION   = 1
 
   private val luaPatchList = Map(
-    "mainmenu.lua"    -> MPPatchLuaOverride(injectAfter = Seq("after_mainmenu.lua")),
-    "modsmenu.lua"    -> MPPatchLuaOverride(injectAfter = Seq("after_modsmenu.lua")),
-    "stagingroom.lua" -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua", "before_stagingroom.lua"))
+    "mainmenu.lua"          -> MPPatchLuaOverride(injectAfter = Seq("after_mainmenu.lua")),
+    "modsmenu.lua"          -> MPPatchLuaOverride(injectAfter = Seq("after_modsmenu.lua")),
+    "stagingroom.lua"       -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua","before_stagingroom.lua")),
+    "multiplayerselect.lua" -> MPPatchLuaOverride(injectBefore = Seq("before_multiplayerselect.lua")),
+    "mpgamesetupscreen.lua" -> MPPatchLuaOverride(injectAfter = Seq("after_mpgamesetupscreen.lua"))
   )
-  private val runtimeFiles = Map(
-    "mppatch_runtime.lua" -> res.loadResource("patch/lib/mppatch_runtime.lua")
-  )
+
+  private val runtimeFileNames = Seq("mppatch_runtime.lua", "mppatch_utils.lua", "mppatch_modutils.lua",
+                                     "mppatch_uiutils.lua")
+  private val uiFileNames = Seq("mppatch_multiplayerproxy")
+  private val newFiles = runtimeFileNames.map(x =>
+    x -> res.loadResource(s"patch/lib/$x")
+  ).toMap ++ uiFileNames.flatMap(x => Seq(
+    s"$x.lua" -> res.loadResource(s"patch/ui/$x.lua"),
+    s"$x.xml" -> res.loadResource(s"patch/ui/$x.xml")
+  )).toMap
 
   private def loadWrapper(str: Seq[String]) =
     if(str.isEmpty) "" else {
       "--- BEGIN INJECTED MPPATCH CODE ---\n\n"+
       str.mkString("\n")+
-      "\n--- END INJECTED MPPATCH CODE ---\n\n"
+      "\n--- END INJECTED MPPATCH CODE ---"
     }
   private def getLuaFragment(path: String) = {
-    val code = res.loadResource("patch/"+path)
-    "-- source file: patch/"+path+"\n\n"+
+    val code = res.loadResource("patch/hooks/"+path)
+    "-- source file: patch/hooks/"+path+"\n\n"+
     code+(if(!code.endsWith("\n")) "\n" else "")
   }
+  private def getXmlFile(path: String) = XML.load(res.getResource(path))
   private def findPatchTargets(path: Path, patches: Map[String, MPPatchLuaOverride]): Map[String, String] =
     IOUtils.listFiles(path).flatMap { file =>
       val fileName = file.getFileName.toString
@@ -70,22 +73,28 @@ object MPPatch {
       else patches.get(fileName.toLowerCase(Locale.ENGLISH)) match {
         case Some(patch) =>
           val runtime      = "include \"mppatch_runtime.lua\"\n"
-          val injectBefore = runtime +: patch.beforePaths.map(getLuaFragment)
+          val injectBefore = runtime +: patch.injectBefore.map(getLuaFragment)
           val contents     = IOUtils.readFileAsString(file)
-          val injectAfter  = patch.afterPaths.map(getLuaFragment)
-          val finalFile    = loadWrapper(injectBefore)+contents+loadWrapper(injectAfter)
+          val injectAfter  = patch.injectAfter.map(getLuaFragment)
+          val finalFile    = loadWrapper(injectBefore)+"\n\n"+contents+"\n\n"+loadWrapper(injectAfter)
           Seq(fileName -> finalFile)
         case None =>
           Seq()
       }
     }.toMap
 
+  private val textFiles = Seq("text_en_US.xml").flatMap(x =>
+    getXmlFile("patch/xml/"+x).child
+  )
+
   private def prepareList(map: Map[String, String]) = map.mapValues(_.getBytes(StandardCharsets.UTF_8))
+  private def findPathTargets(base: Path, platform: Platform, path: String*) =
+    findPatchTargets(platform.resolve(base, platform.assetsPath +: path: _*), luaPatchList)
   def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
-    val patchedFileList =
-      findPatchTargets(platform.resolve(civBaseDirectory, platform.assetsPath, "ui"), luaPatchList)
-    DLCData(DLCManifest(DlcUUID.BASE_DLC_UUID, 1, 300, "MPPatch", "MPPatch"),
-            DLCGameplay(Nil, Nil, Nil, prepareList(runtimeFiles), prepareList(patchedFileList),
-                        Seq(UISkin_BraveNewWorld)))
+    val patchedFileList = findPathTargets(civBaseDirectory, platform, "UI")
+    DLCData(DLCManifest(DLC_UUID, DLC_VERSION, 1, "MPPatch", "MPPatch"),
+            DLCGameplay(globalTextData = textFiles,
+                        uiOnlyFiles = prepareList(patchedFileList ++ newFiles),
+                        uiSkins = Seq(DLCUISkin("MPPatch", "BaseGame", "Common", false, Map(), None))))
   }
 }

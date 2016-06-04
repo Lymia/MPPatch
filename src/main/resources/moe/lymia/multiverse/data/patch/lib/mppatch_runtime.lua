@@ -18,64 +18,97 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-_mpPatch = nil
+_mpPatch = {}
+_mpPatch._mt = {}
+setmetatable(_mpPatch, _mpPatch._mt)
 
 local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70")
-local hasPatch = false
-if patch.__mvmm_marker then hasPatch = true end
 
-if not hasPatch then return end
+if not patch.__mppatch_marker then
+    _mpPatch.enabled = false
+    _mpPatch.canEnable = false
+    function _mpPatch._mt.__index(_, k)
+        error("Access to field "..k.." in MpPatch runtime without patch installed.")
+    end
+    return
+end
 
-_mpPatch = {}
 _mpPatch.patch = patch
 _mpPatch.versionString = patch.version.versionString
 
-local function getFullPath()
-    local accum = ContextPtr:GetID()
-    local path = ".."
-    local seen = {}
-    while true do
-        local currentContext = ContextPtr:LookUpControl(path)
-        if not currentContext then break end
-        if seen[currentContext:GetID()] then
-            return "{...}/"..accum
-        end
-        seen[currentContext:GetID()] = true
-        accum = currentContext:GetID().."/"..accum
-        path = path.."/.."
+_mpPatch.uuid = "df74f698-2343-11e6-89c4-8fef6d8f889e"
+_mpPatch.enabled = ContentManager.IsActive(_mpPatch.uuid, ContentType.GAMEPLAY)
+_mpPatch.canEnable = true
+_mpPatch.debug = not not patch.debug
+
+-- globals from patch
+local rawset = _mpPatch.patch.globals.rawset
+
+-- Metatable __index hooks
+local indexers = {}
+function _mpPatch._mt.__index(_, k)
+    for _, fn in ipairs(indexers) do
+        local v = fn(k)
+        if v ~= nil then return v end
     end
-    return accum
+    error("Access to unknown field "..k.." in MpPatch runtime.")
+end
+function _mpPatch._mt.registerIndexer(fn)
+    table.insert(indexers, fn)
 end
 
-function _mpPatch.isModding()
-    local path = _mpPatch.fullPath
-    return not not (path:find("ModMultiplayerSelectScreen") or path:find("ModdingMultiplayer"))
-end
-
-function _mpPatch.overrideWithModList(list)
-    patch.NetPatch.reset()
-    for _, mod in ipairs(list) do
-        patch.NetPatch.pushMod(mod.ID, mod.Version)
+-- Metatable __newindex hooks
+local newIndexers = {}
+function _mpPatch._mt.__newindex(_, k, v)
+    for _, fn in ipairs(newIndexers) do
+        if fn(k, v) then return end
     end
-    patch.NetPatch.overrideModList()
+    rawset(_mpPatch, k, v)
 end
-function _mpPatch.overrideWithLoadedMods()
-    _mpPatch.overrideWithModList(Modding.GetActivatedMods())
+function _mpPatch._mt.registerNewIndexer(fn)
+    table.insert(newIndexers, fn)
 end
-function _mpPatch.overrideModsFromSaveFile(file)
-    local _, requiredMods = Modding.GetSavedGameRequirements(file)
-    if type(requiredMods) == "table" then
-        _mpPatch.overrideWithModList(requiredMods)
+
+-- Lazy variables
+local lazyVals = {}
+_mpPatch._mt.registerIndexer(function(k)
+    local fn = lazyVals[k]
+    if fn then
+        local v = fn()
+        _mpPatch[k] = v
+        return v
     end
+end)
+function _mpPatch._mt.registerLazyVal(k, fn)
+    lazyVals[k] = fn
 end
 
-function _mpPatch.hookTable(table, hooks)
-    return setmetatable({}, {__index = function(_, k)
-        if hooks[k] then return hooks[k] end
-        if k == "_super" then return table end
-        return table[k]
-    end})
+-- Properties
+local properties = {}
+_mpPatch._mt.registerIndexer(function(k)
+    local p = properties[k]
+    if p then
+        return p.read()
+    end
+end)
+_mpPatch._mt.registerNewIndexer(function(k, v)
+    local p = properties[k]
+    if p then
+        if not p.write then error("write to immutable property "..k) end
+        p.write(v)
+        return true
+    end
+end)
+function _mpPatch._mt.registerProperty(k, read, write)
+    properties[k] = {read = read, write = write}
 end
 
-_mpPatch.fullPath = getFullPath()
-print("MPPatch runtime loaded in ".._mpPatch.fullPath)
+include "mppatch_utils.lua"
+include "mppatch_modutils.lua"
+include "mppatch_uiutils.lua"
+
+print("MPPatch runtime loaded")
+if _mpPatch.debug then
+    print("Current UI path: ".._mpPatch.fullPath)
+    print("[!!] A debug version of the MpPatch binary patch is installed!")
+end

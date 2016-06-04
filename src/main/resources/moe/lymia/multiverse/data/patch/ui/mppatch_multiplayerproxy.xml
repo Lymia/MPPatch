@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Context ColorSet="Beige_Black_Alpha" Font="TwCenMT22" FontStyle="Shadow" Name="MainMenu" >
+  <LuaContext FileName="Assets/UI/FrontEnd/Multiplayer/MultiplayerSelect" ID="ModMultiplayerSelectScreen" Hidden="1"/>
+</Context>
