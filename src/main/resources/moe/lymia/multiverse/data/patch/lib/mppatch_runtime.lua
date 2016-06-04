@@ -41,6 +41,10 @@ _mpPatch.enabled = ContentManager.IsActive(_mpPatch.uuid, ContentType.GAMEPLAY)
 _mpPatch.canEnable = true
 _mpPatch.debug = not not patch.debug
 
+function _mpPatch.debugPrint(...)
+    if _mpPatch.debug then print(...) end
+end
+
 -- globals from patch
 local rawset = _mpPatch.patch.globals.rawset
 

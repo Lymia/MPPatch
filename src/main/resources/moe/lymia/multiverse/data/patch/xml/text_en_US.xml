@@ -14,5 +14,11 @@
             <!-- Used when MpPatch isn't loaded, but the source of the failure could not be determined. -->
             <Text>MpPatch failed to load</Text>
         </Row>
+
+        <!-- These strings are used in the multiplayer game creation menu -->
+        <Row Tag="TXT_KEY_MPPATCH_CANNOT_BE_DISABLED">
+            <!-- This is used in the tooltip for DLC that cannot be disabled as a mod depends on it. -->
+            <Text>This DLC cannot be disabled because the following mods depend on it:</Text>
+        </Row>
     </Language_en_US>
 </GameData>

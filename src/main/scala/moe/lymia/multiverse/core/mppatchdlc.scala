@@ -37,11 +37,14 @@ object MPPatchDLC {
   val DLC_VERSION   = 1
 
   private val luaPatchList = Map(
-    "mainmenu.lua"          -> MPPatchLuaOverride(injectAfter = Seq("after_mainmenu.lua")),
-    "modsmenu.lua"          -> MPPatchLuaOverride(injectAfter = Seq("after_modsmenu.lua")),
-    "stagingroom.lua"       -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua","before_stagingroom.lua")),
+    "mainmenu.lua"          -> MPPatchLuaOverride(injectAfter  = Seq("after_mainmenu.lua")),
+    "modsmenu.lua"          -> MPPatchLuaOverride(injectAfter  = Seq("after_modsmenu.lua")),
+    "stagingroom.lua"       -> MPPatchLuaOverride(injectBefore = Seq("before_stagingroom.lua")),
     "multiplayerselect.lua" -> MPPatchLuaOverride(injectBefore = Seq("before_multiplayerselect.lua")),
-    "mpgamesetupscreen.lua" -> MPPatchLuaOverride(injectAfter = Seq("after_mpgamesetupscreen.lua"))
+    "lobby.lua"             -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua")),
+    "mpgamesetupscreen.lua" -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua"),
+                                                  injectAfter  = Seq("after_mpgamesetupscreen.lua")),
+    "mpgameoptions.lua"     -> MPPatchLuaOverride(injectAfter  = Seq("after_mpgameoptions.lua"))
   )
 
   private val runtimeFileNames = Seq("mppatch_runtime.lua", "mppatch_utils.lua", "mppatch_modutils.lua",

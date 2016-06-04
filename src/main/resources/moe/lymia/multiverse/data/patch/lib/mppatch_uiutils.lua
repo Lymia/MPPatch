@@ -41,3 +41,11 @@ function _mpPatch.loadElementFromProxy(proxyName, controlName)
     local proxy = ContextPtr:LoadNewContext(proxyName)
     Controls[controlName] = LookUpControl(proxy, controlName)
 end
+
+function _mpPatch.setBIsModding()
+    function ContextPtr.LookUpControl()
+        return {
+            GetID = function() return "ModMultiplayerSelectScreen" end
+        }
+    end
+end

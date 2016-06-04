@@ -40,9 +40,45 @@ function _mpPatch.overrideModsFromSaveFile(file)
     end
 end
 
-_mpPatch._mt.registerProperty("isModding", function()
-    return PreGame.GetGameOption("_MPPATCH_HAS_MODS") == 1
+_mpPatch._mt.registerProperty("areModsEnabled", function()
+    return #Modding.GetActivatedMods() > 0
 end)
+
+function _mpPatch.getModName(uuid, version)
+    local details = Modding.GetInstalledModDetails(uuid, version) or {}
+    return details.Name or "<unknown mod "..uuid.." v"..version..">"
+end
+
+-- Mod dependency listing
+function _mpPatch.normalizeDlcName(name)
+    return name:gsub("-", ""):upper()
+end
+function _mpPatch.getModDependencies(modList)
+    local dlcDependencies = {}
+    for row in GameInfo.DownloadableContent() do
+        dlcDependencies[_mpPatch.normalizeDlcName(row.PackageID)] = {}
+    end
+
+    for _, mod in ipairs(modList) do
+        local info = { ID = mod.ID, Version = mod.Version, Name = _mpPatch.getModName(mod.ID, mod.Version) }
+        for _, assoc in ipairs(Modding.GetDlcAssociations(mod.ID, mod.Version)) do
+            if assoc.Type == 2 then
+                if assoc.PackageID == "*" then
+                    for row in GameInfo.DownloadableContent() do
+                        table.insert(dlcDependencies[_mpPatch.normalizeDlcName(row.PackageID)], info)
+                    end
+                else
+                    local normName = _mpPatch.normalizeDlcName(assoc.PackageID)
+                    if dlcDependencies[normName] then
+                        table.insert(dlcDependencies[normName], info)
+                    end
+                end
+            end
+        end
+    end
+
+    return dlcDependencies
+end
 
 -- UUID encoding/decoding for storing a mod list in PreGame's options table
 local uuidRegex = ("("..("[0-9a-zA-Z]"):rep(4)..")"):rep(8)
@@ -57,20 +93,40 @@ local function decodeUUID(table)
 end
 
 -- Enroll/decode mods into the PreGame option table
+_mpPatch._mt.registerProperty("isModding", function()
+    return PreGame.GetGameOption("_MPPATCH_HAS_MODS") == 1
+end)
+
+local function enrollModName(id, name)
+    PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_NAME_LENGTH", #name)
+    for i=1,#name do
+        PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_NAME_"..i, name:byte(i))
+    end
+end
 local function enrollMod(id, uuid, version)
     PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_VERSION", version)
     for i, v in ipairs(encodeUUID(uuid)) do
         PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_"..i, v)
     end
+    enrollModName(id, _mpPatch.getModName(uuid, version))
 end
 function _mpPatch.enrollModsList(modList)
-    PreGame.SetGameOption("_MPPATCH_HAS_MODS", 1)
-    PreGame.SetGameOption("_MPPATCH_MOD_COUNT", #modList)
-    for i, v in ipairs(modList) do
-        enrollMod(i, v.ID, v.Version)
+    if #modList > 0 then
+        PreGame.SetGameOption("_MPPATCH_HAS_MODS", 1)
+        PreGame.SetGameOption("_MPPATCH_MOD_COUNT", #modList)
+        for i, v in ipairs(modList) do
+            enrollMod(i, v.ID, v.Version)
+        end
     end
 end
 
+local function decodeModName(id)
+    local charTable = {}
+    for i=1,PreGame.GetGameOption("_MPPATCH_MOD_"..id.."_NAME_LENGTH") do
+        charTable[i] = string.char(PreGame.GetGameOption("_MPPATCH_MOD_"..id.."_NAME_"..i))
+    end
+    return table.concat(charTable)
+end
 local function decodeMod(id)
     local uuidTable = {}
     for i=1,8 do
@@ -78,7 +134,8 @@ local function decodeMod(id)
     end
     return {
         ID      = decodeUUID(uuidTable),
-        Version = PreGame.GetGameOption("_MPPATCH_MOD_"..id.."_VERSION")
+        Version = PreGame.GetGameOption("_MPPATCH_MOD_"..id.."_VERSION"),
+        Name    = decodeModName(id)
     }
 end
 function _mpPatch.decodeModsList()

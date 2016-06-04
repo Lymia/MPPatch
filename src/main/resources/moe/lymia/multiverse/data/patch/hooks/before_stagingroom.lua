@@ -8,4 +8,8 @@ if _mpPatch and _mpPatch.enabled then
         _mpPatch.overrideModsFromPreGame()
         return Matchmaking._super.LaunchMultiplayerGame(...)
     end})
+
+    if _mpPatch.isModding then
+        _mpPatch.setBIsModding()
+    end
 end
