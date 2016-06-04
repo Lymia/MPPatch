@@ -25,11 +25,14 @@ This exports a few functions and tables:
  * `patch.panic(string)`, a function allowing a Lua script to report a critical error and bail.
  * `patch.shared`, a table that's shared between different script contexts.
  * `patch.NetPatch`, a table contains functions that controls our modification to the `SetActiveDLCAndMods` function.
+ * `patch.globals`, a table containing global functions normally unavailable to Lua code that our UI patch uses.
+   Currently, the `rawget` and `rawset` functions are exposed through this table.
  
 In addition, if a debug version of the patch is installed, additional tables are exported in `patch.debug`:
 
  * `patch.debug.globals`, the contents of the actual `_G` table of the `Lua_State` used by Civilization V. This allows
    lua code to access functions it normally can't access, such as getfenv. Obviously this breaks security wide open.
+ * `patch.debug._G`, the contents of the `_G` table of the current thread.
  * `patch.debug.registry`, the contents of the Lua registery. (pesudo-index LUA_REGISTRYINDEX)
 
 Our patch to `SetActiveDLCandMods` fundamentally works by replacing the arguments to the functions in a way controlled
