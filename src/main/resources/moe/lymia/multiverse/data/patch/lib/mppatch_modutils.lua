@@ -117,6 +117,8 @@ function _mpPatch.enrollModsList(modList)
         for i, v in ipairs(modList) do
             enrollMod(i, v.ID, v.Version)
         end
+    else
+        PreGame.SetGameOption("_MPPATCH_HAS_MODS", 0)
     end
 end
 

@@ -39,6 +39,7 @@ object MPPatchDLC {
   private val luaPatchList = Map(
     "mainmenu.lua"          -> MPPatchLuaOverride(injectAfter  = Seq("after_mainmenu.lua")),
     "modsmenu.lua"          -> MPPatchLuaOverride(injectAfter  = Seq("after_modsmenu.lua")),
+    "joiningroom.lua"       -> MPPatchLuaOverride(injectAfter  = Seq("after_joiningroom.lua")),
     "stagingroom.lua"       -> MPPatchLuaOverride(injectBefore = Seq("before_stagingroom.lua")),
     "multiplayerselect.lua" -> MPPatchLuaOverride(injectBefore = Seq("before_multiplayerselect.lua")),
     "lobby.lua"             -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua")),
