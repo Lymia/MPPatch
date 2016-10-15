@@ -26,11 +26,16 @@ import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
 
 import moe.lymia.multiverse.platform.Platform
-import moe.lymia.multiverse.util.res.{PatchData, PatchVersion}
+import moe.lymia.multiverse.util.res.{PatchData, PatchVersion, VersionInfo}
 import moe.lymia.multiverse.util.{Crypto, IOUtils, XMLUtils}
 
 import scala.collection.JavaConversions._
 import scala.xml.Node
+
+object PathNames {
+  val PATCH_STATE_FILENAME = "mppatch_install_state.xml"
+  val PATCH_LOCK_FILENAME  = ".mppatch_install_lock"
+}
 
 sealed trait PatchStatus
 object PatchStatus {
@@ -51,30 +56,36 @@ object PatchStatus {
 }
 
 private case class PatchFile(path: String, expectedSha1: String)
-private case class PatchState(patchVersionSha1: String,
-                              replacementTarget: PatchFile, originalFile: PatchFile,
-                              additionalFiles: Seq[PatchFile]) {
+private case class PatchState(patchVersionSha1: String, replacementTarget: PatchFile, originalFile: PatchFile,
+                              additionalFiles: Seq[PatchFile],
+                              dlcUpdateVersion: Int, dlcInstallPath: String, textDataInstallPath: String) {
   lazy val expectedFiles = additionalFiles.map(_.path).toSet + originalFile.path
 }
 private object PatchState {
-  private val formatVersion = 1
+  private val formatVersion = s"mppatch-v${VersionInfo.versionString}"
 
   def serializePatchFile(file: PatchFile) = <PatchFile path={file.path} expectedSha1={file.expectedSha1}/>
-  def serialize(state: PatchState) = <PatchState version={formatVersion.toString}>
+  def serialize(state: PatchState) = <PatchState version={formatVersion}>
     <PatchVersionSha1>{state.patchVersionSha1}</PatchVersionSha1>
     <ReplacementTarget>{serializePatchFile(state.replacementTarget)}</ReplacementTarget>
     <OriginalFile>{serializePatchFile(state.originalFile)}</OriginalFile>
     <AdditionalFiles>{state.additionalFiles.map(serializePatchFile)}</AdditionalFiles>
+    <DLCUpdateVersion>{state.dlcUpdateVersion}</DLCUpdateVersion>
+    <DLCInstallPath>{state.dlcInstallPath}</DLCInstallPath>
+    <TextDataInstallPath>{state.textDataInstallPath}</TextDataInstallPath>
   </PatchState>
 
   def unserializePatchFile(node: Node) =
     PatchFile(XMLUtils.getAttribute(node, "path"), XMLUtils.getAttribute(node, "expectedSha1"))
   def unserialize(xml: Node) =
-    if(XMLUtils.getAttribute(xml, "version").toInt != formatVersion) None
+    if(XMLUtils.getAttribute(xml, "version") != formatVersion) None
     else Some(PatchState(XMLUtils.getNodeText(xml, "PatchVersionSha1"),
                          unserializePatchFile((xml \ "ReplacementTarget" \ "PatchFile").head),
                          unserializePatchFile((xml \ "OriginalFile"      \ "PatchFile").head),
-                         (xml \ "AdditionalFiles" \ "PatchFile").map(unserializePatchFile)))
+                         (xml \ "AdditionalFiles" \ "PatchFile").map(unserializePatchFile),
+                         XMLUtils.getNodeText(xml, "DLCUpdateVersion").toInt,
+                         XMLUtils.getNodeText(xml, "DLCInstallPath"),
+                         XMLUtils.getNodeText(xml, "TextDataInstallPath")))
 }
 
 sealed trait PatchActionStatus
@@ -96,12 +107,15 @@ trait PatchPlatformInfo {
   def findInstalledFiles(list: Seq[String]): Seq[String]
 }
 
-class PatchInstaller(basePath: Path, platform: Platform) {
+class PatchInstaller(basePath: Path, platform: Platform, log: String => Unit = println _) {
   private def resolve(path: String) = basePath.resolve(path)
 
-  private val patchStatePath = resolve(PathNames.PATCH_STATE_FILENAME)
-  private val patchLockPath  = resolve(PathNames.PATCH_LOCK_FILENAME)
-  private val platformInfo   = platform.patchInfo
+  private val patchStatePath     = resolve(PathNames.PATCH_STATE_FILENAME)
+  private val patchLockPath      = resolve(PathNames.PATCH_LOCK_FILENAME)
+  private val platformInfo       = platform.patchInfo
+
+  private val dlcInstallPath     = "DLC/MpPatch"
+  private val dlcTextPath        = "Gameplay/XML/NewText/mppatch_textdata.xml"
 
   private def lock[T](f: => T) = {
     try {
@@ -144,13 +158,17 @@ class PatchInstaller(basePath: Path, platform: Platform) {
           if((detectedPatchFiles.toSet -- patchState.expectedFiles).nonEmpty)
             PatchStatus.FoundLeftoverFiles
           else if(!Files.exists(resolve(patchState.replacementTarget.path)) ||
-             !patchState.additionalFiles.forall(validatePatchFile) || !originalFileStatus)
+                  !patchState.additionalFiles.forall(validatePatchFile) || !originalFileStatus ||
+                  !Files.exists(resolve(patchState.dlcInstallPath)) ||
+                  !Files.exists(resolve(patchState.textDataInstallPath)))
             PatchStatus.PatchCorrupted(originalFileStatus)
           else if(!validatePatchFile(patchState.replacementTarget))
             PatchStatus.TargetUpdated(isVersionKnown(patchState.replacementTarget.path))
           else PatchVersion.get(platform.platformName, patchState.originalFile.expectedSha1) match {
             case Some(version) =>
-              if(version.patch.sha1 == patchState.patchVersionSha1)
+              if(patchState.dlcUpdateVersion != MPPatchDLC.DLC_UPDATEVERSION)
+                PatchStatus.RequiresUpdate
+              else if(version.patch.sha1 == patchState.patchVersionSha1)
                 PatchStatus.Installed(isDebug = false)
               else if(version.debugPatch.sha1 == patchState.patchVersionSha1)
                 PatchStatus.Installed(isDebug = true)
@@ -198,9 +216,13 @@ class PatchInstaller(basePath: Path, platform: Platform) {
           for(file <- platformInfo.additionalFiles(version.version)) yield installFile(file)
         )
 
+        DLCDataWriter.writeDLC(resolve(platform.assetsPath).resolve(dlcInstallPath),
+                               Some(resolve(platform.assetsPath).resolve(dlcTextPath)),
+                               MPPatchDLC.generateBaseDLC(basePath, platform), platform)
+
         val state = PatchState(patchData.sha1, replacementTarget,
                                PatchFile(platformInfo.replacementNewName(version.version), version.version),
-                               additional)
+                               additional, MPPatchDLC.DLC_UPDATEVERSION, dlcInstallPath, dlcTextPath)
         IOUtils.writeXML(patchStatePath, PatchState.serialize(state))
       }
   }
@@ -211,11 +233,13 @@ class PatchInstaller(basePath: Path, platform: Platform) {
       lock {
         for(PatchFile(name, _) <- patchState.additionalFiles) Files.delete(resolve(name))
         if(!targetUpdated) {
-          Files.delete(resolve(patchState.replacementTarget.path))
+          IOUtils.deleteDirectory(resolve(patchState.replacementTarget.path))
           Files.move(resolve(patchState.originalFile.path), resolve(patchState.replacementTarget.path))
         } else {
-          Files.delete(resolve(patchState.originalFile.path))
+          IOUtils.deleteDirectory(resolve(patchState.originalFile.path))
         }
+        IOUtils.deleteDirectory(resolve(patchState.textDataInstallPath))
+        IOUtils.deleteDirectory(resolve(patchState.dlcInstallPath))
         Files.delete(patchStatePath)
       }
   }
@@ -231,7 +255,6 @@ class PatchInstaller(basePath: Path, platform: Platform) {
   }
 
   def safeUpdate(debug: Boolean) = checkPatchStatus() match {
-    case PatchStatus.Installed(`debug`) => sys.error("no need to update")
     case PatchStatus.Installed(_) | PatchStatus.RequiresUpdate =>
       uninstallPatch(false)
       installPatch(debug)
@@ -243,7 +266,8 @@ class PatchInstaller(basePath: Path, platform: Platform) {
     case _ => sys.error("cannot safely update")
   }
   def safeUninstall() = checkPatchStatus() match {
-    case PatchStatus.NotInstalled(_) => sys.error("no need to uninstall")
+    case PatchStatus.NotInstalled(_) =>
+      // do nothing
     case PatchStatus.Installed(_) | PatchStatus.RequiresUpdate =>
       uninstallPatch(false)
     case PatchStatus.TargetUpdated(true) =>

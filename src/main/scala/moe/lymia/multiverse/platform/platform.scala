@@ -48,6 +48,7 @@ object PlatformType {
 
 trait Platform {
   val platformName: String
+  val gameSteamID = 8930
 
   def defaultSystemPaths: Seq[Path]
 

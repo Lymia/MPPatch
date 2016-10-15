@@ -82,8 +82,8 @@ object DLCDataWriter {
     <NODE>
       <GUID>{s"{${manifest.uuid}}"}</GUID>
       <Version>{manifest.version.toString}</Version>
-      <Name> {languageValues(s"${manifest.uuid.toString.replace("-", "")}_v${manifest.version}")} </Name>
-      <Description> {languageValues(manifest.name)} </Description>
+      <Name>{languageValues(s"${manifest.uuid.toString.replace("-", "")}_v${manifest.version}")}</Name>
+      <Description>{languageValues(manifest.name)}</Description>
       <Priority>{manifest.priority.toString}</Priority>
 
       <SteamApp>99999</SteamApp>

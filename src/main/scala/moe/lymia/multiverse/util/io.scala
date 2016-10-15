@@ -22,9 +22,11 @@
 
 package moe.lymia.multiverse.util
 
+import java.io.IOException
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, StandardOpenOption}
+import java.nio.file._
+import java.nio.file.attribute.BasicFileAttributes
 
 import scala.xml.{Node, NodeSeq, PrettyPrinter, XML}
 import scala.annotation.tailrec
@@ -67,6 +69,23 @@ object IOUtils {
     if(parent == null) false
     else if(Files.isSameFile(parent, child)) true
     else isSubdirectory(parent.getParent, child)
+
+  def deleteDirectory(path: Path) = Files.walkFileTree(path, new SimpleFileVisitor[Path] {
+    override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+      Files.delete(file)
+      FileVisitResult.CONTINUE
+    }
+
+    override def visitFileFailed(file: Path, exc: IOException) = {
+      Files.delete(file)
+      FileVisitResult.CONTINUE
+    }
+
+    override def postVisitDirectory(dir: Path, exc: IOException) = if(exc == null) {
+      Files.delete(dir)
+      FileVisitResult.CONTINUE
+    } else throw exc
+  })
 
   def withLock[T](lockFile: Path)(f: => T) = {
     val lock = new FileLock(lockFile)

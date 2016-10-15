@@ -22,6 +22,8 @@
 
 package moe.lymia.multiverse.util
 
+import java.awt.Desktop
+import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 
@@ -36,4 +38,10 @@ object Steam {
                                    StandardCharsets.UTF_8).map(_.trim);
            m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)) :+ p
     else Seq(p)
+
+  private val desktop = Desktop.getDesktop
+  private def loadURI(uri: String) = desktop.browse(new URI(uri))
+
+  def launchGame(gameId: Int) = loadURI("steam://run/"+gameId)
+  def validateGameFiles(gameId: Int) = loadURI("steam://validate/"+gameId)
 }

@@ -26,11 +26,11 @@ import java.io.File
 import java.nio.file.{Files, Path}
 import java.util.Locale
 
-import moe.lymia.multiverse.core.Installer
+import moe.lymia.multiverse.core.PatchInstaller
 import moe.lymia.multiverse.util.res.{I18N, VersionInfo}
 import moe.lymia.multiverse.platform.Platform
 
-case class CLIArguments(command: (CLIArguments, Platform, Installer) => Unit,
+case class CLIArguments(command: (CLIArguments, Platform, PatchInstaller) => Unit,
                         systemPath: Option[Path],
                         // patch options
                         debug: Boolean = false)
@@ -66,23 +66,23 @@ class CLI(locale: Locale) {
 
   private def resolvePaths(paths: Seq[Path]) = paths.find(x => Files.exists(x) && Files.isDirectory(x))
   private def loadInstaller(args: CLIArguments, platform: Platform) =
-    new Installer(args.systemPath.get, platform)
+    new PatchInstaller(args.systemPath.get, platform)
 
-  private def cmd_unknown(args: CLIArguments, platform: Platform, installer: Installer) = {
+  private def cmd_unknown(args: CLIArguments, platform: Platform, installer: PatchInstaller) = {
     println(i18n("cli.cmd.unknown"))
   }
 
-  private def cmd_status(args: CLIArguments, platform: Platform, installer: Installer) = {
-    val status = installer.patchInstaller.checkPatchStatus()
-    println(i18n("cli.cmd.status.patchStatus", status, installer.patchInstaller.actionStatus(false)
-                                                     , installer.patchInstaller.actionStatus(true )))
+  private def cmd_status(args: CLIArguments, platform: Platform, installer: PatchInstaller) = {
+    val status = installer.checkPatchStatus()
+    println(i18n("cli.cmd.status.patchStatus", status, installer.actionStatus(false)
+                                                     , installer.actionStatus(true )))
   }
 
-  private def cmd_update(args: CLIArguments, platform: Platform, installer: Installer) = {
-    installer.patchInstaller.safeUpdate(args.debug)
+  private def cmd_update(args: CLIArguments, platform: Platform, installer: PatchInstaller) = {
+    installer.safeUpdate(args.debug)
   }
-  private def cmd_uninstall(args: CLIArguments, platform: Platform, installer: Installer) = {
-    installer.patchInstaller.safeUninstall()
+  private def cmd_uninstall(args: CLIArguments, platform: Platform, installer: PatchInstaller) = {
+    installer.safeUninstall()
   }
 
   def executeCommand(args: Seq[String]) = {

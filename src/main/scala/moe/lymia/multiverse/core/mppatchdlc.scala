@@ -33,8 +33,9 @@ import scala.xml.XML
 
 case class MPPatchLuaOverride(injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
 object MPPatchDLC {
-  val DLC_UUID      = UUID.fromString("df74f698-2343-11e6-89c4-8fef6d8f889e")
-  val DLC_VERSION   = 1
+  val DLC_UUID          = UUID.fromString("df74f698-2343-11e6-89c4-8fef6d8f889e")
+  val DLC_VERSION       = 1
+  val DLC_UPDATEVERSION = 1
 
   private val luaPatchList = Map(
     "mainmenu.lua"          -> MPPatchLuaOverride(injectAfter  = Seq("after_mainmenu.lua")),
