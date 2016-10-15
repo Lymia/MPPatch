@@ -80,13 +80,6 @@ private object PatchState {
                          XMLUtils.getNodeText(xml, "TextDataInstallPath")))
 }
 
-sealed trait PatchActionStatus
-object PatchActionStatus {
-  case object CanLaunch    extends PatchActionStatus
-  case object NeedsUpdate  extends PatchActionStatus
-  case object NeedsCleanup extends PatchActionStatus
-}
-
 case class PatchInstalledFile(name: String, data: Array[Byte], executable: Boolean = false)
 trait PatchPlatformInfo {
   val replacementTarget: String
@@ -99,7 +92,7 @@ trait PatchPlatformInfo {
   def findInstalledFiles(list: Seq[String]): Seq[String]
 }
 
-class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit = println _) {
+class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit = println) {
   def resolve(path: String) = basePath.resolve(path)
 
   private val patchStatePath     = resolve(PathNames.PATCH_STATE_FILENAME)
@@ -109,13 +102,7 @@ class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit
   private val dlcInstallPath     = "DLC/MpPatch"
   private val dlcTextPath        = "Gameplay/XML/NewText/mppatch_textdata.xml"
 
-  private def lock[T](f: => T) = {
-    try {
-      IOUtils.withLock(patchLockPath)(f)
-    } finally {
-      Files.deleteIfExists(patchLockPath)
-    }
-  }
+  private def lock[T](f: => T) = IOUtils.withLock(patchLockPath)(f)
 
   private def validatePatchFile(file: PatchFile) = {
     val path = resolve(file.path)
@@ -251,16 +238,6 @@ class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit
 
   def cleanupPatch() = {
 
-  }
-
-  def actionStatus(debug: Boolean) = checkPatchStatus() match {
-    case PatchStatus.Installed(`debug`) =>
-      PatchActionStatus.CanLaunch
-    case PatchStatus.Installed(_) | PatchStatus.NeedsUpdate | PatchStatus.NotInstalled(true) |
-         PatchStatus.TargetUpdated(true) =>
-      PatchActionStatus.NeedsUpdate
-    case _ =>
-      PatchActionStatus.NeedsCleanup
   }
 
   def safeUpdate(debug: Boolean) = checkPatchStatus() match {
