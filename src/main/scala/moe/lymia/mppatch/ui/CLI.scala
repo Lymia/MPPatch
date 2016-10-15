@@ -64,7 +64,6 @@ class CLI(locale: Locale) {
     sys.error("System.exit returned!!!")
   }
 
-  private def resolvePaths(paths: Seq[Path]) = paths.find(x => Files.exists(x) && Files.isDirectory(x))
   private def loadInstaller(args: CLIArguments, platform: Platform) =
     new PatchInstaller(args.systemPath.get, platform)
 

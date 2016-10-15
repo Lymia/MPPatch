@@ -40,19 +40,11 @@ object PathNames {
 sealed trait PatchStatus
 object PatchStatus {
   case class Installed(isDebug: Boolean) extends PatchStatus
-  case object RequiresUpdate extends PatchStatus
-  case object UnknownVersionInstalled extends PatchStatus
+  case object NeedsUpdate extends PatchStatus
   case class NotInstalled(isKnownVersion: Boolean) extends PatchStatus
-
-  case object TargetCorrupted extends PatchStatus
-  case object FatalIncompatibility extends PatchStatus
   case class TargetUpdated(knownVersion: Boolean) extends PatchStatus
-  case class PatchCorrupted(originalFileOK: Boolean) extends PatchStatus
 
-  sealed trait StateError extends PatchStatus
-  case object StateCorrupted extends StateError
-  case object StateIsDirty extends StateError
-  case object FoundLeftoverFiles extends StateError
+  case object NeedsCleanup extends PatchStatus
 }
 
 private case class PatchFile(path: String, expectedSha1: String)
@@ -90,9 +82,9 @@ private object PatchState {
 
 sealed trait PatchActionStatus
 object PatchActionStatus {
-  case object CanLaunch   extends PatchActionStatus
-  case object NeedsUpdate extends PatchActionStatus
-  case object FatalError  extends PatchActionStatus
+  case object CanLaunch    extends PatchActionStatus
+  case object NeedsUpdate  extends PatchActionStatus
+  case object NeedsCleanup extends PatchActionStatus
 }
 
 case class PatchInstalledFile(name: String, data: Array[Byte], executable: Boolean = false)
@@ -107,8 +99,8 @@ trait PatchPlatformInfo {
   def findInstalledFiles(list: Seq[String]): Seq[String]
 }
 
-class PatchInstaller(basePath: Path, platform: Platform, log: String => Unit = println _) {
-  private def resolve(path: String) = basePath.resolve(path)
+class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit = println _) {
+  def resolve(path: String) = basePath.resolve(path)
 
   private val patchStatePath     = resolve(PathNames.PATCH_STATE_FILENAME)
   private val patchLockPath      = resolve(PathNames.PATCH_LOCK_FILENAME)
@@ -144,42 +136,43 @@ class PatchInstaller(basePath: Path, platform: Platform, log: String => Unit = p
       None
   }
 
-  def checkPatchStatus() = {
+  def checkPatchStatus(): PatchStatus = {
     val detectedPatchFiles = platformInfo.findInstalledFiles(IOUtils.listFileNames(basePath))
 
-    if(Files.exists(patchLockPath)) PatchStatus.StateIsDirty
-    else if(Files.exists(patchStatePath)) loadPatchState() match {
+    if(!Files.exists(patchStatePath)) return {
+      if(!Files.exists(resolve(platformInfo.replacementTarget))) PatchStatus.NeedsCleanup
+      else if(detectedPatchFiles.nonEmpty) PatchStatus.NeedsCleanup
+      else PatchStatus.NotInstalled(isVersionKnown(platformInfo.replacementTarget))
+    }
+
+    loadPatchState() match {
       case Some(patchState) =>
-        if(patchState.replacementTarget.path != platformInfo.replacementTarget)
-          PatchStatus.FatalIncompatibility
+        if((detectedPatchFiles.toSet -- patchState.expectedFiles).nonEmpty) PatchStatus.NeedsCleanup
+        else if(patchState.replacementTarget.path != platformInfo.replacementTarget) PatchStatus.NeedsUpdate
         else {
           val originalFileStatus = validatePatchFile(patchState.originalFile)
 
-          if((detectedPatchFiles.toSet -- patchState.expectedFiles).nonEmpty)
-            PatchStatus.FoundLeftoverFiles
-          else if(!Files.exists(resolve(patchState.replacementTarget.path)) ||
+          if(!Files.exists(resolve(patchState.replacementTarget.path)) ||
                   !patchState.additionalFiles.forall(validatePatchFile) || !originalFileStatus ||
                   !Files.exists(resolve(patchState.dlcInstallPath)) ||
                   !Files.exists(resolve(patchState.textDataInstallPath)))
-            PatchStatus.PatchCorrupted(originalFileStatus)
+            PatchStatus.NeedsCleanup
           else if(!validatePatchFile(patchState.replacementTarget))
             PatchStatus.TargetUpdated(isVersionKnown(patchState.replacementTarget.path))
           else PatchVersion.get(platform.platformName, patchState.originalFile.expectedSha1) match {
             case Some(version) =>
               if(patchState.dlcUpdateVersion != MPPatchDLC.DLC_UPDATEVERSION)
-                PatchStatus.RequiresUpdate
+                PatchStatus.NeedsUpdate
               else if(version.patch.sha1 == patchState.patchVersionSha1)
                 PatchStatus.Installed(isDebug = false)
               else if(version.debugPatch.sha1 == patchState.patchVersionSha1)
                 PatchStatus.Installed(isDebug = true)
-              else PatchStatus.RequiresUpdate
-            case None => PatchStatus.UnknownVersionInstalled
+              else PatchStatus.NeedsUpdate
+            case None => PatchStatus.NeedsCleanup
           }
         }
-      case None => PatchStatus.StateCorrupted
-    } else if(!Files.exists(resolve(platformInfo.replacementTarget))) PatchStatus.TargetCorrupted
-    else if(detectedPatchFiles.nonEmpty) PatchStatus.FoundLeftoverFiles
-    else PatchStatus.NotInstalled(isVersionKnown(platformInfo.replacementTarget))
+      case None => PatchStatus.NeedsCleanup
+    }
   }
 
   private def installFile(file: PatchInstalledFile) = {
@@ -230,35 +223,48 @@ class PatchInstaller(basePath: Path, platform: Platform, log: String => Unit = p
       }
   }
 
-  private def uninstallPatch(targetUpdated: Boolean) = loadPatchState() match {
-    case None => sys.error("could not load patch state")
-    case Some(patchState) =>
-      lock {
-        for(PatchFile(name, _) <- patchState.additionalFiles) Files.delete(resolve(name))
-        if(!targetUpdated) {
-          IOUtils.deleteDirectory(resolve(patchState.replacementTarget.path))
-          Files.move(resolve(patchState.originalFile.path), resolve(patchState.replacementTarget.path))
-        } else {
-          IOUtils.deleteDirectory(resolve(patchState.originalFile.path))
+  private def uninstallPatch(targetUpdated: Boolean, ignoreError: Boolean = false) = {
+    def checkError[T](v: => T): Unit =
+      if(ignoreError) try {
+        v
+      } catch {
+        case e: Exception => log("Error while uninstalling patch: "+e.toString)
+      } else v
+    loadPatchState() match {
+      case None =>
+        if(!ignoreError) sys.error("could not load patch state")
+      case Some(patchState) =>
+        lock {
+          for(PatchFile(name, _) <- patchState.additionalFiles) Files.delete(resolve(name))
+          if(!targetUpdated) {
+            checkError(IOUtils.deleteDirectory(resolve(patchState.replacementTarget.path)))
+            checkError(Files.move(resolve(patchState.originalFile.path), resolve(patchState.replacementTarget.path)))
+          } else {
+            checkError(IOUtils.deleteDirectory(resolve(patchState.originalFile.path)))
+          }
+          checkError(IOUtils.deleteDirectory(resolve(patchState.textDataInstallPath)))
+          checkError(IOUtils.deleteDirectory(resolve(patchState.dlcInstallPath)))
+          checkError(Files.delete(patchStatePath))
         }
-        IOUtils.deleteDirectory(resolve(patchState.textDataInstallPath))
-        IOUtils.deleteDirectory(resolve(patchState.dlcInstallPath))
-        Files.delete(patchStatePath)
-      }
+    }
+  }
+
+  def cleanupPatch() = {
+
   }
 
   def actionStatus(debug: Boolean) = checkPatchStatus() match {
     case PatchStatus.Installed(`debug`) =>
       PatchActionStatus.CanLaunch
-    case PatchStatus.Installed(_) | PatchStatus.RequiresUpdate | PatchStatus.NotInstalled(true) |
+    case PatchStatus.Installed(_) | PatchStatus.NeedsUpdate | PatchStatus.NotInstalled(true) |
          PatchStatus.TargetUpdated(true) =>
       PatchActionStatus.NeedsUpdate
     case _ =>
-      PatchActionStatus.FatalError
+      PatchActionStatus.NeedsCleanup
   }
 
   def safeUpdate(debug: Boolean) = checkPatchStatus() match {
-    case PatchStatus.Installed(_) | PatchStatus.RequiresUpdate =>
+    case PatchStatus.Installed(_) | PatchStatus.NeedsUpdate =>
       uninstallPatch(false)
       installPatch(debug)
     case PatchStatus.TargetUpdated(true) =>
@@ -271,9 +277,9 @@ class PatchInstaller(basePath: Path, platform: Platform, log: String => Unit = p
   def safeUninstall() = checkPatchStatus() match {
     case PatchStatus.NotInstalled(_) =>
       // do nothing
-    case PatchStatus.Installed(_) | PatchStatus.RequiresUpdate =>
+    case PatchStatus.Installed(_) | PatchStatus.NeedsUpdate =>
       uninstallPatch(false)
-    case PatchStatus.TargetUpdated(true) =>
+    case PatchStatus.TargetUpdated(_) =>
       uninstallPatch(true)
     case _ => sys.error("cannot safely uninstall")
   }

@@ -20,20 +20,10 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.ui
+package moe.lymia.mppatch
 
-import java.util.Locale
-import javax.swing.{JFrame, UIManager}
+import java.nio.file.{Files, Path}
 
-import moe.lymia.mppatch.util.res.I18N
-
-object GUI {
-  def show(locale: Locale) = {
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
-    val frame = new MainFrame(I18N(locale))
-  }
-}
-
-class MainFrame(i18n: I18N) extends JFrame {
-  setTitle(i18n("common.title"))
+package object ui {
+  private[ui] def resolvePaths(paths: Seq[Path]) = paths.find(x => Files.exists(x) && Files.isDirectory(x))
 }

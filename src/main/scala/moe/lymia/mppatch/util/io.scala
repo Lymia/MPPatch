@@ -87,10 +87,10 @@ object IOUtils {
     } else throw exc
   })
 
-  def withLock[T](lockFile: Path)(f: => T) = {
+  def withLock[T](lockFile: Path, error: => T = sys.error(s"Could not acquire lock."))(f: => T) = {
     val lock = new FileLock(lockFile)
-    if(!lock.acquired) sys.error(s"Could not acquire lock $lockFile")
-    try {
+    if(!lock.acquired) error
+    else try {
       f
     } finally {
       lock.release()
