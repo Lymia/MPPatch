@@ -20,18 +20,20 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch
+package moe.lymia.mppatch.ui
 
 import java.util.Locale
+import javax.swing.{JFrame, UIManager}
 
-import moe.lymia.mppatch.ui.{CLI, GUI}
+import moe.lymia.mppatch.util.res.I18N
 
-object MPPatchInstaller {
-  def main(args: Array[String]) {
-    if(args.length == 0) {
-      GUI.show(Locale.getDefault)
-    } else {
-      new CLI(Locale.getDefault).executeCommand(args)
-    }
+object GUI {
+  def show(locale: Locale) = {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+    val frame = new MainFrame(I18N(locale))
   }
+}
+
+class MainFrame(i18n: I18N) extends JFrame {
+  setTitle(i18n("common.title"))
 }
