@@ -73,8 +73,7 @@ class CLI(locale: Locale) {
 
   private def cmd_status(args: CLIArguments, platform: Platform, installer: PatchInstaller) = {
     val status = installer.checkPatchStatus()
-    println(i18n("cli.cmd.status.patchStatus", status, installer.actionStatus(false)
-                                                     , installer.actionStatus(true )))
+    println(i18n("cli.cmd.status.patchStatus", status))
   }
 
   private def cmd_update(args: CLIArguments, platform: Platform, installer: PatchInstaller) = {
