@@ -34,7 +34,7 @@
 #ifdef DEBUG
     FILE* debug_log_file;
     __attribute__((constructor(150))) static void initDebugLogging() {
-        debug_log_file = fopen("mvmm_debug.log", "w");
+        debug_log_file = fopen("mppatch_debug.log", "w");
     }
 #else
     #define debug_print(format, ...)

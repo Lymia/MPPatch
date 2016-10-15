@@ -123,14 +123,14 @@ object DLCDataWriter {
     val filesInclude  = populateDirectory(dlcBasePath, "Files", dlcData.data.importFileList, "Directory", platform)
     val uiFileInclude = populateDirectory(dlcBasePath, "UI_Files", dlcData.data.uiOnlyFiles, "Directory", platform)
     val mapIncludes   = populateDirectory(dlcBasePath, "Maps", dlcData.data.mapIncludes.map(map =>
-      s"mvmm_map_${nameString}_${newId()}.${map.extension}" -> map.data
+      s"mppatch_map_${nameString}_${newId()}.${map.extension}" -> map.data
     ).toMap, "MapDirectory", platform)
 
     def writeIncludes(pathName: String, includes: Seq[DLCInclude]) = {
       val path = platform.resolve(dlcBasePath, pathName)
       if(includes.nonEmpty) Files.createDirectories(path)
       (for(DLCInclude(event, fileData) <- includes) yield {
-        val fileName = s"mvmm_include_${nameString}_${event}_${newId()}.xml"
+        val fileName = s"mppatch_include_${nameString}_${event}_${newId()}.xml"
         IOUtils.writeXML(platform.resolve(path, fileName), fileData)
         <NODE>{fileName}</NODE>.copy(label = event)
       }, if(includes.nonEmpty) <Directory>{pathName}</Directory> else Seq())

@@ -40,20 +40,20 @@ trait ResourceGenerators { this: Build =>
 
       // Generate version information file
       val properties = new java.util.Properties
-      properties.put("mvmm.version.string", version.value)
+      properties.put("mppatch.version.string", version.value)
       val VersionRegex(major, minor, _, patch, _, suffix) = version.value
-      properties.put("mvmm.version.major" , major)
-      properties.put("mvmm.version.minor" , minor)
-      properties.put("mvmm.version.patch" , patch)
-      properties.put("mvmm.version.suffix", suffix)
-      properties.put("mvmm.version.commit", git.gitHeadCommit.value getOrElse "<unknown>")
+      properties.put("mppatch.version.major" , major)
+      properties.put("mppatch.version.minor" , minor)
+      properties.put("mppatch.version.patch" , patch)
+      properties.put("mppatch.version.suffix", suffix)
+      properties.put("mppatch.version.commit", git.gitHeadCommit.value getOrElse "<unknown>")
 
-      properties.put("mvmm.patch.compat"  , version_patchCompat.toString)
+      properties.put("mppatch.patch.compat"  , version_patchCompat.toString)
 
-      properties.put("mvmm.build.time"    , new java.util.Date().toString)
-      properties.put("mvmm.build.path"    , baseDirectory.value.getAbsolutePath)
+      properties.put("mppatch.build.time"    , new java.util.Date().toString)
+      properties.put("mppatch.build.path"    , baseDirectory.value.getAbsolutePath)
 
-      properties.put("mvmm.build.treestatus", try {
+      properties.put("mppatch.build.treestatus", try {
         IO.withTemporaryFile[String]("git-status", ".txt") { file =>
           assertProcess("git status --porcelain" #> file !)
           IO.read(file)

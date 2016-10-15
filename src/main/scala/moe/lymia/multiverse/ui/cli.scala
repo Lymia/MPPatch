@@ -37,7 +37,7 @@ case class CLIArguments(command: (CLIArguments, Platform, PatchInstaller) => Uni
 
 class CLI(locale: Locale) {
   private val i18n = I18N(locale)
-  private val parser = new scopt.OptionParser[CLIArguments]("mvmm") {
+  private val parser = new scopt.OptionParser[CLIArguments]("mppatch") {
     head("Multiverse Mod Manager", "v"+VersionInfo.versionString)
 
     help("help").text(i18n(s"cli.param.help"))

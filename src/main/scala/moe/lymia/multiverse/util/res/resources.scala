@@ -34,7 +34,7 @@ object VersionInfo {
     else {
       prop.load(resource)
       (key: String, default: String) => {
-        val p = prop.getProperty("mvmm."+key)
+        val p = prop.getProperty("mppatch."+key)
         if(p==null || p.isEmpty) default else p
       }
     }
