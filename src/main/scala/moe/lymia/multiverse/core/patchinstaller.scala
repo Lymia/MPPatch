@@ -62,7 +62,7 @@ private case class PatchState(patchVersionSha1: String, replacementTarget: Patch
   lazy val expectedFiles = additionalFiles.map(_.path).toSet + originalFile.path
 }
 private object PatchState {
-  private val formatVersion = s"mppatch-v${VersionInfo.versionString}"
+  private val formatVersion = "0"
 
   def serializePatchFile(file: PatchFile) = <PatchFile path={file.path} expectedSha1={file.expectedSha1}/>
   def serialize(state: PatchState) = <PatchState version={formatVersion}>
@@ -216,13 +216,16 @@ class PatchInstaller(basePath: Path, platform: Platform, log: String => Unit = p
           for(file <- platformInfo.additionalFiles(version.version)) yield installFile(file)
         )
 
-        DLCDataWriter.writeDLC(resolve(platform.assetsPath).resolve(dlcInstallPath),
-                               Some(resolve(platform.assetsPath).resolve(dlcTextPath)),
+        val assets = resolve(platform.assetsPath)
+        DLCDataWriter.writeDLC(assets.resolve(platform.mapPath(dlcInstallPath)),
+                               Some(assets.resolve(platform.mapPath(dlcTextPath))),
                                MPPatchDLC.generateBaseDLC(basePath, platform), platform)
 
         val state = PatchState(patchData.sha1, replacementTarget,
                                PatchFile(platformInfo.replacementNewName(version.version), version.version),
-                               additional, MPPatchDLC.DLC_UPDATEVERSION, dlcInstallPath, dlcTextPath)
+                               additional, MPPatchDLC.DLC_UPDATEVERSION,
+                               platform.assetsPath + "/" + platform.mapPath(dlcInstallPath),
+                               platform.assetsPath + "/" + platform.mapPath(dlcTextPath))
         IOUtils.writeXML(patchStatePath, PatchState.serialize(state))
       }
   }

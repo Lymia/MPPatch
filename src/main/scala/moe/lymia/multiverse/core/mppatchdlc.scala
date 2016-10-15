@@ -44,8 +44,7 @@ object MPPatchDLC {
     "stagingroom.lua"       -> MPPatchLuaOverride(injectBefore = Seq("before_stagingroom.lua")),
     "multiplayerselect.lua" -> MPPatchLuaOverride(injectBefore = Seq("before_multiplayerselect.lua")),
     "lobby.lua"             -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua")),
-    "mpgamesetupscreen.lua" -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua"),
-                                                  injectAfter  = Seq("after_mpgamesetupscreen.lua")),
+    "mpgamesetupscreen.lua" -> MPPatchLuaOverride(injectBefore = Seq("intercept_bIsModding.lua")),
     "mpgameoptions.lua"     -> MPPatchLuaOverride(injectAfter  = Seq("after_mpgameoptions.lua"))
   )
 
