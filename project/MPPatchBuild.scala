@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package moe.lymia.multiverse.build
+package moe.lymia.mppatch.build
 
 import sbt._
 import sbt.Keys._
@@ -30,13 +30,13 @@ import com.typesafe.sbt.SbtProguard._
 
 import Config._
 
-object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
+object MPPatchBuild extends Build with PatchBuild with ResourceGenerators {
   // Additional keys
   val proguardMapping = TaskKey[File]("proguard-mapping")
   val buildDist       = TaskKey[File]("build-dist")
   val dist            = InputKey[Unit]("dist")
 
-  lazy val project = Project("multiverse-mod-manager", file(".")) settings (versionWithGit ++ proguardSettings ++ Seq(
+  lazy val project = Project("mppatch", file(".")) settings (versionWithGit ++ proguardSettings ++ Seq(
     GitKeys.baseVersion in ThisBuild := version_baseVersion,
 
     organization := "moe.lymia",
@@ -44,7 +44,7 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
     scalacOptions ++= ("-Xlint -Yclosure-elim -target:jvm-1.8 -optimize -deprecation -unchecked "+
                        "-Ydead-code -Yinline -Yinline-handlers").split(" ").toSeq,
 
-    homepage := Some(url("https://github.com/Lymia/MultiverseModManager")),
+    homepage := Some(url("https://github.com/Lymia/MPPatch")),
     licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
 
     // Dependencies
@@ -61,7 +61,7 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
       IO.createDirectory(path)
       IO.withTemporaryDirectory { dir =>
         IO.unzip(source, dir)
-        val f = Path.allSubpaths(dir) ++ Seq(((proguardMapping in Proguard).value, "moe/lymia/multiverse/symbols.map"))
+        val f = Path.allSubpaths(dir) ++ Seq(((proguardMapping in Proguard).value, "moe/lymia/mppatch/symbols.map"))
         IO.zip(f, target)
       }
       target
@@ -73,7 +73,7 @@ object MultiverseBuild extends Build with PatchBuild with ResourceGenerators {
     ProguardKeys.options ++= Seq("-verbose", "@"+(baseDirectory.value / "project" / "proguard.pro").getCanonicalPath),
 
     // Print mapping to file
-    proguardMapping := ProguardKeys.proguardDirectory.value / ("multiverse-mod-manager_symbols-"+version.value+".map"),
+    proguardMapping := ProguardKeys.proguardDirectory.value / ("mppatch_symbols-"+version.value+".map"),
     ProguardKeys.options ++= Seq("-printmapping", proguardMapping.value.toString),
 
     // Proguard filter configuration

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package moe.lymia.multiverse.build
+package moe.lymia.mppatch.build
 
 import sbt._
 import sbt.Keys._
@@ -70,8 +70,8 @@ trait PatchBuild { this: Build =>
       cachedGeneration(cacheDirectory, tempTarget, finalTarget,
         "#ifndef VERSION_H\n"+
         "#define VERSION_H\n"+
-        "#define patchMarkerString \"Multiverse Mod Manager CvGameDatabase patch by Lymia (lymia@lymiahugs.com)."+
-        "Website: https://github.com/Lymia/MultiverseModManager\"\n"+
+        "#define patchMarkerString \"MPPatch by Lymia (lymia@lymiahugs.com)."+
+        "Website: https://github.com/Lymia/MPPatch\"\n"+
         "#define patchVersionMajor "+tryParse(major, -1)+"\n"+
         "#define patchVersionMinor "+tryParse(minor, -1)+"\n"+
         "#define patchCompatVersion "+version_patchCompat+"\n"+
@@ -141,7 +141,7 @@ trait PatchBuild { this: Build =>
       linuxDirectory.value / "extern_defines.c")(generateProxyDefine),
 
     resourceGenerators in Compile += Def.task {
-      val patchDirectory = (resourceManaged in Compile).value / "moe" / "lymia" / "multiverse" / "data" / "patches"
+      val patchDirectory = (resourceManaged in Compile).value / "moe" / "lymia" / "mppatch" / "data" / "patches"
       val logger         = streams.value.log
 
       IO.createDirectory(patchDirectory)

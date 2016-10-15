@@ -20,14 +20,14 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core
+package moe.lymia.mppatch.core
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
-import moe.lymia.multiverse.platform.Platform
-import moe.lymia.multiverse.util.{Crypto, IOUtils}
+import moe.lymia.mppatch.platform.Platform
+import moe.lymia.mppatch.util.{Crypto, IOUtils}
 
 import scala.xml.{Node, NodeSeq}
 

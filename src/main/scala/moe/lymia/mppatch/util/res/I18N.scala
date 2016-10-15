@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.util.res
+package moe.lymia.mppatch.util.res
 
 import java.text.MessageFormat
 import java.util.{Locale, Properties}

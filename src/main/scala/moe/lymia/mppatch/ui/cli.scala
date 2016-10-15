@@ -20,15 +20,15 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.ui
+package moe.lymia.mppatch.ui
 
 import java.io.File
 import java.nio.file.{Files, Path}
 import java.util.Locale
 
-import moe.lymia.multiverse.core.PatchInstaller
-import moe.lymia.multiverse.util.res.{I18N, VersionInfo}
-import moe.lymia.multiverse.platform.Platform
+import moe.lymia.mppatch.core.PatchInstaller
+import moe.lymia.mppatch.util.res.{I18N, VersionInfo}
+import moe.lymia.mppatch.platform.Platform
 
 case class CLIArguments(command: (CLIArguments, Platform, PatchInstaller) => Unit,
                         systemPath: Option[Path],
@@ -38,7 +38,7 @@ case class CLIArguments(command: (CLIArguments, Platform, PatchInstaller) => Uni
 class CLI(locale: Locale) {
   private val i18n = I18N(locale)
   private val parser = new scopt.OptionParser[CLIArguments]("mppatch") {
-    head("Multiverse Mod Manager", "v"+VersionInfo.versionString)
+    head("MPPatch Installer", "v"+VersionInfo.versionString)
 
     help("help").text(i18n(s"cli.param.help"))
 

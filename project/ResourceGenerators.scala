@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package moe.lymia.multiverse.build
+package moe.lymia.mppatch.build
 
 import sbt._
 import sbt.Keys._
@@ -62,8 +62,8 @@ trait ResourceGenerators { this: Build =>
         case _: Throwable => "<unknown>"
       })
 
-      val versionPropertiesPath = basePath / "moe" / "lymia" / "multiverse" / "data" / "version.properties"
-      IO.write(properties, "Multiverse Mod Manager build information", versionPropertiesPath)
+      val versionPropertiesPath = basePath / "moe" / "lymia" / "mppatch" / "data" / "version.properties"
+      IO.write(properties, "MPPatch build information", versionPropertiesPath)
 
       // Final generated files list
       Seq(versionPropertiesPath)

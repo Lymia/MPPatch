@@ -20,14 +20,14 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.platform
+package moe.lymia.mppatch.platform
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Path, Paths}
 import java.util.Locale
 
-import moe.lymia.multiverse.core.{PatchInstalledFile, PatchPlatformInfo}
-import moe.lymia.multiverse.util.Steam
+import moe.lymia.mppatch.core.{PatchInstalledFile, PatchPlatformInfo}
+import moe.lymia.mppatch.util.Steam
 
 object LinuxPlatform extends Platform {
   val platformName = "linux"

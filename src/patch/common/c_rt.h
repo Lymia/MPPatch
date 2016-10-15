@@ -39,7 +39,7 @@
         char debug_print_buffer[2048]; \
         snprintf(debug_print_buffer, 2048, "[%s] " format "\n", time_str_tmp, ##arg); \
         debug_print_buffer[2047] = '\0'; \
-        fprintf(stderr, "[Multiverse Mod Manager] %s", debug_print_buffer); \
+        fprintf(stderr, "[MPPatch] %s", debug_print_buffer); \
         fprintf(debug_log_file, "%s", debug_print_buffer); \
         fflush(debug_log_file); \
     }

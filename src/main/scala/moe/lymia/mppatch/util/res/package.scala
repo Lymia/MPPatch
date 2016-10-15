@@ -20,18 +20,28 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse
+package moe.lymia.mppatch.util
 
-import java.util.Locale
+import java.io.InputStream
 
-import moe.lymia.multiverse.ui.CLI
+import scala.io.Codec
 
-object MultiverseModManager {
-  def main(args: Array[String]) {
-    if(args.length == 0) {
-      sys.error("gui not yet implemented")
-    } else {
-      new CLI(Locale.getDefault).executeCommand(args)
-    }
+package object res {
+  private val base = "/moe/lymia/mppatch/data/"
+
+  private[res] def resourceExists(s: String) = {
+    val res = getClass.getResourceAsStream(base + s)
+    if(res != null) res.close()
+    res != null
   }
+  def getResource(s: String) =
+    getClass.getResourceAsStream(base + s)
+
+  private[res] def loadFromStream(s: InputStream) =
+    io.Source.fromInputStream(s)(Codec.UTF8).mkString
+  private[res] def loadBinaryResourceFromStream(s: InputStream) =
+    Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
+
+  def loadResource(s: String) = loadFromStream(getResource(s))
+  def loadBinaryResource(s: String) = loadBinaryResourceFromStream(getResource(s))
 }

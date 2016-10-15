@@ -20,14 +20,14 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.platform
+package moe.lymia.mppatch.platform
 
 import java.nio.file.{Files, Path, Paths}
 import javax.swing.JFileChooser
 
-import moe.lymia.multiverse.core.PatchPlatformInfo
-import moe.lymia.multiverse.util.Steam
-import moe.lymia.multiverse.util.win32.WindowsRegistry
+import moe.lymia.mppatch.core.PatchPlatformInfo
+import moe.lymia.mppatch.util.Steam
+import moe.lymia.mppatch.util.win32.WindowsRegistry
 
 object Win32Platform extends Platform {
   val platformName = "win32"

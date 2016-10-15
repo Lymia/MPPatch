@@ -20,14 +20,14 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.core
+package moe.lymia.mppatch.core
 
 import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
 
-import moe.lymia.multiverse.platform.Platform
-import moe.lymia.multiverse.util.res.{PatchData, PatchVersion, VersionInfo}
-import moe.lymia.multiverse.util.{Crypto, IOUtils, XMLUtils}
+import moe.lymia.mppatch.platform.Platform
+import moe.lymia.mppatch.util.res.{PatchData, PatchVersion, VersionInfo}
+import moe.lymia.mppatch.util.{Crypto, IOUtils, XMLUtils}
 
 import scala.collection.JavaConversions._
 import scala.xml.Node

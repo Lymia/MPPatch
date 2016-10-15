@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package moe.lymia.multiverse.build
+package moe.lymia.mppatch.build
 
 import sbt._
 

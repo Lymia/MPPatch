@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.util.win32
+package moe.lymia.mppatch.util.win32
 
 import java.util.Locale
 import java.util.prefs.Preferences

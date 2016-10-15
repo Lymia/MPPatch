@@ -37,7 +37,7 @@
 __attribute__((noreturn)) void fatalError_fn(const char* message) {
   fputs(message, stderr);
   debug_print("%s", message);
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Multiverse Mod Manager", message, 0);
+  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "MPPatch", message, 0);
   exit(1);
 }
 

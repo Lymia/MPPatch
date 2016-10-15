@@ -5,6 +5,6 @@
 
 -keepattributes *
 
--keep public class moe.lymia.multiverse.MultiverseModManager {
+-keep public class moe.lymia.mppatch.MPPatch {
     public static void main(java.lang.String[]);
 }

@@ -20,12 +20,12 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.platform
+package moe.lymia.mppatch.platform
 
 import java.nio.file.Path
 import java.util.Locale
 
-import moe.lymia.multiverse.core.PatchPlatformInfo
+import moe.lymia.mppatch.core.PatchPlatformInfo
 
 import scala.annotation.tailrec
 

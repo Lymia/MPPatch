@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.util.res
+package moe.lymia.mppatch.util.res
 
 import java.util.Properties
 
-import moe.lymia.multiverse.util.Crypto
+import moe.lymia.mppatch.util.Crypto
 
 object VersionInfo {
   private lazy val properties = {

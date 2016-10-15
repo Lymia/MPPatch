@@ -109,7 +109,7 @@ static void luaTable_NetPatch(lua_State *L, int table) {
 }
 
 static int luaHook_panic(lua_State *L) {
-    fatalError("[Multiverse Mod Manager] Critical error in Lua code:\n%s", luaL_checkstring(L, 1));
+    fatalError("[MPPatch] Critical error in Lua code:\n%s", luaL_checkstring(L, 1));
 }
 static void luaTable_versioninfo(lua_State *L, int table) {
     table_setInteger(L, table, "major", patchVersionMajor);

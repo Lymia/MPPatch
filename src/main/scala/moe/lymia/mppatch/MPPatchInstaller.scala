@@ -20,28 +20,18 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.multiverse.util
+package moe.lymia.mppatch
 
-import java.awt.Desktop
-import java.net.URI
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path, Paths}
+import java.util.Locale
 
-import scala.collection.JavaConversions._
+import moe.lymia.mppatch.ui.CLI
 
-object Steam {
-  // TODO: Parse this properly instead of this weirdness.
-  val lineRegex = "\"[0-9]+\"\\s+\"(.*)\"".r
-  def loadLibraryFolders(p: Path) =
-    if(Files.exists(p))
-      (for(l <- Files.readAllLines(p.resolve("steamapps").resolve("libraryfolders.vdf"),
-                                   StandardCharsets.UTF_8).map(_.trim);
-           m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)) :+ p
-    else Seq(p)
-
-  private val desktop = Desktop.getDesktop
-  private def loadURI(uri: String) = desktop.browse(new URI(uri))
-
-  def launchGame(gameId: Int) = loadURI("steam://run/"+gameId)
-  def validateGameFiles(gameId: Int) = loadURI("steam://validate/"+gameId)
+object MPPatchInstaller {
+  def main(args: Array[String]) {
+    if(args.length == 0) {
+      sys.error("gui not yet implemented")
+    } else {
+      new CLI(Locale.getDefault).executeCommand(args)
+    }
+  }
 }
