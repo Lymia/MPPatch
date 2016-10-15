@@ -16,7 +16,7 @@ the injected API:
 
 ```lua
 local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70")
-if not patch.__mvmm_marker then error("Native patch not installed!")
+if not patch.__mppatch_marker then error("Native patch not installed!") end
 ```
 
 This exports a few functions and tables:
