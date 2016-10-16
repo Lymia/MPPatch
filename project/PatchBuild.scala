@@ -113,7 +113,7 @@ trait PatchBuild { this: Build =>
     },
     win32Directory := prepareDirectory(patchBuildDir.value / "win32") { dir =>
       cachedTransform(patchCacheDir.value / "win23_lua_stub",
-        patchSourceDir.value / "win32" / "lua51_Win32.c",
+        patchSourceDir.value / "win32" / "stub" / "lua51_Win32.c",
         dir / "lua51_Win32.dll")((in, out) => mingw_gcc(Seq("-shared", "-o", out, in)))
     },
     linuxDirectory := simplePrepareDirectory(patchBuildDir.value / "linux"),
