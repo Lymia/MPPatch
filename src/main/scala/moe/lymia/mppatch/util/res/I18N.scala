@@ -40,7 +40,7 @@ case class I18N(locale: Locale, map: Map[String, String]) {
 object I18N {
   private def defaultLocale = Locale.US
   private def sourceFile(locale: Locale, generic: Boolean) =
-    s"i18n/${locale.getLanguage}/${if(generic) "generic" else locale.getCountry}.properties"
+    s"i18n/${locale.getLanguage}_${if(generic) "generic" else locale.getCountry}.properties"
 
   @tailrec def findSourceFile(locale: Locale): String =
          if(resourceExists(sourceFile(locale, false))) sourceFile(locale, false)
