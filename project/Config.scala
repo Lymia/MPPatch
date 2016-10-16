@@ -29,7 +29,7 @@ object Config {
   val config_gcc           = "gcc"
   val config_nasm          = "nasm"
 
-  val version_baseVersion  = "0.0.0"
+  val version_baseVersion  = "0.1.0"
   val version_patchCompat  = 1
 
   val config_steam_sdlbin_path = "libsdl2_2.0.3+steamrt1+srt4_i386.deb"
