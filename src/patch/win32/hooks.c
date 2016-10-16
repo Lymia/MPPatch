@@ -39,20 +39,21 @@ void* filterProxySymbol(const char* name, void* target) {
         return lGetMemoryUsageProxy;
     } else return target;
 }
-static PatchInformation* SetActiveDLCAndMods_patchInfo;
+PatchInformation* SetActiveDLCAndMods_patchInfo = 0;
 __attribute__((constructor(500))) static void installHooks() {
-    BinaryType type = getBinaryType();
-
     // Lua hook
     lGetMemoryUsage = resolveSymbol(CV_GAME_DATABASE, lGetMemoryUsage_symbol);
+}
+__attribute__((destructor(500))) static void destroyHooks() {
+    if(SetActiveDLCAndMods_patchInfo != 0) unpatch(SetActiveDLCAndMods_patchInfo);
+}
 
-    // DLC/Mod hook
+void installNetHook() {
+    BinaryType type = getBinaryType();
+
     void* offset    = resolveAddress(CV_BINARY, switchOnType(type, SetActiveDLCAndMods_offset));
     int   patchSize = switchOnType(type, SetActiveDLCAndMods_hook_length);
 
     SetActiveDLCAndMods_patchInfo = proxyFunction(offset, SetActiveDLCAndModsProxy, patchSize, "SetActiveDLCAndMods");
     SetActiveDLCAndMods = (SetActiveDLCAndMods_t) SetActiveDLCAndMods_patchInfo->functionFragment->data;
-}
-__attribute__((destructor(500))) static void destroyHooks() {
-    unpatch(SetActiveDLCAndMods_patchInfo);
 }

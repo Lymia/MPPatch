@@ -29,21 +29,22 @@
 #include "lua_hook.h"
 
 static PatchInformation* lGetMemoryUsage_patchInfo;
-static PatchInformation* SetActiveDLCAndMods_patchInfo;
+PatchInformation* SetActiveDLCAndMods_patchInfo = 0;
 
 __attribute__((constructor(500))) static void installHooks() {
     // Lua hook
     lGetMemoryUsage_patchInfo = proxyFunction(resolveSymbol(CV_MERGED_BINARY, lGetMemoryUsage_symbol),
                                              lGetMemoryUsageProxy, lGetMemoryUsage_hook_length, "lGetMemoryUsage");
     lGetMemoryUsage = (lGetMemoryUsage_t) lGetMemoryUsage_patchInfo->functionFragment->data;
+}
+__attribute__((destructor(500))) static void destroyHooks() {
+    unpatch(lGetMemoryUsage_patchInfo);
+    if(SetActiveDLCAndMods_patchInfo != 0) unpatch(SetActiveDLCAndMods_patchInfo);
+}
 
-    // DLC/Mod hook
+void installNetHook() {
     SetActiveDLCAndMods_patchInfo = proxyFunction(resolveSymbol(CV_MERGED_BINARY, SetActiveDLCAndMods_symbol),
                                                   SetActiveDLCAndModsProxy, SetActiveDLCAndMods_hook_length,
                                                   "SetActiveDLCAndMods");
     SetActiveDLCAndMods = (SetActiveDLCAndMods_t) SetActiveDLCAndMods_patchInfo->functionFragment->data;
-}
-__attribute__((destructor(500))) static void destroyHooks() {
-    unpatch(lGetMemoryUsage_patchInfo);
-    unpatch(SetActiveDLCAndMods_patchInfo);
 }

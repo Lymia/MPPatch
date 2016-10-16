@@ -114,12 +114,15 @@ PatchInformation* proxyFunction(void* fromAddress, void* toAddress, int patchByt
 
     return info;
 }
-void unpatch(PatchInformation* info) {
+void unpatchCode(PatchInformation* info) {
     memory_oldProtect protectFlags;
     debug_print("Unpatching at %p", info->offset);
     unprotectMemoryRegion(info->offset, 5, &protectFlags);
     memcpy(info->offset, info->oldData, 5);
     protectMemoryRegion(info->offset, 5, &protectFlags);
+}
+void unpatch(PatchInformation* info) {
+    unpatchCode(info);
     executable_free(info->functionFragment);
     free(info);
 }

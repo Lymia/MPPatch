@@ -26,6 +26,7 @@ function _mpPatch.overrideWithModList(list)
         patch.NetPatch.pushMod(mod.ID, mod.Version)
     end
     patch.NetPatch.overrideModList()
+    patch.NetPatch.install()
 end
 function _mpPatch.overrideModsFromPreGame()
     local modList = _mpPatch.decodeModsList()

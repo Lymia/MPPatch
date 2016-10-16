@@ -79,6 +79,10 @@ void NetPatch_overrideDLCList() {
     overrideDLCActive = true;
 }
 
+void NetPatch_install() {
+    if(SetActiveDLCAndMods_patchInfo == 0) installNetHook();
+}
+
 void NetPatch_reset() {
     overrideDLCActive  = false;
     overrideModsActive = false;
@@ -86,6 +90,11 @@ void NetPatch_reset() {
     overrideReloadMods = false;
     CppList_clear(overrideDLCList);
     CppList_clear(overrideModList);
+
+    if(SetActiveDLCAndMods_patchInfo != 0) {
+        unpatch(SetActiveDLCAndMods_patchInfo);
+        SetActiveDLCAndMods_patchInfo = 0;
+    }
 }
 
 #ifdef DEBUG
@@ -115,8 +124,13 @@ void NetPatch_reset() {
 SetActiveDLCAndMods_t SetActiveDLCAndMods;
 ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
                                                                   char pReloadDlc, char pReloadMods) {
+    PatchInformation* patchInfo = SetActiveDLCAndMods_patchInfo;
+    unpatchCode(SetActiveDLCAndMods_patchInfo);
+    SetActiveDLCAndMods_patchInfo = 0;
+
     #ifdef DEBUG
-        debug_print("In SetActiveDLCAndModsProxy. (reloadDlc = %d, reloadMods = %d)", pReloadDlc, pReloadMods)
+        debug_print("In SetActiveDLCAndModsProxy. (this = %p, reloadDlc = %d, reloadMods = %d)",
+                    this, pReloadDlc, pReloadMods)
         debugPrintList(dlcList, "Original DLC GUID List", printGUID);
         debugPrintList(modList, "Original Mod List", printMod);
     #endif
@@ -145,6 +159,7 @@ ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, Cp
     }
 
     int ret = SetActiveDLCAndMods(this, dlcList, modList, pReloadDlc, pReloadMods);
+    free(patchInfo);
     NetPatch_reset();
     return ret;
 }

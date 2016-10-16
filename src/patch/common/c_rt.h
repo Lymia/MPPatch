@@ -67,6 +67,7 @@ typedef struct PatchInformation {
 
 void patchJmpInstruction(void* fromAddress, void* toAddress, const char* logReason);
 PatchInformation* proxyFunction(void* fromAddress, void* toAddress, int patchBytes, const char* logReason);
+void unpatchCode(PatchInformation* data);
 void unpatch(PatchInformation* data);
 
 #endif /* C_RT_H */

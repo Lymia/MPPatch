@@ -34,13 +34,17 @@ void NetPatch_pushDLC(uint32_t data1, uint16_t data2, uint16_t data3, uint64_t d
 void NetPatch_overrideReloadDLC(bool val);
 void NetPatch_overrideDLCList();
 
+void NetPatch_install();
 void NetPatch_reset();
+
 
 ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
                                                                   char reloadDlc, char reloadMods);
-
 typedef int SetActiveDLCAndMods_attributes (*SetActiveDLCAndMods_t)(void*, CppList*, CppList*, char, char);
+extern PatchInformation* SetActiveDLCAndMods_patchInfo;
 extern SetActiveDLCAndMods_t SetActiveDLCAndMods;
+
+void installNetHook();
 
 #endif /* NET_HOOK_H */
 

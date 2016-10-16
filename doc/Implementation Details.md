@@ -52,6 +52,9 @@ by Lua code. These functions are exported in the `patch.NetPatch` table, contain
    fields of the in-memory storage format Microsoft uses for GUIDs. The `Data4` field is split into two values,
    `guid_4_high`, containing the most significant 32 bits, and `guid_4_low`, containing the least significant 32 bits.
    See [here](https://msdn.microsoft.com/en-us/library/windows/desktop/aa373931\(v=vs.85\).aspx) for documentation.
+ * `patch.NetPatch.install()`, which causes the patch to SetActiveDLCandMods to actually be written to memory. Steam
+    CEG or some other DRM system seems to interfere with the functioning of the patch, and this is an attempt to dodge
+    it.
  * `patch.NetPatch.reset()`, which clears any overrides set. This function is automatically called after every time the
    `SetActiveDLCAndMods` function is called for any reason to avoid any unintentional overrides.
 

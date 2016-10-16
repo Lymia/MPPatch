@@ -92,6 +92,10 @@ static int luaHook_NetPatch_overrideDLCList(lua_State *L) {
     return 0;
 }
 
+static int luaHook_NetPatch_install(lua_State *L) {
+    NetPatch_install();
+    return 0;
+}
 static int luaHook_NetPatch_reset(lua_State *L) {
     NetPatch_reset();
     return 0;
@@ -105,6 +109,7 @@ static void luaTable_NetPatch(lua_State *L, int table) {
     table_setCFunction(L, table, "overrideReloadDLC" , luaHook_NetPatch_overrideReloadDLC );
     table_setCFunction(L, table, "overrideDLCList"   , luaHook_NetPatch_overrideDLCList   );
 
+    table_setCFunction(L, table, "install"           , luaHook_NetPatch_install           );
     table_setCFunction(L, table, "reset"             , luaHook_NetPatch_reset             );
 }
 
