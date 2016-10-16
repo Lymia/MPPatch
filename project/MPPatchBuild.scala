@@ -52,12 +52,10 @@ object MPPatchBuild extends Build with PatchBuild with ResourceGenerators {
     // Dependencies
     resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
-    libraryDependencies += "com.github.scopt" %% "scopt" % "3.4.0",
 
     // Build distribution file
     assemblyShadeRules in assembly := Seq(
-      ShadeRule.rename("scala.**" -> "moe.lymia.mppatch.externlibs.scala.@1").inAll,
-      ShadeRule.rename("scopt.**" -> "moe.lymia.mppatch.externlibs.scopt.@1").inAll
+      ShadeRule.rename("scala.**" -> "moe.lymia.mppatch.externlibs.scala.@1").inAll
     ),
     assemblyMergeStrategy in assembly := {
       case PathList(x) if Set("library.properties", "rootdoc.txt", "scala-xml.properties").contains(x) =>
