@@ -146,6 +146,7 @@ int CppList_size(CppList* list) {
     return list->length;
 }
 void CppList_clear(CppList* list) {
+    list->length = 0;
     CppListLink_clear(list->head);
 }
 void CppList_free(CppList* list) {
