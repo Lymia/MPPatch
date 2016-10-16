@@ -39,11 +39,8 @@ _mpPatch.versionString = patch.version.versionString
 _mpPatch.uuid = "df74f698-2343-11e6-89c4-8fef6d8f889e"
 _mpPatch.enabled = ContentManager.IsActive(_mpPatch.uuid, ContentType.GAMEPLAY)
 _mpPatch.canEnable = true
-_mpPatch.debug = not not patch.debug
 
-function _mpPatch.debugPrint(...)
-    if _mpPatch.debug then print(...) end
-end
+_mpPatch.debugPrint = print
 
 -- globals from patch
 local rawset = _mpPatch.patch.globals.rawset
@@ -112,7 +109,4 @@ include "mppatch_modutils.lua"
 include "mppatch_uiutils.lua"
 
 print("MPPatch runtime loaded")
-if _mpPatch.debug then
-    print("Current UI path: ".._mpPatch.fullPath)
-    print("[!!] A debug version of the MpPatch binary patch is installed!")
-end
+print("Current UI path: ".._mpPatch.fullPath)
