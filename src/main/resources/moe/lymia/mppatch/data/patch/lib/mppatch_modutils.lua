@@ -32,7 +32,7 @@ function _mpPatch.overrideWithModList(list)
 end
 function _mpPatch.overrideModsFromPreGame()
     local modList = _mpPatch.decodeModsList()
-    if modList then
+    if modList and _mpPatch.isModding then
         _mpPatch.overrideWithModList(modList)
     end
 end
