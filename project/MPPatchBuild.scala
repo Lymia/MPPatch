@@ -24,11 +24,12 @@ package moe.lymia.mppatch.build
 
 import sbt._
 import sbt.Keys._
-
 import com.typesafe.sbt.SbtGit._
 import com.typesafe.sbt.SbtProguard._
-
 import Config._
+
+import sbtassembly._
+import AssemblyKeys._
 
 object MPPatchBuild extends Build with PatchBuild with ResourceGenerators {
   // Additional keys
@@ -54,6 +55,17 @@ object MPPatchBuild extends Build with PatchBuild with ResourceGenerators {
     libraryDependencies += "com.github.scopt" %% "scopt" % "3.4.0",
 
     // Build distribution file
+    assemblyShadeRules in assembly := Seq(
+      ShadeRule.rename("scala.**" -> "moe.lymia.mppatch.externlibs.scala.@1").inAll,
+      ShadeRule.rename("scopt.**" -> "moe.lymia.mppatch.externlibs.scopt.@1").inAll
+    ),
+    assemblyMergeStrategy in assembly := {
+      case PathList(x) if Set("library.properties", "rootdoc.txt", "scala-xml.properties").contains(x) =>
+        MergeStrategy.discard
+      case x =>
+        val oldStrategy = (assemblyMergeStrategy in assembly).value
+        oldStrategy(x)
+    },
     buildDist := {
       val path   = crossTarget.value / "dist"
       val source = (ProguardKeys.proguard in Proguard).value.head
@@ -67,10 +79,11 @@ object MPPatchBuild extends Build with PatchBuild with ResourceGenerators {
       }
       target
     },
+    ProguardKeys.proguard in Proguard <<= (ProguardKeys.proguard in Proguard).dependsOn(assembly),
     dist := streams.value.log.info("Final binary output to: "+buildDist.value)
   ) ++ patchBuildSettings ++ resourceGeneratorSettings ++ inConfig(Proguard)(Seq(
     // Package whole project into a single .jar file with Proguard.
-    ProguardKeys.proguardVersion := "5.2.1",
+    ProguardKeys.proguardVersion := "5.3",
     ProguardKeys.options ++= Seq("-verbose", "@"+(baseDirectory.value / "project" / "proguard.pro").getCanonicalPath),
 
     // Print mapping to file
@@ -78,7 +91,7 @@ object MPPatchBuild extends Build with PatchBuild with ResourceGenerators {
     ProguardKeys.options ++= Seq("-printmapping", proguardMapping.value.toString),
 
     // Proguard filter configuration
-    ProguardKeys.inputs := (dependencyClasspath in Compile).value.files,
-    ProguardKeys.filteredInputs ++= ProguardOptions.noFilter((packageBin in Compile).value)
+    ProguardKeys.inputs := Seq(),
+    ProguardKeys.filteredInputs ++= ProguardOptions.noFilter((assemblyOutputPath in assembly).value)
   )))
 }
