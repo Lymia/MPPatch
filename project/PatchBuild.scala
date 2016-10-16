@@ -188,7 +188,7 @@ trait PatchBuild { this: Build =>
             logger.info("Compiling binary patch"+logIsDebug+" for version "+version)
 
             cc(versionFlags ++ includePaths("-I") ++ Seq(
-              "-m32", "-flto", "-g", "-shared", "-O0", "--std=gnu11", "-Wall", "-o", target,
+              "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-o", target,
               "-fstack-protector", "-fstack-protector-all", "-D_FORTIFY_SOURCE=2", nasm_o) ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ sourceFiles)
             target
