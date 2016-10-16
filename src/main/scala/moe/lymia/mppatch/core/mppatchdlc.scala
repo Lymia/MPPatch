@@ -49,7 +49,7 @@ object MPPatchDLC {
   )
 
   private val runtimeFileNames = Seq("mppatch_runtime.lua", "mppatch_utils.lua", "mppatch_modutils.lua",
-                                     "mppatch_uiutils.lua")
+                                     "mppatch_uiutils.lua", "mppatch_debug.lua")
   private val uiFileNames = Seq("mppatch_multiplayerproxy")
   private val newFiles = runtimeFileNames.map(x =>
     x -> res.loadResource(s"patch/lib/$x")

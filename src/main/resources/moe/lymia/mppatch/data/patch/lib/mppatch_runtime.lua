@@ -107,6 +107,7 @@ end
 include "mppatch_utils.lua"
 include "mppatch_modutils.lua"
 include "mppatch_uiutils.lua"
+include "mppatch_debug.lua"
 
 print("MPPatch runtime loaded")
 print("Current UI path: ".._mpPatch.fullPath)
