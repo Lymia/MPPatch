@@ -26,7 +26,7 @@
 #include "platform.h"
 #include "extern_defines.h"
 
-int lGetMemoryUsageProxy(lua_State *L);
+lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L);
 
 typedef int lGetMemoryUsage_attributes (*lGetMemoryUsage_t)(lua_State *L);
 extern lGetMemoryUsage_t lGetMemoryUsage;

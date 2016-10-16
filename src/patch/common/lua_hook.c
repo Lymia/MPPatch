@@ -171,7 +171,7 @@ static void luaTable_globals(lua_State *L, int table) {
 }
 
 lGetMemoryUsage_t lGetMemoryUsage;
-ENTRY int lGetMemoryUsageProxy(lua_State *L) {
+ENTRY lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L) {
     if(lua_type(L, 1) == LUA_TSTRING && !strcmp(luaL_checkstring(L, 1), LuaTableHook_SENTINEL)) {
         debug_print("Found sentinel value, returning MPPatch table.")
 
