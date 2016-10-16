@@ -57,7 +57,7 @@ class GUI(locale: Locale) {
   }
 
   def actionUpdate(): Unit = {
-    installer.safeUpdate(true)
+    installer.safeUpdate()
   }
   def actionUninstall(): Unit = {
     installer.safeUninstall()
@@ -144,7 +144,7 @@ class GUI(locale: Locale) {
     uninstallButton.setAction("gui.action.uninstall", actionUninstall)
 
     installer.checkPatchStatus() match {
-      case PatchStatus.Installed(_) =>
+      case PatchStatus.Installed =>
         setStatus("gui.status.ready")
         installButton.setActionText("gui.action.reinstall")
         installButton.setEnabled(true)

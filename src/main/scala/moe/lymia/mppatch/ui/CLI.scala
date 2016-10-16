@@ -31,9 +31,7 @@ import moe.lymia.mppatch.util.res.{I18N, VersionInfo}
 import moe.lymia.mppatch.platform.Platform
 
 case class CLIArguments(command: (CLIArguments, Platform, PatchInstaller) => Unit,
-                        systemPath: Option[Path],
-                        // patch options
-                        debug: Boolean = false)
+                        systemPath: Option[Path])
 
 class CLI(locale: Locale) {
   private val i18n = I18N(locale)
@@ -51,10 +49,7 @@ class CLI(locale: Locale) {
       .valueName(i18n("cli.param.args.directory")).text(i18n("cli.param.system-path"))
 
     cmd2("status").action((_, args) => args.copy(command = cmd_status))
-    cmd2("updatePatch").action((_, args) => args.copy(command = cmd_update)).children(
-      opt[Unit]('d', "debug").action((_, args) => args.copy(debug = true))
-        .text(i18n("cli.cmd.updatePatch.param.debug"))
-    )
+    cmd2("updatePatch").action((_, args) => args.copy(command = cmd_update))
     cmd2("uninstallPatch").action((_, args) => args.copy(command = cmd_uninstall))
   }
 
@@ -77,7 +72,7 @@ class CLI(locale: Locale) {
   }
 
   private def cmd_update(args: CLIArguments, platform: Platform, installer: PatchInstaller) = {
-    installer.safeUpdate(args.debug)
+    installer.safeUpdate()
   }
   private def cmd_uninstall(args: CLIArguments, platform: Platform, installer: PatchInstaller) = {
     installer.safeUninstall()

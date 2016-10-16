@@ -169,51 +169,44 @@ trait PatchBuild { this: Build =>
         val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s"))
         def includePaths(flag: String) = fullSourcePath.flatMap(x => Seq(flag, dir(x)))
 
-        def buildVersion(debug: Boolean, target: File) = {
-          val versionStr = "version_"+version + (if(debug) "_debug" else "")
-          val logIsDebug = if(debug) " (debug version)" else ""
-          val buildTmp = patchBuildDir.value / versionStr
-          IO.createDirectory(buildTmp)
+        val target = patchDirectory / (version+binaryExtension)
+        val versionStr = "version_"+version
+        val buildTmp = patchBuildDir.value / versionStr
+        IO.createDirectory(buildTmp)
 
-          val versionFlags = if(debug) Seq("-DDEBUG") else Seq()
-          val nasm_o = trackDependencies(patchCacheDir.value / (versionStr + "_nasm_o"), sBuildDependencies.toSet) {
-            logger.info("Compiling as_entry.o"+logIsDebug+" for version "+version)
+        val nasm_o = trackDependencies(patchCacheDir.value / (versionStr + "_nasm_o"), sBuildDependencies.toSet) {
+          logger.info("Compiling as_entry.o for version "+version)
 
-            val output = buildTmp / "as_entry.o"
-            nasm(versionFlags ++ includePaths("-i") ++ Seq("-Ox", "-f", nasmFormat, "-o", output,
-                                                           patchSourceDir.value / "common" / "as_entry.s"))
-            output
-          }
+          val output = buildTmp / "as_entry.o"
+          nasm(includePaths("-i") ++ Seq("-Ox", "-f", nasmFormat, "-o", output,
+                                         patchSourceDir.value / "common" / "as_entry.s"))
+          output
+        }
+        val outputPath =
           trackDependencies(patchCacheDir.value / (versionStr + "_c_out"), cBuildDependencies.toSet + nasm_o) {
-            logger.info("Compiling binary patch"+logIsDebug+" for version "+version)
+            logger.info("Compiling binary patch for version "+version)
 
-            cc(versionFlags ++ includePaths("-I") ++ Seq(
+            cc(includePaths("-I") ++ Seq(
               "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-o", target,
               "-fstack-protector", "-fstack-protector-all", "-D_FORTIFY_SOURCE=2", nasm_o) ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ sourceFiles)
             target
           }
-        }
 
-        val normalPath = buildVersion(debug = false, patchDirectory / (version+binaryExtension))
-        val debugPath  = buildVersion(debug = true , patchDirectory / (version+"_debug"+binaryExtension))
-
-        val mf = trackDependencies(patchCacheDir.value / ("version_manifest_"+version), Set(normalPath, debugPath)) {
+        val mf = trackDependencies(patchCacheDir.value / ("version_manifest_"+version), Set(outputPath)) {
           logger.info("Creating version manifest for version "+version)
 
           val propTarget = patchDirectory / (version+".properties")
           val properties = new java.util.Properties
-          properties.put("normal.resname", version+binaryExtension)
-          properties.put("normal.sha1"   , sha1_hex(IO.readBytes(normalPath)))
-          properties.put("debug.resname" , version+"_debug"+binaryExtension)
-          properties.put("debug.sha1"    , sha1_hex(IO.readBytes(debugPath)))
-          properties.put("platform"      , platform)
-          properties.put("target.sha1"   , sha1)
+          properties.put("resname"    , version+binaryExtension)
+          properties.put("sha1"       , sha1_hex(IO.readBytes(outputPath)))
+          properties.put("platform"   , platform)
+          properties.put("target.sha1", sha1)
           IO.write(properties, "Patch information for version "+version, propTarget)
           propTarget
         }
 
-        Seq(normalPath, debugPath, mf)
+        Seq(outputPath, mf)
       }
 
       patches.toSeq.flatten
