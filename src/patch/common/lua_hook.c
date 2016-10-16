@@ -123,30 +123,6 @@ static void luaTable_versioninfo(lua_State *L, int table) {
     table_setString (L, table, "versionString", patchFullVersion);
 }
 
-static void lua_pushGlobals(lua_State *L) {
-    lua_pushstring(L, ""); // S
-    lua_pushstring(L, "gsub"); // S S
-    lua_gettable(L, -2);
-    lua_getfenv(L, -1);
-    lua_insert(L, -3);
-    lua_pop(L, 2);
-}
-
-#ifdef DEBUG
-    static void luaTable_debug(lua_State *L, int table) {
-        lua_pushstring(L, "globals");
-        lua_pushGlobals(L);
-        lua_rawset(L, table);
-
-        lua_pushstring(L, "_G");
-        lua_pushvalue(L, LUA_GLOBALSINDEX);
-        lua_rawset(L, table);
-
-        lua_pushstring(L, "registry");
-        lua_pushvalue(L, LUA_REGISTRYINDEX);
-        lua_rawset(L, table);
-    }
-#endif
 static void luaTable_pushSharedState(lua_State *L) {
     lua_pushstring(L, LuaTableHook_REGINDEX);
     lua_gettable(L, LUA_REGISTRYINDEX);
@@ -162,6 +138,14 @@ static void luaTable_pushSharedState(lua_State *L) {
 }
 
 static const char* copyList[] = {"rawset", "rawget", NULL};
+static void lua_pushGlobals(lua_State *L) {
+    lua_pushstring(L, ""); // S
+    lua_pushstring(L, "gsub"); // S S
+    lua_gettable(L, -2);
+    lua_getfenv(L, -1);
+    lua_insert(L, -3);
+    lua_pop(L, 2);
+}
 static void luaTable_globals(lua_State *L, int table) {
     lua_pushGlobals(L);
     int globals = lua_gettop(L);
@@ -193,10 +177,6 @@ ENTRY lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L) {
         lua_pushstring(L, "shared");
         luaTable_pushSharedState(L);
         lua_rawset(L, table);
-
-        #ifdef DEBUG
-            table_setTable(L, table, "debug", luaTable_debug);
-        #endif
 
         return 1;
     } else {

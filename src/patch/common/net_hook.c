@@ -97,29 +97,27 @@ void NetPatch_reset() {
     }
 }
 
-#ifdef DEBUG
-    static void printGUID(void* ptr) {
-        GUID* m = (GUID*) ptr;
-        uint64_t data4_le = __builtin_bswap64(m->data4);
-        debug_print_raw(" - {%08x-%04x-%04x-%04x-%04x%08x}",
-                        m->data1, m->data2, m->data3,
-                        (uint32_t) (data4_le >> 48) & 0xFFFF,
-                        (uint32_t) (data4_le >> 32) & 0xFFFF,
-                        (uint32_t) data4_le);
+static void printGUID(void* ptr) {
+    GUID* m = (GUID*) ptr;
+    uint64_t data4_le = __builtin_bswap64(m->data4);
+    debug_print_raw(" - {%08x-%04x-%04x-%04x-%04x%08x}",
+                    m->data1, m->data2, m->data3,
+                    (uint32_t) (data4_le >> 48) & 0xFFFF,
+                    (uint32_t) (data4_le >> 32) & 0xFFFF,
+                    (uint32_t) data4_le);
+}
+static void printMod(void* ptr) {
+    ModInfo* m = (ModInfo*) ptr;
+    debug_print_raw(" - {id = \"%s\", version = %d}", m->modId, m->version);
+}
+static void debugPrintList(CppList* list, const char* header, void (*printFn)(void*)) {
+    if(list == NULL) { debug_print_raw("%s (is null)", header); }
+    else {
+        debug_print_raw("%s (stored length: %d):", header, CppList_size(list));
+        if(CppList_size(list) == 0) { debug_print_raw(" - <no entries>"); }
+        else for(CppListLink* i = CppList_begin(list); i != CppList_end(list); i = i->next) printFn(i->data);
     }
-    static void printMod(void* ptr) {
-        ModInfo* m = (ModInfo*) ptr;
-        debug_print_raw(" - {id = \"%s\", version = %d}", m->modId, m->version);
-    }
-    static void debugPrintList(CppList* list, const char* header, void (*printFn)(void*)) {
-        if(list == NULL) { debug_print_raw("%s (is null)", header); }
-        else {
-            debug_print_raw("%s (stored length: %d):", header, CppList_size(list));
-            if(CppList_size(list) == 0) { debug_print_raw(" - <no entries>"); }
-            else for(CppListLink* i = CppList_begin(list); i != CppList_end(list); i = i->next) printFn(i->data);
-        }
-    }
-#endif
+}
 
 SetActiveDLCAndMods_t SetActiveDLCAndMods;
 ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
@@ -128,25 +126,19 @@ ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, Cp
     unpatchCode(SetActiveDLCAndMods_patchInfo);
     SetActiveDLCAndMods_patchInfo = 0;
 
-    #ifdef DEBUG
-        debug_print("In SetActiveDLCAndModsProxy. (this = %p, reloadDlc = %d, reloadMods = %d)",
-                    this, pReloadDlc, pReloadMods)
-        debugPrintList(dlcList, "Original DLC GUID List", printGUID);
-        debugPrintList(modList, "Original Mod List", printMod);
-    #endif
+    debug_print("In SetActiveDLCAndModsProxy. (this = %p, reloadDlc = %d, reloadMods = %d)",
+                this, pReloadDlc, pReloadMods)
+    debugPrintList(dlcList, "Original DLC GUID List", printGUID);
+    debugPrintList(modList, "Original Mod List", printMod);
 
     if(overrideDLCActive ) {
         debug_print("Overriding DLC list.")
-        #ifdef DEBUG
-            debugPrintList(overrideDLCList, "Override DLC List", printGUID);
-        #endif
+        debugPrintList(overrideDLCList, "Override DLC List", printGUID);
         dlcList = overrideDLCList;
     }
     if(overrideModsActive) {
         debug_print("Overriding mods list.")
-        #ifdef DEBUG
-            debugPrintList(overrideModList, "Override Mod List", printMod);
-        #endif
+        debugPrintList(overrideModList, "Override Mod List", printMod);
         modList = overrideModList;
     }
     if(overrideReloadDLC ) {

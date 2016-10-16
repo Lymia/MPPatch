@@ -31,14 +31,10 @@
 #include "platform.h"
 
 // Debug logging
-#ifdef DEBUG
-    FILE* debug_log_file;
-    __attribute__((constructor(150))) static void initDebugLogging() {
-        debug_log_file = fopen("mppatch_debug.log", "w");
-    }
-#else
-    #define debug_print(format, ...)
-#endif
+FILE* debug_log_file;
+__attribute__((constructor(150))) static void initDebugLogging() {
+    debug_log_file = fopen("mppatch_debug.log", "w");
+}
 
 // String manipulation
 bool endsWith(const char* str, const char* ending) {

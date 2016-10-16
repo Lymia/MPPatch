@@ -30,25 +30,20 @@
 #include <time.h>
 #include "platform.h"
 
-#ifdef DEBUG
-    extern FILE* debug_log_file;
-    #define debug_print_raw(format, arg...) { \
-        time_t time_val = time(NULL); \
-        char* time_str_tmp = asctime(localtime(&time_val)); \
-        time_str_tmp[strlen(time_str_tmp) - 1] = 0; \
-        char debug_print_buffer[2048]; \
-        snprintf(debug_print_buffer, 2048, "[%s] " format "\n", time_str_tmp, ##arg); \
-        debug_print_buffer[2047] = '\0'; \
-        fprintf(stderr, "[MPPatch] %s", debug_print_buffer); \
-        fprintf(debug_log_file, "%s", debug_print_buffer); \
-        fflush(debug_log_file); \
-    }
-    #define debug_print(format, arg...) \
-        debug_print_raw("%s at %s:%u - " format, __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg)
-#else
-    #define debug_print_raw(format, ...)
-    #define debug_print(format, ...)
-#endif
+extern FILE* debug_log_file;
+#define debug_print_raw(format, arg...) { \
+    time_t time_val = time(NULL); \
+    char* time_str_tmp = asctime(localtime(&time_val)); \
+    time_str_tmp[strlen(time_str_tmp) - 1] = 0; \
+    char debug_print_buffer[2048]; \
+    snprintf(debug_print_buffer, 2048, "[%s] " format "\n", time_str_tmp, ##arg); \
+    debug_print_buffer[2047] = '\0'; \
+    fprintf(stderr, "[MPPatch] %s", debug_print_buffer); \
+    fprintf(debug_log_file, "%s", debug_print_buffer); \
+    fflush(debug_log_file); \
+}
+#define debug_print(format, arg...) \
+    debug_print_raw("%s at %s:%u - " format, __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg)
 
 #define ENTRY __attribute__((force_align_arg_pointer))
 
@@ -71,4 +66,3 @@ void unpatchCode(PatchInformation* data);
 void unpatch(PatchInformation* data);
 
 #endif /* C_RT_H */
-

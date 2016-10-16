@@ -34,7 +34,6 @@ void  lua_pushvalue (lua_State *L, int index);
 #define lua_pop(L,n)  lua_settop(L, -(n)-1)
 
 #define LUA_REGISTRYINDEX       (-10000)
-#define LUA_GLOBALSINDEX        (-10002)
 void lua_gettable (lua_State *L, int index);
 void lua_settable (lua_State *L, int index);
 
