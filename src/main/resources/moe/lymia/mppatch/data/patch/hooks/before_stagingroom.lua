@@ -29,14 +29,11 @@ if _mpPatch and _mpPatch.enabled then
     end
     Events.MultiplayerGameLaunched.Add(MultiplayerGameLaunchedHook)
 
-    UIManager = _mpPatch.hookTable(UIManager, {
-        DequeuePopup = function(...)
-            local context = ...
-            if context == ContextPtr then
-                MultiplayerGameLaunchedHook_remove()
-            end
-            return UIManager._super.DequeuePopup(...)
-        end,
-        CData = UIManager.CData
-    })
+    _mpPatch.patch.globals.rawset(UIManager, "DequeuePopup", function(this, ...)
+        local context = ...
+        if context == ContextPtr then
+            MultiplayerGameLaunchedHook_remove()
+        end
+        return UIManager._super.DequeuePopup(UIManager._super, ...)
+    end)
 end
