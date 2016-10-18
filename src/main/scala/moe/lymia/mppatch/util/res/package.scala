@@ -27,7 +27,7 @@ import java.io.InputStream
 import scala.io.Codec
 
 package object res {
-  private val base = "/moe/lymia/mppatch/data/"
+  private val base = "/moe/lymia/mppatch/"
 
   private[res] def resourceExists(s: String) = {
     val res = getClass.getResourceAsStream(base + s)

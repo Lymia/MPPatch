@@ -25,23 +25,22 @@ package moe.lymia.mppatch.core
 import java.nio.file.Path
 import java.util.{Locale, UUID}
 
-import moe.lymia.mppatch.util.{IOUtils, res}
+import moe.lymia.mppatch.util.{Crypto, IOUtils, res}
 import moe.lymia.mppatch.util.XMLUtils._
 
 import scala.xml.{Node, XML}
 
-
 trait PatchFileSource {
   def loadResource(name: String): String
-}
-object ResourceSource extends PatchFileSource {
-  override def loadResource(name: String): String = res.loadResource("patch/files/"+name)
+  def loadNative  (name: String): Array[Byte]
 }
 
 case class LuaOverride(fileName: String, injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
+case class NativePatch(platform: String, version: String, path: String, sha1: String)
 case class PatchManifest(dlcManifest: DLCManifest, patchVersion: String,
                          luaPatches: Seq[LuaOverride], libraryFileNames: Seq[String],
-                         newScreenFileNames: Seq[String], textFileNames: Seq[String])
+                         newScreenFileNames: Seq[String], textFileNames: Seq[String],
+                         nativePatches: Seq[NativePatch])
 object PatchManifest {
   def readDLCManifest(node: Node) =
     DLCManifest(UUID.fromString(getAttribute(node, "UUID")),
@@ -51,21 +50,25 @@ object PatchManifest {
   def loadLuaOverride(node: Node) =
     LuaOverride(loadFilename(node),
                 (node \ "InjectBefore").map(loadFilename), (node \ "InjectAfter").map(loadFilename))
+  def loadNativePatch(node: Node) =
+    NativePatch(getAttribute(node, "Platform"), getAttribute(node, "Version"),
+                getAttribute(node, "Filename"), getAttribute(node, "Sha1"))
   def loadFromXML(xml: Node) = {
     val manifestVersion = getAttribute(xml, "ManifestVersion")
     if(manifestVersion != "0") sys.error("Unknown ManifestVersion: "+manifestVersion)
     PatchManifest(readDLCManifest((xml \ "Info").head), getAttribute(xml, "PatchVersion"),
-                              (xml \ "Hook"    ).map(loadLuaOverride),
-                              (xml \ "Include" ).map(loadFilename),
-                              (xml \ "Screen"  ).map(loadFilename),
-                              (xml \ "TextData").map(loadFilename))
+                                  (xml \ "Hook"    ).map(loadLuaOverride),
+                                  (xml \ "Include" ).map(loadFilename),
+                                  (xml \ "Screen"  ).map(loadFilename),
+                                  (xml \ "TextData").map(loadFilename),
+                                  (xml \ "Version" ).map(loadNativePatch))
   }
 
   val resPatchData = loadFromXML(XML.loadString(res.loadResource("patch/manifest.xml")))
 }
 
-class PatchLoader(data: PatchManifest, source: PatchFileSource) {
-  def manifest = data.dlcManifest
+class PatchLoader(source: PatchFileSource) {
+  val data = PatchManifest.loadFromXML(XML.loadString(source.loadResource("manifest.xml")))
 
   lazy val luaPatchList = data.luaPatches.map(x => x.fileName.toLowerCase -> x).toMap
   lazy val libraryFiles = data.libraryFileNames.map(x =>
@@ -104,4 +107,21 @@ class PatchLoader(data: PatchManifest, source: PatchFileSource) {
         None
     }
   }
+
+  val versionMap = data.nativePatches.map(x => (x.platform, x.version) -> x).toMap
+  def getNativePatch(targetPlatform: String, versionName: String) =
+    versionMap.get((targetPlatform, versionName))
+  def nativePatchExists(targetPlatform: String, versionName: String) =
+    versionMap.contains((targetPlatform, versionName))
+  def loadVersion(patch: NativePatch) = {
+    val fileData = source.loadNative(patch.path)
+    if(Crypto.sha1_hex(fileData) != patch.sha1) sys.error("sha1 mismatch in native patch")
+    fileData
+  }
+}
+object PatchLoader {
+  val default = new PatchLoader(new PatchFileSource {
+    override def loadResource(name: String): String      = res.loadResource("patch/"+name)
+    override def loadNative  (name: String): Array[Byte] = res.loadBinaryResource("patch/"+name)
+  })
 }

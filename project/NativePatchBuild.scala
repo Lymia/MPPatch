@@ -24,9 +24,10 @@ package moe.lymia.mppatch.build
 
 import sbt._
 import sbt.Keys._
-
 import Config._
 import Utils._
+
+import scala.xml.XML
 
 trait NativePatchBuild { this: Build =>
   object NativePatchBuildUtils {
@@ -82,6 +83,7 @@ trait NativePatchBuild { this: Build =>
   }
   import NativePatchBuildUtils._
 
+  case class NativePatchFile(platform: String, version: String, file: File, sha1: String)
   object NativePatchBuildKeys {
     val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
     val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
@@ -97,6 +99,8 @@ trait NativePatchBuild { this: Build =>
 
     val win32ExternDef = TaskKey[File]("native-patch-win32-extern-defines")
     val linuxExternDef = TaskKey[File]("native-patch-linux-extern-defines")
+
+    val nativeFiles          = TaskKey[Seq[NativePatchFile]]("native-patch-files")
   }
   import NativePatchBuildKeys._
 
@@ -140,8 +144,9 @@ trait NativePatchBuild { this: Build =>
       patchSourceDir.value / "linux" / "extern_defines.gen",
       linuxDirectory.value / "extern_defines.c")(generateProxyDefine),
 
-    resourceGenerators in Compile += Def.task {
-      val patchDirectory = (resourceManaged in Compile).value / "moe" / "lymia" / "mppatch" / "data" / "patches"
+    nativeFiles := {
+      val patchDirectory = patchBuildDir.value / "output"
+      val progVersion    = version.value
       val logger         = streams.value.log
 
       IO.createDirectory(patchDirectory)
@@ -169,7 +174,7 @@ trait NativePatchBuild { this: Build =>
         val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s"))
         def includePaths(flag: String) = fullSourcePath.flatMap(x => Seq(flag, dir(x)))
 
-        val target = patchDirectory / (version+binaryExtension)
+        val target = patchDirectory / (version+"_"+progVersion+binaryExtension)
         val versionStr = "version_"+version
         val buildTmp = patchBuildDir.value / versionStr
         IO.createDirectory(buildTmp)
@@ -193,23 +198,43 @@ trait NativePatchBuild { this: Build =>
             target
           }
 
-        val mf = trackDependencies(patchCacheDir.value / ("version_manifest_"+version), Set(outputPath)) {
-          logger.info("Creating version manifest for version "+version)
+        NativePatchFile(platform, sha1, outputPath, sha1_hex(IO.readBytes(outputPath)))
+      }
+      patches.toSeq
+    },
 
-          val propTarget = patchDirectory / (version+".properties")
-          val properties = new java.util.Properties
-          properties.put("resname"    , version+binaryExtension)
-          properties.put("sha1"       , sha1_hex(IO.readBytes(outputPath)))
-          properties.put("platform"   , platform)
-          properties.put("target.sha1", sha1)
-          IO.write(properties, "Patch information for version "+version, propTarget)
-          propTarget
-        }
+    resourceGenerators in Compile += Def.task {
+      val basePath  = (resourceManaged in Compile).value
+      val patchPath = baseDirectory.value / "src" / "patch"
+      val logger    = streams.value.log
 
-        Seq(outputPath, mf)
+      val target    = basePath / "moe" / "lymia" / "mppatch" / "patch"
+      target.mkdirs()
+
+      val copiedFiles = for(directory <- Seq("hooks", "lib", "screen", "text");
+                            file      <- (patchPath / directory).listFiles if file.isFile) yield {
+        val targetFile = target / file.getName
+        IO.copyFile(file, targetFile)
+        targetFile
       }
 
-      patches.toSeq.flatten
+      val versions = nativeFiles.value
+      val patches = for(version <- versions) yield {
+        val targetFile = target / version.file.getName
+        IO.copyFile(version.file, targetFile)
+        targetFile
+      }
+
+      val manifest = target / "manifest.xml"
+      val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}>
+        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
+        {versions.map(x => <Version Platform={x.platform} Version={x.version}
+                                    Filename={x.file.getName} Sha1={x.sha1}/>)}
+      </PatchManifest>
+      IO.write(manifest, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + output.toString())
+
+      // Final generated files list
+      manifest +: (copiedFiles ++ patches)
     }.taskValue
   )
 }

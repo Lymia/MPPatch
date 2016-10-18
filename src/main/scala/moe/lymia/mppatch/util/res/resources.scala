@@ -50,21 +50,3 @@ object VersionInfo {
 
   lazy val patchCompat   = Integer.parseInt(properties("patch.compat", "-1"))
 }
-
-case class PatchData(platform: String, version: String, path: String, sha1: String) {
-  def fileData = loadBinaryResource("patches/"+path)
-  lazy val validateFileData = Crypto.sha1_hex(fileData) == sha1
-}
-object PatchData {
-  def getPatchManifest(targetPlatform: String, versionName: String) =
-    Option(getResource("patches/"+targetPlatform+"_"+versionName+".properties"))
-  def get(targetPlatform: String, versionName: String) =
-    getPatchManifest(targetPlatform, versionName).map { version =>
-      val properties = new Properties
-      properties.load(version)
-      PatchData(targetPlatform, versionName,
-                   properties.getProperty("resname", ""), properties.getProperty("sha1", ""))
-    }
-  def exists(targetPlatform: String, versionName: String) =
-    getPatchManifest(targetPlatform, versionName).nonEmpty
-}

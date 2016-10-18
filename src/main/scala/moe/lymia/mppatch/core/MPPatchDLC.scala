@@ -39,9 +39,8 @@ object MPPatchDLC {
   private def prepareList(map: Map[String, String]) = map.mapValues(_.getBytes(StandardCharsets.UTF_8))
   private def findPathTargets(base: Path, loader: PatchLoader, platform: Platform, path: String*) =
     findPatchTargets(platform.resolve(base, platform.assetsPath +: path: _*), loader)
-  def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
-    val loader = new PatchLoader(PatchManifest.resPatchData, ResourceSource)
-    DLCData(loader.manifest,
+  def generateBaseDLC(civBaseDirectory: Path, loader: PatchLoader, platform: Platform) = {
+    DLCData(loader.data.dlcManifest,
             DLCGameplay(textData = loader.textFiles,
                         uiFiles = Map(
                           "LuaPatches" -> prepareList(findPathTargets(civBaseDirectory, loader, platform, "UI")),

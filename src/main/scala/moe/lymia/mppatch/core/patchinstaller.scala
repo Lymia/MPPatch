@@ -26,7 +26,6 @@ import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
 
 import moe.lymia.mppatch.platform.Platform
-import moe.lymia.mppatch.util.res.{PatchData, VersionInfo}
 import moe.lymia.mppatch.util.{Crypto, IOUtils, XMLUtils}
 
 import scala.collection.JavaConversions._
@@ -92,7 +91,7 @@ trait PatchPlatformInfo {
   def findInstalledFiles(list: Seq[String]): Seq[String]
 }
 
-class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit = println) {
+class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform, log: String => Unit = println) {
   def resolve(path: String) = basePath.resolve(path)
 
   private val patchStatePath     = resolve(PathNames.PATCH_STATE_FILENAME)
@@ -109,9 +108,9 @@ class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit
     Files.exists(path) && Files.isRegularFile(path) && Crypto.sha1_hex(Files.readAllBytes(path)) == file.expectedSha1
   }
   private def isVersionKnown(path: String) =
-    PatchData.exists(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
+    loader.nativePatchExists(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
   private def getVersion(path: String) =
-    PatchData.get(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
+    loader.getNativePatch(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
   private def loadPatchState() = try {
     PatchState.unserialize(IOUtils.readXML(patchStatePath))
   } catch {
@@ -146,7 +145,7 @@ class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit
             PatchStatus.NeedsCleanup
           else if(!validatePatchFile(patchState.replacementTarget))
             PatchStatus.TargetUpdated(isVersionKnown(patchState.replacementTarget.path))
-          else PatchData.get(platform.platformName, patchState.originalFile.expectedSha1) match {
+          else loader.getNativePatch(platform.platformName, patchState.originalFile.expectedSha1) match {
             case Some(version) =>
               if(patchState.dlcUpdateVersion != MPPatchDLC.DLC_UPDATEVERSION)
                 PatchStatus.NeedsUpdate
@@ -168,8 +167,8 @@ class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit
       Files.getPosixFilePermissions(path) + OWNER_EXECUTE + GROUP_EXECUTE + OTHERS_EXECUTE)
     PatchFile(name, Crypto.sha1_hex(data))
   }
-  private def installFromPatchData(target: String, patch: PatchData) =
-    PatchInstalledFile(target, patch.fileData)
+  private def installFromPatchData(target: String, patch: NativePatch) =
+    PatchInstalledFile(target, loader.loadVersion(patch))
 
   // TODO: Make sure this is atomic enough
   private def installPatch() = getVersion(platformInfo.replacementTarget) match {
@@ -195,7 +194,7 @@ class PatchInstaller(val basePath: Path, platform: Platform, log: String => Unit
         val assets = resolve(platform.assetsPath)
         DLCDataWriter.writeDLC(assets.resolve(platform.mapPath(dlcInstallPath)),
                                Some(assets.resolve(platform.mapPath(dlcTextPath))),
-                               MPPatchDLC.generateBaseDLC(basePath, platform), platform)
+                               MPPatchDLC.generateBaseDLC(basePath, loader, platform), platform)
 
         val state = PatchState(patchData.sha1, replacementTarget,
                                PatchFile(platformInfo.replacementNewName(patchData.version), patchData.version),
