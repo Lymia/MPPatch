@@ -10,7 +10,7 @@ if _mpPatch and _mpPatch.enabled then
     local function cancelOverride()
         if not Matchmaking.IsHost() then
             print("Cancelling override.")
-            patch.NetPatch.reset()
+            _mpPatch.patch.NetPatch.reset()
         end
     end
 
