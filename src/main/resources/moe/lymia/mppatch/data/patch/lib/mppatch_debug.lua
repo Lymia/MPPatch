@@ -65,7 +65,7 @@ _mpPatch.eventList = {
     "UnitShouldDimFlag", "UnitStateChangeDetected", "UnitTypeChanged", "UnitVisibilityChanged", "UserRequestClose",
     "WarStateChanged", "WorldMouseOver",
 }
-local excludeList = {LocalMachineAppUpdate = true}
+local excludeList = {LocalMachineAppUpdate = true, KeyUpEvent = true, GameMessageChat = true }
 if not _mpPatch.patch.shared.eventHookInstalled then
     _mpPatch.patch.shared.eventHookInstalled = true
 
