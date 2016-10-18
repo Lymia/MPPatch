@@ -49,7 +49,8 @@ object PatchStatus {
 private case class PatchFile(path: String, expectedSha1: String)
 private case class PatchState(patchVersionSha1: String, replacementTarget: PatchFile, originalFile: PatchFile,
                               additionalFiles: Seq[PatchFile],
-                              dlcUpdateVersion: Int, dlcInstallPath: String, textDataInstallPath: String) {
+                              installedVersion: String, installedTimestamp: Long,
+                              dlcInstallPath: String, textDataInstallPath: String) {
   lazy val expectedFiles = additionalFiles.map(_.path).toSet + originalFile.path
 }
 private object PatchState {
@@ -61,7 +62,8 @@ private object PatchState {
     <ReplacementTarget>{serializePatchFile(state.replacementTarget)}</ReplacementTarget>
     <OriginalFile>{serializePatchFile(state.originalFile)}</OriginalFile>
     <AdditionalFiles>{state.additionalFiles.map(serializePatchFile)}</AdditionalFiles>
-    <DLCUpdateVersion>{state.dlcUpdateVersion}</DLCUpdateVersion>
+    <InstalledVersion>{state.installedVersion}</InstalledVersion>
+    <InstalledTimestamp>{state.installedTimestamp}</InstalledTimestamp>
     <DLCInstallPath>{state.dlcInstallPath}</DLCInstallPath>
     <TextDataInstallPath>{state.textDataInstallPath}</TextDataInstallPath>
   </PatchState>
@@ -74,7 +76,8 @@ private object PatchState {
                          unserializePatchFile((xml \ "ReplacementTarget" \ "PatchFile").head),
                          unserializePatchFile((xml \ "OriginalFile"      \ "PatchFile").head),
                          (xml \ "AdditionalFiles" \ "PatchFile").map(unserializePatchFile),
-                         XMLUtils.getNodeText(xml, "DLCUpdateVersion").toInt,
+                         XMLUtils.getNodeText(xml, "InstalledVersion"),
+                         XMLUtils.getNodeText(xml, "InstalledTimestamp").toLong,
                          XMLUtils.getNodeText(xml, "DLCInstallPath"),
                          XMLUtils.getNodeText(xml, "TextDataInstallPath")))
 }
@@ -147,11 +150,11 @@ class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform
             PatchStatus.TargetUpdated(isVersionKnown(patchState.replacementTarget.path))
           else loader.getNativePatch(platform.platformName, patchState.originalFile.expectedSha1) match {
             case Some(version) =>
-              if(patchState.dlcUpdateVersion != MPPatchDLC.DLC_UPDATEVERSION)
+              if(patchState.installedTimestamp != loader.data.timestamp ||
+                 patchState.installedVersion != loader.data.patchVersion ||
+                 version.sha1 != patchState.patchVersionSha1)
                 PatchStatus.NeedsUpdate
-              else if(version.sha1 == patchState.patchVersionSha1)
-                PatchStatus.Installed
-              else PatchStatus.NeedsUpdate
+              else PatchStatus.Installed
             case None => PatchStatus.NeedsCleanup
           }
         }
@@ -198,7 +201,7 @@ class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform
 
         val state = PatchState(patchData.sha1, replacementTarget,
                                PatchFile(platformInfo.replacementNewName(patchData.version), patchData.version),
-                               additional, MPPatchDLC.DLC_UPDATEVERSION,
+                               additional, loader.data.patchVersion, loader.data.timestamp,
                                platform.assetsPath + "/" + platform.mapPath(dlcInstallPath),
                                platform.assetsPath + "/" + platform.mapPath(dlcTextPath))
         IOUtils.writeXML(patchStatePath, PatchState.serialize(state))

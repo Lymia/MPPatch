@@ -20,16 +20,14 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util.res
+package moe.lymia.mppatch.util
 
 import java.util.Properties
-
-import moe.lymia.mppatch.util.Crypto
 
 object VersionInfo {
   private lazy val properties = {
     val prop = new Properties()
-    val resource = getResource("version.properties")
+    val resource = IOUtils.getResource("version.properties")
     if(resource==null) (key: String, default: String) => default
     else {
       prop.load(resource)

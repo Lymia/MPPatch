@@ -22,7 +22,7 @@
 
 package moe.lymia.mppatch.util
 
-import java.io.IOException
+import java.io.{IOException, InputStream}
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file._
@@ -30,8 +30,18 @@ import java.nio.file.attribute.BasicFileAttributes
 
 import scala.xml.{Node, PrettyPrinter, XML}
 import scala.annotation.tailrec
+import scala.io.Codec
 
 object IOUtils {
+  private val resPath = "/moe/lymia/mppatch/"
+
+  def getResource(s: String) = getClass.getResourceAsStream(resPath + s)
+  def resourceExists(s: String) = getResource(s) != null
+  def loadFromStream(s: InputStream) = io.Source.fromInputStream(s)(Codec.UTF8).mkString
+  def loadBinaryFromStream(s: InputStream) = Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
+  def loadResource(s: String) = loadFromStream(getResource(s))
+  def loadBinaryResource(s: String) = loadBinaryFromStream(getResource(s))
+
   def writeFile(path: Path, data: Array[Byte]): Unit = {
     if(path.getParent != null) Files.createDirectories(path.getParent)
     Files.write(path, data)
@@ -75,6 +85,19 @@ object IOUtils {
     } else throw exc
   })
 
+  private class FileLock(lockFile: Path) {
+    private val channel  = FileChannel.open(lockFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
+    private val lock     = Option(channel.tryLock)
+    private var released = false
+
+    val acquired = lock.isDefined
+    def release() = if(!released) {
+      lock.foreach(_.release)
+      channel.close()
+      released = true
+    }
+    if(lock.isEmpty) release()
+  }
   def withLock[T](lockFile: Path, error: => T = sys.error(s"Could not acquire lock."))(f: => T) = {
     val lock = new FileLock(lockFile)
     if(!lock.acquired) error
@@ -84,18 +107,4 @@ object IOUtils {
       lock.release()
     }
   }
-}
-
-class FileLock(lockFile: Path) {
-  private val channel  = FileChannel.open(lockFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
-  private val lock     = Option(channel.tryLock)
-  private var released = false
-
-  val acquired = lock.isDefined
-  def release() = if(!released) {
-    lock.foreach(_.release)
-    channel.close()
-    released = true
-  }
-  if(lock.isEmpty) release()
 }

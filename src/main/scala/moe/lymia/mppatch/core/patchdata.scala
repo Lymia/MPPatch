@@ -25,7 +25,7 @@ package moe.lymia.mppatch.core
 import java.nio.file.Path
 import java.util.{Locale, UUID}
 
-import moe.lymia.mppatch.util.{Crypto, IOUtils, res}
+import moe.lymia.mppatch.util.{Crypto, IOUtils}
 import moe.lymia.mppatch.util.XMLUtils._
 
 import scala.xml.{Node, XML}
@@ -37,7 +37,7 @@ trait PatchFileSource {
 
 case class LuaOverride(fileName: String, injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
 case class NativePatch(platform: String, version: String, path: String, sha1: String)
-case class PatchManifest(dlcManifest: DLCManifest, patchVersion: String,
+case class PatchManifest(dlcManifest: DLCManifest, patchVersion: String, timestamp: Long,
                          luaPatches: Seq[LuaOverride], libraryFileNames: Seq[String],
                          newScreenFileNames: Seq[String], textFileNames: Seq[String],
                          nativePatches: Seq[NativePatch])
@@ -56,15 +56,14 @@ object PatchManifest {
   def loadFromXML(xml: Node) = {
     val manifestVersion = getAttribute(xml, "ManifestVersion")
     if(manifestVersion != "0") sys.error("Unknown ManifestVersion: "+manifestVersion)
-    PatchManifest(readDLCManifest((xml \ "Info").head), getAttribute(xml, "PatchVersion"),
+    PatchManifest(readDLCManifest((xml \ "Info").head),
+                                  getAttribute(xml, "PatchVersion"), getAttribute(xml, "Timestamp").toLong,
                                   (xml \ "Hook"    ).map(loadLuaOverride),
                                   (xml \ "Include" ).map(loadFilename),
                                   (xml \ "Screen"  ).map(loadFilename),
                                   (xml \ "TextData").map(loadFilename),
                                   (xml \ "Version" ).map(loadNativePatch))
   }
-
-  val resPatchData = loadFromXML(XML.loadString(res.loadResource("patch/manifest.xml")))
 }
 
 class PatchLoader(source: PatchFileSource) {
@@ -121,7 +120,7 @@ class PatchLoader(source: PatchFileSource) {
 }
 object PatchLoader {
   val default = new PatchLoader(new PatchFileSource {
-    override def loadResource(name: String): String      = res.loadResource("patch/"+name)
-    override def loadNative  (name: String): Array[Byte] = res.loadBinaryResource("patch/"+name)
+    override def loadResource(name: String): String      = IOUtils.loadResource("patch/"+name)
+    override def loadNative  (name: String): Array[Byte] = IOUtils.loadBinaryResource("patch/"+name)
   })
 }

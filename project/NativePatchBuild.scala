@@ -226,7 +226,8 @@ trait NativePatchBuild { this: Build =>
       }
 
       val manifest = target / "manifest.xml"
-      val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}>
+      val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
+                                  Timestamp={System.currentTimeMillis().toString}>
         {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
         {versions.map(x => <Version Platform={x.platform} Version={x.version}
                                     Filename={x.file.getName} Sha1={x.sha1}/>)}

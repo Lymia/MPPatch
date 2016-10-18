@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util.res
+package moe.lymia.mppatch.util
 
 import java.text.MessageFormat
 import java.util.{Locale, Properties}
@@ -43,14 +43,14 @@ object I18N {
     s"i18n/${locale.getLanguage}_${if(generic) "generic" else locale.getCountry}.properties"
 
   @tailrec def findSourceFile(locale: Locale): String =
-         if(resourceExists(sourceFile(locale, false))) sourceFile(locale, false)
-    else if(resourceExists(sourceFile(locale, true ))) sourceFile(locale, true )
-    else if(locale != defaultLocale)                   findSourceFile(defaultLocale)
-    else                                               sys.error("default locale file not found!")
+         if(IOUtils.resourceExists(sourceFile(locale, false))) sourceFile(locale, false)
+    else if(IOUtils.resourceExists(sourceFile(locale, true ))) sourceFile(locale, true )
+    else if(locale != defaultLocale)                           findSourceFile(defaultLocale)
+    else                                                       sys.error("default locale file not found!")
 
   def loadI18NData(sourceFile: String): Map[String, String] = {
     val prop = new Properties()
-    prop.load(getResource(sourceFile))
+    prop.load(IOUtils.getResource(sourceFile))
 
     val includes = prop.getProperty("includes")
     val includeData = if(includes != null && includes.trim.nonEmpty) {

@@ -30,8 +30,7 @@ import javax.swing._
 
 import moe.lymia.mppatch.core.{PatchInstaller, PatchLoader, PatchStatus}
 import moe.lymia.mppatch.platform.Platform
-import moe.lymia.mppatch.util.IOUtils
-import moe.lymia.mppatch.util.res.I18N
+import moe.lymia.mppatch.util.{I18N, IOUtils}
 
 class GUI(locale: Locale) {
   val i18n = I18N(locale)
