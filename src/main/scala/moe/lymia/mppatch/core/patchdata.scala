@@ -32,16 +32,10 @@ import scala.xml.{Node, XML}
 
 
 trait PatchFileSource {
-  def loadHook   (name: String): String
-  def loadLibrary(name: String): String
-  def loadScreen (name: String): String
-  def loadText   (name: String): String
+  def loadResource(name: String): String
 }
 object ResourceSource extends PatchFileSource {
-  override def loadHook   (name: String): String = res.loadResource("patch/hooks/"+name)
-  override def loadLibrary(name: String): String = res.loadResource("patch/lib/"+name)
-  override def loadScreen (name: String): String = res.loadResource("patch/screen/"+name)
-  override def loadText   (name: String): String = res.loadResource("patch/text/"+name)
+  override def loadResource(name: String): String = res.loadResource("patch/files/"+name)
 }
 
 case class LuaOverride(fileName: String, injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
@@ -68,7 +62,6 @@ object PatchManifest {
   }
 
   val resPatchData = loadFromXML(XML.loadString(res.loadResource("patch/manifest.xml")))
-  println(resPatchData)
 }
 
 class PatchLoader(data: PatchManifest, source: PatchFileSource) {
@@ -76,14 +69,14 @@ class PatchLoader(data: PatchManifest, source: PatchFileSource) {
 
   lazy val luaPatchList = data.luaPatches.map(x => x.fileName.toLowerCase -> x).toMap
   lazy val libraryFiles = data.libraryFileNames.map(x =>
-    x -> source.loadLibrary(s"$x")
+    x -> source.loadResource(s"$x")
   ).toMap
   val newScreenFiles = data.newScreenFileNames.flatMap(x => Seq(
-    s"$x.lua" -> source.loadScreen(s"$x.lua"),
-    s"$x.xml" -> source.loadScreen(s"$x.xml")
+    s"$x.lua" -> source.loadResource(s"$x.lua"),
+    s"$x.xml" -> source.loadResource(s"$x.xml")
   )).toMap
   val textFiles = data.textFileNames.map(x =>
-    x -> XML.loadString(source.loadText(x))
+    x -> XML.loadString(source.loadResource(x))
   ).toMap
 
   private def loadWrapper(str: Seq[String]) =
@@ -93,7 +86,7 @@ class PatchLoader(data: PatchManifest, source: PatchFileSource) {
       "\n--- END INJECTED MPPATCH CODE ---"
     }
   private def getLuaFragment(path: String) = {
-    val code = source.loadHook(path)
+    val code = source.loadResource(path)
     "-- source file: "+path+"\n\n"+
     code+(if(!code.endsWith("\n")) "\n" else "")
   }

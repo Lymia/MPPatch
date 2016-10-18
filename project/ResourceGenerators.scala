@@ -24,19 +24,17 @@ package moe.lymia.mppatch.build
 
 import sbt._
 import sbt.Keys._
-
 import com.typesafe.sbt.SbtGit._
-
 import Config._
 import Utils._
 
 import language.postfixOps
+import scala.xml.XML
 
 trait ResourceGenerators { this: Build =>
   val resourceGeneratorSettings = Seq(
     resourceGenerators in Compile += Def.task {
       val basePath = (resourceManaged in Compile).value
-      val logger   = streams.value.log
 
       // Generate version information file
       val properties = new java.util.Properties
@@ -67,6 +65,34 @@ trait ResourceGenerators { this: Build =>
 
       // Final generated files list
       Seq(versionPropertiesPath)
+    }.taskValue,
+
+
+    resourceGenerators in Compile += Def.task {
+      val basePath  = (resourceManaged in Compile).value
+      val patchPath = baseDirectory.value / "src" / "patch"
+      val logger    = streams.value.log
+
+      val target    = basePath / "moe" / "lymia" / "mppatch" / "data" / "patch"
+      val dataDir   = target / "files"
+
+      dataDir.mkdirs()
+
+      val copiedFiles = for(directory <- Seq("hooks", "lib", "screen", "text");
+                            file      <- (patchPath / directory).listFiles if file.isFile) yield {
+        val targetFile = dataDir / file.getName
+        IO.copyFile(file, targetFile)
+        targetFile
+      }
+
+      val manifest = target / "manifest.xml"
+      val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}>
+        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
+      </PatchManifest>
+      IO.write(manifest, "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + output.toString())
+
+      // Final generated files list
+      manifest +: copiedFiles
     }.taskValue
   )
 }
