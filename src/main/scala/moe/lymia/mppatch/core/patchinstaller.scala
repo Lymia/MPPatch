@@ -26,7 +26,7 @@ import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
 
 import moe.lymia.mppatch.platform.Platform
-import moe.lymia.mppatch.util.res.{PatchData, PatchData$, VersionInfo}
+import moe.lymia.mppatch.util.res.{PatchData, VersionInfo}
 import moe.lymia.mppatch.util.{Crypto, IOUtils, XMLUtils}
 
 import scala.collection.JavaConversions._

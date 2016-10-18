@@ -28,20 +28,8 @@ import java.nio.charset.StandardCharsets
 import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
 
-import scala.xml.{Node, NodeSeq, PrettyPrinter, XML}
+import scala.xml.{Node, PrettyPrinter, XML}
 import scala.annotation.tailrec
-
-object XMLUtils {
-  def getOptional(nodes: NodeSeq) =
-    if(nodes.isEmpty) None else Some(nodes.text)
-
-  def getAttributeNode    (node: Node, attribute: String) = node \ s"@$attribute"
-  def getAttribute        (node: Node, attribute: String) = getAttributeNode(node, attribute).text
-  def getOptionalAttribute(node: Node, attribute: String) = getOptional(getAttributeNode(node, attribute))
-
-  def getNodeText         (node: Node, tag: String)       = (node \ tag).text.trim
-  def getOptionalNodeText (node: Node, tag: String)       = getOptional(node \ tag).map(_.trim)
-}
 
 object IOUtils {
   def writeFile(path: Path, data: Array[Byte]): Unit = {

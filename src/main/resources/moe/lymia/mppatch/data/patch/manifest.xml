@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<PatchManifest ManifestVersion="0" PatchVersion="0">
+    <Info UUID="df74f698-2343-11e6-89c4-8fef6d8f889e" Version="1" Priority="1" Name="MPPatch" ShortName="MPPatch"/>
+
+    <Include Filename="mppatch_runtime.lua"/>
+    <Include Filename="mppatch_utils.lua"/>
+    <Include Filename="mppatch_modutils.lua"/>
+    <Include Filename="mppatch_uiutils.lua"/>
+    <Include Filename="mppatch_debug.lua"/>
+
+    <TextData Filename="text_en_US.xml"/>
+
+    <Screen Filename="mppatch_multiplayerproxy"/>
+
+    <Hook Filename="mainmenu.lua">
+        <InjectAfter  Filename="after_mainmenu.lua"/>
+    </Hook>
+    <Hook Filename="modsmenu.lua">
+        <InjectAfter  Filename="after_modsmenu.lua"/>
+    </Hook>
+    <Hook Filename="joiningroom.lua">
+        <InjectAfter  Filename="after_joiningroom.lua"/>
+    </Hook>
+    <Hook Filename="stagingroom.lua">
+        <InjectBefore Filename="before_stagingroom.lua"/>
+        <InjectAfter  Filename="after_stagingroom.lua"/>
+    </Hook>
+    <Hook Filename="multiplayerselect.lua">
+        <InjectBefore Filename="before_multiplayerselect.lua"/>
+    </Hook>
+    <Hook Filename="lobby.lua">
+        <InjectBefore Filename="intercept_bIsModding.lua"/>
+    </Hook>
+    <Hook Filename="mpgamesetupscreen.lua">
+        <InjectBefore Filename="intercept_bIsModding.lua"/>
+    </Hook>
+    <Hook Filename="mpgameoptions.lua">
+        <InjectAfter  Filename="after_mpgameoptions.lua"/>
+    </Hook>
+    <Hook Filename="contentswitch.lua">
+        <InjectAfter  Filename="after_contentswitch.lua"/>
+    </Hook>
+</PatchManifest>
