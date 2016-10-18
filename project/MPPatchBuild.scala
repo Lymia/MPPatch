@@ -31,7 +31,7 @@ import Config._
 import sbtassembly._
 import AssemblyKeys._
 
-object MPPatchBuild extends Build with PatchBuild with ResourceGenerators {
+object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators {
   // Additional keys
   val proguardMapping = TaskKey[File]("proguard-mapping")
   val buildDist       = TaskKey[File]("build-dist")

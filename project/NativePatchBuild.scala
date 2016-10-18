@@ -28,8 +28,8 @@ import sbt.Keys._
 import Config._
 import Utils._
 
-trait PatchBuild { this: Build =>
-  object PatchBuildUtils {
+trait NativePatchBuild { this: Build =>
+  object NativePatchBuildUtils {
     // Helper functions for compiling
     def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
     def gcc      (p: Seq[Any]) = runProcess(config_gcc +: p)
@@ -80,9 +80,9 @@ trait PatchBuild { this: Build =>
       )
     }
   }
-  import PatchBuildUtils._
+  import NativePatchBuildUtils._
 
-  object PatchBuildKeys {
+  object NativePatchBuildKeys {
     val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
     val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
     val patchSourceDir = SettingKey[File]("native-patch-source-directory")
@@ -98,13 +98,13 @@ trait PatchBuild { this: Build =>
     val win32ExternDef = TaskKey[File]("native-patch-win32-extern-defines")
     val linuxExternDef = TaskKey[File]("native-patch-linux-extern-defines")
   }
-  import PatchBuildKeys._
+  import NativePatchBuildKeys._
 
   // Patch build script
   val patchBuildSettings = Seq(
     patchBuildDir  := crossTarget.value / "native-patch-build",
     patchCacheDir  := patchBuildDir.value / "cache",
-    patchSourceDir := baseDirectory.value / "src" / "patch",
+    patchSourceDir := baseDirectory.value / "src" / "native",
 
     // prepare common directories
     commonIncludes := prepareDirectory(patchBuildDir.value / "common") { dir =>
