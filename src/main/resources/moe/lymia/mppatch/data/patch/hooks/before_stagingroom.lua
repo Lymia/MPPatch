@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.enabled then
+if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
     Modding = _mpPatch.hookTable(Modding, {ActivateAllowedDLC = function(...)
         _mpPatch.overrideModsFromPreGame()
         return Modding._super.ActivateAllowedDLC(...)
