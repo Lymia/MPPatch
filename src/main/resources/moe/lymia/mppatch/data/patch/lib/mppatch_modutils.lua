@@ -24,7 +24,7 @@ function _mpPatch.overrideWithModList(list)
     _mpPatch.debugPrint("Overriding mods...")
     patch.NetPatch.reset()
     for _, mod in ipairs(list) do
-        _mpPatch.debugPrint("- Adding mod "..mod.ID.." v"..mod.Version)
+        _mpPatch.debugPrint("- Adding mod ".._mpPatch.getModName(mod.ID, mod.Version).."...")
         patch.NetPatch.pushMod(mod.ID, mod.Version)
     end
     patch.NetPatch.overrideModList()
@@ -107,13 +107,16 @@ local function enrollModName(id, name)
     end
 end
 local function enrollMod(id, uuid, version)
+    local modName = _mpPatch.getModName(uuid, version)
+    _mpPatch.debugPrint("- Enrolling mod "..modName)
     PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_VERSION", version)
     for i, v in ipairs(encodeUUID(uuid)) do
         PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_"..i, v)
     end
-    enrollModName(id, _mpPatch.getModName(uuid, version))
+    enrollModName(id, modName)
 end
 function _mpPatch.enrollModsList(modList)
+    _mpPatch.debugPrint("Enrolling mods...")
     if #modList > 0 then
         PreGame.SetGameOption("_MPPATCH_HAS_MODS", 1)
         PreGame.SetGameOption("_MPPATCH_MOD_COUNT", #modList)
