@@ -108,7 +108,7 @@ trait NativePatchBuild { this: Build =>
   val patchBuildSettings = Seq(
     patchBuildDir  := crossTarget.value / "native-patch-build",
     patchCacheDir  := patchBuildDir.value / "cache",
-    patchSourceDir := baseDirectory.value / "src" / "native",
+    patchSourceDir := baseDirectory.value / "src" / "patch" / "native",
 
     // prepare common directories
     commonIncludes := prepareDirectory(patchBuildDir.value / "common") { dir =>
@@ -211,8 +211,8 @@ trait NativePatchBuild { this: Build =>
       val target    = basePath / "moe" / "lymia" / "mppatch" / "patch"
       target.mkdirs()
 
-      val copiedFiles = for(directory <- Seq("hooks", "lib", "screen", "text");
-                            file      <- (patchPath / directory).listFiles if file.isFile) yield {
+      val copiedFiles = for(directory <- (patchPath / "ui").listFiles if directory.isDirectory;
+                            file      <- directory.listFiles if file.isFile) yield {
         val targetFile = target / file.getName
         IO.copyFile(file, targetFile)
         targetFile
@@ -234,7 +234,7 @@ trait NativePatchBuild { this: Build =>
       IO.write(manifest, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + output.toString())
 
       // Final generated files list
-      manifest +: (copiedFiles ++ patches)
+      manifest +: (copiedFiles ++ patches).toSeq
     }.taskValue
   )
 }

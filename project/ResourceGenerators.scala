@@ -29,7 +29,6 @@ import Config._
 import Utils._
 
 import language.postfixOps
-import scala.xml.XML
 
 trait ResourceGenerators { this: Build =>
   val resourceGeneratorSettings = Seq(
