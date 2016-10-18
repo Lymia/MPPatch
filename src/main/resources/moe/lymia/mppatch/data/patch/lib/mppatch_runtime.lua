@@ -41,9 +41,20 @@ _mpPatch.uuid = "df74f698-2343-11e6-89c4-8fef6d8f889e"
 _mpPatch.enabled = ContentManager.IsActive(_mpPatch.uuid, ContentType.GAMEPLAY)
 _mpPatch.canEnable = true
 
-function _mpPatch.debugPrint(str)
-    print(str)
-    _mpPatch.patch.debugPrint(_mpPatch.fullPath..": "..str)
+function _mpPatch.debugPrint(...)
+    local args = {...}
+    local accum = ""
+    local count = 0
+    for _, v in pairs(args) do
+        if v > count then count = v end
+    end
+    for i=1,count do
+        accum = accum .. args[i]
+        if i ~= count then accum = accum .. "\t" end
+    end
+
+    print(accum)
+    _mpPatch.patch.debugPrint(_mpPatch.fullPath..": "..accum)
 end
 
 -- globals from patch
