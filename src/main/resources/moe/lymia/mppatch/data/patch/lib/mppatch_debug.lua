@@ -69,18 +69,18 @@ local excludeList = {LocalMachineAppUpdate = true}
 if not _mpPatch.patch.shared.eventHookInstalled then
     _mpPatch.patch.shared.eventHookInstalled = true
 
-    local print, unpack = print, unpack
+    local _mpPatch, unpack = _mpPatch, unpack
     for _, event in ipairs(_mpPatch.eventList) do
         local eventObj = Events[event]
         if excludeList[event] then
-            print("Event "..event.." ignored for logging.")
+            _mpPatch.debugPrint("Event "..event.." ignored for logging.")
         elseif not eventObj then
-            print("Could not log event "..event.." (does not exist)")
+            _mpPatch.debugPrint("Could not log event "..event.." (does not exist)")
         else
-            print("Logging event "..event)
+            _mpPatch.debugPrint("Logging event "..event)
             eventObj.Add(function(...)
                 local args = {...}
-                print("Got event: "..event.."\n",unpack(args))
+                _mpPatch.debugPrint("Got event: "..event.."\n",unpack(args))
             end)
         end
     end

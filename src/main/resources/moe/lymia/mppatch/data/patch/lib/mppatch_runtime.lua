@@ -36,11 +36,15 @@ end
 _mpPatch.patch = patch
 _mpPatch.versionString = patch.version.versionString
 
+_mpPatch.context = "<init>"
 _mpPatch.uuid = "df74f698-2343-11e6-89c4-8fef6d8f889e"
 _mpPatch.enabled = ContentManager.IsActive(_mpPatch.uuid, ContentType.GAMEPLAY)
 _mpPatch.canEnable = true
 
-_mpPatch.debugPrint = print
+function _mpPatch.debugPrint(str)
+    print(str)
+    _mpPatch.patch.debugPrint(_mpPatch.fullPath..": "..str)
+end
 
 -- globals from patch
 local rawset = _mpPatch.patch.globals.rawset
@@ -109,5 +113,6 @@ include "mppatch_modutils.lua"
 include "mppatch_uiutils.lua"
 include "mppatch_debug.lua"
 
-print("MPPatch runtime loaded")
-print("Current UI path: ".._mpPatch.fullPath)
+_mpPatch.debugPrint("MPPatch runtime loaded")
+_mpPatch.context = _mpPatch.fullPath
+_mpPatch.debugPrint("Current UI path: ".._mpPatch.context)

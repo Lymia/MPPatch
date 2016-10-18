@@ -116,6 +116,10 @@ static void luaTable_NetPatch(lua_State *L, int table) {
 static int luaHook_panic(lua_State *L) {
     fatalError("[MPPatch] Critical error in Lua code:\n%s", luaL_checkstring(L, 1));
 }
+static int luaHook_debugPrint(lua_State *L) {
+    debug_print("%s", luaL_checkstring(L, 1));
+    return 0;
+}
 static void luaTable_versioninfo(lua_State *L, int table) {
     table_setInteger(L, table, "major", patchVersionMajor);
     table_setInteger(L, table, "minor", patchVersionMinor);
@@ -173,6 +177,7 @@ ENTRY lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L) {
         table_setTable(L, table, "globals", luaTable_globals);
         table_setString(L, table, "credits", patchMarkerString);
         table_setCFunction(L, table, "panic", luaHook_panic);
+        table_setCFunction(L, table, "debugPrint", luaHook_debugPrint);
 
         lua_pushstring(L, "shared");
         luaTable_pushSharedState(L);

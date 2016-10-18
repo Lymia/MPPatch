@@ -21,10 +21,10 @@
 local patch = _mpPatch.patch
 
 function _mpPatch.overrideWithModList(list)
-    print("Overriding mods...")
+    _mpPatch.debugPrint("Overriding mods...")
     patch.NetPatch.reset()
     for _, mod in ipairs(list) do
-        print("- Adding mod "..mod.ID.." v"..mod.Version)
+        _mpPatch.debugPrint("- Adding mod "..mod.ID.." v"..mod.Version)
         patch.NetPatch.pushMod(mod.ID, mod.Version)
     end
     patch.NetPatch.overrideModList()

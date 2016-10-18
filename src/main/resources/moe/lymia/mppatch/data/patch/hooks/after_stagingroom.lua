@@ -9,7 +9,7 @@ if _mpPatch and _mpPatch.enabled then
 
     local function cancelOverride()
         if not Matchmaking.IsHost() then
-            print("Cancelling override.")
+            _mpPatch.debugPrint("Cancelling override.")
             _mpPatch.patch.NetPatch.reset()
         end
     end
