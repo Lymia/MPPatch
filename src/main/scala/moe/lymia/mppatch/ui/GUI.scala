@@ -24,6 +24,7 @@ package moe.lymia.mppatch.ui
 
 import java.awt.event.ActionEvent
 import java.awt.{Dimension, GridBagConstraints, GridBagLayout}
+import java.nio.file.{Files, Path}
 import java.util.Locale
 import javax.swing._
 
@@ -49,6 +50,7 @@ class GUI(locale: Locale) {
   }
 
   val platform  = Platform.currentPlatform.getOrElse(error(i18n("gui.unknownplatform")))
+  def resolvePaths(paths: Seq[Path]) = paths.find(x => Files.exists(x) && Files.isDirectory(x))
   val installer = resolvePaths(platform.defaultSystemPaths) match {
     case Some(x) => new PatchInstaller(x, platform)
     case None    =>
