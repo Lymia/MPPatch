@@ -45,8 +45,8 @@ function _mpPatch.debugPrint(...)
     local args = {...}
     local accum = ""
     local count = 0
-    for _, v in pairs(args) do
-        if v > count then count = v end
+    for k, _ in pairs(args) do
+        if k > count then count = k end
     end
     for i=1,count do
         accum = accum .. args[i]
