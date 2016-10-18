@@ -50,12 +50,14 @@ object MPPatchDLC {
     "mpgameoptions.lua"     -> MPPatchLuaOverride(injectAfter  = Seq("after_mpgameoptions.lua"))
   )
 
-  private val runtimeFileNames = Seq("mppatch_runtime.lua", "mppatch_utils.lua", "mppatch_modutils.lua",
+  private val libraryFileNames = Seq("mppatch_runtime.lua", "mppatch_utils.lua", "mppatch_modutils.lua",
                                      "mppatch_uiutils.lua", "mppatch_debug.lua")
-  private val uiFileNames = Seq("mppatch_multiplayerproxy")
-  private val newFiles = runtimeFileNames.map(x =>
+  private val libraryFiles = libraryFileNames.map(x =>
     x -> res.loadResource(s"patch/lib/$x")
-  ).toMap ++ uiFileNames.flatMap(x => Seq(
+  ).toMap
+
+  private val newScreenFileNames = Seq("mppatch_multiplayerproxy")
+  private val newScreenFiles = newScreenFileNames.flatMap(x => Seq(
     s"$x.lua" -> res.loadResource(s"patch/ui/$x.lua"),
     s"$x.xml" -> res.loadResource(s"patch/ui/$x.xml")
   )).toMap
@@ -89,18 +91,21 @@ object MPPatchDLC {
       }
     }.toMap
 
-  private val textFiles = Seq("text_en_US.xml").flatMap(x =>
-    getXmlFile("patch/xml/"+x).child
-  )
+  private val textFiles = Seq("text_en_US.xml").map(x =>
+    x -> getXmlFile("patch/xml/"+x)
+  ).toMap
 
   private def prepareList(map: Map[String, String]) = map.mapValues(_.getBytes(StandardCharsets.UTF_8))
   private def findPathTargets(base: Path, platform: Platform, path: String*) =
     findPatchTargets(platform.resolve(base, platform.assetsPath +: path: _*), luaPatchList)
   def generateBaseDLC(civBaseDirectory: Path, platform: Platform) = {
-    val patchedFileList = findPathTargets(civBaseDirectory, platform, "UI")
     DLCData(DLCManifest(DLC_UUID, DLC_VERSION, 1, "MPPatch", "MPPatch"),
-            DLCGameplay(globalTextData = textFiles,
-                        uiOnlyFiles = prepareList(patchedFileList ++ newFiles),
-                        uiSkins = Seq(DLCUISkin("MPPatch", "BaseGame", "Common", false, Map(), None))))
+            DLCGameplay(textData = textFiles,
+                        uiFiles = Map(
+                          "LuaPatches" -> prepareList(findPathTargets(civBaseDirectory, platform, "UI")),
+                          "Runtime"    -> prepareList(libraryFiles),
+                          "Screens"    -> prepareList(newScreenFiles)
+                        ),
+                        uiSkins = Seq(DLCUISkin("MPPatch", "BaseGame", "Common"))))
   }
 }
