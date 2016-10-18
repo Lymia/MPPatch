@@ -23,11 +23,11 @@ if _mpPatch and _mpPatch.enabled then
     end
     MultiplayerGameLaunchedHook_remove = function()
         if MultiplayerGameLaunchedHook_added then
-            Event.MultiplayerGameLaunched.Remove(MultiplayerGameLaunchedHook)
+            Events.MultiplayerGameLaunched.Remove(MultiplayerGameLaunchedHook)
             MultiplayerGameLaunchedHook_added = false
         end
     end
-    Event.MultiplayerGameLaunched.Add(MultiplayerGameLaunchedHook)
+    Events.MultiplayerGameLaunched.Add(MultiplayerGameLaunchedHook)
 
     UIManager = _mpPatch.hookTable(UIManager, {
         DequeuePopup = function(...)
