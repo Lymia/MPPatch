@@ -9,45 +9,27 @@ if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
         return StartCountdownOld(...)
     end
 
-    local function cancelOverride(force)
-        if not Matchmaking.IsHost() and (force or not startLock) then
+    local function cancelOverride()
+        if not Matchmaking.IsHost() then
             _mpPatch.debugPrint("Cancelling override.")
             _mpPatch.patch.NetPatch.reset()
-            startLock = false
         end
     end
 
-    local StopCountdownOld = StopCountdown
-    function StopCountdown(...)
-        cancelOverride()
-        return StopCountdownOld(...)
-    end
-
-    local OnUpdateOld = OnUpdate
-    function OnUpdate(...)
-        local fDTime = ...
-        local g_fCountdownTimer = g_fCountdownTimer - fDTime
-        if Network.IsEveryoneConnected() and g_fCountdownTimer <= 1 then
-            _mpPatch.debugPrint("Locking cancel for launch.")
-            startLock = true
-        end
-        return OnUpdateOld(...)
-    end
-
-    local OnPreGameDirtyOld = OnPreGameDirty
-    function OnPreGameDirty(...)
+    local function OnPreGameDirtyHook(...)
         if not ContextPtr:IsHidden() then
-            cancelOverride(true)
+            _mpPatch.debugPrint("cancelOverride from OnPreGameDirty")
+            cancelOverride()
         end
         return OnPreGameDirtyOld(...)
     end
-    Events.PreGameDirty.Add( OnPreGameDirty );
+    Events.PreGameDirty.Add(OnPreGameDirtyHook)
 
     local DequeuePopup = UIManager.DequeuePopup
     _mpPatch.patch.globals.rawset(UIManager, "DequeuePopup", function(this, ...)
         local context = ...
         if context == ContextPtr then
-            _mpPatch.debugPrint("DequeuePopup from StagingRoom")
+            _mpPatch.debugPrint("cancelOverride from DequeuePopup")
             cancelOverride()
         end
         return DequeuePopup(UIManager, ...)
