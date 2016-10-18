@@ -27,7 +27,6 @@ import sbt.Keys._
 import com.typesafe.sbt.SbtGit._
 import com.typesafe.sbt.SbtProguard._
 import Config._
-
 import sbtassembly._
 import AssemblyKeys._
 
@@ -50,12 +49,13 @@ object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators 
     licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
 
     // Dependencies
-    resolvers += Resolver.sonatypeRepo("public"),
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
+    libraryDependencies += "org.tukaani" % "xz" % "1.5",
 
     // Build distribution file
     assemblyShadeRules in assembly := Seq(
-      ShadeRule.rename("scala.**" -> "moe.lymia.mppatch.externlibs.scala.@1").inAll
+      ShadeRule.rename("scala.**" -> "moe.lymia.mppatch.externlibs.scala.@1").inAll,
+      ShadeRule.rename("org.tukaani.xz.**" -> "moe.lymia.mppatch.externlibs.xz.@1").inAll
     ),
     assemblyMergeStrategy in assembly := {
       case PathList(x) if Set("library.properties", "rootdoc.txt", "scala-xml.properties").contains(x) =>
