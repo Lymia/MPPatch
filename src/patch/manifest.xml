@@ -40,4 +40,7 @@
     <Hook Filename="contentswitch.lua">
         <InjectAfter  Filename="after_contentswitch.lua"/>
     </Hook>
+
+    <InstallScript Platform="linux" Filename="linux.xml"/>
+    <InstallScript Platform="win32" Filename="win32.xml"/>
 </PatchManifest>

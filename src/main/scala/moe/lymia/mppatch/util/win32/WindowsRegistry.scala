@@ -58,10 +58,9 @@ object WindowsRegistry {
       }
   }
 
-  case class Hive private[WindowsRegistry](
-                                            private[WindowsRegistry] val hiveId: Int,
-                                            private[WindowsRegistry] val hrName: String,
-                                            private[WindowsRegistry] val h: Dynamic) {
+  case class Hive private[WindowsRegistry](private[WindowsRegistry] val hiveId: Int,
+                                           private[WindowsRegistry] val hrName: String,
+                                           private[WindowsRegistry] val h: Dynamic) {
 
     assert(System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"),
            "Windows registry not available.")

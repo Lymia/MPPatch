@@ -30,6 +30,7 @@ object XMLUtils {
 
   def getAttributeNode    (node: Node, attribute: String) = node \ s"@$attribute"
   def getAttribute        (node: Node, attribute: String) = getAttributeNode(node, attribute).text
+  def getBoolAttribute    (node: Node, attribute: String) = getAttributeNode(node, attribute).nonEmpty
   def getOptionalAttribute(node: Node, attribute: String) = getOptional(getAttributeNode(node, attribute))
 
   def getNodeText         (node: Node, tag: String)       = (node \ tag).text.trim

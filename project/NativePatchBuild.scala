@@ -211,7 +211,8 @@ trait NativePatchBuild { this: Build =>
       val target    = basePath / "moe" / "lymia" / "mppatch" / "patch"
       target.mkdirs()
 
-      val copiedFiles = for(directory <- (patchPath / "ui").listFiles if directory.isDirectory;
+      val copiedFiles = for(directory <- (patchPath / "install") +: (patchPath / "ui").listFiles
+                                         if directory.isDirectory;
                             file      <- directory.listFiles if file.isFile) yield {
         val targetFile = target / file.getName
         IO.copyFile(file, targetFile)

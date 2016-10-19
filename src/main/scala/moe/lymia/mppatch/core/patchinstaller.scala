@@ -38,16 +38,19 @@ object PathNames {
 
 sealed trait PatchStatus
 object PatchStatus {
-  case object Installed extends PatchStatus
-  case object NeedsUpdate extends PatchStatus
   case class NotInstalled(isKnownVersion: Boolean) extends PatchStatus
-  case class TargetUpdated(knownVersion: Boolean) extends PatchStatus
+  case class TargetUpdated(isKnownVersion: Boolean) extends PatchStatus
 
-  case object NeedsCleanup extends PatchStatus
+  case object Installed       extends PatchStatus
+  case object CanUninstall    extends PatchStatus
+  case object NeedsUpdate     extends PatchStatus
+  case object NeedsRepair     extends PatchStatus
+  case object NeedsCleanup    extends PatchStatus
+  case object NeedsValidation extends PatchStatus
 }
 
 private case class PatchFile(path: String, expectedSha1: String)
-private case class PatchState(patchVersionSha1: String, replacementTarget: PatchFile, originalFile: PatchFile,
+private case class PatchState(replacementTarget: PatchFile, originalFile: PatchFile,
                               additionalFiles: Seq[PatchFile],
                               installedVersion: String, installedTimestamp: Long,
                               dlcInstallPath: String, textDataInstallPath: String) {
@@ -58,7 +61,6 @@ private object PatchState {
 
   def serializePatchFile(file: PatchFile) = <PatchFile path={file.path} expectedSha1={file.expectedSha1}/>
   def serialize(state: PatchState) = <PatchState version={formatVersion}>
-    <PatchVersionSha1>{state.patchVersionSha1}</PatchVersionSha1>
     <ReplacementTarget>{serializePatchFile(state.replacementTarget)}</ReplacementTarget>
     <OriginalFile>{serializePatchFile(state.originalFile)}</OriginalFile>
     <AdditionalFiles>{state.additionalFiles.map(serializePatchFile)}</AdditionalFiles>
@@ -72,8 +74,7 @@ private object PatchState {
     PatchFile(XMLUtils.getAttribute(node, "path"), XMLUtils.getAttribute(node, "expectedSha1"))
   def unserialize(xml: Node) =
     if(XMLUtils.getAttribute(xml, "version") != formatVersion) None
-    else Some(PatchState(XMLUtils.getNodeText(xml, "PatchVersionSha1"),
-                         unserializePatchFile((xml \ "ReplacementTarget" \ "PatchFile").head),
+    else Some(PatchState(unserializePatchFile((xml \ "ReplacementTarget" \ "PatchFile").head),
                          unserializePatchFile((xml \ "OriginalFile"      \ "PatchFile").head),
                          (xml \ "AdditionalFiles" \ "PatchFile").map(unserializePatchFile),
                          XMLUtils.getNodeText(xml, "InstalledVersion"),
@@ -82,24 +83,12 @@ private object PatchState {
                          XMLUtils.getNodeText(xml, "TextDataInstallPath")))
 }
 
-case class PatchInstalledFile(name: String, data: Array[Byte], executable: Boolean = false)
-trait PatchPlatformInfo {
-  val replacementTarget: String
-  def replacementNewName(versionName: String): String
-  def patchInstallTarget(versionName: String): String
-
-  def patchReplacementFile(versionName: String): Option[PatchInstalledFile]
-  def additionalFiles(versionName: String): Seq[PatchInstalledFile]
-
-  def findInstalledFiles(list: Seq[String]): Seq[String]
-}
-
 class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform, log: String => Unit = println) {
   def resolve(path: String) = basePath.resolve(path)
 
   private val patchStatePath     = resolve(PathNames.PATCH_STATE_FILENAME)
   private val patchLockPath      = resolve(PathNames.PATCH_LOCK_FILENAME)
-  private val platformInfo       = platform.patchInfo
+  private val installScript      = loader.loadInstallScript(platform.platformName).get
 
   private val dlcInstallPath     = "DLC/MpPatch"
   private val dlcTextPath        = "Gameplay/XML/NewText/mppatch_textdata.xml"
@@ -126,25 +115,23 @@ class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform
   }
 
   def checkPatchStatus(): PatchStatus = {
-    val detectedPatchFiles = platformInfo.findInstalledFiles(IOUtils.listFileNames(basePath))
+    val detectedPatchFiles = IOUtils.listFileNames(basePath).filter(installScript.isLeftoverFile)
 
     if(!Files.exists(patchStatePath)) return {
-      if(!Files.exists(resolve(platformInfo.replacementTarget))) PatchStatus.NeedsCleanup
+      if(!Files.exists(resolve(installScript.replacementTarget))) PatchStatus.NeedsValidation
       else if(detectedPatchFiles.nonEmpty) PatchStatus.NeedsCleanup
-      else PatchStatus.NotInstalled(isVersionKnown(platformInfo.replacementTarget))
+      else PatchStatus.NotInstalled(isVersionKnown(installScript.replacementTarget))
     }
 
     loadPatchState() match {
       case Some(patchState) =>
         if((detectedPatchFiles.toSet -- patchState.expectedFiles).nonEmpty) PatchStatus.NeedsCleanup
-        else if(patchState.replacementTarget.path != platformInfo.replacementTarget) PatchStatus.NeedsUpdate
         else {
-          val originalFileStatus = validatePatchFile(patchState.originalFile)
-
           if(!Files.exists(resolve(patchState.replacementTarget.path)) ||
-                  !patchState.additionalFiles.forall(validatePatchFile) || !originalFileStatus ||
-                  !Files.exists(resolve(patchState.dlcInstallPath)) ||
-                  !Files.exists(resolve(patchState.textDataInstallPath)))
+             !patchState.additionalFiles.forall(validatePatchFile) ||
+             !validatePatchFile(patchState.originalFile) ||
+             !Files.exists(resolve(patchState.dlcInstallPath)) ||
+             !Files.exists(resolve(patchState.textDataInstallPath)))
             PatchStatus.NeedsCleanup
           else if(!validatePatchFile(patchState.replacementTarget))
             PatchStatus.TargetUpdated(isVersionKnown(patchState.replacementTarget.path))
@@ -152,84 +139,70 @@ class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform
             case Some(version) =>
               if(patchState.installedTimestamp != loader.data.timestamp ||
                  patchState.installedVersion != loader.data.patchVersion ||
-                 version.sha1 != patchState.patchVersionSha1)
+                 patchState.replacementTarget.path != installScript.replacementTarget)
                 PatchStatus.NeedsUpdate
               else PatchStatus.Installed
-            case None => PatchStatus.NeedsCleanup
+            case None => PatchStatus.CanUninstall
           }
         }
       case None => PatchStatus.NeedsCleanup
     }
   }
 
-  private def installFile(file: PatchInstalledFile) = {
-    val PatchInstalledFile(name, data, executable) = file
+  private def installFile(name: String, data: Array[Byte], executable: Boolean = false) = {
     val path = resolve(name)
     Files.write(path, data)
     if(executable) Files.setPosixFilePermissions(path,
       Files.getPosixFilePermissions(path) + OWNER_EXECUTE + GROUP_EXECUTE + OTHERS_EXECUTE)
     PatchFile(name, Crypto.sha1_hex(data))
   }
-  private def installFromPatchData(target: String, patch: NativePatch) =
-    PatchInstalledFile(target, loader.loadVersion(patch))
 
   // TODO: Make sure this is atomic enough
-  private def installPatch() = getVersion(platformInfo.replacementTarget) match {
+  private def installPatch() = getVersion(installScript.replacementTarget) match {
     case None => sys.error("attempt to install patch on unknown version")
     case Some(patchData) =>
       lock {
-        val patchInstallTarget = resolve(platformInfo.replacementNewName(patchData.version))
-        Files.move(resolve(platformInfo.replacementTarget), patchInstallTarget)
-        val patchTarget = installFromPatchData(platformInfo.patchInstallTarget(patchData.version), patchData)
-        val (replacementTarget, patchAdditional) = platformInfo.patchReplacementFile(patchData.version) match {
-          case Some(replacementFile) =>
-            assert(replacementFile.name != platformInfo.patchInstallTarget(patchData.version))
-            assert(replacementFile.name == platformInfo.replacementTarget)
-            (installFile(replacementFile), Seq(installFile(patchTarget)))
-          case None =>
-            assert(platformInfo.patchInstallTarget(patchData.version) == platformInfo.replacementTarget)
-            (installFile(patchTarget), Seq())
-        }
-        val additional = patchAdditional ++ (
-          for(file <- platformInfo.additionalFiles(patchData.version)) yield installFile(file)
-        )
+        val patchInstallTarget = resolve(installScript.renameTo)
+        Files.move(resolve(installScript.replacementTarget), patchInstallTarget)
+        val patchTarget = installFile(installScript.patchTarget, loader.loadVersion(patchData))
+        val additionalMap = installScript.additionalFiles.map { file =>
+          file.filename -> installFile(file.filename, loader.source.loadBinary(file.source), file.isExecutable)
+        }.toMap
 
         val assets = resolve(platform.assetsPath)
         DLCDataWriter.writeDLC(assets.resolve(platform.mapPath(dlcInstallPath)),
                                Some(assets.resolve(platform.mapPath(dlcTextPath))),
                                MPPatchDLC.generateBaseDLC(basePath, loader, platform), platform)
 
-        val state = PatchState(patchData.sha1, replacementTarget,
-                               PatchFile(platformInfo.replacementNewName(patchData.version), patchData.version),
-                               additional, loader.data.patchVersion, loader.data.timestamp,
+        val state = PatchState(if(installScript.patchTarget == installScript.replacementTarget) patchTarget
+                               else additionalMap(installScript.replacementTarget),
+                               PatchFile(installScript.renameTo, patchData.version),
+                               additionalMap.values.toSeq :+ patchTarget,
+                               loader.data.patchVersion, loader.data.timestamp,
                                platform.assetsPath + "/" + platform.mapPath(dlcInstallPath),
                                platform.assetsPath + "/" + platform.mapPath(dlcTextPath))
         IOUtils.writeXML(patchStatePath, PatchState.serialize(state))
       }
   }
 
-  private def uninstallPatch(targetUpdated: Boolean, ignoreError: Boolean = false) = {
-    def checkError[T](v: => T): Unit =
-      if(ignoreError) try {
-        v
-      } catch {
-        case e: Exception => log("Error while uninstalling patch: "+e.toString)
-      } else v
+  private def uninstallPatch(targetUpdated: Boolean) = {
+
     loadPatchState() match {
-      case None =>
-        if(!ignoreError) sys.error("could not load patch state")
+      case None => sys.error("could not load patch state")
       case Some(patchState) =>
         lock {
-          for(PatchFile(name, _) <- patchState.additionalFiles) Files.delete(resolve(name))
-          if(!targetUpdated) {
-            checkError(IOUtils.deleteDirectory(resolve(patchState.replacementTarget.path)))
-            checkError(Files.move(resolve(patchState.originalFile.path), resolve(patchState.replacementTarget.path)))
-          } else {
-            checkError(IOUtils.deleteDirectory(resolve(patchState.originalFile.path)))
+          if(targetUpdated) {
+            Files.delete(resolve(patchState.originalFile.path))
+            Files.move(resolve(patchState.replacementTarget.path), resolve(patchState.originalFile.path))
           }
-          checkError(IOUtils.deleteDirectory(resolve(patchState.textDataInstallPath)))
-          checkError(IOUtils.deleteDirectory(resolve(patchState.dlcInstallPath)))
-          checkError(Files.delete(patchStatePath))
+          for(PatchFile(name, _) <- patchState.additionalFiles) Files.deleteIfExists(resolve(name))
+
+          Files.deleteIfExists(resolve(patchState.replacementTarget.path))
+          Files.move(resolve(patchState.originalFile.path), resolve(patchState.replacementTarget.path))
+
+          IOUtils.deleteDirectory(resolve(patchState.dlcInstallPath))
+          IOUtils.deleteDirectory(resolve(patchState.textDataInstallPath))
+          Files.delete(patchStatePath)
         }
     }
   }

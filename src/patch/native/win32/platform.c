@@ -80,7 +80,7 @@ static bool checkFileExists(LPCTSTR szPath) {
   return (attrib != INVALID_FILE_ATTRIBUTES &&
          !(attrib & FILE_ATTRIBUTE_DIRECTORY));
 }
-#define TARGET_LIBRARY_NAME "CvGameDatabase_orig_" CV_CHECKSUM ".dll"
+#define TARGET_LIBRARY_NAME "CvGameDatabase_Original.dll"
 __attribute__((constructor(200))) static void initializeProxy() {
     debug_print("Loading original CvGameDatabase");
     if(!checkFileExists(TARGET_LIBRARY_NAME))

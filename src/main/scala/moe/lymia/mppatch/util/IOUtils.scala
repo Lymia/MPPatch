@@ -68,22 +68,24 @@ object IOUtils {
     else if(Files.isSameFile(parent, child)) true
     else isSubdirectory(parent.getParent, child)
 
-  def deleteDirectory(path: Path) = Files.walkFileTree(path, new SimpleFileVisitor[Path] {
-    override def visitFile(file: Path, attrs: BasicFileAttributes) = {
-      Files.delete(file)
-      FileVisitResult.CONTINUE
-    }
+  def deleteDirectory(path: Path) =
+    if(Files.exists(path))
+      Files.walkFileTree(path, new SimpleFileVisitor[Path] {
+        override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+          Files.delete(file)
+          FileVisitResult.CONTINUE
+        }
 
-    override def visitFileFailed(file: Path, exc: IOException) = {
-      Files.delete(file)
-      FileVisitResult.CONTINUE
-    }
+        override def visitFileFailed(file: Path, exc: IOException) = {
+          Files.delete(file)
+          FileVisitResult.CONTINUE
+        }
 
-    override def postVisitDirectory(dir: Path, exc: IOException) = if(exc == null) {
-      Files.delete(dir)
-      FileVisitResult.CONTINUE
-    } else throw exc
-  })
+        override def postVisitDirectory(dir: Path, exc: IOException) = if(exc == null) {
+          Files.delete(dir)
+          FileVisitResult.CONTINUE
+        } else throw exc
+      })
 
   private class FileLock(lockFile: Path) {
     private val channel  = FileChannel.open(lockFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)

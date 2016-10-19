@@ -22,10 +22,11 @@
 
 package moe.lymia.mppatch.platform
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import java.util.Locale
 
-import moe.lymia.mppatch.core.PatchPlatformInfo
+import moe.lymia.mppatch.util.Steam
+import moe.lymia.mppatch.util.win32.WindowsRegistry
 
 import scala.annotation.tailrec
 
@@ -60,8 +61,6 @@ trait Platform {
     else resolve(path.resolve(mapPath(name.head)), name.tail: _*)
 
   def normalizeLineEndings(name: String): String
-
-  def patchInfo: PatchPlatformInfo
 }
 object Platform {
   def apply(t: PlatformType) = t match {
@@ -72,3 +71,29 @@ object Platform {
 
   lazy val currentPlatform = apply(PlatformType.currentPlatform)
 }
+
+object Win32Platform extends Platform {
+  val platformName = "win32"
+
+  override def defaultSystemPaths: Seq[Path] =
+    WindowsRegistry.HKEY_CURRENT_USER("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
+      x => Steam.loadLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
+    WindowsRegistry.HKEY_CURRENT_USER("Software\\Firaxis\\Civilization5", "LastKnownPath").map(x => Paths.get(x)).toSeq
+  override def assetsPath = "Assets"
+
+  def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
+}
+
+object LinuxPlatform extends Platform {
+  val platformName = "linux"
+
+  private val home = Paths.get(System.getProperty("user.home"))
+  def defaultSystemPaths: Seq[Path] =
+    Steam.loadLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
+
+  def assetsPath = "steamassets/assets"
+  override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
+
+  def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n")
+}
+
