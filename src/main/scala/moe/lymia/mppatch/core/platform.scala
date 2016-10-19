@@ -20,13 +20,12 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.platform
+package moe.lymia.mppatch.core
 
 import java.nio.file.{Path, Paths}
 import java.util.Locale
 
-import moe.lymia.mppatch.util.Steam
-import moe.lymia.mppatch.util.win32.WindowsRegistry
+import moe.lymia.mppatch.util.{Steam, WindowsRegistry}
 
 import scala.annotation.tailrec
 

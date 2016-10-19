@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util.win32
+package moe.lymia.mppatch.util
 
 import java.lang.reflect.{Array => _, _}
 

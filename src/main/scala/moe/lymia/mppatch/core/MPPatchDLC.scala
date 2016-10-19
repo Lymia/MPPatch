@@ -25,7 +25,6 @@ package moe.lymia.mppatch.core
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
-import moe.lymia.mppatch.platform.Platform
 import moe.lymia.mppatch.util.IOUtils
 
 object MPPatchDLC {

@@ -20,10 +20,12 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util
+package moe.lymia.mppatch.ui
 
 import java.text.MessageFormat
 import java.util.{Locale, Properties}
+
+import moe.lymia.mppatch.util.IOUtils
 
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._
