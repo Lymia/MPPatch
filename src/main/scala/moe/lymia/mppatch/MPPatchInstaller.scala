@@ -22,14 +22,6 @@
 
 package moe.lymia.mppatch
 
-import java.util.Locale
-import javax.swing.UIManager
-
-import moe.lymia.mppatch.ui.GUI
-
 object MPPatchInstaller {
-  def main(args: Array[String]) {
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
-    new GUI(Locale.getDefault).show()
-  }
+  def main(args: Array[String]) = ui.main(args)
 }
