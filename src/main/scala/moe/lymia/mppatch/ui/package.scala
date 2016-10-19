@@ -26,17 +26,13 @@ import java.awt.{GridBagConstraints, Insets}
 import java.util.Locale
 import javax.swing.{JFrame, JOptionPane, UIManager, WindowConstants}
 
-package object ui {
-  def main(args: Seq[String]): Unit = {
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
-    new MainFrame(Locale.getDefault).show()
-  }
+import scala.language.implicitConversions
 
-  def constraints(gridx: Int = GridBagConstraints.RELATIVE, gridy: Int = GridBagConstraints.RELATIVE,
-                  gridwidth: Int = 1, gridheight: Int = 1, weightx: Double = 0, weighty: Double = 0,
-                  anchor: Int = GridBagConstraints.CENTER, fill: Int = GridBagConstraints.NONE,
-                  insets: Insets = new Insets(0, 0, 0, 0), ipadx: Int = 0, ipady: Int = 0) =
-    new GridBagConstraints(gridx, gridy, gridwidth, gridheight, weightx, weighty, anchor, fill, insets, ipadx, ipady)
+package ui {
+  case class Constraints(gridx: Int = GridBagConstraints.RELATIVE, gridy: Int = GridBagConstraints.RELATIVE,
+                         gridwidth: Int = 1, gridheight: Int = 1, weightx: Double = 0, weighty: Double = 0,
+                         anchor: Int = GridBagConstraints.CENTER, fill: Int = GridBagConstraints.NONE,
+                         insets: Insets = new Insets(0, 0, 0, 0), ipadx: Int = 0, ipady: Int = 0)
 
   trait FrameBase {
     def locale: Locale
@@ -69,4 +65,15 @@ package object ui {
         frame.setVisible(true)
     }
   }
+}
+
+package object ui {
+  def main(args: Seq[String]): Unit = {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+    new MainFrame(Locale.getDefault).show()
+  }
+
+  implicit def constraints2GridBagConstraints(c: Constraints): GridBagConstraints =
+    new GridBagConstraints(c.gridx, c.gridy, c.gridwidth, c.gridheight, c.weightx, c.weighty,
+                           c.anchor, c.fill, c.insets, c.ipadx, c.ipady)
 }

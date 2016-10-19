@@ -92,21 +92,21 @@ class MainFrame(val locale: Locale) extends FrameBase {
 
     val label = new JLabel()
     label.setText(i18n("gui.status"))
-    statusPane.add(label, constraints(ipadx = 3, ipady = 3))
+    statusPane.add(label, Constraints(ipadx = 3, ipady = 3))
 
     currentStatus = new JTextField()
     currentStatus.setEditable(false)
     currentStatus.setPreferredSize(new Dimension(450, currentStatus.getPreferredSize.getHeight.toInt))
-    statusPane.add(currentStatus, constraints(gridx = 1, weightx = 1, ipadx = 3, ipady = 3,
+    statusPane.add(currentStatus, Constraints(gridx = 1, weightx = 1, ipadx = 3, ipady = 3,
                                               fill = GridBagConstraints.BOTH))
 
-    frame.add(statusPane, constraints(gridwidth = 2))
+    frame.add(statusPane, Constraints(gridwidth = 2))
 
     installButton = new ActionButton()
-    frame.add(installButton  , constraints(gridx = 0, gridy = 1, weightx = 0.5,
+    frame.add(installButton  , Constraints(gridx = 0, gridy = 1, weightx = 0.5,
                                            fill = GridBagConstraints.BOTH))
     uninstallButton = new ActionButton()
-    frame.add(uninstallButton, constraints(gridx = 1, gridy = 1, weightx = 0.5,
+    frame.add(uninstallButton, Constraints(gridx = 1, gridy = 1, weightx = 0.5,
                                            fill = GridBagConstraints.BOTH))
   }
 
