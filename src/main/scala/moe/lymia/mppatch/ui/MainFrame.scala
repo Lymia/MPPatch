@@ -22,7 +22,6 @@
 
 package moe.lymia.mppatch.ui
 
-import java.awt.event.ActionEvent
 import java.awt.{Dimension, GridBagConstraints, GridBagLayout}
 import java.nio.file.{Files, Path}
 import java.util.Locale
@@ -59,27 +58,35 @@ class MainFrame(val locale: Locale) extends FrameBase {
     var action: () => Unit = () => error("no action registered")
     var text  : String     = "<no action>"
 
-    setAction(new AbstractAction() {
-      override def actionPerformed(e: ActionEvent): Unit = {
-        val cont = i18n(text+".continuous")
-        try {
-          action()
-          JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
-        } catch {
-          case e: Exception => dumpException("gui.commandfailed", e, i18n(text+".continuous"))
-        }
-        MainFrame.this.update()
+    setAction(MainFrame.this.action { e =>
+      val cont = i18n(text+".continuous")
+      try {
+        action()
+        JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
+      } catch {
+        case e: Exception => dumpException("gui.commandfailed", e, i18n(text+".continuous"))
       }
+      MainFrame.this.update()
     })
 
     def setActionText(name: String): Unit = {
       text = name
       setText(i18n(name))
+      setToolTipText(i18n(name+".tooltip"))
     }
     def setAction(name: String, action: () => Unit): Unit = {
       this.action = action
       setActionText(name)
     }
+  }
+
+  def squareButton(button: JButton) = {
+    val size = button.getMinimumSize
+    if(size.getWidth < size.getHeight) {
+      button.setMinimumSize  (new Dimension(size.getHeight.toInt, size.getHeight.toInt))
+      button.setPreferredSize(new Dimension(size.getHeight.toInt, size.getHeight.toInt))
+    }
+    button
   }
 
   def buildForm() {
@@ -92,22 +99,39 @@ class MainFrame(val locale: Locale) extends FrameBase {
 
     val label = new JLabel()
     label.setText(i18n("gui.status"))
-    statusPane.add(label, Constraints(ipadx = 3, ipady = 3))
+    statusPane.add(label, constraints(ipadx = 3, ipady = 3))
 
     currentStatus = new JTextField()
     currentStatus.setEditable(false)
     currentStatus.setPreferredSize(new Dimension(450, currentStatus.getPreferredSize.getHeight.toInt))
-    statusPane.add(currentStatus, Constraints(gridx = 1, weightx = 1, ipadx = 3, ipady = 3,
+    statusPane.add(currentStatus, constraints(gridx = 1, weightx = 1, ipadx = 3, ipady = 3,
                                               fill = GridBagConstraints.BOTH))
 
-    frame.add(statusPane, Constraints(gridwidth = 2))
+    frame.add(statusPane, constraints(gridwidth = 4, fill = GridBagConstraints.BOTH))
 
     installButton = new ActionButton()
-    frame.add(installButton  , Constraints(gridx = 0, gridy = 1, weightx = 0.5,
+    frame.add(installButton  , constraints(gridx = 0, gridy = 1, weightx = 0.5,
                                            fill = GridBagConstraints.BOTH))
+
     uninstallButton = new ActionButton()
-    frame.add(uninstallButton, Constraints(gridx = 1, gridy = 1, weightx = 0.5,
+    frame.add(uninstallButton, constraints(gridx = 1, gridy = 1, weightx = 0.5,
                                            fill = GridBagConstraints.BOTH))
+
+    val settingsButton = new JButton()
+    settingsButton.setAction(action { e => update() })
+    settingsButton.setText(i18n("gui.icon.settings"))
+    settingsButton.setToolTipText(i18n("gui.tooltip.settings"))
+    squareButton(settingsButton)
+    frame.add(settingsButton, constraints(gridx = 2, gridy = 1,
+                                          fill = GridBagConstraints.BOTH))
+
+    val refreshButton = new JButton()
+    refreshButton.setAction(action { e => update() })
+    refreshButton.setText(i18n("gui.icon.refresh"))
+    refreshButton.setToolTipText(i18n("gui.tooltip.refresh"))
+    squareButton(refreshButton)
+    frame.add(refreshButton, constraints(gridx = 3, gridy = 1,
+                                         fill = GridBagConstraints.BOTH))
   }
 
   def setStatus(text: String) = currentStatus.setText(i18n(text))

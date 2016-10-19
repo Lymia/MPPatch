@@ -22,58 +22,12 @@
 
 package moe.lymia.mppatch
 
-import java.awt.{GridBagConstraints, Insets}
 import java.util.Locale
-import javax.swing.{JFrame, JOptionPane, UIManager, WindowConstants}
-
-import scala.language.implicitConversions
-
-package ui {
-  case class Constraints(gridx: Int = GridBagConstraints.RELATIVE, gridy: Int = GridBagConstraints.RELATIVE,
-                         gridwidth: Int = 1, gridheight: Int = 1, weightx: Double = 0, weighty: Double = 0,
-                         anchor: Int = GridBagConstraints.CENTER, fill: Int = GridBagConstraints.NONE,
-                         insets: Insets = new Insets(0, 0, 0, 0), ipadx: Int = 0, ipady: Int = 0)
-
-  trait FrameBase {
-    def locale: Locale
-    val i18n = I18N(locale)
-    var frame: JFrame = _
-
-    def error[T](string: String): T = {
-      JOptionPane.showMessageDialog(if(frame != null && frame.isVisible) frame else null, string,
-                                    i18n("common.title"), JOptionPane.ERROR_MESSAGE)
-      if(frame != null) {
-        frame.setVisible(false)
-        frame.dispose()
-      }
-      sys.error(string)
-    }
-    def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T = {
-      e.printStackTrace()
-      error(i18n(errorString, (e.getClass+": "+e.getMessage) +: exArgs : _*))
-    }
-
-    def buildForm()
-    def update() { }
-
-    def showForm() = {
-        buildForm()
-        update()
-        frame.pack()
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-        frame.setLocationRelativeTo(null)
-        frame.setVisible(true)
-    }
-  }
-}
+import javax.swing.UIManager
 
 package object ui {
   def main(args: Seq[String]): Unit = {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
     new MainFrame(Locale.getDefault).show()
   }
-
-  implicit def constraints2GridBagConstraints(c: Constraints): GridBagConstraints =
-    new GridBagConstraints(c.gridx, c.gridy, c.gridwidth, c.gridheight, c.weightx, c.weighty,
-                           c.anchor, c.fill, c.insets, c.ipadx, c.ipady)
 }

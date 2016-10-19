@@ -22,6 +22,8 @@
 
 package moe.lymia.mppatch.ui
 
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 import java.text.MessageFormat
 import java.util.{Locale, Properties}
 
@@ -52,7 +54,7 @@ object I18N {
 
   def loadI18NData(sourceFile: String): Map[String, String] = {
     val prop = new Properties()
-    prop.load(IOUtils.getResource(sourceFile))
+    prop.load(new InputStreamReader(IOUtils.getResource(sourceFile), StandardCharsets.UTF_8))
 
     val includes = prop.getProperty("includes")
     val includeData = if(includes != null && includes.trim.nonEmpty) {
