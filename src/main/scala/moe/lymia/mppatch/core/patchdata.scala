@@ -54,7 +54,8 @@ object InstallScript {
                   (xml \ "LeftoverFilter").map(x => getAttribute(x, "Regex")))
 }
 
-case class LuaOverride(fileName: String, injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
+case class LuaOverride(fileName: String, includes: Seq[String],
+                       injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
 case class NativePatch(platform: String, version: String, path: String, sha1: String)
 case class PatchManifest(dlcManifest: DLCManifest, patchVersion: String, timestamp: Long,
                          luaPatches: Seq[LuaOverride], libraryFileNames: Seq[String],
@@ -67,7 +68,7 @@ object PatchManifest {
                 getAttribute(node, "ShortName"), getAttribute(node, "Name"))
   def loadFilename(node: Node) = getAttribute(node, "Filename")
   def loadLuaOverride(node: Node) =
-    LuaOverride(loadFilename(node),
+    LuaOverride(loadFilename(node), (node \ "Include").map(loadFilename),
                 (node \ "InjectBefore").map(loadFilename), (node \ "InjectAfter").map(loadFilename))
   def loadNativePatch(node: Node) =
     NativePatch(getAttribute(node, "Platform"), getAttribute(node, "Version"),
@@ -118,7 +119,7 @@ class PatchLoader(val source: PatchFileSource) {
     val fileName = path.getFileName.toString
     luaPatchList.get(fileName.toLowerCase(Locale.ENGLISH)) match {
       case Some(patch) =>
-        val runtime      = "include \"mppatch_runtime.lua\"\n"
+        val runtime      = s"${patch.includes.map(x => s"include [[$x]]").mkString("\n")}\n"
         val injectBefore = runtime +: patch.injectBefore.map(getLuaFragment)
         val contents     = IOUtils.readFileAsString(path)
         val injectAfter  = patch.injectAfter.map(getLuaFragment)
