@@ -4,8 +4,12 @@
 # Obfusication options #
 ########################
 
--dontobfuscate
--keepattributes *
+-keeppackagenames **
+-keepattributes SourceFile,SourceDir,LineNumberTable,RuntimeVisible*Annotations*
+
+-keepnames class ** {
+    <methods>;
+}
 
 #########################
 # Optimization settings #
