@@ -69,7 +69,7 @@ trait ResourceGenerators { this: Build =>
       properties.put("mppatch.version.patch" , patch)
       properties.put("mppatch.version.suffix", suffix)
       properties.put("mppatch.version.commit", git.gitHeadCommit.value getOrElse "<unknown>")
-      properties.put("mppatch.version.clean" , git.gitUncommittedChanges.value.toString)
+      properties.put("mppatch.version.clean" , (!git.gitUncommittedChanges.value).toString)
 
       properties.put("mppatch.patch.compat"  , version_patchCompat.toString)
 
@@ -81,7 +81,7 @@ trait ResourceGenerators { this: Build =>
       properties.put("build.treestatus", propertyFromProcess("git", "status", "--porcelain"))
 
       properties.put("build.version.uname" , propertyFromProcess("uname", "-a"))
-      properties.put("build.version.distro", propertyFromProcess("lsb_release", "-a"))
+      properties.put("build.version.distro", tryProperty { IO.read(file("/etc/os-release")) })
       properties.put("build.version.sbt"   , sbtVersion.value)
       properties.put("build.version.nasm"  , propertyFromProcess(config_nasm, "-v"))
       properties.put("build.version.gcc"   , propertyFromProcess(config_linux_gcc, "-v"))
