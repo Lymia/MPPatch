@@ -50,9 +50,15 @@ trait ResourceGenerators { this: Build =>
     assertProcess(proc ! logger)
     output.mkString("\n")
   }
+
+  object ResourceKeys {
+    val versionFile     = TaskKey[File]("resource-version-file")
+  }
+  import ResourceKeys._
+
   val resourceGeneratorSettings = Seq(
-    resourceGenerators in Compile += Def.task {
-      val basePath = (resourceManaged in Compile).value
+    versionFile := {
+      val path = crossTarget.value / "version-resource-cache.properties"
 
       // Generate version information file
       val properties = new java.util.Properties
@@ -63,21 +69,32 @@ trait ResourceGenerators { this: Build =>
       properties.put("mppatch.version.patch" , patch)
       properties.put("mppatch.version.suffix", suffix)
       properties.put("mppatch.version.commit", git.gitHeadCommit.value getOrElse "<unknown>")
+      properties.put("mppatch.version.clean" , git.gitUncommittedChanges.value.toString)
 
       properties.put("mppatch.patch.compat"  , version_patchCompat.toString)
 
-      properties.put("mppatch.build.sbt"       , sbtVersion.value)
-      properties.put("mppatch.build.nasm"      , propertyFromProcess(config_nasm, "-v"))
-      properties.put("mppatch.build.gcc"       , propertyFromProcess(config_linux_gcc, "-v"))
-      properties.put("mppatch.build.mingw.gcc" , propertyFromProcess(config_mingw_gcc, "-v"))
-      properties.put("mppatch.build.user"      , tryProperty { System.getProperty("user.name") })
-      properties.put("mppatch.build.system"    , tryProperty { InetAddress.getLocalHost.toString })
-      properties.put("mppatch.build.time"      , new java.util.Date().toString)
-      properties.put("mppatch.build.path"      , baseDirectory.value.getAbsolutePath)
-      properties.put("mppatch.build.treestatus", propertyFromProcess("git", "status", "--porcelain"))
+      properties.put("build.os"        , tryProperty { System.getProperty("os.name") })
+      properties.put("build.user"      , tryProperty { System.getProperty("user.name") })
+      properties.put("build.host"      , tryProperty { InetAddress.getLocalHost.toString })
+      properties.put("build.time"      , new java.util.Date().toString)
+      properties.put("build.path"      , baseDirectory.value.getAbsolutePath)
+      properties.put("build.treestatus", propertyFromProcess("git", "status", "--porcelain"))
+
+      properties.put("build.version.uname" , propertyFromProcess("uname", "-a"))
+      properties.put("build.version.distro", propertyFromProcess("lsb_release", "-a"))
+      properties.put("build.version.sbt"   , sbtVersion.value)
+      properties.put("build.version.nasm"  , propertyFromProcess(config_nasm, "-v"))
+      properties.put("build.version.gcc"   , propertyFromProcess(config_linux_gcc, "-v"))
+      properties.put("build.version.mingw" , propertyFromProcess(config_mingw_gcc, "-v"))
+      IO.write(properties, "MPPatch build information", path)
+
+      path
+    },
+    resourceGenerators in Compile += Def.task {
+      val basePath = (resourceManaged in Compile).value
 
       val versionPropertiesPath = basePath / "moe" / "lymia" / "mppatch" / "version.properties"
-      IO.write(properties, "MPPatch build information", versionPropertiesPath)
+      IO.copyFile(versionFile.value, versionPropertiesPath)
 
       // Final generated files list
       Seq(versionPropertiesPath)

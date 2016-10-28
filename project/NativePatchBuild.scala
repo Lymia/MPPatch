@@ -29,7 +29,7 @@ import Utils._
 
 import scala.xml.{PrettyPrinter, XML}
 
-trait NativePatchBuild { this: Build =>
+trait NativePatchBuild { this: Build with ResourceGenerators =>
   object NativePatchBuildUtils {
     // Helper functions for compiling
     def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
@@ -100,7 +100,7 @@ trait NativePatchBuild { this: Build =>
     val win32ExternDef = TaskKey[File]("native-patch-win32-extern-defines")
     val linuxExternDef = TaskKey[File]("native-patch-linux-extern-defines")
 
-    val nativeFiles          = TaskKey[Seq[NativePatchFile]]("native-patch-files")
+    val nativeFiles    = TaskKey[Seq[NativePatchFile]]("native-patch-files")
   }
   import NativePatchBuildKeys._
 
@@ -236,8 +236,11 @@ trait NativePatchBuild { this: Build =>
       </PatchManifest>
       IO.write(manifest, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
 
+      val versionFile = target / "version.properties"
+      IO.copyFile(ResourceKeys.versionFile.value, versionFile)
+
       // Final generated files list
-      manifest +: (copiedFiles ++ patches).toSeq
+      versionFile +: manifest +: (copiedFiles ++ patches).toSeq
     }.taskValue
   )
 }

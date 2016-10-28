@@ -45,6 +45,7 @@ object VersionInfo {
   lazy val commit        = properties("version.commit","unknown")
   lazy val treeStatus    = properties("version.treestatus","unknown")
   lazy val versionString = properties("version.string","unknown")
+  lazy val isDirty       = properties("version.clean", "false") == "true"
 
   lazy val patchCompat   = Integer.parseInt(properties("patch.compat", "-1"))
 }
