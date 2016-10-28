@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets
 import java.text.MessageFormat
 import java.util.{Locale, Properties}
 
-import moe.lymia.mppatch.util.IOUtils
+import moe.lymia.mppatch.util.common.IOUtils
 
 import scala.annotation.tailrec
 import scala.collection.JavaConversions._

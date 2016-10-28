@@ -26,8 +26,8 @@ import java.nio.file.Path
 import java.util.regex.Pattern
 import java.util.{Locale, UUID}
 
-import moe.lymia.mppatch.util.{Crypto, IOUtils}
 import moe.lymia.mppatch.util.XMLUtils._
+import moe.lymia.mppatch.util.common.{Crypto, IOUtils}
 
 import scala.xml.{Node, XML}
 

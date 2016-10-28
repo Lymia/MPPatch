@@ -28,7 +28,7 @@ import java.util.Locale
 import javax.swing._
 
 import moe.lymia.mppatch.core.{PatchInstaller, PatchLoader, PatchStatus, Platform}
-import moe.lymia.mppatch.util.IOUtils
+import moe.lymia.mppatch.util.common.IOUtils
 
 class MainFrame(val locale: Locale) extends FrameBase {
   var installButton  : ActionButton = _

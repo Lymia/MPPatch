@@ -24,6 +24,8 @@ package moe.lymia.mppatch.util
 
 import java.util.Properties
 
+import moe.lymia.mppatch.util.common.IOUtils
+
 object VersionInfo {
   private lazy val properties = {
     val prop = new Properties()

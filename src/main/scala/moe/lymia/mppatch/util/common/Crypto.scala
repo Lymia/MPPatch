@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util
+package moe.lymia.mppatch.util.common
 
 import java.nio.ByteBuffer
 import java.security.MessageDigest

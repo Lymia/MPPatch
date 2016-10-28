@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util
+package moe.lymia.mppatch.util.common
 
 import java.io.{IOException, InputStream}
 import java.nio.channels.FileChannel
@@ -28,9 +28,9 @@ import java.nio.charset.StandardCharsets
 import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
 
-import scala.xml.{Node, PrettyPrinter, XML}
 import scala.annotation.tailrec
 import scala.io.Codec
+import scala.xml.{Node, PrettyPrinter, XML}
 
 object IOUtils {
   private val resPath = "/moe/lymia/mppatch/"
