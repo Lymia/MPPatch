@@ -26,7 +26,7 @@ object Config {
   val config_scalaVersion = "2.11.8"
 
   val config_mingw_gcc     = "i686-w64-mingw32-gcc"
-  val config_gcc           = "gcc"
+  val config_linux_gcc     = "gcc"
   val config_nasm          = "nasm"
 
   val version_baseVersion  = "0.1.0"

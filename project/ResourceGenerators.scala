@@ -31,8 +31,25 @@ import Config._
 import Utils._
 
 import language.postfixOps
+import scala.collection.mutable.ArrayBuffer
 
 trait ResourceGenerators { this: Build =>
+  private def tryProperty(s: => String) = try {
+    val str = s
+    if(str == null) "<null>" else str
+  } catch {
+    case t: Throwable => s"<unknown (${t.getClass.getName}: ${t.getMessage})>"
+  }
+  private def propertyFromProcess(proc: String*) = tryProperty {
+    val output = new ArrayBuffer[String]()
+    val logger = new ProcessLogger {
+      override def buffer[T](f: => T): T = f
+      override def error(s: => String): Unit = output += s
+      override def info(s: => String): Unit = output += s
+    }
+    assertProcess(proc ! logger)
+    output.mkString("\n")
+  }
   val resourceGeneratorSettings = Seq(
     resourceGenerators in Compile += Def.task {
       val basePath = (resourceManaged in Compile).value
@@ -49,22 +66,15 @@ trait ResourceGenerators { this: Build =>
 
       properties.put("mppatch.patch.compat"  , version_patchCompat.toString)
 
-      val userName   = System.getProperty("user.name")
-      val systemName = try { InetAddress.getLocalHost.toString } catch { case _: Throwable => "<unknown>" }
-      properties.put("mppatch.build.sbt"     , sbtVersion.value)
-      properties.put("mppatch.build.user"    , if(userName == null) "<unknown>" else userName)
-      properties.put("mppatch.build.system"  , systemName)
-      properties.put("mppatch.build.time"    , new java.util.Date().toString)
-      properties.put("mppatch.build.path"    , baseDirectory.value.getAbsolutePath)
-
-      properties.put("mppatch.build.treestatus", try {
-        IO.withTemporaryFile[String]("git-status", ".txt") { file =>
-          assertProcess("git status --porcelain" #> file !)
-          IO.read(file)
-        }
-      } catch {
-        case _: Throwable => "<unknown>"
-      })
+      properties.put("mppatch.build.sbt"       , sbtVersion.value)
+      properties.put("mppatch.build.nasm"      , propertyFromProcess(config_nasm, "-v"))
+      properties.put("mppatch.build.gcc"       , propertyFromProcess(config_linux_gcc, "-v"))
+      properties.put("mppatch.build.mingw.gcc" , propertyFromProcess(config_mingw_gcc, "-v"))
+      properties.put("mppatch.build.user"      , tryProperty { System.getProperty("user.name") })
+      properties.put("mppatch.build.system"    , tryProperty { InetAddress.getLocalHost.toString })
+      properties.put("mppatch.build.time"      , new java.util.Date().toString)
+      properties.put("mppatch.build.path"      , baseDirectory.value.getAbsolutePath)
+      properties.put("mppatch.build.treestatus", propertyFromProcess("git", "status", "--porcelain"))
 
       val versionPropertiesPath = basePath / "moe" / "lymia" / "mppatch" / "version.properties"
       IO.write(properties, "MPPatch build information", versionPropertiesPath)

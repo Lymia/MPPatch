@@ -33,7 +33,7 @@ trait NativePatchBuild { this: Build =>
   object NativePatchBuildUtils {
     // Helper functions for compiling
     def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
-    def gcc      (p: Seq[Any]) = runProcess(config_gcc +: p)
+    def gcc      (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
     def nasm     (p: Seq[Any]) = runProcess(config_nasm +: p)
 
     // Codegen for the proxy files.
