@@ -22,6 +22,8 @@
 
 package moe.lymia.mppatch.build
 
+import java.net.InetAddress
+
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.SbtGit._
@@ -47,6 +49,11 @@ trait ResourceGenerators { this: Build =>
 
       properties.put("mppatch.patch.compat"  , version_patchCompat.toString)
 
+      val userName   = System.getProperty("user.name")
+      val systemName = try { InetAddress.getLocalHost.toString } catch { case _: Throwable => "<unknown>" }
+      properties.put("mppatch.build.sbt"     , sbtVersion.value)
+      properties.put("mppatch.build.user"    , if(userName == null) "<unknown>" else userName)
+      properties.put("mppatch.build.system"  , systemName)
       properties.put("mppatch.build.time"    , new java.util.Date().toString)
       properties.put("mppatch.build.path"    , baseDirectory.value.getAbsolutePath)
 

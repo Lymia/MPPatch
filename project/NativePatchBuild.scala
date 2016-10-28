@@ -27,7 +27,7 @@ import sbt.Keys._
 import Config._
 import Utils._
 
-import scala.xml.XML
+import scala.xml.{PrettyPrinter, XML}
 
 trait NativePatchBuild { this: Build =>
   object NativePatchBuildUtils {
@@ -226,6 +226,7 @@ trait NativePatchBuild { this: Build =>
         targetFile
       }
 
+      val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
       val manifest = target / "manifest.xml"
       val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
                                   Timestamp={System.currentTimeMillis().toString}>
@@ -233,7 +234,7 @@ trait NativePatchBuild { this: Build =>
         {versions.map(x => <Version Platform={x.platform} Version={x.version}
                                     Filename={x.file.getName} Sha1={x.sha1}/>)}
       </PatchManifest>
-      IO.write(manifest, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + output.toString())
+      IO.write(manifest, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
 
       // Final generated files list
       manifest +: (copiedFiles ++ patches).toSeq
