@@ -82,7 +82,8 @@ object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators 
   ) ++ patchBuildSettings ++ resourceGeneratorSettings ++ inConfig(Proguard)(Seq(
     // Package whole project into a single .jar file with Proguard.
     ProguardKeys.proguardVersion := "5.3",
-    ProguardKeys.options ++= Seq("-verbose", "@"+(baseDirectory.value / "project" / "proguard.pro").getCanonicalPath),
+    ProguardKeys.options ++= Seq("-verbose", "-include",
+                                 (baseDirectory.value / "project" / "proguard.pro").getCanonicalPath),
 
     // Print mapping to file
     proguardMapping := ProguardKeys.proguardDirectory.value / ("mppatch_symbols-"+version.value+".map"),
