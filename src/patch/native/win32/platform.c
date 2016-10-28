@@ -62,7 +62,7 @@ __attribute__((constructor(201))) static void initializeBinaryType() {
 
     char moduleName[1024];
     if(!GetModuleFileName(NULL, moduleName, sizeof(moduleName)))
-        fatalError("Could not get main executable binary name. (code: 0x%08x)", GetLastError());
+        fatalError("Could not get main executable binary name. (code: 0x%08lx)", GetLastError());
     debug_print("Binary name: %s", moduleName);
 
     if     (endsWith(moduleName, "CivilizationV.exe"       )) detectedBinaryType = BIN_DX9   ;
@@ -87,7 +87,7 @@ __attribute__((constructor(200))) static void initializeProxy() {
         fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.");
     baseDll = LoadLibrary(TARGET_LIBRARY_NAME);
     if(baseDll == NULL)
-        fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08x)", GetLastError());
+        fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08lx)", GetLastError());
 }
 __attribute__((destructor(200))) static void deinitializeProxy() {
     debug_print("Unloading original CvGameDatabase");
