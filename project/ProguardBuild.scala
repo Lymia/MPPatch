@@ -31,7 +31,7 @@ object ProguardBuild {
   object Keys {
     val shadeMappings     = SettingKey[Seq[(String, String)]]("proguard-wrapper-shade-mappings")
     val excludeFiles      = SettingKey[Set[String]]("proguard-wrapper-exclude-files")
-    val proguardMainClass = SettingKey[String]("proguard-main-class")
+    val proguardConfig    = SettingKey[String]("proguard-wrapper-config")
     val proguardMapping   = TaskKey[File]("proguard-wrapper-mapping")
   }
   import Keys._
@@ -53,8 +53,9 @@ object ProguardBuild {
     // Package whole project into a single .jar file with Proguard.
     ProguardKeys.proguardVersion := "5.3",
     ProguardKeys.options ++= Seq("-verbose", "-include",
-                                 (baseDirectory.value / "project" / "proguard.pro").getCanonicalPath),
-    ProguardKeys.options += ProguardOptions.keepMain(proguardMainClass.value),
+                                 (file(".") / "project" / proguardConfig.value).getCanonicalPath),
+    ProguardKeys.options +=
+      ProguardOptions.keepMain((mainClass in Compile).value.getOrElse(sys.error("No main class!"))),
 
     // Print mapping to file
     proguardMapping := ProguardKeys.proguardDirectory.value / ("symbols-"+version.value+".map"),

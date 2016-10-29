@@ -24,15 +24,13 @@ import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.SbtGit.GitKeys
 import com.typesafe.sbt.SbtProguard._
-import sbtassembly._
 
 import Config._
 
 import ProguardBuild.Keys._
+import LoaderBuild.Keys._
 
 // Additional keys
-val buildDist       = TaskKey[File]("build-dist")
-val dist            = InputKey[Unit]("dist")
 
 val commonSettings = versionWithGit ++ Seq(
   // Organization configuration
@@ -49,32 +47,40 @@ val commonSettings = versionWithGit ++ Seq(
 )
 
 lazy val mppatch = project in file(".") settings (commonSettings ++ ProguardBuild.settings ++ Seq(
-  name := "MPPatch",
+  name := "mppatch-nopack",
 
-  // Dependencies
   libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
+  shadeMappings       += "scala.**" -> "moe.lymia.mppatch.externlibs.scala.@1",
+
   libraryDependencies += "org.tukaani" % "xz" % "1.5",
+  shadeMappings       += "org.tukaani.xz.**" -> "moe.lymia.mppatch.externlibs.xz.@1",
+
   libraryDependencies += "org.whispersystems" % "curve25519-java" % "0.3.0",
+  shadeMappings       += "org.whispersystems.curve25519.**" -> "moe.lymia.mppatch.externlibs.curve25519.@1",
 
-  // Shade rules
-  shadeMappings += "scala.**" -> "moe.lymia.mppatch.externlibs.scala.@1",
-  shadeMappings += "org.tukaani.xz.**" -> "moe.lymia.mppatch.externlibs.xz.@1",
-  excludeFiles  := Set("library.properties", "rootdoc.txt", "scala-xml.properties"),
-  proguardMainClass := "moe.lymia.mppatch.ui.Installer",
-
-  // Build distribution file
-  buildDist := {
-    val path   = crossTarget.value / "dist"
-    val source = (ProguardKeys.proguard in Proguard).value.head
-    val target = path / source.getName
-
-    IO.createDirectory(path)
-    IO.withTemporaryDirectory { dir =>
-      IO.unzip(source, dir)
-      val f = Path.allSubpaths(dir) ++ Seq(((proguardMapping in Proguard).value, "moe/lymia/mppatch/symbols.map"))
-      IO.zip(f, target)
-    }
-    target
-  },
-  dist := streams.value.log.info("Final binary output to: "+buildDist.value)
+  excludeFiles   := Set("library.properties", "rootdoc.txt", "scala-xml.properties"),
+  proguardConfig := "installer.pro"
 ) ++ PatchBuild.settings ++ ResourceGenerators.settings ++ NativePatchBuild.settings)
+
+lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBuild.settings ++ Seq(
+  name := "mppatch",
+  autoScalaLibrary := false,
+
+  loaderSourceJar := (ProguardKeys.proguard in Proguard in mppatch).value.head,
+  loaderTargetPath := "moe/lymia/mppatch/installer.pack"
+))
+
+// Build distribution file
+InputKey[Unit]("dist") := {
+  val path   = crossTarget.value / "dist"
+  val source = (ProguardKeys.proguard in Proguard).value.head
+  val target = path / source.getName
+
+  IO.createDirectory(path)
+  IO.withTemporaryDirectory { dir =>
+    IO.unzip(source, dir)
+    val f = Path.allSubpaths(dir) ++ Seq(((proguardMapping in Proguard).value, "moe/lymia/mppatch/symbols.map"))
+    IO.zip(f, target)
+  }
+  streams.value.log.info("Final binary output to: "+target)
+}
