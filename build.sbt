@@ -73,14 +73,15 @@ lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBu
 // Build distribution file
 InputKey[Unit]("dist") := {
   val path   = crossTarget.value / "dist"
-  val source = (ProguardKeys.proguard in Proguard).value.head
-  val target = path / source.getName
 
-  IO.createDirectory(path)
-  IO.withTemporaryDirectory { dir =>
-    IO.unzip(source, dir)
-    val f = Path.allSubpaths(dir) ++ Seq(((proguardMapping in Proguard).value, "moe/lymia/mppatch/symbols.map"))
-    IO.zip(f, target)
+  def copy(source: File) = {
+    val output = path / source.getName
+    IO.copyFile(source, output)
+    output
   }
-  streams.value.log.info("Final binary output to: "+target)
+  val noPackOut = copy((ProguardKeys.proguard in Proguard).value.head)
+  val packOut   = copy((Keys.`package` in Compile in loader).value)
+
+  streams.value.log.info(s"Output nopack to: $noPackOut")
+  streams.value.log.info(s"Output packed to: $packOut")
 }
