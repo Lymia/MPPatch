@@ -22,9 +22,7 @@
 
 package moe.lymia.mppatch.util.common
 
-import java.nio.ByteBuffer
 import java.security.MessageDigest
-import java.util.UUID
 
 object  Crypto {
   def digest(algorithm: String, data: Array[Byte]) = {
@@ -44,15 +42,4 @@ object  Crypto {
   def sha1  (data: Array[Byte]) = digest("SHA-1"  , data)
   def sha256(data: Array[Byte]) = digest("SHA-256", data)
   def sha512(data: Array[Byte]) = digest("SHA-512", data)
-
-  private def makeUUID(data: Array[Byte], version: Int) = {
-    val newData    = data.updated(6, ((data(6) & 0x0F) | (version << 4)).toByte)
-                         .updated(8, ((data(8) & 0x3F) | 0x80).toByte)
-    val buffer = ByteBuffer.wrap(newData).asLongBuffer()
-    new UUID(buffer.get(0), buffer.get(1))
-  }
-  def uuidToBytes(namespace: UUID) =
-    ByteBuffer.allocate(16).putLong(namespace.getMostSignificantBits).putLong(namespace.getLeastSignificantBits).array
-  def md5_uuid (namespace: UUID, data: Array[Byte]) = makeUUID(md5 (uuidToBytes(namespace) ++ data), 3)
-  def sha1_uuid(namespace: UUID, data: Array[Byte]) = makeUUID(sha1(uuidToBytes(namespace) ++ data), 5)
 }
