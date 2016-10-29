@@ -30,7 +30,7 @@ import javax.swing._
 import moe.lymia.mppatch.core._
 import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 
-class MainFrame(val locale: Locale) extends FrameBase {
+class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   var installButton  : ActionButton = _
   var uninstallButton: ActionButton = _
   var currentStatus  : JTextField   = _
@@ -61,7 +61,6 @@ class MainFrame(val locale: Locale) extends FrameBase {
     var text  : String     = "<no action>"
 
     setAction(MainFrame.this.action { e =>
-      val cont = i18n(text+".continuous")
       try {
         action()
         JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
@@ -98,24 +97,30 @@ class MainFrame(val locale: Locale) extends FrameBase {
 
   def buildForm() {
     frame = new JFrame()
+    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
+
     frame.setTitle(i18n("common.title"))
     frame.setLayout(new GridBagLayout())
 
     val statusPane = new JPanel()
     statusPane.setLayout(new GridBagLayout())
 
-    val label = new JLabel()
-    label.setText(i18n("gui.status"))
-    statusPane.add(label, constraints(ipadx = 3, ipady = 3))
+    // Status seciton
+    {
+      val label = new JLabel()
+      label.setText(i18n("gui.status"))
+      statusPane.add(label, constraints(ipadx = 3, ipady = 3))
 
-    currentStatus = new JTextField()
-    currentStatus.setEditable(false)
-    currentStatus.setPreferredSize(new Dimension(450, currentStatus.getPreferredSize.getHeight.toInt))
-    statusPane.add(currentStatus, constraints(gridx = 1, weightx = 1, ipadx = 3, ipady = 3,
-                                              fill = GridBagConstraints.BOTH))
+      currentStatus = new JTextField()
+      currentStatus.setEditable(false)
+      currentStatus.setPreferredSize(new Dimension(450, currentStatus.getPreferredSize.getHeight.toInt))
+      statusPane.add(currentStatus, constraints(gridx = 1, weightx = 1, ipadx = 3, ipady = 3,
+                                                fill = GridBagConstraints.BOTH))
+    }
 
-    frame.add(statusPane, constraints(gridwidth = 4, fill = GridBagConstraints.BOTH))
+    frame.add(statusPane, constraints(gridwidth = 3, fill = GridBagConstraints.BOTH))
 
+    // Button section
     installButton = new ActionButton()
     frame.add(installButton  , constraints(gridx = 0, gridy = 1, weightx = 0.5,
                                            fill = GridBagConstraints.BOTH))
@@ -131,14 +136,6 @@ class MainFrame(val locale: Locale) extends FrameBase {
     symbolButton(settingsButton)
     frame.add(settingsButton, constraints(gridx = 2, gridy = 1,
                                           fill = GridBagConstraints.BOTH))
-
-    val refreshButton = new JButton()
-    refreshButton.setAction(action { e => update() })
-    refreshButton.setText(i18n("gui.icon.advanced"))
-    refreshButton.setToolTipText(i18n("gui.tooltip.advanced"))
-    symbolButton(refreshButton)
-    frame.add(refreshButton, constraints(gridx = 3, gridy = 1,
-                                         fill = GridBagConstraints.BOTH))
   }
 
   def setStatus(text: String) = currentStatus.setText(i18n(text))
@@ -181,7 +178,7 @@ class MainFrame(val locale: Locale) extends FrameBase {
       }) {
         showForm()
         while(frame.isVisible) try {
-          Thread.sleep(1000)
+          Thread.sleep(100)
         } catch {
           case _: InterruptedException => // ignored
         }
@@ -190,8 +187,7 @@ class MainFrame(val locale: Locale) extends FrameBase {
       continueLoop = false
       lockLoop()
     }
+  } finally {
     if(frame.isDisplayable) frame.dispose()
-  } catch {
-    case e: Exception => dumpException("gui.genericerror", e)
   }
 }

@@ -13,7 +13,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THEss
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
@@ -22,19 +22,28 @@
 
 package moe.lymia.mppatch.ui
 
-import java.util.Locale
-import javax.swing.{JFrame, UIManager}
+object Preferences {
+  trait PreferenceSerializer[T] {
+    def encode(t: T): String
+    def decode(s: String): T
+  }
+  case class SimplePreferenceSerializer[T](encodeF: T => String, decodeF: String => T) {
+    def encode(t: T): String = encodeF(t)
+    def decode(s: String): T = decodeF(s)
+  }
 
-object Installer extends FrameError[JFrame] with I18NTrait {
-  def locale = Locale.getDefault
-  override def frame: JFrame = null
+  implicit val StringPreference = SimplePreferenceSerializer[String](identity, identity)
 
-  def main(args: Array[String]): Unit = try {
-    System.setProperty("awt.useSystemAAFontSettings","on")
-    System.setProperty("swing.aatext", "true")
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
-    new MainFrame(locale).show()
-  } catch {
-    case e: Exception => dumpException("gui.genericerror", e)
+  val prefs = java.util.prefs.Preferences.userNodeForPackage(getClass)
+  case class PreferenceKey[T : PreferenceSerializer](name: String, default: T) {
+    private val encoder = implicitly[PreferenceSerializer[T]]
+    private val defaultString = encoder.encode(default)
+
+    def value = try {
+      encoder.decode(prefs.get(name, defaultString))
+    } catch {
+      case _: Exception => default
+    }
+    def value_=(t: T) = prefs.put(name, encoder.encode(t))
   }
 }

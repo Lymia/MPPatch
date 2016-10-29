@@ -23,7 +23,7 @@
 package moe.lymia.mppatch.ui
 
 import java.awt.event.ActionEvent
-import java.awt.{GridBagConstraints, Insets}
+import java.awt.{Frame, GridBagConstraints, Insets}
 import java.util.Locale
 import javax.swing._
 
@@ -41,10 +41,14 @@ trait FrameUtils {
   }
 }
 
-trait FrameBase extends FrameUtils {
+trait I18NTrait {
   def locale: Locale
   val i18n = I18N(locale)
-  var frame: JFrame = _
+}
+
+trait FrameError[F <: Frame] {
+  def frame: F
+  def i18n: I18N
 
   def error[T](string: String): T = {
     JOptionPane.showMessageDialog(if(frame != null && frame.isVisible) frame else null, string,
@@ -59,16 +63,20 @@ trait FrameBase extends FrameUtils {
     e.printStackTrace()
     error(i18n(errorString, (e.getClass+": "+e.getMessage) +: exArgs : _*))
   }
+}
+
+trait FrameBase[F <: Frame] extends FrameError[F] with FrameUtils with I18NTrait {
+  var frame: F = _
+  def parent: F = null.asInstanceOf[F]
 
   def buildForm()
   def update() { }
 
   def showForm() = {
-      buildForm()
-      update()
-      frame.pack()
-      frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-      frame.setLocationRelativeTo(null)
-      frame.setVisible(true)
+    buildForm()
+    update()
+    frame.pack()
+    frame.setLocationRelativeTo(null)
+    frame.setVisible(true)
   }
 }
