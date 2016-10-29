@@ -42,14 +42,14 @@ object DLCKey {
     Seq(0x1f, 0x33, 0x93, 0xfb, 0x35, 0x0f, 0x42, 0xc7,
         0xbd, 0x50, 0xbe, 0x7a, 0xa5, 0xc2, 0x61, 0x81) map (_.toByte)
   private val staticInterlaceStream = Stream.from(0) map (x => staticInterlace(x%staticInterlace.length))
-  private def interlaceData(data: Seq[Byte]) =
+  private def interlaceData(data: Array[Byte]) =
     data.zip(staticInterlaceStream).flatMap(x => Seq(x._1, x._2))
 
   private def encodeLe32(i: Int) =
-    Seq(i&0xFF, (i>>8)&0xFF, (i>>16)&0xFF, (i>>24)&0xFF)
+    Array(i&0xFF, (i>>8)&0xFF, (i>>16)&0xFF, (i>>24)&0xFF)
   private def encodeBe32(i: Int) = encodeLe32(i).reverse
   private def encodeLe16(i: Int) =
-    Seq(i&0xFF, (i>>8)&0xFF)
+    Array(i&0xFF, (i>>8)&0xFF)
   private def encodeUUID(u: UUID) =
     (encodeLe32(((u.getMostSignificantBits >>32) & 0xFFFFFFFF).toInt) ++
      encodeLe16(((u.getMostSignificantBits >>16) &     0xFFFF).toInt) ++

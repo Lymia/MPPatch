@@ -27,32 +27,32 @@ import java.security.MessageDigest
 import java.util.UUID
 
 object  Crypto {
-  def digest(algorithm: String, data: Seq[Byte]) = {
+  def digest(algorithm: String, data: Array[Byte]) = {
     val md = MessageDigest.getInstance(algorithm)
     val hash = md.digest(data.toArray)
     hash
   }
-  def hexdigest(algorithm: String, data: Seq[Byte]) =
+  def hexdigest(algorithm: String, data: Array[Byte]) =
     digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
 
-  def md5_hex   (data: Seq[Byte]) = hexdigest("MD5"    , data)
-  def sha1_hex  (data: Seq[Byte]) = hexdigest("SHA-1"  , data)
-  def sha256_hex(data: Seq[Byte]) = hexdigest("SHA-256", data)
-  def sha512_hex(data: Seq[Byte]) = hexdigest("SHA-512", data)
+  def md5_hex   (data: Array[Byte]) = hexdigest("MD5"    , data)
+  def sha1_hex  (data: Array[Byte]) = hexdigest("SHA-1"  , data)
+  def sha256_hex(data: Array[Byte]) = hexdigest("SHA-256", data)
+  def sha512_hex(data: Array[Byte]) = hexdigest("SHA-512", data)
 
-  def md5   (data: Seq[Byte]) = digest("MD5"    , data)
-  def sha1  (data: Seq[Byte]) = digest("SHA-1"  , data)
-  def sha256(data: Seq[Byte]) = digest("SHA-256", data)
-  def sha512(data: Seq[Byte]) = digest("SHA-512", data)
+  def md5   (data: Array[Byte]) = digest("MD5"    , data)
+  def sha1  (data: Array[Byte]) = digest("SHA-1"  , data)
+  def sha256(data: Array[Byte]) = digest("SHA-256", data)
+  def sha512(data: Array[Byte]) = digest("SHA-512", data)
 
-  private def makeUUID(data: Seq[Byte], version: Int) = {
+  private def makeUUID(data: Array[Byte], version: Int) = {
     val newData    = data.updated(6, ((data(6) & 0x0F) | (version << 4)).toByte)
                          .updated(8, ((data(8) & 0x3F) | 0x80).toByte)
-    val buffer = ByteBuffer.wrap(newData.toArray).asLongBuffer()
+    val buffer = ByteBuffer.wrap(newData).asLongBuffer()
     new UUID(buffer.get(0), buffer.get(1))
   }
   def uuidToBytes(namespace: UUID) =
     ByteBuffer.allocate(16).putLong(namespace.getMostSignificantBits).putLong(namespace.getLeastSignificantBits).array
-  def md5_uuid (namespace: UUID, data: Seq[Byte]) = makeUUID(md5 (uuidToBytes(namespace) ++ data), 3)
-  def sha1_uuid(namespace: UUID, data: Seq[Byte]) = makeUUID(sha1(uuidToBytes(namespace) ++ data), 5)
+  def md5_uuid (namespace: UUID, data: Array[Byte]) = makeUUID(md5 (uuidToBytes(namespace) ++ data), 3)
+  def sha1_uuid(namespace: UUID, data: Array[Byte]) = makeUUID(sha1(uuidToBytes(namespace) ++ data), 5)
 }
