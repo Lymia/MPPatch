@@ -1,3 +1,5 @@
+import sbt.{IO, Process, _}
+
 /*
  * Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
  *
@@ -20,20 +22,30 @@
  * SOFTWARE.
  */
 
-import sbt._
+object Config {
+  val config_scalaVersion = "2.11.8"
 
-import java.security.MessageDigest
+  val config_mingw_gcc     = "i686-w64-mingw32-gcc"
+  val config_linux_gcc     = "gcc"
+  val config_nasm          = "nasm"
 
-import language.postfixOps
+  val version_baseVersion  = "0.1.0"
+  val version_patchCompat  = 1
+
+  val config_steam_sdlbin_path = "libsdl2_2.0.3+steamrt1+srt4_i386.deb"
+  val config_steam_sdldev_path = "libsdl2-dev_2.0.3+steamrt1+srt4_i386.deb"
+  val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
+}
 
 object Utils {
-  // Various helper functions
   val VersionRegex = "([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(-(.*))?".r // major.minor.patch-suffix
+
+  // Process helper functions
   def assertProcess(i: Int) = if(i != 0) sys.error("Process returned non-zero return value! (ret: "+i+")")
   def runProcess   (p: Seq[Any]) = assertProcess(Process(p.map(_.toString)) !)
   def runProcess   (p: Seq[Any], cd: File) = assertProcess(Process(p.map(_.toString), cd) !)
-  def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
 
+  // Directory helpers
   def dir     (path: File) = path.toString + "/"
   def allFiles(path: File, extension: String) = path.listFiles.filter(_.getName.endsWith(extension)).toSeq
 
@@ -44,19 +56,7 @@ object Utils {
   }
   def simplePrepareDirectory(path: File) = prepareDirectory(path){ dir => }
 
-  // Steam runtime helper functions
-  def extractSteamRuntime[T](source: File, target: File, beforeLog: => T = null)(fn: (File, File) => Unit) =
-    if(target.exists) target else {
-      beforeLog
-      IO.withTemporaryDirectory { temp =>
-        runProcess(Seq("ar", "xv", source), temp)
-        runProcess(Seq("tar", "xvf", temp / "data.tar.gz"), temp)
-        fn(temp, target)
-      }
-      target
-    }
-
-  // Code generation functions
+  // Code generation helpers
   def cached(cacheDirectory: File, inStyle: FilesInfo.Style = FilesInfo.lastModified, // hack to fix ambigous overload
              outStyle: FilesInfo.Style = FilesInfo.exists)
             (fn: Set[File] => Set[File]) = FileFunction.cached(cacheDirectory, inStyle, outStyle)(fn)

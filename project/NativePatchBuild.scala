@@ -25,13 +25,22 @@ import sbt.Keys._
 import Config._
 import Utils._
 
-import scala.xml.{PrettyPrinter, XML}
-
 object NativePatchBuild {
-  // Helper functions for compiling
   def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
   def gcc      (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
   def nasm     (p: Seq[Any]) = runProcess(config_nasm +: p)
+
+  // Steam runtime
+  def extractSteamRuntime[T](source: File, target: File, beforeLog: => T = null)(fn: (File, File) => Unit) =
+    if(target.exists) target else {
+      beforeLog
+      IO.withTemporaryDirectory { temp =>
+        runProcess(Seq("ar", "xv", source), temp)
+        runProcess(Seq("tar", "xvf", temp / "data.tar.gz"), temp)
+        fn(temp, target)
+      }
+      target
+    }
 
   // Codegen for the proxy files.
   def generateProxyDefine(file: File, target: File) {
@@ -63,6 +72,7 @@ object NativePatchBuild {
   }
 
   // Codegen for version header
+  def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
   def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
     val VersionRegex(major, minor, _, patch, _, suffix) = version
     cachedGeneration(cacheDirectory, tempTarget, finalTarget,
