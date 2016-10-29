@@ -83,7 +83,7 @@ trait NativePatchBuild { this: Build =>
   }
   import NativePatchBuildUtils._
 
-  case class NativePatchFile(platform: String, version: String, file: File, sha1: String)
+  case class NativePatchFile(platform: String, version: String, file: File)
   object NativePatchBuildKeys {
     val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
     val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
@@ -153,7 +153,7 @@ trait NativePatchBuild { this: Build =>
 
       val patches = for(versionDir <- (patchSourceDir.value / "versions").listFiles) yield {
         val version = versionDir.getName
-        val Array(platform, sha1) = version.split("_")
+        val Array(platform, sha256) = version.split("_")
 
         val (cc, nasmFormat, binaryExtension, sourcePath, sourceFiles, extraCDeps, gccFlags) =
           platform match {
@@ -161,8 +161,7 @@ trait NativePatchBuild { this: Build =>
               Seq(patchSourceDir.value / "win32"), Seq(win32ExternDef.value),
               allFiles(win32Directory.value, ".dll"),
               Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
-                  "-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat",
-                  "-DCV_CHECKSUM=\""+sha1+"\""))
+                  "-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat"))
             case "linux" => (gcc       _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux", steamrtSDLDev.value), Seq(linuxExternDef.value),
               Seq(steamrtSDL.value),
@@ -198,7 +197,7 @@ trait NativePatchBuild { this: Build =>
             target
           }
 
-        NativePatchFile(platform, sha1, outputPath, sha1_hex(IO.readBytes(outputPath)))
+        NativePatchFile(platform, sha256, outputPath)
       }
       patches.toSeq
     }

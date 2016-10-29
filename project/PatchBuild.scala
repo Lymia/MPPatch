@@ -67,8 +67,7 @@ trait PatchBuild { this: Build with NativePatchBuild with ResourceGenerators =>
       val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
                                   Timestamp={System.currentTimeMillis().toString}>
         {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
-        {versions.map(x => <Version Platform={x.platform} Version={x.version}
-                                    Filename={x.file.getName} Sha1={x.sha1}/>)}
+        {versions.map(x => <Version Platform={x.platform} Version={x.version} Filename={x.file.getName}/>)}
       </PatchManifest>
 
       val manifestFile = PatchFile("manifest.xml", xmlWriter.format(output))

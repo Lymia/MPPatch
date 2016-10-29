@@ -85,14 +85,4 @@ object Utils {
     cachedTransform(cacheDirectory, tempTarget, finalTarget, inStyle = FilesInfo.hash)((in, out) =>
       IO.copyFile(in, out))
   }
-
-  // Crypto helper functions
-  def digest(algorithm: String, data: Seq[Byte]) = {
-    val md = MessageDigest.getInstance(algorithm)
-    val hash = md.digest(data.toArray)
-    hash
-  }
-  def hexdigest(algorithm: String, data: Seq[Byte]) =
-    digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
-  def sha1_hex(data: Seq[Byte]) = hexdigest("SHA1", data)
 }

@@ -49,7 +49,7 @@ object PatchStatus {
   case object NeedsValidation extends PatchStatus
 }
 
-private case class PatchFile(path: String, expectedSha1: String)
+private case class PatchFile(path: String, expectedSha256: String)
 private case class PatchState(replacementTarget: PatchFile, originalFile: PatchFile,
                               additionalFiles: Seq[PatchFile],
                               installedVersion: String, installedTimestamp: Long,
@@ -59,7 +59,7 @@ private case class PatchState(replacementTarget: PatchFile, originalFile: PatchF
 private object PatchState {
   private val formatVersion = "0"
 
-  def serializePatchFile(file: PatchFile) = <PatchFile path={file.path} expectedSha1={file.expectedSha1}/>
+  def serializePatchFile(file: PatchFile) = <PatchFile path={file.path} expectedSha256={file.expectedSha256}/>
   def serialize(state: PatchState) = <PatchState version={formatVersion}>
     <ReplacementTarget>{serializePatchFile(state.replacementTarget)}</ReplacementTarget>
     <OriginalFile>{serializePatchFile(state.originalFile)}</OriginalFile>
@@ -71,7 +71,7 @@ private object PatchState {
   </PatchState>
 
   def unserializePatchFile(node: Node) =
-    PatchFile(XMLUtils.getAttribute(node, "path"), XMLUtils.getAttribute(node, "expectedSha1"))
+    PatchFile(XMLUtils.getAttribute(node, "path"), XMLUtils.getAttribute(node, "expectedSha256"))
   def unserialize(xml: Node) =
     if(XMLUtils.getAttribute(xml, "version") != formatVersion) None
     else Some(PatchState(unserializePatchFile((xml \ "ReplacementTarget" \ "PatchFile").head),
@@ -97,12 +97,13 @@ class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform
 
   private def validatePatchFile(file: PatchFile) = {
     val path = resolve(file.path)
-    Files.exists(path) && Files.isRegularFile(path) && Crypto.sha1_hex(Files.readAllBytes(path)) == file.expectedSha1
+    Files.exists(path) && Files.isRegularFile(path) &&
+      Crypto.sha256_hex(Files.readAllBytes(path)) == file.expectedSha256
   }
   private def isVersionKnown(path: String) =
-    loader.nativePatchExists(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
+    loader.nativePatchExists(platform.platformName, Crypto.sha256_hex(Files.readAllBytes(resolve(path))))
   private def getVersion(path: String) =
-    loader.getNativePatch(platform.platformName, Crypto.sha1_hex(Files.readAllBytes(resolve(path))))
+    loader.getNativePatch(platform.platformName, Crypto.sha256_hex(Files.readAllBytes(resolve(path))))
   private def loadPatchState() = try {
     PatchState.unserialize(IOUtils.readXML(patchStatePath))
   } catch {
@@ -135,7 +136,7 @@ class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform
             PatchStatus.NeedsCleanup
           else if(!validatePatchFile(patchState.replacementTarget))
             PatchStatus.TargetUpdated(isVersionKnown(patchState.replacementTarget.path))
-          else loader.getNativePatch(platform.platformName, patchState.originalFile.expectedSha1) match {
+          else loader.getNativePatch(platform.platformName, patchState.originalFile.expectedSha256) match {
             case Some(version) =>
               if(patchState.installedTimestamp != loader.data.timestamp ||
                  patchState.installedVersion != loader.data.patchVersion ||
@@ -154,7 +155,7 @@ class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform
     Files.write(path, data)
     if(executable) Files.setPosixFilePermissions(path,
       Files.getPosixFilePermissions(path) + OWNER_EXECUTE + GROUP_EXECUTE + OTHERS_EXECUTE)
-    PatchFile(name, Crypto.sha1_hex(data))
+    PatchFile(name, Crypto.sha256_hex(data))
   }
 
   // TODO: Make sure this is atomic enough

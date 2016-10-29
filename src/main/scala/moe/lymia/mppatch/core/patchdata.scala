@@ -58,7 +58,7 @@ object InstallScript {
 
 case class LuaOverride(fileName: String, includes: Seq[String],
                        injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
-case class NativePatch(platform: String, version: String, path: String, sha1: String)
+case class NativePatch(platform: String, version: String, path: String)
 case class PatchManifest(dlcManifest: DLCManifest, patchVersion: String, timestamp: Long,
                          luaPatches: Seq[LuaOverride], libraryFileNames: Seq[String],
                          newScreenFileNames: Seq[String], textFileNames: Seq[String],
@@ -73,8 +73,7 @@ object PatchManifest {
     LuaOverride(loadFilename(node), (node \ "Include").map(loadFilename),
                 (node \ "InjectBefore").map(loadFilename), (node \ "InjectAfter").map(loadFilename))
   def loadNativePatch(node: Node) =
-    NativePatch(getAttribute(node, "Platform"), getAttribute(node, "Version"),
-                getAttribute(node, "Filename"), getAttribute(node, "Sha1"))
+    NativePatch(getAttribute(node, "Platform"), getAttribute(node, "Version"), getAttribute(node, "Filename"))
   def loadInstallScript(node: Node) =
     getAttribute(node, "Platform") -> loadFilename(node)
   def loadFromXML(xml: Node) = {
@@ -140,11 +139,7 @@ class PatchLoader(val source: PatchFileSource) {
     versionMap.get((targetPlatform, versionName))
   def nativePatchExists(targetPlatform: String, versionName: String) =
     versionMap.contains((targetPlatform, versionName))
-  def loadVersion(patch: NativePatch) = {
-    val fileData = source.loadBinary(patch.path)
-    if(Crypto.sha1_hex(fileData) != patch.sha1) sys.error("sha1 mismatch in native patch")
-    fileData
-  }
+  def loadVersion(patch: NativePatch) = source.loadBinary(patch.path)
 }
 
 case class PatchPackageLoader(data: PatchPackage) extends PatchFileSource {
