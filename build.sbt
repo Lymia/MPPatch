@@ -50,13 +50,16 @@ lazy val mppatch = project in file(".") settings (commonSettings ++ ProguardBuil
   name := "mppatch-nopack",
 
   libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
-  shadeMappings       += "scala.**" -> "moe.lymia.mppatch.libs.scala.@1",
+  shadeMappings       += "scala.**" -> "moe.lymia.mppatch.lib.scala.@1",
 
   libraryDependencies += "org.tukaani" % "xz" % "1.5",
-  shadeMappings       += "org.tukaani.xz.**" -> "moe.lymia.mppatch.libs.xz.@1",
+  shadeMappings       += "org.tukaani.xz.**" -> "moe.lymia.mppatch.lib.xz.@1",
 
   libraryDependencies += "org.whispersystems" % "curve25519-java" % "0.3.0",
-  shadeMappings       += "org.whispersystems.curve25519.**" -> "moe.lymia.mppatch.libs.curve25519.@1",
+  shadeMappings       += "org.whispersystems.curve25519.**" -> "moe.lymia.mppatch.lib.curve25519.@1",
+
+  libraryDependencies += "com.github.rjeschke" % "txtmark" % "0.13",
+  shadeMappings       += "com.github.rjeschke.txtmark.**" -> "moe.lymia.mppatch.lib.txtmark.@1",
 
   excludeFiles   := Set("library.properties", "rootdoc.txt", "scala-xml.properties"),
   proguardConfig := "installer.pro"

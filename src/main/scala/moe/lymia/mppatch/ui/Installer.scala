@@ -27,6 +27,8 @@ import javax.swing.UIManager
 
 object Installer {
   def main(args: Array[String]): Unit = {
+    System.setProperty("awt.useSystemAAFontSettings","on")
+    System.setProperty("swing.aatext", "true")
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
     new MainFrame(Locale.getDefault).show()
   }

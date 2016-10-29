@@ -22,7 +22,7 @@
 
 package moe.lymia.mppatch.ui
 
-import java.awt.{Dimension, GridBagConstraints, GridBagLayout}
+import java.awt.{Dimension, Font, GridBagConstraints, GridBagLayout}
 import java.nio.file.{Files, Path}
 import java.util.Locale
 import javax.swing._
@@ -82,12 +82,17 @@ class MainFrame(val locale: Locale) extends FrameBase {
     }
   }
 
-  def squareButton(button: JButton) = {
+  val symbolFont = Font.createFont(Font.TRUETYPE_FONT, IOUtils.getResource("text/Symbola_hint_subset.ttf"))
+  def symbolButton(button: JButton) = {
     val size = button.getMinimumSize
     if(size.getWidth < size.getHeight) {
       button.setMinimumSize  (new Dimension(size.getHeight.toInt, size.getHeight.toInt))
       button.setPreferredSize(new Dimension(size.getHeight.toInt, size.getHeight.toInt))
     }
+
+    val font = button.getFont
+    button.setFont(symbolFont.deriveFont(Font.PLAIN, font.getSize))
+
     button
   }
 
@@ -123,15 +128,15 @@ class MainFrame(val locale: Locale) extends FrameBase {
     settingsButton.setAction(action { e => update() })
     settingsButton.setText(i18n("gui.icon.settings"))
     settingsButton.setToolTipText(i18n("gui.tooltip.settings"))
-    squareButton(settingsButton)
+    symbolButton(settingsButton)
     frame.add(settingsButton, constraints(gridx = 2, gridy = 1,
                                           fill = GridBagConstraints.BOTH))
 
     val refreshButton = new JButton()
     refreshButton.setAction(action { e => update() })
-    refreshButton.setText(i18n("gui.icon.refresh"))
-    refreshButton.setToolTipText(i18n("gui.tooltip.refresh"))
-    squareButton(refreshButton)
+    refreshButton.setText(i18n("gui.icon.advanced"))
+    refreshButton.setToolTipText(i18n("gui.tooltip.advanced"))
+    symbolButton(refreshButton)
     frame.add(refreshButton, constraints(gridx = 3, gridy = 1,
                                          fill = GridBagConstraints.BOTH))
   }
