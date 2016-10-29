@@ -35,6 +35,6 @@ object Installer extends FrameError[JFrame] with I18NTrait {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
     new MainFrame(locale).show()
   } catch {
-    case e: Exception => dumpException("gui.genericerror", e)
+    case e: Exception => dumpException("error.genericerror", e)
   }
 }

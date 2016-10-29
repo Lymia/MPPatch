@@ -33,9 +33,12 @@ import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   var installButton  : ActionButton = _
   var uninstallButton: ActionButton = _
+  var installPath    : JTextField   = _
+  var currentVersion : JTextField   = _
+  var targetVesrion  : JTextField   = _
   var currentStatus  : JTextField   = _
 
-  val platform  = Platform.currentPlatform.getOrElse(error(i18n("gui.unknownplatform")))
+  val platform  = Platform.currentPlatform.getOrElse(error(i18n("error.unknownplatform")))
   def resolvePaths(paths: Seq[Path]) = paths.find(x => Files.exists(x) && Files.isDirectory(x))
   val installer = resolvePaths(platform.defaultSystemPaths) match {
     case Some(x) =>
@@ -65,7 +68,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
         action()
         JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
       } catch {
-        case e: Exception => dumpException("gui.commandfailed", e, i18n(text+".continuous"))
+        case e: Exception => dumpException("error.commandfailed", e, i18n(text+".continuous"))
       }
       MainFrame.this.update()
     })
@@ -99,24 +102,45 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     frame = new JFrame()
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
 
-    frame.setTitle(i18n("common.title"))
+    frame.setTitle(i18n("title"))
     frame.setLayout(new GridBagLayout())
 
+    // Status seciton
     val statusPane = new JPanel()
     statusPane.setLayout(new GridBagLayout())
 
-    // Status seciton
-    {
+    def gridLabel(row: Int, labelStr: String) = {
       val label = new JLabel()
-      label.setText(i18n("gui.status"))
-      statusPane.add(label, constraints(ipadx = 3, ipady = 3))
-
-      currentStatus = new JTextField()
-      currentStatus.setEditable(false)
-      currentStatus.setPreferredSize(new Dimension(450, currentStatus.getPreferredSize.getHeight.toInt))
-      statusPane.add(currentStatus, constraints(gridx = 1, weightx = 1, ipadx = 3, ipady = 3,
-                                                fill = GridBagConstraints.BOTH))
+      label.setText(i18n(s"label.$labelStr"))
+      statusPane.add(label, constraints(gridy = row, ipadx = 3, ipady = 3, anchor = GridBagConstraints.LINE_START))
     }
+    def gridTextField(row: Int, width: Int = 2) = {
+      val textField = new JTextField()
+      textField.setEditable(false)
+      textField.setPreferredSize(new Dimension(450, textField.getPreferredSize.getHeight.toInt))
+      statusPane.add(textField, constraints(gridx = 1, gridy = row, gridwidth = width, weightx = 1,
+                                            ipadx = 3, ipady = 3, fill = GridBagConstraints.BOTH))
+      textField
+    }
+
+    gridLabel(0, "path")
+    installPath = gridTextField(0, 1)
+
+    val browseButton = new JButton()
+    browseButton.setAction(action { e => update() })
+    browseButton.setText(i18n("icon.browse"))
+    browseButton.setToolTipText(i18n("tooltip.browse"))
+    symbolButton(browseButton)
+    statusPane.add(browseButton, constraints(gridx = 2, gridy = 0, fill = GridBagConstraints.BOTH))
+
+    gridLabel(1, "installed")
+    currentVersion = gridTextField(1)
+
+    gridLabel(2, "target")
+    targetVesrion = gridTextField(2)
+
+    gridLabel(3, "status")
+    currentStatus = gridTextField(3)
 
     frame.add(statusPane, constraints(gridwidth = 3, fill = GridBagConstraints.BOTH))
 
@@ -131,8 +155,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
     val settingsButton = new JButton()
     settingsButton.setAction(action { e => update() })
-    settingsButton.setText(i18n("gui.icon.settings"))
-    settingsButton.setToolTipText(i18n("gui.tooltip.settings"))
+    settingsButton.setText(i18n("icon.settings"))
+    settingsButton.setToolTipText(i18n("tooltip.settings"))
     symbolButton(settingsButton)
     frame.add(settingsButton, constraints(gridx = 2, gridy = 1,
                                           fill = GridBagConstraints.BOTH))
@@ -140,28 +164,31 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
   def setStatus(text: String) = currentStatus.setText(i18n(text))
   override def update() = {
+    currentVersion.setText(installer.loadPatchState().fold(i18n("status.noversion"))(_.installedVersion))
+    targetVesrion.setText(installer.loader.data.patchVersion)
+
     installButton.setEnabled(false)
-    installButton.setAction("gui.action.install", actionUpdate)
+    installButton.setAction("action.install", actionUpdate)
 
     uninstallButton.setEnabled(false)
-    uninstallButton.setAction("gui.action.uninstall", actionUninstall)
+    uninstallButton.setAction("action.uninstall", actionUninstall)
 
     installer.checkPatchStatus() match {
       case PatchStatus.Installed =>
-        setStatus("gui.status.ready")
-        installButton.setActionText("gui.action.reinstall")
+        setStatus("status.ready")
+        installButton.setActionText("action.reinstall")
         installButton.setEnabled(true)
         uninstallButton.setEnabled(true)
       case PatchStatus.NeedsUpdate =>
-        setStatus("gui.status.needsupdate")
-        installButton.setActionText("gui.action.update")
+        setStatus("status.needsupdate")
+        installButton.setActionText("action.update")
         installButton.setEnabled(true)
         uninstallButton.setEnabled(true)
       case PatchStatus.NotInstalled(true) =>
-        setStatus("gui.status.notinstalled")
+        setStatus("status.notinstalled")
         installButton.setEnabled(true)
       case PatchStatus.NotInstalled(false) =>
-        setStatus("gui.status.unknownversion")
+        setStatus("status.unknownversion")
       case x => setStatus("unknown state: "+x)
     }
   }
@@ -172,8 +199,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     var continueLoop = true
     def lockLoop() =
       IOUtils.withLock(lockFile, error = {
-        val doOverride = JOptionPane.showConfirmDialog(frame, i18n("gui.retrylock"),
-                                                       i18n("common.title"), JOptionPane.YES_NO_OPTION)
+        val doOverride = JOptionPane.showConfirmDialog(frame, i18n("error.retrylock"),
+                                                       i18n("title"), JOptionPane.YES_NO_OPTION)
         if(doOverride == JOptionPane.OK_OPTION) continueLoop = true
       }) {
         showForm()

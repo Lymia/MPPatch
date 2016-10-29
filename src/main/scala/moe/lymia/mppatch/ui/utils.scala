@@ -52,7 +52,7 @@ trait FrameError[F <: Frame] {
 
   def error[T](string: String): T = {
     JOptionPane.showMessageDialog(if(frame != null && frame.isVisible) frame else null, string,
-                                  i18n("common.title"), JOptionPane.ERROR_MESSAGE)
+                                  i18n("title"), JOptionPane.ERROR_MESSAGE)
     if(frame != null) {
       frame.setVisible(false)
       frame.dispose()

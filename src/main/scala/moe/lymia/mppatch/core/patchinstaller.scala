@@ -49,11 +49,11 @@ object PatchStatus {
   case object NeedsValidation extends PatchStatus
 }
 
-private case class PatchFile(path: String, expectedSha256: String)
-private case class PatchState(replacementTarget: PatchFile, originalFile: PatchFile,
-                              additionalFiles: Seq[PatchFile],
-                              installedVersion: String, installedTimestamp: Long,
-                              dlcInstallPath: String, textDataInstallPath: String) {
+case class PatchFile(path: String, expectedSha256: String)
+case class PatchState(replacementTarget: PatchFile, originalFile: PatchFile,
+                      additionalFiles: Seq[PatchFile],
+                      installedVersion: String, installedTimestamp: Long,
+                      dlcInstallPath: String, textDataInstallPath: String) {
   lazy val expectedFiles = additionalFiles.map(_.path).toSet + originalFile.path
 }
 private object PatchState {
@@ -83,7 +83,7 @@ private object PatchState {
                          XMLUtils.getNodeText(xml, "TextDataInstallPath")))
 }
 
-class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform, log: String => Unit = println) {
+class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Platform, log: String => Unit = println) {
   def resolve(path: String) = basePath.resolve(path)
 
   private val patchStatePath     = resolve(PathNames.PATCH_STATE_FILENAME)
@@ -104,7 +104,7 @@ class PatchInstaller(val basePath: Path, loader: PatchLoader, platform: Platform
     loader.nativePatchExists(platform.platformName, Crypto.sha256_hex(Files.readAllBytes(resolve(path))))
   private def getVersion(path: String) =
     loader.getNativePatch(platform.platformName, Crypto.sha256_hex(Files.readAllBytes(resolve(path))))
-  private def loadPatchState() = try {
+  def loadPatchState() = try {
     PatchState.unserialize(IOUtils.readXML(patchStatePath))
   } catch {
     case e: Exception =>
