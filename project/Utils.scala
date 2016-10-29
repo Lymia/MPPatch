@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-package moe.lymia.mppatch.build
-
 import sbt._
 
 import java.security.MessageDigest

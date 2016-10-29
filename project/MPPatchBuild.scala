@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-package moe.lymia.mppatch.build
-
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.SbtGit._
@@ -30,13 +28,13 @@ import Config._
 import sbtassembly._
 import AssemblyKeys._
 
-object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators with PatchBuild {
+object MPPatchBuild extends Build {
   // Additional keys
   val proguardMapping = TaskKey[File]("proguard-mapping")
   val buildDist       = TaskKey[File]("build-dist")
   val dist            = InputKey[Unit]("dist")
 
-  lazy val project = Project("mppatch", file(".")) settings (versionWithGit ++ proguardSettings ++ Seq(
+  lazy val mppatch = project in file(".") settings (versionWithGit ++ proguardSettings ++ Seq(
     GitKeys.baseVersion in ThisBuild := version_baseVersion,
 
     organization := "moe.lymia",
@@ -80,7 +78,7 @@ object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators 
     },
     ProguardKeys.proguard in Proguard <<= (ProguardKeys.proguard in Proguard).dependsOn(assembly),
     dist := streams.value.log.info("Final binary output to: "+buildDist.value)
-  ) ++ nativePatchBuildSettings ++ resourceGeneratorSettings ++ patchBuildSettings ++ inConfig(Proguard)(Seq(
+  ) ++ PatchBuild.settings ++ ResourceGenerators.settings ++ NativePatchBuild.settings ++ inConfig(Proguard)(Seq(
     // Package whole project into a single .jar file with Proguard.
     ProguardKeys.proguardVersion := "5.3",
     ProguardKeys.options ++= Seq("-verbose", "-include",

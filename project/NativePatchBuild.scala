@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-package moe.lymia.mppatch.build
-
 import sbt._
 import sbt.Keys._
 import Config._
@@ -29,62 +27,59 @@ import Utils._
 
 import scala.xml.{PrettyPrinter, XML}
 
-trait NativePatchBuild { this: Build =>
-  object NativePatchBuildUtils {
-    // Helper functions for compiling
-    def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
-    def gcc      (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
-    def nasm     (p: Seq[Any]) = runProcess(config_nasm +: p)
+object NativePatchBuild {
+  // Helper functions for compiling
+  def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
+  def gcc      (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
+  def nasm     (p: Seq[Any]) = runProcess(config_nasm +: p)
 
-    // Codegen for the proxy files.
-    def generateProxyDefine(file: File, target: File) {
-      val lines = IO.readLines(file).filter(_.nonEmpty)
-      val proxies = for(Array(t, name, attr, ret, signature, domain, sym) <- lines.map(_.trim.split(":"))) yield {
-        val functionDef =
-          s"""// Proxy for $name
-             |typedef $attr $ret (*${name}_fn) ($signature);
-             |static ${name}_fn ${name}_ptr;
-             |$ret $name($signature) {
-             |  return ${name}_ptr(${signature.split(",").map(_.trim.split(" ").last).mkString(", ")});
-             |}
-          """.stripMargin
-        val initString = s"  ${name}_ptr = (${name}_fn) ${
-          if(t == "offset") s"resolveAddress($domain, ${name}_offset);"
-          else if(t == "symbol") s"""resolveSymbol($domain, "${if(sym == "*") name else sym}");"""
-          else sys.error(s"Unknown proxy type $t")
-        }"
-        (functionDef, initString)
-      }
-
-      IO.write(target, "#include \"c_rt.h\"\n"+
-        "#include \"c_defines.h\"\n"+
-        "#include \"extern_defines.h\"\n\n"+
-        proxies.map(_._1).mkString("\n")+"\n\n"+
-        "__attribute__((constructor(400))) static void loadGeneratedExternSymbols() {\n"+
-        proxies.map(_._2).mkString("\n")+"\n"+
-        "}\n")
+  // Codegen for the proxy files.
+  def generateProxyDefine(file: File, target: File) {
+    val lines = IO.readLines(file).filter(_.nonEmpty)
+    val proxies = for(Array(t, name, attr, ret, signature, domain, sym) <- lines.map(_.trim.split(":"))) yield {
+      val functionDef =
+        s"""// Proxy for $name
+           |typedef $attr $ret (*${name}_fn) ($signature);
+           |static ${name}_fn ${name}_ptr;
+           |$ret $name($signature) {
+           |  return ${name}_ptr(${signature.split(",").map(_.trim.split(" ").last).mkString(", ")});
+           |}
+        """.stripMargin
+      val initString = s"  ${name}_ptr = (${name}_fn) ${
+        if(t == "offset") s"resolveAddress($domain, ${name}_offset);"
+        else if(t == "symbol") s"""resolveSymbol($domain, "${if(sym == "*") name else sym}");"""
+        else sys.error(s"Unknown proxy type $t")
+      }"
+      (functionDef, initString)
     }
 
-    // Codegen for version header
-    def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
-      val VersionRegex(major, minor, _, patch, _, suffix) = version
-      cachedGeneration(cacheDirectory, tempTarget, finalTarget,
-        "#ifndef VERSION_H\n"+
-        "#define VERSION_H\n"+
-        "#define patchMarkerString \"MPPatch by Lymia (lymia@lymiahugs.com)."+
-        "Website: https://github.com/Lymia/MPPatch\"\n"+
-        "#define patchVersionMajor "+tryParse(major, -1)+"\n"+
-        "#define patchVersionMinor "+tryParse(minor, -1)+"\n"+
-        "#define patchCompatVersion "+version_patchCompat+"\n"+
-        "#define patchFullVersion \""+version+"\"\n"+
-        "#endif /* VERSION_H */"
-      )
-    }
+    IO.write(target, "#include \"c_rt.h\"\n"+
+      "#include \"c_defines.h\"\n"+
+      "#include \"extern_defines.h\"\n\n"+
+      proxies.map(_._1).mkString("\n")+"\n\n"+
+      "__attribute__((constructor(400))) static void loadGeneratedExternSymbols() {\n"+
+      proxies.map(_._2).mkString("\n")+"\n"+
+      "}\n")
   }
-  import NativePatchBuildUtils._
 
-  case class NativePatchFile(platform: String, version: String, file: File)
-  object NativePatchBuildKeys {
+  // Codegen for version header
+  def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
+    val VersionRegex(major, minor, _, patch, _, suffix) = version
+    cachedGeneration(cacheDirectory, tempTarget, finalTarget,
+      "#ifndef VERSION_H\n"+
+      "#define VERSION_H\n"+
+      "#define patchMarkerString \"MPPatch by Lymia (lymia@lymiahugs.com)."+
+      "Website: https://github.com/Lymia/MPPatch\"\n"+
+      "#define patchVersionMajor "+tryParse(major, -1)+"\n"+
+      "#define patchVersionMinor "+tryParse(minor, -1)+"\n"+
+      "#define patchCompatVersion "+version_patchCompat+"\n"+
+      "#define patchFullVersion \""+version+"\"\n"+
+      "#endif /* VERSION_H */"
+    )
+  }
+
+  case class PatchFile(platform: String, version: String, file: File)
+  object Keys {
     val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
     val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
     val patchSourceDir = SettingKey[File]("native-patch-source-directory")
@@ -100,12 +95,12 @@ trait NativePatchBuild { this: Build =>
     val win32ExternDef = TaskKey[File]("native-patch-win32-extern-defines")
     val linuxExternDef = TaskKey[File]("native-patch-linux-extern-defines")
 
-    val nativeVersions = TaskKey[Seq[NativePatchFile]]("native-patch-files")
+    val nativeVersions = TaskKey[Seq[PatchFile]]("native-patch-files")
   }
-  import NativePatchBuildKeys._
+  import Keys._
 
   // Patch build script
-  val nativePatchBuildSettings = Seq(
+  val settings = Seq(
     patchBuildDir  := crossTarget.value / "native-patch-build",
     patchCacheDir  := patchBuildDir.value / "cache",
     patchSourceDir := baseDirectory.value / "src" / "patch" / "native",
@@ -197,7 +192,7 @@ trait NativePatchBuild { this: Build =>
             target
           }
 
-        NativePatchFile(platform, sha256, outputPath)
+        PatchFile(platform, sha256, outputPath)
       }
       patches.toSeq
     }

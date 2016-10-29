@@ -20,8 +20,6 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.build
-
 import java.io.{DataOutputStream, FileOutputStream}
 import java.nio.charset.StandardCharsets
 
@@ -32,26 +30,18 @@ import Utils._
 
 import scala.xml._
 
-trait PatchBuild { this: Build with NativePatchBuild with ResourceGenerators =>
+object PatchBuild {
   object PatchFile {
     def apply(name: String, data: Array[Byte]) = (name, data)
     def apply(name: String, data: String) = (name, data.getBytes(StandardCharsets.UTF_8))
   }
 
-  object PatchBuildKeys {
+  object Keys {
     val patchFiles = TaskKey[Map[String, Array[Byte]]]("patch-build-files")
   }
-  import PatchBuildKeys._
+  import Keys._
 
-  /*
-      val basePath  = (resourceManaged in Compile).value
-      val patchPath = baseDirectory.value / "src" / "patch"
-      val logger    = streams.value.log
-
-      val target    = basePath / "moe" / "lymia" / "mppatch" / "patch"
-      target.mkdirs()
-  */
-  val patchBuildSettings = Seq(
+  val settings = Seq(
     patchFiles := {
       val patchPath = baseDirectory.value / "src" / "patch"
       val copiedFiles = for(directory <- (patchPath / "install") +: (patchPath / "ui").listFiles
@@ -59,7 +49,7 @@ trait PatchBuild { this: Build with NativePatchBuild with ResourceGenerators =>
                             file      <- directory.listFiles if file.isFile)
         yield PatchFile(file.getName, IO.readBytes(file))
 
-      val versions = NativePatchBuildKeys.nativeVersions.value
+      val versions = NativePatchBuild.Keys.nativeVersions.value
       val patchFiles = for(version <- versions)
         yield PatchFile(version.file.getName, IO.readBytes(version.file))
 
@@ -71,7 +61,7 @@ trait PatchBuild { this: Build with NativePatchBuild with ResourceGenerators =>
       </PatchManifest>
 
       val manifestFile = PatchFile("manifest.xml", xmlWriter.format(output))
-      val versionFile  = PatchFile("version.properties", IO.readBytes(ResourceKeys.versionFile.value))
+      val versionFile  = PatchFile("version.properties", IO.readBytes(ResourceGenerators.Keys.versionFile.value))
 
       // Final generated files list
       (versionFile +: manifestFile +: (patchFiles ++ copiedFiles)).toMap

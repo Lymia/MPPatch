@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-package moe.lymia.mppatch.build
-
 import java.net.InetAddress
 
 import sbt._
@@ -33,7 +31,7 @@ import Utils._
 import language.postfixOps
 import scala.collection.mutable.ArrayBuffer
 
-trait ResourceGenerators { this: Build =>
+object ResourceGenerators {
   private def tryProperty(s: => String) = try {
     val str = s
     if(str == null) "<null>" else str
@@ -51,12 +49,12 @@ trait ResourceGenerators { this: Build =>
     output.mkString("\n")
   }
 
-  object ResourceKeys {
+  object Keys {
     val versionFile     = TaskKey[File]("resource-version-file")
   }
-  import ResourceKeys._
+  import Keys._
 
-  val resourceGeneratorSettings = Seq(
+  val settings = Seq(
     versionFile := {
       val path = crossTarget.value / "version-resource-cache.properties"
 

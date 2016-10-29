@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-package moe.lymia.mppatch.build
-
 object Config {
   val config_scalaVersion = "2.11.8"
 
