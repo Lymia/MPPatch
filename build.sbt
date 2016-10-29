@@ -60,7 +60,7 @@ lazy val mppatch = project in file(".") settings (commonSettings ++ ProguardBuil
   shadeMappings += "scala.**" -> "moe.lymia.mppatch.externlibs.scala.@1",
   shadeMappings += "org.tukaani.xz.**" -> "moe.lymia.mppatch.externlibs.xz.@1",
   excludeFiles  := Set("library.properties", "rootdoc.txt", "scala-xml.properties"),
-  proguardMainClass := "moe.lymia.mppatch.MPPatchInstaller",
+  proguardMainClass := "moe.lymia.mppatch.ui.Installer",
 
   // Build distribution file
   buildDist := {

@@ -20,13 +20,13 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch
+package moe.lymia.mppatch.ui
 
 import java.util.Locale
 import javax.swing.UIManager
 
-package object ui {
-  def main(args: Seq[String]): Unit = {
+object Installer {
+  def main(args: Array[String]): Unit = {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
     new MainFrame(Locale.getDefault).show()
   }
