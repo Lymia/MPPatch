@@ -69,14 +69,15 @@ public class Loader extends ClassLoader {
 
         JarEntry currentEntry;
         byte[] buffer = new byte[bufferSize];
+        ByteArrayOutputStream fileOut = new ByteArrayOutputStream();
         while((currentEntry = jarIn.getNextJarEntry()) != null) {
             String fileName = currentEntry.getName();
             if(fileName.endsWith(".class")) {
-                ByteArrayOutputStream fileOut = new ByteArrayOutputStream();
                 int len;
                 while((len = jarIn.read(buffer)) != -1) fileOut.write(buffer, 0, len);
                 String className = fileName.substring(0, fileName.length() - 6).replace("/", ".");
                 classData.put(className, fileOut.toByteArray());
+                fileOut.reset();
             }
         }
     }
