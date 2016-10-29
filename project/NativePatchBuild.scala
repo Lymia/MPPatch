@@ -29,7 +29,7 @@ import Utils._
 
 import scala.xml.{PrettyPrinter, XML}
 
-trait NativePatchBuild { this: Build with ResourceGenerators =>
+trait NativePatchBuild { this: Build =>
   object NativePatchBuildUtils {
     // Helper functions for compiling
     def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
@@ -100,12 +100,12 @@ trait NativePatchBuild { this: Build with ResourceGenerators =>
     val win32ExternDef = TaskKey[File]("native-patch-win32-extern-defines")
     val linuxExternDef = TaskKey[File]("native-patch-linux-extern-defines")
 
-    val nativeFiles    = TaskKey[Seq[NativePatchFile]]("native-patch-files")
+    val nativeVersions = TaskKey[Seq[NativePatchFile]]("native-patch-files")
   }
   import NativePatchBuildKeys._
 
   // Patch build script
-  val patchBuildSettings = Seq(
+  val nativePatchBuildSettings = Seq(
     patchBuildDir  := crossTarget.value / "native-patch-build",
     patchCacheDir  := patchBuildDir.value / "cache",
     patchSourceDir := baseDirectory.value / "src" / "patch" / "native",
@@ -144,7 +144,7 @@ trait NativePatchBuild { this: Build with ResourceGenerators =>
       patchSourceDir.value / "linux" / "extern_defines.gen",
       linuxDirectory.value / "extern_defines.c")(generateProxyDefine),
 
-    nativeFiles := {
+    nativeVersions := {
       val patchDirectory = patchBuildDir.value / "output"
       val progVersion    = version.value
       val logger         = streams.value.log
@@ -201,46 +201,6 @@ trait NativePatchBuild { this: Build with ResourceGenerators =>
         NativePatchFile(platform, sha1, outputPath, sha1_hex(IO.readBytes(outputPath)))
       }
       patches.toSeq
-    },
-
-    resourceGenerators in Compile += Def.task {
-      val basePath  = (resourceManaged in Compile).value
-      val patchPath = baseDirectory.value / "src" / "patch"
-      val logger    = streams.value.log
-
-      val target    = basePath / "moe" / "lymia" / "mppatch" / "patch"
-      target.mkdirs()
-
-      val copiedFiles = for(directory <- (patchPath / "install") +: (patchPath / "ui").listFiles
-                                         if directory.isDirectory;
-                            file      <- directory.listFiles if file.isFile) yield {
-        val targetFile = target / file.getName
-        IO.copyFile(file, targetFile)
-        targetFile
-      }
-
-      val versions = nativeFiles.value
-      val patches = for(version <- versions) yield {
-        val targetFile = target / version.file.getName
-        IO.copyFile(version.file, targetFile)
-        targetFile
-      }
-
-      val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
-      val manifest = target / "manifest.xml"
-      val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
-                                  Timestamp={System.currentTimeMillis().toString}>
-        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
-        {versions.map(x => <Version Platform={x.platform} Version={x.version}
-                                    Filename={x.file.getName} Sha1={x.sha1}/>)}
-      </PatchManifest>
-      IO.write(manifest, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
-
-      val versionFile = target / "version.properties"
-      IO.copyFile(ResourceKeys.versionFile.value, versionFile)
-
-      // Final generated files list
-      versionFile +: manifest +: (copiedFiles ++ patches).toSeq
-    }.taskValue
+    }
   )
 }

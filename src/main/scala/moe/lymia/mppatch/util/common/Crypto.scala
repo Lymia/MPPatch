@@ -26,7 +26,7 @@ import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.util.UUID
 
-object Crypto {
+object  Crypto {
   def digest(algorithm: String, data: Seq[Byte]) = {
     val md = MessageDigest.getInstance(algorithm)
     val hash = md.digest(data.toArray)
@@ -35,11 +35,15 @@ object Crypto {
   def hexdigest(algorithm: String, data: Seq[Byte]) =
     digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
 
-  def md5_hex(data: Seq[Byte]) = hexdigest("MD5", data)
-  def sha1_hex(data: Seq[Byte]) = hexdigest("SHA1", data)
+  def md5_hex   (data: Seq[Byte]) = hexdigest("MD5"    , data)
+  def sha1_hex  (data: Seq[Byte]) = hexdigest("SHA-1"  , data)
+  def sha256_hex(data: Seq[Byte]) = hexdigest("SHA-256", data)
+  def sha512_hex(data: Seq[Byte]) = hexdigest("SHA-512", data)
 
-  def md5(data: Seq[Byte]) = digest("MD5", data)
-  def sha1(data: Seq[Byte]) = digest("SHA1", data)
+  def md5   (data: Seq[Byte]) = digest("MD5"    , data)
+  def sha1  (data: Seq[Byte]) = digest("SHA-1"  , data)
+  def sha256(data: Seq[Byte]) = digest("SHA-256", data)
+  def sha512(data: Seq[Byte]) = digest("SHA-512", data)
 
   private def makeUUID(data: Seq[Byte], version: Int) = {
     val newData    = data.updated(6, ((data(6) & 0x0F) | (version << 4)).toByte)

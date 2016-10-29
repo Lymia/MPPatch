@@ -30,7 +30,7 @@ import Config._
 import sbtassembly._
 import AssemblyKeys._
 
-object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators {
+object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators with PatchBuild {
   // Additional keys
   val proguardMapping = TaskKey[File]("proguard-mapping")
   val buildDist       = TaskKey[File]("build-dist")
@@ -51,6 +51,7 @@ object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators 
     // Dependencies
     libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
     libraryDependencies += "org.tukaani" % "xz" % "1.5",
+    libraryDependencies += "org.whispersystems" % "curve25519-java" % "0.3.0",
 
     // Build distribution file
     assemblyShadeRules in assembly := Seq(
@@ -79,7 +80,7 @@ object MPPatchBuild extends Build with NativePatchBuild with ResourceGenerators 
     },
     ProguardKeys.proguard in Proguard <<= (ProguardKeys.proguard in Proguard).dependsOn(assembly),
     dist := streams.value.log.info("Final binary output to: "+buildDist.value)
-  ) ++ patchBuildSettings ++ resourceGeneratorSettings ++ inConfig(Proguard)(Seq(
+  ) ++ nativePatchBuildSettings ++ resourceGeneratorSettings ++ patchBuildSettings ++ inConfig(Proguard)(Seq(
     // Package whole project into a single .jar file with Proguard.
     ProguardKeys.proguardVersion := "5.3",
     ProguardKeys.options ++= Seq("-verbose", "-include",

@@ -22,12 +22,14 @@
 
 package moe.lymia.mppatch.core
 
+import java.io.{DataInputStream, InputStream}
 import java.nio.file.Path
 import java.util.regex.Pattern
 import java.util.{Locale, UUID}
 
+import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 import moe.lymia.mppatch.util.XMLUtils._
-import moe.lymia.mppatch.util.common.{Crypto, IOUtils}
+import moe.lymia.mppatch.util.common.{Crypto, IOWrappers, PatchPackage}
 
 import scala.xml.{Node, XML}
 
@@ -144,9 +146,16 @@ class PatchLoader(val source: PatchFileSource) {
     fileData
   }
 }
-object PatchLoader {
-  val default = new PatchLoader(new PatchFileSource {
-    override def loadResource(name: String): String      = IOUtils.loadResource("patch/"+name)
-    override def loadBinary  (name: String): Array[Byte] = IOUtils.loadBinaryResource("patch/"+name)
-  })
+
+case class PatchPackageLoader(data: PatchPackage) extends PatchFileSource {
+  override def loadResource(name: String): String = data.loadResource(name)
+  override def loadBinary(name: String): Array[Byte] = data.loadBinaryResource(name)
+}
+object PatchPackageLoader {
+  def apply(in: InputStream): PatchPackageLoader =
+    PatchPackageLoader(IOWrappers.readPatchPackage(in match {
+      case in: DataInputStream => in
+      case _ => new DataInputStream(in)
+    }))
+  def apply(resource: String): PatchPackageLoader = PatchPackageLoader(IOUtils.getResource(resource))
 }

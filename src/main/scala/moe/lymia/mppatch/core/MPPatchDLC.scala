@@ -25,7 +25,7 @@ package moe.lymia.mppatch.core
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 
-import moe.lymia.mppatch.util.common.IOUtils
+import moe.lymia.mppatch.util.IOUtils
 
 object MPPatchDLC {
   val DLC_UPDATEVERSION = 1

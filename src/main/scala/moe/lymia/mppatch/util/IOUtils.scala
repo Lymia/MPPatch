@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util.common
+package moe.lymia.mppatch.util
 
 import java.io.{IOException, InputStream}
 import java.nio.channels.FileChannel

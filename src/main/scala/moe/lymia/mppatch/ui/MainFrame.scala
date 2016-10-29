@@ -27,8 +27,8 @@ import java.nio.file.{Files, Path}
 import java.util.Locale
 import javax.swing._
 
-import moe.lymia.mppatch.core.{PatchInstaller, PatchLoader, PatchStatus, Platform}
-import moe.lymia.mppatch.util.common.IOUtils
+import moe.lymia.mppatch.core._
+import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 
 class MainFrame(val locale: Locale) extends FrameBase {
   var installButton  : ActionButton = _
@@ -38,7 +38,9 @@ class MainFrame(val locale: Locale) extends FrameBase {
   val platform  = Platform.currentPlatform.getOrElse(error(i18n("gui.unknownplatform")))
   def resolvePaths(paths: Seq[Path]) = paths.find(x => Files.exists(x) && Files.isDirectory(x))
   val installer = resolvePaths(platform.defaultSystemPaths) match {
-    case Some(x) => new PatchInstaller(x, PatchLoader.default, platform)
+    case Some(x) =>
+      val patchData = PatchPackageLoader(s"patch_${VersionInfo.fromJar.versionString}.mppak")
+      new PatchInstaller(x, new PatchLoader(patchData), platform)
     case None    =>
       // TODO: Allow user selection
       error("system path could not be found")

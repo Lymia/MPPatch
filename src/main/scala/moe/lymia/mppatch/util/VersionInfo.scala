@@ -22,32 +22,44 @@
 
 package moe.lymia.mppatch.util
 
+import java.io.InputStream
 import java.util.Properties
 
-import moe.lymia.mppatch.util.common.IOUtils
+trait VersionInfoSource {
+  def apply(key: String, default: String): String
+}
+object NullSource extends VersionInfoSource {
+  def apply(key: String, default: String) = default
+}
+case class PropertiesSource(prop: Properties) extends VersionInfoSource {
+  def apply(key: String, default: String) = {
+    val p = prop.getProperty(key)
+    if(p == null || p.isEmpty) default else p
+  }
+}
 
+class VersionInfo(properties: VersionInfoSource) {
+  lazy val majorVersion  = Integer.parseInt(properties("mppatch.version.major","-1"))
+  lazy val minorVersion  = Integer.parseInt(properties("mppatch.version.minor","-1"))
+  lazy val patchVersion  = Integer.parseInt(properties("mppatch.version.patch","0"))
+
+  lazy val versionSuffix = properties("mppatch.version.suffix","0")
+  lazy val commit        = properties("mppatch.version.commit","unknown")
+  lazy val treeStatus    = properties("mppatch.version.treestatus","unknown")
+  lazy val versionString = properties("mppatch.version.string","unknown")
+  lazy val isDirty       = properties("mppatch.version.clean", "false") == "true"
+
+  lazy val patchCompat   = Integer.parseInt(properties("mppatch.patch.compat", "-1"))
+}
 object VersionInfo {
-  private lazy val properties = {
-    val prop = new Properties()
-    val resource = IOUtils.getResource("version.properties")
-    if(resource==null) (key: String, default: String) => default
-    else {
-      prop.load(resource)
-      (key: String, default: String) => {
-        val p = prop.getProperty("mppatch."+key)
-        if(p==null || p.isEmpty) default else p
-      }
-    }
+  def loadFromResource(resource: String) = {
+    val stream = IOUtils.getResource(resource)
+    new VersionInfo(if(stream == null) NullSource else {
+      val prop = new Properties()
+      prop.load(stream)
+      PropertiesSource(prop)
+    })
   }
 
-  lazy val majorVersion  = Integer.parseInt(properties("version.major","-1"))
-  lazy val minorVersion  = Integer.parseInt(properties("version.minor","-1"))
-  lazy val patchVersion  = Integer.parseInt(properties("version.patch","0"))
-  lazy val versionSuffix = properties("version.suffix","0")
-  lazy val commit        = properties("version.commit","unknown")
-  lazy val treeStatus    = properties("version.treestatus","unknown")
-  lazy val versionString = properties("version.string","unknown")
-  lazy val isDirty       = properties("version.clean", "false") == "true"
-
-  lazy val patchCompat   = Integer.parseInt(properties("patch.compat", "-1"))
+  val fromJar = loadFromResource("version.properties")
 }

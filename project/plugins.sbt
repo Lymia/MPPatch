@@ -4,6 +4,7 @@ addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.3")
 
 // Dependencies for the util package
 libraryDependencies += "org.tukaani" % "xz" % "1.5"
+libraryDependencies += "org.whispersystems" % "curve25519-java" % "0.3.0"
 
 // should probably not go in plugins.sbt, but... easiest way.
 unmanagedSourceDirectories in Compile +=
