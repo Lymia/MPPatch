@@ -25,10 +25,10 @@ import java.net.InetAddress
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.SbtGit._
+
 import Config._
 import Utils._
 
-import language.postfixOps
 import scala.collection.mutable.ArrayBuffer
 
 object ResourceGenerators {

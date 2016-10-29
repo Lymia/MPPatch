@@ -25,8 +25,6 @@ import java.nio.charset.StandardCharsets
 
 import sbt._
 import sbt.Keys._
-import Config._
-import Utils._
 
 import scala.xml._
 

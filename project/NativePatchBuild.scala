@@ -74,7 +74,7 @@ object NativePatchBuild {
   // Codegen for version header
   def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
   def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
-    val VersionRegex(major, minor, _, patch, _, suffix) = version
+    val VersionRegex(major, minor, _, _, _, _) = version
     cachedGeneration(cacheDirectory, tempTarget, finalTarget,
       "#ifndef VERSION_H\n"+
       "#define VERSION_H\n"+
