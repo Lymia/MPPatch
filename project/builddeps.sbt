@@ -6,6 +6,6 @@ addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.3")
 libraryDependencies += "org.tukaani" % "xz" % "1.5"
 libraryDependencies += "org.whispersystems" % "curve25519-java" % "0.3.0"
 
-// should probably not go in plugins.sbt, but... easiest way.
+// Include common source files
 unmanagedSourceDirectories in Compile +=
   baseDirectory.value / ".." / "src" / "main" / "scala" / "moe" / "lymia" / "mppatch" / "util" / "common"
