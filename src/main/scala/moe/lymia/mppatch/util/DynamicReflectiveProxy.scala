@@ -43,7 +43,7 @@ object DynamicReflectiveProxy {
     new DynamicStaticReflectiveProxy(clazz)
 }
 
-class DynamicReflectiveProxy(obj: AnyRef) extends Dynamic {
+class DynamicReflectiveProxy(val obj: AnyRef) extends Dynamic {
   private lazy val _clazz: Class[_] = obj.getClass
   protected def clazz = _clazz
 

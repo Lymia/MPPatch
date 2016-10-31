@@ -44,15 +44,15 @@ object WindowsRegistry {
   }
 
   sealed trait RegistryKeyType[T] {
-    private[WindowsRegistry] def readKey(hive: Hive, key: String, value: String): Option[T]
-    private[WindowsRegistry] def writeKey(hive: Hive, key: String, value: String, data: T)
+    def readKey(hive: Hive, key: String, value: String): Option[T]
+    def writeKey(hive: Hive, key: String, value: String, data: T)
   }
   implicit case object RegistryStringKey extends RegistryKeyType[String] {
-    private[WindowsRegistry] def readKey(hive: Hive, key: String, value: String) =
+    def readKey(hive: Hive, key: String, value: String) =
       withKey(hive, key, KEY_READ) { handle =>
         fromCString(hive.h.WindowsRegQueryValueEx(handle, toCString(value)).get[Array[Byte]])
       }
-    private[WindowsRegistry] def writeKey(hive: Hive, key: String, value: String, data: String) =
+    def writeKey(hive: Hive, key: String, value: String, data: String) =
       withKey(hive, key, KEY_ALL_ACCESS) { handle =>
         hive.h.WindowsRegSetValueEx(handle, toCString(value), toCString(data))
       }
@@ -62,8 +62,10 @@ object WindowsRegistry {
                                            private[WindowsRegistry] val hrName: String,
                                            private[WindowsRegistry] val h: Dynamic) {
 
-    assert(System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"),
-           "Windows registry not available.")
+    require(h.obj.getClass.getName == "java.util.prefs.WindowsPreferences",
+            "Preferences object must be instance of java.util.prefs.WindowsPreferences")
+    require(System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"),
+            "Windows registry not available.")
 
     def readKey[T: RegistryKeyType](key: String, value: String) =
       implicitly[RegistryKeyType[T]].readKey(this, key, value)
@@ -73,8 +75,8 @@ object WindowsRegistry {
       implicitly[RegistryKeyType[T]].writeKey(this, key, value, data)
     def update[T: RegistryKeyType](key: String, value: String, data: T) = writeKey[T](key, value, data)
   }
-  val HKEY_CURRENT_USER  = Hive(0x80000001, "HKEY_CURRENT_USER",
-                                DynamicReflectiveProxy(Preferences.systemRoot()))
-  val HKEY_LOCAL_MACHINE = Hive(0x80000002, "HKEY_LOCAL_MACHINE",
-                                DynamicReflectiveProxy(Preferences.userRoot()))
+  lazy val HKEY_CURRENT_USER  = Hive(0x80000001, "HKEY_CURRENT_USER",
+                                     DynamicReflectiveProxy(Preferences.systemRoot()))
+  lazy val HKEY_LOCAL_MACHINE = Hive(0x80000002, "HKEY_LOCAL_MACHINE",
+                                     DynamicReflectiveProxy(Preferences.userRoot()))
 }

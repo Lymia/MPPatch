@@ -41,10 +41,11 @@ case class I18N(locale: Locale, map: Map[String, String]) {
   ).getOrElse("<"+key+">")
 }
 
+// TODO: Do fallbacks on a per-key basis
 object I18N {
   private def defaultLocale = Locale.US
   private def sourceFile(locale: Locale, generic: Boolean) =
-    s"text/${locale.getLanguage}_${if(generic) "generic" else locale.getCountry}.properties"
+    s"text/i18n_${locale.getLanguage}_${if(generic) "generic" else locale.getCountry}.properties"
 
   @tailrec def findSourceFile(locale: Locale): String =
          if(IOUtils.resourceExists(sourceFile(locale, false))) sourceFile(locale, false)

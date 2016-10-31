@@ -66,7 +66,7 @@ object PatchBuild {
     },
     resourceGenerators in Compile += Def.task {
       val basePath = (resourceManaged in Compile).value
-      val packagePath = basePath / "moe" / "lymia" / "mppatch" / s"patch_${version.value}.mppak"
+      val packagePath = basePath / "moe" / "lymia" / "mppatch" / s"mppatch.mppak"
 
       import moe.lymia.mppatch.util.common._
       IOWrappers.writePatchPackage(new DataOutputStream(new FileOutputStream(packagePath)),

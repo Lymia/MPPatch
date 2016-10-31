@@ -27,7 +27,9 @@ object Preferences {
     def encode(t: T): String
     def decode(s: String): T
   }
-  case class SimplePreferenceSerializer[T](encodeF: T => String, decodeF: String => T) {
+  case class SimplePreferenceSerializer[T](encodeF: T => String, decodeF: String => T)
+    extends PreferenceSerializer[T] {
+
     def encode(t: T): String = encodeF(t)
     def decode(s: String): T = decodeF(s)
   }
@@ -35,15 +37,21 @@ object Preferences {
   implicit val StringPreference = SimplePreferenceSerializer[String](identity, identity)
 
   val prefs = java.util.prefs.Preferences.userNodeForPackage(getClass)
-  case class PreferenceKey[T : PreferenceSerializer](name: String, default: T) {
-    private val encoder = implicitly[PreferenceSerializer[T]]
-    private val defaultString = encoder.encode(default)
+  class PreferenceKey[T : PreferenceSerializer](val name: String, default: => T) {
+    def this(name: String) = this(name, sys.error("preference "+name+" not set"))
 
+    private val encoder = implicitly[PreferenceSerializer[T]]
+
+    def hasValue = prefs.get(name, null) != null
+    def clear() = prefs.remove(name)
     def value = try {
-      encoder.decode(prefs.get(name, defaultString))
+      val pref = prefs.get(name, null)
+      if(pref == null) default else encoder.decode(pref)
     } catch {
       case _: Exception => default
     }
     def value_=(t: T) = prefs.put(name, encoder.encode(t))
   }
+
+  val installationDirectory = new PreferenceKey[String]("installationDirectory")
 }

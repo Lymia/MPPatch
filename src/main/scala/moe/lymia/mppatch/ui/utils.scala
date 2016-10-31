@@ -27,6 +27,8 @@ import java.awt.{Frame, GridBagConstraints, Insets}
 import java.util.Locale
 import javax.swing._
 
+import moe.lymia.mppatch.util.VersionInfo
+
 import scala.language.implicitConversions
 
 trait FrameUtils {
@@ -42,35 +44,40 @@ trait FrameUtils {
 }
 
 trait I18NTrait {
-  def locale: Locale
-  val i18n = I18N(locale)
+  protected def locale: Locale
+  protected val i18n = I18N(locale)
 }
 
 trait FrameError[F <: Frame] {
-  def frame: F
-  def i18n: I18N
+  protected def frame: F
+  protected def i18n: I18N
 
-  def error[T](string: String): T = {
+  protected def titleString = i18n("title", VersionInfo.fromJar.versionString)
+
+  protected def warn(string: String) = {
     JOptionPane.showMessageDialog(if(frame != null && frame.isVisible) frame else null, string,
-                                  i18n("title"), JOptionPane.ERROR_MESSAGE)
+                                  titleString, JOptionPane.ERROR_MESSAGE)
+  }
+  protected def error[T](string: String): T = {
+    warn(string)
     if(frame != null) {
       frame.setVisible(false)
       frame.dispose()
     }
     sys.error(string)
   }
-  def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T = {
+  protected def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T = {
     e.printStackTrace()
     error(i18n(errorString, (e.getClass+": "+e.getMessage) +: exArgs : _*))
   }
 }
 
 trait FrameBase[F <: Frame] extends FrameError[F] with FrameUtils with I18NTrait {
-  var frame: F = _
-  def parent: F = null.asInstanceOf[F]
+  protected var frame: F = _
+  protected def parent: F = null.asInstanceOf[F]
 
-  def buildForm()
-  def update() { }
+  protected def buildForm()
+  protected def update() { }
 
   def showForm() = {
     buildForm()

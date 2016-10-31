@@ -48,6 +48,7 @@ object PlatformType {
 
 trait Platform {
   val platformName: String
+  val checkPaths: Seq[String]
   val gameSteamID = 8930
 
   def defaultSystemPaths: Seq[Path]
@@ -72,27 +73,33 @@ object Platform {
 }
 
 object Win32Platform extends Platform {
-  val platformName = "win32"
+  override val platformName = "win32"
+  override val checkPaths = Seq("CvGameDatabaseWin32Final Release.dll")
 
-  override def defaultSystemPaths: Seq[Path] =
+  override def defaultSystemPaths: Seq[Path] = try {
     WindowsRegistry.HKEY_CURRENT_USER("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
       x => Steam.loadLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
     WindowsRegistry.HKEY_CURRENT_USER("Software\\Firaxis\\Civilization5", "LastKnownPath").map(x => Paths.get(x)).toSeq
+  } catch {
+    case e: Exception =>
+      System.err.println("Could not load default system paths from registery.")
+      e.printStackTrace()
+      Seq()
+  }
   override def assetsPath = "Assets"
-
-  def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
+  override def normalizeLineEndings(name: String) =
+    name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
 }
 
 object LinuxPlatform extends Platform {
-  val platformName = "linux"
+  override val platformName = "linux"
+  override val checkPaths = Seq("Civ5XP")
 
   private val home = Paths.get(System.getProperty("user.home"))
-  def defaultSystemPaths: Seq[Path] =
+  override def defaultSystemPaths: Seq[Path] =
     Steam.loadLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
-
-  def assetsPath = "steamassets/assets"
+  override def assetsPath = "steamassets/assets"
   override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
-
-  def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n")
+  override def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n")
 }
 

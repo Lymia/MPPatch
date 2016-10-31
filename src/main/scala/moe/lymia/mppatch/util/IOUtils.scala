@@ -32,6 +32,20 @@ import scala.annotation.tailrec
 import scala.io.Codec
 import scala.xml.{Node, PrettyPrinter, XML}
 
+class FileLock(lockFile: Path) {
+  private val channel  = FileChannel.open(lockFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
+  private val lock     = Option(channel.tryLock)
+  private var released = false
+
+  val acquired = lock.isDefined
+  def release() = if(!released) {
+    lock.foreach(_.release)
+    channel.close()
+    released = true
+  }
+  if(lock.isEmpty) release()
+}
+
 object IOUtils {
   private val resPath = "/moe/lymia/mppatch/"
 
@@ -87,26 +101,17 @@ object IOUtils {
         } else throw exc
       })
 
-  private class FileLock(lockFile: Path) {
-    private val channel  = FileChannel.open(lockFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
-    private val lock     = Option(channel.tryLock)
-    private var released = false
-
-    val acquired = lock.isDefined
-    def release() = if(!released) {
-      lock.foreach(_.release)
-      channel.close()
-      released = true
-    }
-    if(lock.isEmpty) release()
-  }
-  def withLock[T](lockFile: Path, error: => T = sys.error(s"Could not acquire lock."))(f: => T) = {
+  def lock(lockFile: Path) = {
     val lock = new FileLock(lockFile)
-    if(!lock.acquired) error
-    else try {
-      f
-    } finally {
-      lock.release()
-    }
+    if(!lock.acquired) None else Some(lock)
   }
+  def withLock[T](lockFile: Path, error: => T = sys.error("Could not acquire lock."))(f: => T) =
+    lock(lockFile) match {
+      case None => error
+      case Some(lock) => try {
+        f
+      } finally {
+        lock.release()
+      }
+    }
 }
