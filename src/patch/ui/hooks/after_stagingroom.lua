@@ -45,9 +45,11 @@ if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
     local OnChatOld = OnChat
     function OnChat(...)
         local fromPlayer, toPlayer, text = ...
-        if not Matchmaking.IsHost() and fromPlayer == m_HostID and text == confirmChat then
-            gameLaunchSet = true
-            _mpPatch.overrideModsFromPreGame()
+        if and fromPlayer == m_HostID and text == confirmChat then
+            if not Matchmaking.IsHost() then
+                gameLaunchSet = true
+                _mpPatch.overrideModsFromPreGame()
+            end
             return
         end
         return OnChatOld(...)
