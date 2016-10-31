@@ -44,8 +44,9 @@ if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
 
     local OnChatOld = OnChat
     function OnChat(...)
-        local fromPlayer, toPlayer, text = ...
-        if and fromPlayer == m_HostID and text == confirmChat then
+        local fromPlayer, _, text = ...
+        if not ContextPtr:IsHidden() and m_PlayerNames[fromPlayer] and
+           fromPlayer == m_HostID and text == confirmChat then
             if not Matchmaking.IsHost() then
                 gameLaunchSet = true
                 _mpPatch.overrideModsFromPreGame()
@@ -54,6 +55,8 @@ if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
         end
         return OnChatOld(...)
     end
+    Events.GameMessageChat.Remove(OnChatOld)
+    Events.GameMessageChat.Add(OnChat)
 
     local DequeuePopup = UIManager.DequeuePopup
     _mpPatch.patch.globals.rawset(UIManager, "DequeuePopup", function(this, ...)
