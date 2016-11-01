@@ -58,7 +58,8 @@ class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialo
     val document = htmlEditor.createDefaultDocument()
     editor.setDocument(document)
 
-    def setPage(page: String) = {
+    def setPage(pageParam: String) = {
+      val page = pageParam.replaceAll("^/+", "")
       println("Setting page to: "+page)
       editor.setText(renderMarkdown(page))
       editor.setCaretPosition(0)
