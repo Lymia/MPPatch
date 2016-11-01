@@ -79,12 +79,14 @@ class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialo
 
     frame.add(new FontLabel(Font.BOLD,
                             i18n("about.0", version.versionString)),
-              constraints(gridy = 0, gridwidth = 2, anchor = GridBagConstraints.LINE_START))
+              constraints(gridy = 0, gridwidth = 2, anchor = GridBagConstraints.LINE_START,
+                          insets = insets(left = 3, right = 3, top = 3)))
     frame.add(new FontLabel(Font.PLAIN,
                             i18n("about.1", version.commit.substring(0, 8),
                                             if(version.isDirty) i18n("about.dirty") else "",
                                             dateFormat.format(version.buildDate), version.buildUser)),
-              constraints(gridy = 1, gridwidth = 2, anchor = GridBagConstraints.LINE_START))
+              constraints(gridy = 1, gridwidth = 2, anchor = GridBagConstraints.LINE_START,
+                          insets = insets(left = 3, right = 3, bottom = 3)))
     frame.add(scroll, constraints(gridy = 3, gridwidth = 2, weightx = 1, weighty = 1,
                                   fill = GridBagConstraints.BOTH))
   }
