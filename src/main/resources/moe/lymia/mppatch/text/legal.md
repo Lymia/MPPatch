@@ -70,12 +70,6 @@ XZ for Java has been placed into the public domain.
 
 The Symbola font has been placed into the public domain.
 
-### curve25519-java
-
-Copyright (C) 2014-2016 Open Whisper Systems
-
-Licenced under the GPLv3: [http://www.gnu.org/licenses/gpl-3.0.html](http://fromres/text/gplv3.md)
-
 ### txtmark
 
 Copyright (C) 2011-2015 René Jeschke <rene_jeschke@yahoo.de>

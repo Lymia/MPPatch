@@ -55,9 +55,6 @@ lazy val mppatch = project in file(".") settings (commonSettings ++ ProguardBuil
   libraryDependencies += "org.tukaani" % "xz" % "1.5",
   shadeMappings       += "org.tukaani.xz.**" -> "moe.lymia.mppatch.lib.xz.@1",
 
-  libraryDependencies += "org.whispersystems" % "curve25519-java" % "0.3.0",
-  shadeMappings       += "org.whispersystems.curve25519.**" -> "moe.lymia.mppatch.lib.curve25519.@1",
-
   libraryDependencies += "com.github.rjeschke" % "txtmark" % "0.13",
   shadeMappings       += "com.github.rjeschke.txtmark.**" -> "moe.lymia.mppatch.lib.txtmark.@1",
 
