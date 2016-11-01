@@ -90,20 +90,6 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     installer.cleanupPatch()
   }
 
-  private val symbolFont = Font.createFont(Font.TRUETYPE_FONT, IOUtils.getResource("text/Symbola_hint_subset.ttf"))
-  private def symbolButton(button: JButton) = {
-    val size = button.getMinimumSize
-    if(size.getWidth < size.getHeight) {
-      button.setMinimumSize  (new Dimension(size.getHeight.toInt, size.getHeight.toInt))
-      button.setPreferredSize(new Dimension(size.getHeight.toInt, size.getHeight.toInt))
-    }
-
-    val font = button.getFont
-    button.setFont(symbolFont.deriveFont(Font.PLAIN, font.getSize))
-
-    button
-  }
-
   protected def buildForm() {
     frame = new JFrame(titleString)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
@@ -113,27 +99,10 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     val statusPane = new JPanel()
     statusPane.setLayout(new GridBagLayout())
 
-    def gridLabel(row: Int, labelStr: String) = {
-      val label = new JLabel()
-      label.setText(i18n(s"label.$labelStr"))
-      statusPane.add(label, constraints(gridy = row, ipadx = 3, ipady = 3,
-                     insets = insets(left = 3, right = 4),
-                     anchor = GridBagConstraints.LINE_START))
-    }
-    def gridTextField(row: Int, width: Int = 2) = {
-      val textField = new JTextField()
-      textField.setEditable(false)
-      textField.setPreferredSize(new Dimension(450, textField.getPreferredSize.getHeight.toInt))
-      statusPane.add(textField, constraints(gridx = 1, gridy = row, gridwidth = width, weightx = 1,
-                                            ipadx = 3, ipady = 3, fill = GridBagConstraints.BOTH))
-      textField
-    }
+    statusPane.gridLabel(0, "path")
+    installPath = statusPane.gridTextField(0, 1)
 
-    gridLabel(0, "path")
-    installPath = gridTextField(0, 1)
-
-    val browseButton = new JButton()
-    browseButton.setAction(action { e =>
+    statusPane.iconButton(2, 0, "browse") {
       val chooser = new JFileChooser()
       if(installer != null) chooser.setCurrentDirectory(installer.basePath.toFile)
       chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
@@ -141,47 +110,28 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
         changeInstaller(chooser.getSelectedFile.toPath)
         update()
       }
-    })
-    browseButton.setText(i18n("icon.browse"))
-    browseButton.setToolTipText(i18n("tooltip.browse"))
-    symbolButton(browseButton)
-    statusPane.add(browseButton, constraints(gridx = 2, gridy = 0, fill = GridBagConstraints.BOTH))
+    }
 
-    gridLabel(1, "target")
-    targetVersion = gridTextField(1)
+    statusPane.gridLabel(1, "target")
+    targetVersion = statusPane.gridTextField(1)
 
-    gridLabel(2, "installed")
-    currentVersion = gridTextField(2)
+    statusPane.gridLabel(2, "installed")
+    currentVersion = statusPane.gridTextField(2)
 
-    gridLabel(3, "status")
-    currentStatus = gridTextField(3)
+    statusPane.gridLabel(3, "status")
+    currentStatus = statusPane.gridTextField(3)
 
     frame.add(statusPane, constraints(gridwidth = 4, fill = GridBagConstraints.BOTH))
 
     // Button section
-    installButton = new ActionButton()
-    frame.add(installButton  , constraints(gridx = 0, gridy = 1, weightx = 0.5,
-                                           fill = GridBagConstraints.BOTH))
+    installButton   = new ActionButton()
+    frame.add(installButton  , constraints(gridx = 0, gridy = 1, weightx = 0.5, fill = GridBagConstraints.BOTH))
 
     uninstallButton = new ActionButton()
-    frame.add(uninstallButton, constraints(gridx = 1, gridy = 1, weightx = 0.5,
-                                           fill = GridBagConstraints.BOTH))
+    frame.add(uninstallButton, constraints(gridx = 1, gridy = 1, weightx = 0.5, fill = GridBagConstraints.BOTH))
 
-    val settingsButton = new JButton()
-    settingsButton.setAction(action { e => new SettingsDialog(locale, this).showForm() })
-    settingsButton.setText(i18n("icon.settings"))
-    settingsButton.setToolTipText(i18n("tooltip.settings"))
-    symbolButton(settingsButton)
-    frame.add(settingsButton, constraints(gridx = 2, gridy = 1,
-                                          fill = GridBagConstraints.BOTH))
-
-    val aboutButton = new JButton()
-    aboutButton.setAction(action { e => new AboutDialog(locale, this).showForm() })
-    aboutButton.setText(i18n("icon.about"))
-    aboutButton.setToolTipText(i18n("tooltip.about"))
-    symbolButton(aboutButton)
-    frame.add(aboutButton, constraints(gridx = 3, gridy = 1,
-                                          fill = GridBagConstraints.BOTH))
+    frame.iconButton(2, 1, "settings") { new SettingsDialog(locale, this).showForm() }
+    frame.iconButton(3, 1, "about"   ) { new AboutDialog   (locale, this).showForm() }
   }
 
   private def setStatus(text: String) = currentStatus.setText(i18n(text))

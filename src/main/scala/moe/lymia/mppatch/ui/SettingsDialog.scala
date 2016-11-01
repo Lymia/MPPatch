@@ -22,6 +22,7 @@
 
 package moe.lymia.mppatch.ui
 
+import java.awt.GridBagLayout
 import java.util.Locale
 import javax.swing.{JDialog, WindowConstants}
 
@@ -29,5 +30,8 @@ class SettingsDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDi
   override protected def buildForm(): Unit = {
     frame = new JDialog(owner.getFrame, i18n("title.settings"), true)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
+    frame.setLayout(new GridBagLayout())
+
+
   }
 }

@@ -23,24 +23,74 @@
 package moe.lymia.mppatch.ui
 
 import java.awt.event.ActionEvent
-import java.awt.{GridBagConstraints, Insets, Window}
+import java.awt._
 import java.util.Locale
 import javax.swing._
 
-import moe.lymia.mppatch.util.VersionInfo
+import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 
 import scala.language.implicitConversions
 
+object FrameUtils {
+  lazy val symbolFont = Font.createFont(Font.TRUETYPE_FONT, IOUtils.getResource("text/Symbola_hint_subset.ttf"))
+}
+import FrameUtils._
+
 trait FrameUtils {
-  def insets(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) = new Insets(top, left, bottom, right)
-  def constraints(gridx: Int = GridBagConstraints.RELATIVE, gridy: Int = GridBagConstraints.RELATIVE,
-                  gridwidth: Int = 1, gridheight: Int = 1, weightx: Double = 0, weighty: Double = 0,
-                  anchor: Int = GridBagConstraints.CENTER, fill: Int = GridBagConstraints.NONE,
-                  insets: Insets = this.insets(), ipadx: Int = 0, ipady: Int = 0) =
+  protected def insets(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) =
+    new Insets(top, left, bottom, right)
+  protected def constraints(gridx: Int = GridBagConstraints.RELATIVE, gridy: Int = GridBagConstraints.RELATIVE,
+                            gridwidth: Int = 1, gridheight: Int = 1, weightx: Double = 0, weighty: Double = 0,
+                            anchor: Int = GridBagConstraints.CENTER, fill: Int = GridBagConstraints.NONE,
+                            insets: Insets = this.insets(), ipadx: Int = 0, ipady: Int = 0) =
     new GridBagConstraints(gridx, gridy, gridwidth, gridheight, weightx, weighty, anchor, fill, insets, ipadx, ipady)
 
-  implicit def action(f: ActionEvent => Unit): Action = new AbstractAction() {
+  protected implicit def action(f: ActionEvent => Unit): Action = new AbstractAction() {
     override def actionPerformed(e: ActionEvent): Unit = f(e)
+  }
+
+  protected class FontLabel(style: Int, string: String) extends JLabel(string) {
+    setFont(getFont.deriveFont(style))
+  }
+
+  protected def symbolButton(button: JButton) = {
+    val size = button.getMinimumSize
+    if(size.getWidth < size.getHeight) {
+      button.setMinimumSize  (new Dimension(size.getHeight.toInt, size.getHeight.toInt))
+      button.setPreferredSize(new Dimension(size.getHeight.toInt, size.getHeight.toInt))
+    }
+
+    val font = button.getFont
+    button.setFont(symbolFont.deriveFont(Font.PLAIN, font.getSize))
+
+    button
+  }
+}
+
+trait I18NFrameUtils extends FrameUtils { this: I18NTrait =>
+  protected implicit class ContainerExtension(c: Container) {
+    def gridLabel(row: Int, labelStr: String) = {
+      val label = new JLabel()
+      label.setText(i18n(s"label.$labelStr"))
+      c.add(label, constraints(gridy = row, insets = insets(left = 3, right = 4),
+                               anchor = GridBagConstraints.LINE_START))
+    }
+    def gridTextField(row: Int, width: Int = 2) = {
+      val textField = new JTextField()
+      textField.setEditable(false)
+      textField.setPreferredSize(new Dimension(450, textField.getPreferredSize.getHeight.toInt))
+      c.add(textField, constraints(gridx = 1, gridy = row, gridwidth = width, weightx = 1,
+                                   fill = GridBagConstraints.BOTH))
+      textField
+    }
+    def iconButton(col: Int, row: Int, str: String)(f: => Unit) = {
+      val button = new JButton()
+      button.setAction(action { e => f })
+      button.setText(i18n("icon."+str))
+      button.setToolTipText(i18n("tooltip."+str))
+      symbolButton(button)
+      c.add(button, constraints(gridx = col, gridy = row, fill = GridBagConstraints.BOTH))
+    }
   }
 }
 
@@ -73,7 +123,7 @@ trait FrameError[F <: Window] {
   }
 }
 
-trait FrameBase[F <: Window] extends FrameError[F] with FrameUtils with I18NTrait {
+trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with I18NTrait {
   protected var frame: F = _
   def getFrame = frame
 
@@ -86,10 +136,6 @@ trait FrameBase[F <: Window] extends FrameError[F] with FrameUtils with I18NTrai
     frame.pack()
     frame.setLocationRelativeTo(null)
     frame.setVisible(true)
-  }
-
-  protected class FontLabel(style: Int, string: String) extends JLabel(string) {
-    setFont(getFont.deriveFont(style))
   }
 
   protected class ActionButton(showCompleteMessage: Boolean = true) extends JButton {
