@@ -80,13 +80,13 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     }
   } else pathFromRegistry()
 
-  private def actionUpdate(): Unit = {
+  private val actionUpdate = () => {
     installer.safeUpdate()
   }
-  private def actionUninstall(): Unit = {
+  private val actionUninstall = () => {
     installer.safeUninstall()
   }
-  private def actionCleanup(): Unit = {
+  private val actionCleanup = () => {
     installer.cleanupPatch()
   }
 

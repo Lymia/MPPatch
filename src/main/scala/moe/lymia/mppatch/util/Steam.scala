@@ -27,7 +27,7 @@ import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path, Paths}
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 object Steam {
   // TODO: Parse this properly instead of this weirdness.
@@ -35,7 +35,7 @@ object Steam {
   def loadLibraryFolders(p: Path) =
     if(Files.exists(p))
       (for(l <- Files.readAllLines(p.resolve("steamapps").resolve("libraryfolders.vdf"),
-                                   StandardCharsets.UTF_8).map(_.trim);
+                                   StandardCharsets.UTF_8).asScala.map(_.trim);
            m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)) :+ p
     else Seq(p)
 

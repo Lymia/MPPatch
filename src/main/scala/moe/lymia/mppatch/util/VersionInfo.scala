@@ -22,7 +22,6 @@
 
 package moe.lymia.mppatch.util
 
-import java.io.InputStream
 import java.util.{Date, Properties}
 
 trait VersionInfoSource {
@@ -51,8 +50,8 @@ class VersionInfo(properties: VersionInfoSource) {
 
   lazy val patchCompat   = properties("mppatch.patch.compat", "-1").toInt
 
-  lazy val buildDate = new Date(properties("build.time", "0").toLong)
-  lazy val buildUser = properties("build.userstring", "<unknown>")
+  lazy val buildDate     = new Date(properties("build.time", "0").toLong)
+  lazy val buildUser     = properties("build.userstring", "<unknown>")
 }
 object VersionInfo {
   def loadFromResource(resource: String) = {

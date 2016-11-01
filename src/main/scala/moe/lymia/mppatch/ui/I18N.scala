@@ -30,7 +30,7 @@ import java.util.{Locale, Properties}
 import moe.lymia.mppatch.util.IOUtils
 
 import scala.annotation.tailrec
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 case class I18N(locale: Locale, map: Map[String, String]) {
   private val messageFormatCache = new collection.mutable.HashMap[String, Option[MessageFormat]]
@@ -62,7 +62,7 @@ object I18N {
       includes.trim.split(",").map(x => loadI18NData(x.trim)).reduce(_ ++ _)
     } else Map()
 
-    includeData ++ prop.filter(_._1 != "includes").map(x => x.copy(_1 = x._1.trim, _2 = x._2))
+    includeData ++ prop.asScala.filter(_._1 != "includes").map(x => x.copy(_1 = x._1.trim, _2 = x._2))
   }
 
   def apply(locale: Locale) = new I18N(locale, loadI18NData(findSourceFile(locale)))
