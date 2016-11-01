@@ -73,15 +73,10 @@ lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBu
 // Build distribution file
 InputKey[Unit]("dist") := {
   val path   = crossTarget.value / "dist"
-
   def copy(source: File) = {
     val output = path / source.getName
     IO.copyFile(source, output)
     output
   }
-  val noPackOut = copy((ProguardKeys.proguard in Proguard).value.head)
-  val packOut   = copy((Keys.`package` in Compile in loader).value)
-
-  streams.value.log.info(s"Output nopack to: $noPackOut")
-  streams.value.log.info(s"Output packed to: $packOut")
+  streams.value.log.info(s"Output packed to: ${copy((Keys.`package` in Compile in loader).value)}")
 }
