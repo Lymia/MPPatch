@@ -33,7 +33,13 @@ import com.github.rjeschke.txtmark.Processor
 import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 
 class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialog] {
-  private def renderMarkdown(resource: String) = Processor.process(IOUtils.loadResource(resource))
+  private def renderMarkdown(resource: String) =
+    s"""<html>
+       |  <body>
+       |    ${Processor.process(IOUtils.loadResource(resource))}
+       |  </body>
+       |</html>
+     """.stripMargin
 
   private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
   private val version = VersionInfo.fromJar
