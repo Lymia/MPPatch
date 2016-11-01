@@ -32,10 +32,11 @@ import moe.lymia.mppatch.util.VersionInfo
 import scala.language.implicitConversions
 
 trait FrameUtils {
+  def insets(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) = new Insets(top, left, bottom, right)
   def constraints(gridx: Int = GridBagConstraints.RELATIVE, gridy: Int = GridBagConstraints.RELATIVE,
                   gridwidth: Int = 1, gridheight: Int = 1, weightx: Double = 0, weighty: Double = 0,
                   anchor: Int = GridBagConstraints.CENTER, fill: Int = GridBagConstraints.NONE,
-                  insets: Insets = new Insets(0, 0, 0, 0), ipadx: Int = 0, ipady: Int = 0) =
+                  insets: Insets = this.insets(), ipadx: Int = 0, ipady: Int = 0) =
     new GridBagConstraints(gridx, gridy, gridwidth, gridheight, weightx, weighty, anchor, fill, insets, ipadx, ipady)
 
   implicit def action(f: ActionEvent => Unit): Action = new AbstractAction() {

@@ -144,7 +144,9 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     def gridLabel(row: Int, labelStr: String) = {
       val label = new JLabel()
       label.setText(i18n(s"label.$labelStr"))
-      statusPane.add(label, constraints(gridy = row, ipadx = 3, ipady = 3, anchor = GridBagConstraints.LINE_START))
+      statusPane.add(label, constraints(gridy = row, ipadx = 3, ipady = 3,
+                     insets = insets(left = 3, right = 4),
+                     anchor = GridBagConstraints.LINE_START))
     }
     def gridTextField(row: Int, width: Int = 2) = {
       val textField = new JTextField()
@@ -173,11 +175,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     symbolButton(browseButton)
     statusPane.add(browseButton, constraints(gridx = 2, gridy = 0, fill = GridBagConstraints.BOTH))
 
-    gridLabel(1, "installed")
-    currentVersion = gridTextField(1)
+    gridLabel(1, "target")
+    targetVersion = gridTextField(1)
 
-    gridLabel(2, "target")
-    targetVersion = gridTextField(2)
+    gridLabel(2, "installed")
+    currentVersion = gridTextField(2)
 
     gridLabel(3, "status")
     currentStatus = gridTextField(3)
