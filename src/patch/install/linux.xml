@@ -20,13 +20,12 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-
 <InstallScript>
     <ReplacementTarget Filename="Civ5XP"/>
     <RenameTo Filename="Civ5XP.orig"/>
     <InstallBinary Filename="libmppatch.so"/>
-    <AdditionalFile Filename="Civ5XP" Source="Civ5XP.sh" SetExecutable="true"/>
-    <AdditionalFile Filename="Civ5XP.launch" Source="Civ5XP.launch.sh" SetExecutable="true"/>
+    <AdditionalFile Filename="Civ5XP" Source="install/Civ5XP.sh" SetExecutable="true"/>
+    <AdditionalFile Filename="Civ5XP.launch" Source="install/Civ5XP.launch.sh" SetExecutable="true"/>
 
     <LeftoverFilter Regex="Civ5XP\.launch"/>
     <LeftoverFilter Regex="libmppatch\.so"/>

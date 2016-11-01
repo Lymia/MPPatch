@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2015-2016 Lymia Alusyia <lymia@lymiahugs.com>
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in
+  ~ all copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  ~ THE SOFTWARE.
+  -->
+<UIPatch>
+    <Info UUID="df74f698-2343-11e6-89c4-8fef6d8f889e" Version="1" Priority="1" Name="MPPatch" ShortName="MPPatch"/>
+
+    <Include Filename="mppatch_runtime.lua"  Source="ui/lib/mppatch_runtime.lua" />
+    <Include Filename="mppatch_mtutils.lua"  Source="ui/lib/mppatch_mtutils.lua" />
+    <Include Filename="mppatch_utils.lua"    Source="ui/lib/mppatch_utils.lua"   />
+    <Include Filename="mppatch_modutils.lua" Source="ui/lib/mppatch_modutils.lua"/>
+    <Include Filename="mppatch_uiutils.lua"  Source="ui/lib/mppatch_uiutils.lua" />
+
+    <TextData Filename="ui/text/text_en_US.xml"/>
+
+    <Screen Filename="mppatch_multiplayerproxy" Source="ui/screen/mppatch_multiplayerproxy"/>
+
+    <!-- Basic frontend hooks -->
+    <Hook Filename="MainMenu.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/mainmenu_status.lua"/>
+        <InjectAfter Filename="ui/hooks/mainmenu_resetpatch.lua"/>
+        <InjectAfter Filename="ui/hooks/mainmenu_eventdebug.lua"/>
+    </Hook>
+    <Hook Filename="ContentSwitch.lua">
+        <InjectAfter Filename="ui/hooks/contentswitch_debug.lua"/>
+    </Hook>
+
+    <!-- Multiplayer/Mods frontend hooks -->
+    <Hook Filename="ModsMenu.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/modsmenu_enablempmenu.lua"/>
+    </Hook>
+    <Hook Filename="MultiplayerSelect.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/multiplayerselect_keepmods.lua"/>
+    </Hook>
+    <Hook Filename="Lobby.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/common_setbismodding.lua"/>
+    </Hook>
+    <Hook Filename="MPGameSetupScreen.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectBefore Filename="ui/hooks/common_setbismodding.lua"/>
+    </Hook>
+
+    <!-- Multiplayer lobby modifications -->
+    <Hook Filename="MPGameOptions.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/mpgameoptions_dlcselection.lua"/>
+    </Hook>
+    <Hook Filename="JoiningRoom.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/joiningroom_keepmods.lua"/>
+    </Hook>
+    <Hook Filename="StagingRoom.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/stagingroom_keepmods.lua"/>
+    </Hook>
+</UIPatch>

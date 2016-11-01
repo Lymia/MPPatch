@@ -30,6 +30,12 @@ function _mpPatch.overrideWithModList(list)
     patch.NetPatch.overrideModList()
     patch.NetPatch.install()
 end
+function _mpPatch.overrideModsFromActivatedList()
+    local modList = Modding.GetActivatedMods()
+    if modList and #modList > 0 then
+        _mpPatch.overrideWithModList(modList)
+    end
+end
 function _mpPatch.overrideModsFromPreGame()
     local modList = _mpPatch.decodeModsList()
     if modList and _mpPatch.isModding then

@@ -41,21 +41,21 @@ object PatchBuild {
 
   val settings = Seq(
     patchFiles := {
+      def loadFromDir(dir: File) =
+        Path.allSubpaths(dir).filter(_._1.isFile).map(x => PatchFile(dir.getName+"/"+x._2, IO.readBytes(x._1))).toSeq
+
       val patchPath = baseDirectory.value / "src" / "patch"
-      val copiedFiles = for(directory <- (patchPath / "install") +: (patchPath / "ui").listFiles
-                                         if directory.isDirectory;
-                            file      <- directory.listFiles if file.isFile)
-        yield PatchFile(file.getName, IO.readBytes(file))
+      val copiedFiles = loadFromDir(patchPath / "install") ++ loadFromDir(patchPath / "ui")
 
       val versions = NativePatchBuild.Keys.nativeVersions.value
       val patchFiles = for(version <- versions)
         yield PatchFile(version.file.getName, IO.readBytes(version.file))
-
       val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
       val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
                                   Timestamp={System.currentTimeMillis().toString}>
         {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
-        {versions.map(x => <Version Platform={x.platform} Version={x.version} Filename={x.file.getName}/>)}
+        {versions.map(x => <NativePatch Platform={x.platform} Version={x.version}
+                                        Filename={x.file.getName}/>)}
       </PatchManifest>
 
       val manifestFile = PatchFile("manifest.xml", xmlWriter.format(output))
@@ -67,6 +67,15 @@ object PatchBuild {
     resourceGenerators in Compile += Def.task {
       val basePath = (resourceManaged in Compile).value
       val packagePath = basePath / "moe" / "lymia" / "mppatch" / s"mppatch.mppak"
+
+      val debugOut = crossTarget.value / "patch-package-debug"
+      streams.value.log.info(s"Writing patch package files to $debugOut")
+      if(debugOut.exists) IO.delete(debugOut)
+      for((name, data) <- patchFiles.value) {
+        val target = debugOut / name
+        IO.createDirectory(target.getParentFile)
+        IO.write(target, data)
+      }
 
       import moe.lymia.mppatch.util.common._
       IOWrappers.writePatchPackage(new DataOutputStream(new FileOutputStream(packagePath)),

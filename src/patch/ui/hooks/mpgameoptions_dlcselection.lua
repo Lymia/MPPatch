@@ -1,7 +1,7 @@
 if _mpPatch and _mpPatch.enabled then
-    local origRefreshGameOptions = RefreshGameOptions
+    local RefreshGameOptionsOld = RefreshGameOptions
     function RefreshGameOptions()
-        origRefreshGameOptions()
+        RefreshGameOptionsOld()
 
         -- find mod dependencies
         local dlcDependencies = _mpPatch.getModDependencies(Modding.GetActivatedMods())

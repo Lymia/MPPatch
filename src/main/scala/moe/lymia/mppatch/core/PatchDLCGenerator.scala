@@ -27,9 +27,7 @@ import java.nio.file.{Files, Path}
 
 import moe.lymia.mppatch.util.IOUtils
 
-object MPPatchDLC {
-  val DLC_UPDATEVERSION = 1
-
+object PatchDLCGenerator {
   private def findPatchTargets(path: Path, loader: PatchLoader): Map[String, String] =
     IOUtils.listFiles(path).flatMap { file =>
       if(Files.isDirectory(file)) findPatchTargets(file, loader)
@@ -39,7 +37,7 @@ object MPPatchDLC {
   private def findPathTargets(base: Path, loader: PatchLoader, platform: Platform, path: String*) =
     findPatchTargets(platform.resolve(base, platform.assetsPath +: path: _*), loader)
   def generateBaseDLC(civBaseDirectory: Path, loader: PatchLoader, platform: Platform) = {
-    DLCData(loader.data.dlcManifest,
+    DLCData(loader.patch.dlcManifest,
             DLCGameplay(textData = loader.textFiles,
                         uiFiles = Map(
                           "LuaPatches" -> prepareList(findPathTargets(civBaseDirectory, loader, platform, "UI")),
@@ -49,3 +47,4 @@ object MPPatchDLC {
                         uiSkins = Seq(DLCUISkin("MPPatch", "BaseGame", "Common"))))
   }
 }
+

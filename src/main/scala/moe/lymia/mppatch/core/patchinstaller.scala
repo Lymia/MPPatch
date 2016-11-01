@@ -208,7 +208,7 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
       val assets = resolve(platform.assetsPath)
       DLCDataWriter.writeDLC(assets.resolve(platform.mapPath(dlcInstallPath)),
                              Some(assets.resolve(platform.mapPath(dlcTextPath))),
-                             MPPatchDLC.generateBaseDLC(basePath, loader, platform), platform)
+                             PatchDLCGenerator.generateBaseDLC(basePath, loader, platform), platform)
 
       val state = PatchState(if(installScript.patchTarget == installScript.replacementTarget) patchTarget
                              else additionalMap(installScript.replacementTarget),

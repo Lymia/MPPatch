@@ -1,4 +1,25 @@
 if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
+    _mpPatch.setBIsModding()
+
+    local function cancelOverride()
+        if context == ContextPtr and not Matchmaking.IsHost() then
+            _mpPatch.debugPrint("Cancelling override.")
+            _mpPatch.patch.NetPatch.reset()
+        end
+    end
+
+    -- Hook simple modding functions.
+    Modding = _mpPatch.hookTable(Modding, {ActivateAllowedDLC = function(...)
+        _mpPatch.overrideModsFromPreGame()
+        return Modding._super.ActivateAllowedDLC(...)
+    end})
+
+    Matchmaking = _mpPatch.hookTable(Matchmaking, {LaunchMultiplayerGame = function(...)
+        _mpPatch.overrideModsFromPreGame()
+        return Matchmaking._super.LaunchMultiplayerGame(...)
+    end})
+
+    -- Protocol for ensuring non-host players will override the mod list.
     local confirmChat = "mppatch:gamelaunchcountdown:WgUUz7wWuxWFmjY02WFS0mka53nFDzJvD00zmuQHKyJT2wNHuWZvrDcejHv5rTyl"
 
     local gameLaunchSet = false
@@ -19,6 +40,7 @@ if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
     local HandleExitRequestOld = HandleExitRequest
     function HandleExitRequest(...)
         if gameLaunchSet then return end
+        cancelOverride()
         return HandleExitRequestOld(...)
     end
 
@@ -58,13 +80,12 @@ if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
     Events.GameMessageChat.Remove(OnChatOld)
     Events.GameMessageChat.Add(OnChat)
 
+    -- Ensure the NetPatch hook doesn't end up escaping the UI.
     local DequeuePopup = UIManager.DequeuePopup
     _mpPatch.patch.globals.rawset(UIManager, "DequeuePopup", function(this, ...)
         local context = ...
-        if context == ContextPtr and not Matchmaking.IsHost() then
-            _mpPatch.debugPrint("Cancelling override.")
-            _mpPatch.patch.NetPatch.reset()
-        end
+        cancelOverride()
         return DequeuePopup(UIManager, ...)
     end)
 end
+
