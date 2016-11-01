@@ -59,6 +59,7 @@ class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialo
     editor.setDocument(document)
 
     def setPage(page: String) = {
+      println("Setting page to: "+page)
       editor.setText(renderMarkdown(page))
       editor.setCaretPosition(0)
     }
@@ -68,6 +69,7 @@ class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialo
       override def hyperlinkUpdate(e: HyperlinkEvent): Unit = {
         if(e.getEventType == HyperlinkEvent.EventType.ACTIVATED) {
           val url = e.getURL
+          println("Navigating to: "+url)
           if(url.getProtocol == "http" && url.getHost == "fromres") setPage(url.getPath)
           else if(url.getProtocol == "http" || url.getProtocol == "https") desktop.browse(e.getURL.toURI)
           else warn("Unknown protocol "+url.getProtocol)
