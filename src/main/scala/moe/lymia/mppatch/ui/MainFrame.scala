@@ -91,31 +91,6 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     installer.cleanupPatch()
   }
 
-  private class ActionButton() extends JButton {
-    var action: () => Unit = () => error("no action registered")
-    var text  : String     = "<no action>"
-
-    setAction(MainFrame.this.action { e =>
-      try {
-        action()
-        JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
-      } catch {
-        case e: Exception => dumpException("error.commandfailed", e, i18n(text+".continuous"))
-      }
-      MainFrame.this.update()
-    })
-
-    def setActionText(name: String): Unit = {
-      text = name
-      setText(i18n(name))
-      setToolTipText(i18n(name+".tooltip"))
-    }
-    def setAction(name: String, action: () => Unit): Unit = {
-      this.action = action
-      setActionText(name)
-    }
-  }
-
   private val symbolFont = Font.createFont(Font.TRUETYPE_FONT, IOUtils.getResource("text/Symbola_hint_subset.ttf"))
   private def symbolButton(button: JButton) = {
     val size = button.getMinimumSize
@@ -184,7 +159,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     gridLabel(3, "status")
     currentStatus = gridTextField(3)
 
-    frame.add(statusPane, constraints(gridwidth = 3, fill = GridBagConstraints.BOTH))
+    frame.add(statusPane, constraints(gridwidth = 4, fill = GridBagConstraints.BOTH))
 
     // Button section
     installButton = new ActionButton()
@@ -196,16 +171,24 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
                                            fill = GridBagConstraints.BOTH))
 
     val settingsButton = new JButton()
-    settingsButton.setAction(action { e => update() })
+    settingsButton.setAction(action { e => new SettingsDialog(locale, this).showForm() })
     settingsButton.setText(i18n("icon.settings"))
     settingsButton.setToolTipText(i18n("tooltip.settings"))
     symbolButton(settingsButton)
     frame.add(settingsButton, constraints(gridx = 2, gridy = 1,
                                           fill = GridBagConstraints.BOTH))
+
+    val aboutButton = new JButton()
+    aboutButton.setAction(action { e => new AboutDialog(locale, this).showForm() })
+    aboutButton.setText(i18n("icon.about"))
+    aboutButton.setToolTipText(i18n("tooltip.about"))
+    symbolButton(aboutButton)
+    frame.add(aboutButton, constraints(gridx = 3, gridy = 1,
+                                          fill = GridBagConstraints.BOTH))
   }
 
   private def setStatus(text: String) = currentStatus.setText(i18n(text))
-  override protected def update() = {
+  override def update() = {
     installButton.setEnabled(false)
     installButton.setAction("action.install", actionUpdate)
 

@@ -63,7 +63,7 @@ lazy val mppatch = project in file(".") settings (commonSettings ++ ProguardBuil
 
   excludeFiles   := Set("library.properties", "rootdoc.txt", "scala-xml.properties"),
   proguardConfig := "installer.pro"
-) ++ PatchBuild.settings ++ ResourceGenerators.settings ++ NativePatchBuild.settings)
+) ++ PatchBuild.settings ++ ResourceBuild.settings ++ NativePatchBuild.settings)
 
 lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBuild.settings ++ Seq(
   name := "mppatch",

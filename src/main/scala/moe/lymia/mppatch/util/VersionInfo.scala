@@ -50,6 +50,9 @@ class VersionInfo(properties: VersionInfoSource) {
   lazy val isDirty       = properties("mppatch.version.clean", "false") == "true"
 
   lazy val patchCompat   = Integer.parseInt(properties("mppatch.patch.compat", "-1"))
+
+  lazy val buildDate = properties("build.time", "<unknown>")
+  lazy val buildUser = properties("build.userstring", "<unknown>")
 }
 object VersionInfo {
   def loadFromResource(resource: String) = {

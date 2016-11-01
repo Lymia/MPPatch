@@ -1,3 +1,8 @@
+# MPPatch
+
+MPPatch {VERSION}  
+Revision {REVISION}, built on {BUILD_DATE} by {BUILD_USER}
+
 ### Contributors
 
 * Lymia (<https://github.com/Lymia/>)

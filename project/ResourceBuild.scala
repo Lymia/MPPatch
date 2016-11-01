@@ -31,7 +31,7 @@ import Utils._
 
 import scala.collection.mutable.ArrayBuffer
 
-object ResourceGenerators {
+object ResourceBuild {
   private def tryProperty(s: => String) = try {
     val str = s
     if(str == null) "<null>" else str
@@ -73,7 +73,10 @@ object ResourceGenerators {
 
       properties.put("build.os"        , tryProperty { System.getProperty("os.name") })
       properties.put("build.user"      , tryProperty { System.getProperty("user.name") })
-      properties.put("build.host"      , tryProperty { InetAddress.getLocalHost.toString })
+      properties.put("build.userstring", tryProperty { System.getProperty("user.name")+"@"+
+                                                       InetAddress.getLocalHost.getHostAddress })
+      properties.put("build.host"      , tryProperty { InetAddress.getLocalHost.getHostName })
+      properties.put("build.hostaddr"  , tryProperty { InetAddress.getLocalHost.getHostAddress })
       properties.put("build.time"      , new java.util.Date().toString)
       properties.put("build.path"      , baseDirectory.value.getAbsolutePath)
       properties.put("build.treestatus", propertyFromProcess("git", "status", "--porcelain"))

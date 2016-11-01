@@ -23,7 +23,7 @@
 package moe.lymia.mppatch.ui
 
 import java.awt.event.ActionEvent
-import java.awt.{Frame, GridBagConstraints, Insets}
+import java.awt.{GridBagConstraints, Insets, Window}
 import java.util.Locale
 import javax.swing._
 
@@ -49,7 +49,7 @@ trait I18NTrait {
   protected val i18n = I18N(locale)
 }
 
-trait FrameError[F <: Frame] {
+trait FrameError[F <: Window] {
   protected def frame: F
   protected def i18n: I18N
 
@@ -73,12 +73,12 @@ trait FrameError[F <: Frame] {
   }
 }
 
-trait FrameBase[F <: Frame] extends FrameError[F] with FrameUtils with I18NTrait {
+trait FrameBase[F <: Window] extends FrameError[F] with FrameUtils with I18NTrait {
   protected var frame: F = _
-  protected def parent: F = null.asInstanceOf[F]
+  def getFrame = frame
 
   protected def buildForm()
-  protected def update() { }
+  def update() { }
 
   def showForm() = {
     buildForm()
@@ -86,5 +86,30 @@ trait FrameBase[F <: Frame] extends FrameError[F] with FrameUtils with I18NTrait
     frame.pack()
     frame.setLocationRelativeTo(null)
     frame.setVisible(true)
+  }
+
+  protected class ActionButton(showCompleteMessage: Boolean = true) extends JButton {
+    var action: () => Unit = () => error("no action registered")
+    var text  : String     = "<no action>"
+
+    setAction(FrameBase.this.action { e =>
+      try {
+        action()
+        if(showCompleteMessage) JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
+      } catch {
+        case e: Exception => dumpException("error.commandfailed", e, i18n(text+".continuous"))
+      }
+      FrameBase.this.update()
+    })
+
+    def setActionText(name: String): Unit = {
+      text = name
+      setText(i18n(name))
+      setToolTipText(i18n(name+".tooltip"))
+    }
+    def setAction(name: String, action: () => Unit): Unit = {
+      this.action = action
+      setActionText(name)
+    }
   }
 }

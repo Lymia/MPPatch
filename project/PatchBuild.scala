@@ -59,7 +59,7 @@ object PatchBuild {
       </PatchManifest>
 
       val manifestFile = PatchFile("manifest.xml", xmlWriter.format(output))
-      val versionFile  = PatchFile("version.properties", IO.readBytes(ResourceGenerators.Keys.versionFile.value))
+      val versionFile  = PatchFile("version.properties", IO.readBytes(ResourceBuild.Keys.versionFile.value))
 
       // Final generated files list
       (versionFile +: manifestFile +: (patchFiles ++ copiedFiles)).toMap
