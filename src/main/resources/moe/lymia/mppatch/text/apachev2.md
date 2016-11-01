@@ -1,3 +1,7 @@
+[Return to legal page.](http://fromres/text/legal.md)
+
+---
+
 Apache License
 ==============
 

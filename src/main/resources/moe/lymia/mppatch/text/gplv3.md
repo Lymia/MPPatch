@@ -1,3 +1,7 @@
+[Return to legal page.](http://fromres/text/legal.md)
+
+---
+
 ### GNU GENERAL PUBLIC LICENSE
 
 Version 3, 29 June 2007

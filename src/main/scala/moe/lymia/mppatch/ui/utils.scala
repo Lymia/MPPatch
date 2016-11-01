@@ -46,7 +46,7 @@ trait FrameUtils {
 
 trait I18NTrait {
   protected def locale: Locale
-  protected val i18n = I18N(locale)
+  protected lazy val i18n = I18N(locale)
 }
 
 trait FrameError[F <: Window] {
@@ -86,6 +86,10 @@ trait FrameBase[F <: Window] extends FrameError[F] with FrameUtils with I18NTrai
     frame.pack()
     frame.setLocationRelativeTo(null)
     frame.setVisible(true)
+  }
+
+  protected class FontLabel(style: Int, string: String) extends JLabel(string) {
+    setFont(getFont.deriveFont(style))
   }
 
   protected class ActionButton(showCompleteMessage: Boolean = true) extends JButton {

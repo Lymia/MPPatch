@@ -21,11 +21,11 @@
  */
 
 import java.net.InetAddress
+import java.text.SimpleDateFormat
 
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.SbtGit._
-
 import Config._
 import Utils._
 
@@ -72,12 +72,10 @@ object ResourceBuild {
       properties.put("mppatch.patch.compat"  , version_patchCompat.toString)
 
       properties.put("build.os"        , tryProperty { System.getProperty("os.name") })
-      properties.put("build.user"      , tryProperty { System.getProperty("user.name") })
       properties.put("build.userstring", tryProperty { System.getProperty("user.name")+"@"+
-                                                       InetAddress.getLocalHost.getHostAddress })
-      properties.put("build.host"      , tryProperty { InetAddress.getLocalHost.getHostName })
+                                                       InetAddress.getLocalHost.getHostName })
       properties.put("build.hostaddr"  , tryProperty { InetAddress.getLocalHost.getHostAddress })
-      properties.put("build.time"      , new java.util.Date().toString)
+      properties.put("build.time"      , new java.util.Date().getTime.toString)
       properties.put("build.path"      , baseDirectory.value.getAbsolutePath)
       properties.put("build.treestatus", propertyFromProcess("git", "status", "--porcelain"))
 

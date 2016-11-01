@@ -23,7 +23,7 @@
 package moe.lymia.mppatch.util
 
 import java.io.InputStream
-import java.util.Properties
+import java.util.{Date, Properties}
 
 trait VersionInfoSource {
   def apply(key: String, default: String): String
@@ -39,19 +39,19 @@ case class PropertiesSource(prop: Properties) extends VersionInfoSource {
 }
 
 class VersionInfo(properties: VersionInfoSource) {
-  lazy val majorVersion  = Integer.parseInt(properties("mppatch.version.major","-1"))
-  lazy val minorVersion  = Integer.parseInt(properties("mppatch.version.minor","-1"))
-  lazy val patchVersion  = Integer.parseInt(properties("mppatch.version.patch","0"))
+  lazy val majorVersion  = properties("mppatch.version.major","-1").toInt
+  lazy val minorVersion  = properties("mppatch.version.minor","-1").toInt
+  lazy val patchVersion  = properties("mppatch.version.patch","0").toInt
 
   lazy val versionSuffix = properties("mppatch.version.suffix","0")
   lazy val commit        = properties("mppatch.version.commit","unknown")
   lazy val treeStatus    = properties("mppatch.version.treestatus","unknown")
   lazy val versionString = properties("mppatch.version.string","unknown")
-  lazy val isDirty       = properties("mppatch.version.clean", "false") == "true"
+  lazy val isDirty       = properties("mppatch.version.clean", "false") == "false"
 
-  lazy val patchCompat   = Integer.parseInt(properties("mppatch.patch.compat", "-1"))
+  lazy val patchCompat   = properties("mppatch.patch.compat", "-1").toInt
 
-  lazy val buildDate = properties("build.time", "<unknown>")
+  lazy val buildDate = new Date(properties("build.time", "0").toLong)
   lazy val buildUser = properties("build.userstring", "<unknown>")
 }
 object VersionInfo {

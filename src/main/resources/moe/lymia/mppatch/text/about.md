@@ -1,20 +1,17 @@
-# MPPatch
+Legal information can be found [here](http://fromres/text/legal.md).
 
-MPPatch {VERSION}  
-Revision {REVISION}, built on {BUILD_DATE} by {BUILD_USER}
+**Contributors**
 
-### Contributors
+⚫ [Lymia Aluysia](https://github.com/Lymia/), main developer
 
-* Lymia (<https://github.com/Lymia/>)
+**Libraries and resources used**
 
-### Libraries and resources used
+⚫ [Scala](http://www.scala-lang.org/), the programming language used for this installer  
+⚫ [XZ for Java](http://tukaani.org/xz/java.html), for compressing patch files  
+⚫ [curve25519-java](https://github.com/WhisperSystems/curve25519-java), for verifying patch files  
+⚫ [txtmark](https://github.com/rjeschke/txtmark), for rendering help files  
+⚫ [Symbola font](http://users.teilar.gr/~g1951d/), used for button icons
 
-* Scala (<http://www.scala-lang.org/>)
-* XZ for Java (<http://tukaani.org/xz/java.html>)
-* curve25519-java (<https://github.com/WhisperSystems/curve25519-java>)
-* txtmark (<https://github.com/rjeschke/txtmark>)
-* Symbola font (<http://users.teilar.gr/~g1951d/>)
+**Special Thanks**
 
-### Special Thanks
-
-* Firaxis Games for creating Civilization V.
+⚫ Firaxis Games for creating Civilization V.

@@ -73,7 +73,6 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   }
   if(Preferences.installationDirectory.hasValue) {
     val configPath = Paths.get(Preferences.installationDirectory.value)
-    println(configPath)
     if(checkPath(configPath)) changeInstaller(configPath)
     else {
       Preferences.installationDirectory.clear()
@@ -106,10 +105,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   }
 
   protected def buildForm() {
-    frame = new JFrame()
+    frame = new JFrame(titleString)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-
-    frame.setTitle(titleString)
     frame.setLayout(new GridBagLayout())
 
     // Status seciton

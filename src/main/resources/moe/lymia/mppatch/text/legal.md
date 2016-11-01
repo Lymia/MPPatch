@@ -1,10 +1,36 @@
+[Return to main page.](http://fromres/text/about.md)
+
+---
+
+License
+=======
+
+Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 3rd Party Licenses
 ==================
 
 MPPatch uses third party libraries and resources. They are under the following licenses.
 
-Scala License
--------------
+### Scala License
 
 Copyright (c) 2002-2016 EPFL
 
@@ -36,25 +62,21 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-XZ for Java
------------
+### XZ for Java
 
-XZ for Java (<http://tukaani.org/xz/java.html>) has been placed into the public domain.
+XZ for Java has been placed into the public domain.
 
-Symbola Font
-------------
+### Symbola Font
 
-The Symbola font (<http://users.teilar.gr/~g1951d/>) has been placed into the public domain.
+The Symbola font has been placed into the public domain.
 
-curve25519-java
----------------
+### curve25519-java
 
 Copyright (C) 2014-2016 Open Whisper Systems
 
-Licenced under the GPLv3: <http://www.gnu.org/licenses/gpl-3.0.html>
+Licenced under the GPLv3: [http://www.gnu.org/licenses/gpl-3.0.html](http://fromres/text/gplv3.md)
 
-txtmark
--------
+### txtmark
 
 Copyright (C) 2011-2015 René Jeschke <rene_jeschke@yahoo.de>
 
@@ -62,10 +84,16 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-* <http://www.apache.org/licenses/LICENSE-2.0>
+* [http://www.apache.org/licenses/LICENSE-2.0](http://fromres/text/apachev2.md)
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+Misc
+====
+
+* Sid Meier's Civilization V, Civ, Civilization, Firaxis Games, and Take-Two Interactive Software are all
+  trademarks and/or registered trademarks of Take-Two Interactive Software, Inc.

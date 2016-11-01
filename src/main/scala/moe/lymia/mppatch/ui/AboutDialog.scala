@@ -22,29 +22,68 @@
 
 package moe.lymia.mppatch.ui
 
+import java.awt._
+import java.text.DateFormat
 import java.util.Locale
-import javax.swing.{JDialog, WindowConstants}
+import javax.swing.text.html.HTMLEditorKit
+import javax.swing._
+import javax.swing.event.{HyperlinkEvent, HyperlinkListener}
 
 import com.github.rjeschke.txtmark.Processor
 import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 
 class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialog] {
-  private val variables = Seq(
-    "VERSION"    -> VersionInfo.fromJar.versionString,
-    "REVISION"   -> VersionInfo.fromJar.commit.substring(0, 8),
-    "BUILD_DATE" -> VersionInfo.fromJar.buildDate,
-    "BUILD_USER" -> VersionInfo.fromJar.buildUser
-  )
-  private def renderMarkdown(resource: String) = {
-    var markdown = IOUtils.loadResource(resource)
-    for((key, value) <- variables) markdown = markdown.replace(s"{$key}", value)
-    Processor.process(markdown)
-  }
+  private def renderMarkdown(resource: String) = Processor.process(IOUtils.loadResource(resource))
 
-  println(renderMarkdown("text/about.md"))
-
+  private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
+  private val version = VersionInfo.fromJar
+  private val desktop = Desktop.getDesktop
   override protected def buildForm(): Unit = {
     frame = new JDialog(owner.getFrame, i18n("title.about"), true)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
+    frame.setLayout(new GridBagLayout())
+
+    val editor = new JEditorPane()
+    editor.setEditable(false)
+
+    val scroll = new JScrollPane(editor)
+    scroll.setPreferredSize(new Dimension(500, 300))
+
+    val htmlEditor = new HTMLEditorKit
+    editor.setEditorKit(htmlEditor)
+
+    val stylesheet = htmlEditor.getStyleSheet
+    stylesheet.importStyleSheet(IOUtils.getResourceURL("text/style.css"))
+
+    val document = htmlEditor.createDefaultDocument()
+    editor.setDocument(document)
+
+    def setPage(page: String) = {
+      editor.setText(renderMarkdown(page))
+      editor.setCaretPosition(0)
+    }
+    setPage("text/about.md")
+
+    editor.addHyperlinkListener(new HyperlinkListener {
+      override def hyperlinkUpdate(e: HyperlinkEvent): Unit = {
+        if(e.getEventType == HyperlinkEvent.EventType.ACTIVATED) {
+          val url = e.getURL
+          if(url.getProtocol == "http" && url.getHost == "fromres") setPage(url.getPath)
+          else if(url.getProtocol == "http" || url.getProtocol == "https") desktop.browse(e.getURL.toURI)
+          else warn("Unknown protocol "+url.getProtocol)
+        }
+      }
+    })
+
+    frame.add(new FontLabel(Font.BOLD,
+                            i18n("about.0", version.versionString)),
+              constraints(gridy = 0, gridwidth = 2, anchor = GridBagConstraints.LINE_START))
+    frame.add(new FontLabel(Font.PLAIN,
+                            i18n("about.1", version.commit.substring(0, 8),
+                                            if(version.isDirty) i18n("about.dirty") else "",
+                                            dateFormat.format(version.buildDate), version.buildUser)),
+              constraints(gridy = 1, gridwidth = 2, anchor = GridBagConstraints.LINE_START))
+    frame.add(scroll, constraints(gridy = 3, gridwidth = 2, weightx = 1, weighty = 1,
+                                  fill = GridBagConstraints.BOTH))
   }
 }

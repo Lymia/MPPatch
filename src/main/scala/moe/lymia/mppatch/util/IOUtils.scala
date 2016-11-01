@@ -49,6 +49,7 @@ class FileLock(lockFile: Path) {
 object IOUtils {
   private val resPath = "/moe/lymia/mppatch/"
 
+  def getResourceURL(s: String) = getClass.getResource(resPath + s)
   def getResource(s: String) = getClass.getResourceAsStream(resPath + s)
   def resourceExists(s: String) = getResource(s) != null
   def loadFromStream(s: InputStream) = io.Source.fromInputStream(s)(Codec.UTF8).mkString
