@@ -36,8 +36,8 @@ public class Loader extends ClassLoader {
     private static final Pack200.Unpacker unpacker = Pack200.newUnpacker();
     private static final int bufferSize = 1024 * 16;
 
-    private HashMap<String, byte[]>   classData  = new HashMap<>();
-    private HashMap<String, Class<?>> classCache = new HashMap<>();
+    private HashMap<String, byte[]  > classData  = new HashMap<String, byte[]  >();
+    private HashMap<String, Class<?>> classCache = new HashMap<String, Class<?>>();
 
     private String mainClass;
 
@@ -82,49 +82,67 @@ public class Loader extends ClassLoader {
         }
     }
 
-    private void error(String error, Exception e) {
-        JOptionPane.showMessageDialog(null, "Could not startPackedProgram MPPatch installer:\n"+e, "MPPatch Installer",
-                                      JOptionPane.ERROR_MESSAGE);
-        throw new RuntimeException(error, e);
-    }
-
     private void startPackedProgram(String[] args) {
         try {
             loadPack200(getClass().getClassLoader().getResourceAsStream("moe/lymia/mppatch/installer.pack"));
         } catch (IOException e) {
-            error("Could not parse pack200 contents.", e);
+            throw error("Could not parse pack200 contents.", e);
         }
 
-        Class<?> clazz = null;
+        Class<?> clazz;
         try {
             clazz = Class.forName(mainClass, false, this);
         } catch (ClassNotFoundException e) {
-            error("Main-Class not found.", e);
+            throw error("Main-Class not found.", e);
         }
 
-        Method m = null;
+        Method m;
         try {
-            m = clazz != null ? clazz.getMethod("main", String[].class) : null;
+            m = clazz.getMethod("main", String[].class);
         } catch (NoSuchMethodException e) {
-            error("main method not found.", e);
+            throw error("main method not found.", e);
         }
 
-        if(m == null) error("method is null", null);
+        if(m == null) throw error("method is null", null);
 
         try {
             m.invoke(null, new Object[] { args });
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            error("Failed to call main method.", e);
+        } catch (InvocationTargetException e) {
+            throw error("Failed to call main method.", e);
+        } catch (IllegalAccessException e) {
+            throw error("Failed to call main method.", e);
         }
     }
+
+    private static RuntimeException error(String error, Exception e) {
+        JOptionPane.showMessageDialog(null, "Could not start MPPatch installer:\n"+error, "MPPatch Installer",
+                                      JOptionPane.ERROR_MESSAGE);
+        return new RuntimeException(error, e);
+    }
+
+    private static boolean isJava8() {
+        String version = System.getProperty("java.version");
+        String[] components = version.split("\\.");
+        return Integer.parseInt(components[0]) > 1 ||
+               (Integer.parseInt(components[0]) == 1 && Integer.parseInt(components[1]) >= 8);
+    }
+
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | UnsupportedLookAndFeelException |
-                 IllegalAccessException | InstantiationException e) {
+        } catch (Exception e) {
             System.err.println("Warning: Failed to set system Look and Feel.");
             e.printStackTrace();
         }
+
+        boolean isJava8;
+        try {
+            isJava8 = isJava8();
+        } catch (Exception e) {
+            throw error("Could not parse JVM version", e);
+        }
+
+        if(!isJava8) throw error("Java 1.8 or later is required to run this program.", null);
 
         new Loader().startPackedProgram(args);
     }
