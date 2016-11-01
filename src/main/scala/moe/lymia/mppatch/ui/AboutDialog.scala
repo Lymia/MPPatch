@@ -58,8 +58,15 @@ class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialo
     val htmlEditor = new HTMLEditorKit
     editor.setEditorKit(htmlEditor)
 
+    val systemFont = new JLabel().getFont
     val stylesheet = htmlEditor.getStyleSheet
-    stylesheet.importStyleSheet(IOUtils.getResourceURL("text/style.css"))
+    stylesheet.addRule(IOUtils.loadResource("text/style.css"))
+    stylesheet.addRule(
+      s"""p, li, h1, h2, h3, h4, h5, h6 {
+         |  font-family: ${systemFont.getFontName},sans-serif;
+         |  font-size: ${systemFont.getSize};
+         |}
+       """.stripMargin)
 
     val document = htmlEditor.createDefaultDocument()
     editor.setDocument(document)
