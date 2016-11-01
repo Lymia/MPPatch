@@ -27,7 +27,7 @@ import java.security.MessageDigest
 object  Crypto {
   def digest(algorithm: String, data: Array[Byte]) = {
     val md = MessageDigest.getInstance(algorithm)
-    val hash = md.digest(data.toArray)
+    val hash = md.digest(data)
     hash
   }
   def hexdigest(algorithm: String, data: Array[Byte]) =

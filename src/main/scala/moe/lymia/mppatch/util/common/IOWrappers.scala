@@ -34,6 +34,16 @@ case class PatchPackage(data: Map[String, Array[Byte]]) {
 }
 
 object IOWrappers {
+  private def writeArray(out: DataOutputStream, data: Array[Byte]) = {
+    out.writeInt(data.length)
+    out.write(data)
+  }
+  private def readArray(in: DataInputStream) = {
+    val data = new Array[Byte](in.readInt())
+    in.readFully(data)
+    data
+  }
+
   // XZ compression
   val xzOptions = new LZMA2Options(9)
   def writeXZ(out: DataOutputStream)(f: DataOutputStream => Unit) = {
