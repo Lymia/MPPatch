@@ -62,7 +62,7 @@ object I18N {
       includes.trim.split(",").map(x => loadI18NData(x.trim)).reduce(_ ++ _)
     } else Map()
 
-    includeData ++ prop.filter(_._1 != "includes").map(x => x.copy(_1 = x._1.trim, _2 = x._2.trim))
+    includeData ++ prop.filter(_._1 != "includes").map(x => x.copy(_1 = x._1.trim, _2 = x._2))
   }
 
   def apply(locale: Locale) = new I18N(locale, loadI18NData(findSourceFile(locale)))
