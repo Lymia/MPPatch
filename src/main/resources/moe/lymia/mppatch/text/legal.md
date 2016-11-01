@@ -5,7 +5,7 @@
 License
 =======
 
-Copyright (C) 2015-2016 Lymia Aluysia <lymiahugs@gmail.com>
+Copyright (C) 2015-2016 Lymia Aluysia &lt;lymiahugs@gmail.com&gt;
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -70,9 +70,15 @@ XZ for Java has been placed into the public domain.
 
 The Symbola font has been placed into the public domain.
 
+### curve25519-java
+
+Copyright (C) 2014-2016 Open Whisper Systems
+
+Licenced under the GPLv3: [http://www.gnu.org/licenses/gpl-3.0.html](http://fromres/text/gplv3.md)
+
 ### txtmark
 
-Copyright (C) 2011-2015 René Jeschke <rene_jeschke@yahoo.de>
+Copyright (C) 2011-2015 René Jeschke &lt;rene_jeschke@yahoo.de&gt;
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
