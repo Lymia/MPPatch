@@ -82,7 +82,6 @@ object NativePatchBuild {
       "Website: https://github.com/Lymia/MPPatch\"\n"+
       "#define patchVersionMajor "+tryParse(major, -1)+"\n"+
       "#define patchVersionMinor "+tryParse(minor, -1)+"\n"+
-      "#define patchCompatVersion "+version_patchCompat+"\n"+
       "#define patchFullVersion \""+version+"\"\n"+
       "#endif /* VERSION_H */"
     )

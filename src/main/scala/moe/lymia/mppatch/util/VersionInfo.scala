@@ -48,8 +48,6 @@ class VersionInfo(properties: VersionInfoSource) {
   lazy val versionString = properties("mppatch.version.string","unknown")
   lazy val isDirty       = properties("mppatch.version.clean", "false") == "false"
 
-  lazy val patchCompat   = properties("mppatch.patch.compat", "-1").toInt
-
   lazy val buildDate     = new Date(properties("build.time", "0").toLong)
   lazy val buildUser     = properties("build.userstring", "<unknown>")
 }

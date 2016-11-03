@@ -69,8 +69,6 @@ object ResourceBuild {
       properties.put("mppatch.version.commit", git.gitHeadCommit.value getOrElse "<unknown>")
       properties.put("mppatch.version.clean" , (!git.gitUncommittedChanges.value).toString)
 
-      properties.put("mppatch.patch.compat"  , version_patchCompat.toString)
-
       properties.put("build.os"        , tryProperty { System.getProperty("os.name") })
       properties.put("build.userstring", tryProperty { System.getProperty("user.name")+"@"+
                                                        InetAddress.getLocalHost.getHostName })

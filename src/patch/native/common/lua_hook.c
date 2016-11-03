@@ -123,7 +123,6 @@ static int luaHook_debugPrint(lua_State *L) {
 static void luaTable_versioninfo(lua_State *L, int table) {
     table_setInteger(L, table, "major", patchVersionMajor);
     table_setInteger(L, table, "minor", patchVersionMinor);
-    table_setInteger(L, table, "compatVersion", patchCompatVersion);
     table_setString (L, table, "versionString", patchFullVersion);
 }
 
