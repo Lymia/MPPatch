@@ -23,5 +23,8 @@ manually. See [here](http://www.scala-sbt.org/0.13/tutorial/Installing-sbt-on-Li
 On Arch Linux, you will need the following packages: `base-devel jdk8-openjdk sbt mingw-w64-gcc nasm`. In addition, on
 64-bit systems, you will need `gcc-multilib`.
 
+The first time you build a release, you must initialize submodules used by MPPatch. To do this, run
+`git submodule update --init`.
+
 To build a release, use `sbt clean dist`. You can also use `sbt run` to test your local version without building a full
 release.
