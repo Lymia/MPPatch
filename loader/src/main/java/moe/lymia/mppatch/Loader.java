@@ -26,60 +26,32 @@ import javax.swing.*;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.jar.JarEntry;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 
-public class Loader extends ClassLoader {
+public class Loader {
     private static final Pack200.Unpacker unpacker = Pack200.newUnpacker();
-    private static final int bufferSize = 1024 * 16;
 
-    private HashMap<String, byte[]  > classData  = new HashMap<String, byte[]  >();
-    private HashMap<String, Class<?>> classCache = new HashMap<String, Class<?>>();
-
+    private File tempJarFile;
     private String mainClass;
 
-    private Class<?> loadClassData(String name) {
-        if(classCache.containsKey(name)) return classCache.get(name);
-        if(classData .containsKey(name)) {
-            byte[] data = classData.get(name);
-            Class<?> clazz = defineClass(name, data, 0, data.length);
-            classData.remove(name);
-            classCache.put(name, clazz);
-            return clazz;
-        }
-        return null;
-    }
-
-    @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
-        Class<?> clazz = loadClassData(name);
-        if(clazz == null) return super.findClass(name);
-        return clazz;
-    }
-
     private void loadPack200(InputStream in) throws IOException {
-        ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        unpacker.unpack(in, new JarOutputStream(byteOut));
-        JarInputStream jarIn = new JarInputStream(new ByteArrayInputStream(byteOut.toByteArray()));
+        tempJarFile = File.createTempFile("mppatch-installer-", ".jar");
+        tempJarFile.deleteOnExit();
 
+        JarOutputStream jarOut = new JarOutputStream(new FileOutputStream(tempJarFile));
+        unpacker.unpack(in, jarOut);
+        jarOut.finish();
+
+        JarInputStream jarIn = new JarInputStream(new FileInputStream(tempJarFile));
         mainClass = jarIn.getManifest().getMainAttributes().getValue("Main-Class");
+        jarIn.close();
 
-        JarEntry currentEntry;
-        byte[] buffer = new byte[bufferSize];
-        ByteArrayOutputStream fileOut = new ByteArrayOutputStream();
-        while((currentEntry = jarIn.getNextJarEntry()) != null) {
-            String fileName = currentEntry.getName();
-            if(fileName.endsWith(".class")) {
-                int len;
-                while((len = jarIn.read(buffer)) != -1) fileOut.write(buffer, 0, len);
-                String className = fileName.substring(0, fileName.length() - 6).replace("/", ".");
-                classData.put(className, fileOut.toByteArray());
-                fileOut.reset();
-            }
-        }
+        System.out.println("Main-Class: "+mainClass);
     }
 
     private void startPackedProgram(String[] args) {
@@ -89,9 +61,16 @@ public class Loader extends ClassLoader {
             throw error("Could not parse pack200 contents.", e);
         }
 
+        ClassLoader loader;
+        try {
+            loader = new URLClassLoader(new URL[]{tempJarFile.toURL()}, getClass().getClassLoader());
+        } catch (MalformedURLException e) {
+            throw error("unexpected error", e);
+        }
+
         Class<?> clazz;
         try {
-            clazz = Class.forName(mainClass, false, this);
+            clazz = Class.forName(mainClass, false, loader);
         } catch (ClassNotFoundException e) {
             throw error("Main-Class not found.", e);
         }
@@ -117,6 +96,7 @@ public class Loader extends ClassLoader {
     private static RuntimeException error(String error, Exception e) {
         JOptionPane.showMessageDialog(null, "Could not start MPPatch installer:\n"+error, "MPPatch Installer",
                                       JOptionPane.ERROR_MESSAGE);
+        e.printStackTrace();
         return new RuntimeException(error, e);
     }
 

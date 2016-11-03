@@ -69,7 +69,8 @@ lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBu
   javacOptions ++= Seq("-source", "1.5", "-target", "1.5"),
 
   loaderSourceJar := (ProguardKeys.proguard in Proguard in mppatch).value.head,
-  loaderTargetPath := "moe/lymia/mppatch/installer.pack"
+  loaderTargetPath := "moe/lymia/mppatch/installer.pack",
+  loaderExclude += "moe/lymia/mppatch/mppatch.mppak"
 ))
 
 // Build distribution file

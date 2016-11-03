@@ -25,7 +25,7 @@ package moe.lymia.mppatch.ui
 import java.util.Locale
 import javax.swing.{JFrame, UIManager}
 
-object Installer extends FrameError[JFrame] with I18NTrait {
+class InstallerMain extends FrameError[JFrame] with I18NTrait {
   protected def locale = Locale.getDefault
   override protected def frame: JFrame = null
 
@@ -37,4 +37,8 @@ object Installer extends FrameError[JFrame] with I18NTrait {
   } catch {
     case e: Exception => dumpException("error.genericerror", e)
   }
+}
+
+object Installer {
+  def main(args: Array[String]): Unit = new InstallerMain().main(args)
 }

@@ -33,6 +33,8 @@ object LoaderBuild {
     val loaderSourceJar  = TaskKey[File]("loader-source-jar")
     val loaderTargetPath = TaskKey[String]("loader-target-path")
 
+    val loaderExclude    = TaskKey[Set[String]]("loader-exclude")
+
     val loaderOutputFile = TaskKey[File]("loader-output-file")
     val loaderOutputRaw  = TaskKey[(File, Seq[File])]("loader-output-raw")
     val loaderOutput     = TaskKey[File]("loader-output")
@@ -40,6 +42,7 @@ object LoaderBuild {
   import Keys._
 
   val settings = Seq(
+    loaderExclude := Set(),
     loaderOutputFile := crossTarget.value / "loaderTarget.pack.xz",
     loaderOutputRaw := {
       val packer = Pack200.newPacker()
@@ -50,11 +53,12 @@ object LoaderBuild {
       p.put(Packer.MODIFICATION_TIME, Packer.LATEST)
       p.put(Packer.UNKNOWN_ATTRIBUTE, Packer.ERROR)
 
+      val exclude = loaderExclude.value
       val copiedResources = IO.withTemporaryFile("loaderTarget", ".jar") { tempFile =>
         val copiedResources = IO.withTemporaryDirectory { dir =>
           IO.unzip(loaderSourceJar.value, dir)
           val (classFiles, resources) =
-            Path.allSubpaths(dir).partition { x => x._2.endsWith(".class") || x._2.endsWith("MANIFEST.MF") }
+            Path.allSubpaths(dir).partition { x => !exclude.contains(x._2) }
           IO.zip(classFiles, tempFile)
 
           for((file, path) <- resources if file.isFile) yield {
