@@ -33,7 +33,6 @@ import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var installButton  : ActionButton = _
   private var uninstallButton: ActionButton = _
-  private var installPath    : JTextField   = _
   private var currentVersion : JTextField   = _
   private var targetVersion  : JTextField   = _
   private var currentStatus  : JTextField   = _
@@ -45,22 +44,28 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
   private val syncLock = new Object
   private var patchPackage: PatchLoader = _
+  private var isUserChange = false
   private var isValid = false
   private var installer: PatchInstaller = _
-  private def changeInstaller(path: Path, changeByUser: Boolean = true): Unit = syncLock synchronized {
+  def getPatch = patchPackage
+  def getInstaller = installer
+  def changeInstaller(path: Path, changeByUser: Boolean = true): Unit = syncLock synchronized {
     val instance = new PatchInstaller(path, patchPackage, platform)
-    isValid = checkPath(path)
-    if(installer != null) installer.releaseLock()
-    if(isValid) {
-      instance.acquireLock()
-      if(changeByUser) Preferences.installationDirectory.value = path.toFile.toString
-    }
-    installer = instance
+    isUserChange = changeByUser
+    if(Files.exists(path)) {
+      isValid = checkPath(path)
+      if(installer != null) installer.releaseLock()
+      if(isValid) {
+        instance.acquireLock()
+        if(changeByUser) Preferences.installationDirectory.value = path.toFile.toString
+      }
+      installer = instance
+    } else installer = null
   }
-  private def reloadInstaller() = syncLock synchronized {
+  def reloadInstaller() = syncLock synchronized {
     if(installer != null) changeInstaller(installer.basePath)
   }
-  private def changePatchPackage(pack: PatchFileSource) = syncLock synchronized {
+  def changePatchPackage(pack: PatchFileSource) = syncLock synchronized {
     patchPackage = new PatchLoader(pack)
     reloadInstaller()
   }
@@ -73,7 +78,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   }
   if(Preferences.installationDirectory.hasValue) {
     val configPath = Paths.get(Preferences.installationDirectory.value)
-    if(checkPath(configPath)) changeInstaller(configPath)
+    if(checkPath(configPath)) changeInstaller(configPath, false)
     else {
       Preferences.installationDirectory.clear()
       pathFromRegistry()
@@ -95,33 +100,12 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     frame.setLayout(new GridBagLayout())
 
-    // Status seciton
-    val statusPane = new JPanel()
-    statusPane.setLayout(new GridBagLayout())
-
-    statusPane.gridLabel(0, "path")
-    installPath = statusPane.gridTextField(0, 1)
-
-    statusPane.iconButton(2, 0, "browse") {
-      val chooser = new JFileChooser()
-      if(installer != null) chooser.setCurrentDirectory(installer.basePath.toFile)
-      chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-      if(chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
-        changeInstaller(chooser.getSelectedFile.toPath)
-        update()
-      }
+    // Status section
+    frame.subFrame(constraints(gridwidth = 4, fill = GridBagConstraints.BOTH)) { statusPane =>
+      targetVersion = statusPane.gridTextRow(0, "target")
+      currentVersion = statusPane.gridTextRow(1, "installed")
+      currentStatus = statusPane.gridTextRow(2, "status")
     }
-
-    statusPane.gridLabel(1, "target")
-    targetVersion = statusPane.gridTextField(1)
-
-    statusPane.gridLabel(2, "installed")
-    currentVersion = statusPane.gridTextField(2)
-
-    statusPane.gridLabel(3, "status")
-    currentStatus = statusPane.gridTextField(3)
-
-    frame.add(statusPane, constraints(gridwidth = 4, fill = GridBagConstraints.BOTH))
 
     // Button section
     installButton   = new ActionButton()
@@ -146,11 +130,9 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
     installer match {
       case null =>
-        installPath   .setText("")
         currentVersion.setText(i18n("status.dir.noversion"))
-        setStatus("status.cannotfind")
+        setStatus(if(isUserChange) "status.doesnotexist" else "status.cannotfind")
       case _ =>
-        installPath   .setText(installer.basePath.toString)
         currentVersion.setText(installer.installedVersion.fold(i18n("status.dir.noversion"))(identity))
 
         if(!isValid) setStatus("status.noprogram")

@@ -36,23 +36,13 @@ case class I18N(locale: Locale, map: Map[String, String]) {
   private val messageFormatCache = new collection.mutable.HashMap[String, Option[MessageFormat]]
   def getFormat(key: String) =
     messageFormatCache.getOrElseUpdate(key, map.get(key).map(s => new MessageFormat(s, locale)))
+  def hasKey(key: String) = map.contains(key)
   def apply(key: String, args: Any*) = getFormat(key).map(format =>
     format.format(args.toArray)
   ).getOrElse("<"+key+">")
 }
 
-// TODO: Do fallbacks on a per-key basis
 object I18N {
-  private def defaultLocale = Locale.US
-  private def sourceFile(locale: Locale, generic: Boolean) =
-    s"text/i18n_${locale.getLanguage}_${if(generic) "generic" else locale.getCountry}.properties"
-
-  @tailrec def findSourceFile(locale: Locale): String =
-         if(IOUtils.resourceExists(sourceFile(locale, false))) sourceFile(locale, false)
-    else if(IOUtils.resourceExists(sourceFile(locale, true ))) sourceFile(locale, true )
-    else if(locale != defaultLocale)                           findSourceFile(defaultLocale)
-    else                                                       sys.error("default locale file not found!")
-
   def loadI18NData(sourceFile: String): Map[String, String] = {
     val prop = new Properties()
     prop.load(new InputStreamReader(IOUtils.getResource(sourceFile), StandardCharsets.UTF_8))
@@ -65,5 +55,16 @@ object I18N {
     includeData ++ prop.asScala.filter(_._1 != "includes").map(x => x.copy(_1 = x._1.trim, _2 = x._2))
   }
 
-  def apply(locale: Locale) = new I18N(locale, loadI18NData(findSourceFile(locale)))
+  private def defaultLocale = Locale.US
+  private def sourceFile(locale: Locale, generic: Boolean) =
+    s"text/i18n_${locale.getLanguage}_${if(generic) "generic" else locale.getCountry}.properties"
+  private def getSingleLocaleStrings(locale: Locale, generic: Boolean): Map[String, String] = {
+    val file = sourceFile(locale, generic)
+    if(IOUtils.resourceExists(file)) loadI18NData(file) else Map()
+  }
+  private def getLocaleStrings(locale: Locale): Map[String, String] =
+    getSingleLocaleStrings(defaultLocale, true) ++ getSingleLocaleStrings(defaultLocale, false) ++
+    getSingleLocaleStrings(locale       , true) ++ getSingleLocaleStrings(locale       , false)
+
+  def apply(locale: Locale) = new I18N(locale, getLocaleStrings(locale))
 }

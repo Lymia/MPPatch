@@ -32,7 +32,7 @@ import javax.swing.event.{HyperlinkEvent, HyperlinkListener}
 import com.github.rjeschke.txtmark.Processor
 import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 
-class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialog] {
+class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
   private def renderMarkdown(resource: String) =
     s"""<html>
        |  <body>
@@ -45,7 +45,7 @@ class AboutDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialo
   private val version = VersionInfo.fromJar
   private val desktop = Desktop.getDesktop
   override protected def buildForm(): Unit = {
-    frame = new JDialog(owner.getFrame, i18n("title.about"), true)
+    frame = new JDialog(main.getFrame, i18n("title.about"), true)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     frame.setLayout(new GridBagLayout())
 

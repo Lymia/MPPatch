@@ -22,16 +22,63 @@
 
 package moe.lymia.mppatch.ui
 
-import java.awt.GridBagLayout
+import java.awt.{GridBagConstraints, GridBagLayout}
+import java.nio.file.{InvalidPathException, Paths}
 import java.util.Locale
-import javax.swing.{JDialog, WindowConstants}
+import javax.swing._
 
-class SettingsDialog(val locale: Locale, owner: MainFrame) extends FrameBase[JDialog] {
+class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
+  private var installPath: JTextField = _
+
+  private def applySettings(): Unit = {
+    main.changeInstaller(Paths.get(installPath.getText))
+    main.update()
+  }
+  private def closeWindow() = {
+    frame.setVisible(false)
+    frame.dispose()
+  }
+
   override protected def buildForm(): Unit = {
-    frame = new JDialog(owner.getFrame, i18n("title.settings"), true)
+    frame = new JDialog(main.getFrame, i18n("title.settings"), true)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     frame.setLayout(new GridBagLayout())
 
+    frame.subFrame(constraints(fill = GridBagConstraints.BOTH)) { textOptions =>
+      installPath = textOptions.gridButtonTextRow(0, "path", "browse") {
+        val installer = main.getInstaller
+        val chooser = new JFileChooser()
+        if(installer != null) chooser.setCurrentDirectory(installer.basePath.toFile)
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
+        if(chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
+          installPath.setText(chooser.getSelectedFile.toString)
+      }
+      installPath.setEditable(true)
+      main.getInstaller match {
+        case null => installPath.setText("")
+        case installer => installPath.setText(installer.basePath.toString)
+      }
+    }
 
+    frame.subFrame(constraints(gridy = 2, fill = GridBagConstraints.BOTH)) { frameButtons =>
+      frameButtons.add(new JPanel, constraints(weightx = 1))
+
+      val apply = new ActionButton(false)
+      apply.setAction("action.apply", () => applySettings())
+      frameButtons.add(apply, constraints(gridx = 1))
+
+      val cancel = new ActionButton(false)
+      cancel.setAction("action.cancel", () => closeWindow())
+      frameButtons.add(cancel, constraints(gridx = 2))
+
+      val ok = new ActionButton(false)
+      ok.setAction("action.ok", () => {
+        applySettings()
+        closeWindow()
+      })
+      frameButtons.add(ok, constraints(gridx = 3))
+
+      equalWidth(apply, cancel, ok)
+    }
   }
 }

@@ -65,10 +65,28 @@ trait FrameUtils {
 
     button
   }
+  protected def equalWidth(component: JComponent*) = {
+    val maxWidth = component.map(_.getMinimumSize.getWidth).max.toInt + 20
+    for(c <- component) {
+      val height = c.getMinimumSize.getHeight.toInt
+      c.setMinimumSize  (new Dimension(maxWidth, height))
+      c.setPreferredSize(new Dimension(maxWidth, height))
+    }
+  }
+
+  protected implicit class ContainerExtension(c: Container) {
+    def subFrame(constraints: GridBagConstraints)(f: JPanel => Unit) = {
+      val panel = new JPanel()
+      panel.setLayout(new GridBagLayout())
+      f(panel)
+      c.add(panel, constraints)
+      panel
+    }
+  }
 }
 
 trait I18NFrameUtils extends FrameUtils { this: I18NTrait =>
-  protected implicit class ContainerExtension(c: Container) {
+  protected implicit class I18NContainerExtension(c: Container) {
     def gridLabel(row: Int, labelStr: String) = {
       val label = new JLabel()
       label.setText(i18n(s"label.$labelStr"))
@@ -90,6 +108,17 @@ trait I18NFrameUtils extends FrameUtils { this: I18NTrait =>
       button.setToolTipText(i18n("tooltip."+str))
       symbolButton(button)
       c.add(button, constraints(gridx = col, gridy = row, fill = GridBagConstraints.BOTH))
+    }
+
+    def gridTextRow(row: Int, labelStr: String) = {
+      gridLabel(row, labelStr)
+      gridTextField(row)
+    }
+    def gridButtonTextRow(row: Int, labelStr: String, icon: String)(f: => Unit) = {
+      gridLabel(row, labelStr)
+      val field = gridTextField(row, 1)
+      iconButton(2, row, icon)(f)
+      field
     }
   }
 }
@@ -145,9 +174,12 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with I18N
     setAction(FrameBase.this.action { e =>
       try {
         action()
-        if(showCompleteMessage) JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
+        if(showCompleteMessage && i18n.hasKey(text+".completed"))
+          JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
       } catch {
-        case e: Exception => dumpException("error.commandfailed", e, i18n(text+".continuous"))
+        case e: Exception =>
+          dumpException(if(i18n.hasKey(text+".continuous")) "error.commandfailed" else "error.commandfailed.generic",
+                        e, i18n(text+".continuous"))
       }
       FrameBase.this.update()
     })
@@ -155,7 +187,7 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with I18N
     def setActionText(name: String): Unit = {
       text = name
       setText(i18n(name))
-      setToolTipText(i18n(name+".tooltip"))
+      if(i18n.hasKey(name+".tooltip")) setToolTipText(i18n(name+".tooltip"))
     }
     def setAction(name: String, action: () => Unit): Unit = {
       this.action = action
