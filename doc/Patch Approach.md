@@ -1,5 +1,5 @@
-Implementation Details
-======================
+Patch Approach
+==============
 
 For some reason, Firaxis decided to not release Civilization V with multiplayer modding support enabled, even though
 much of the code for it already existed. Reactivating it is not possible solely from Lua code, as
@@ -46,8 +46,8 @@ by Lua code. These functions are exported in the `patch.NetPatch` table, contain
    `guid_4_high`, containing the most significant 32 bits, and `guid_4_low`, containing the least significant 32 bits.
    See [here](https://msdn.microsoft.com/en-us/library/windows/desktop/aa373931\(v=vs.85\).aspx) for documentation.
  * `patch.NetPatch.install()`, which causes the patch to SetActiveDLCandMods to actually be written to memory. Steam
-    CEG or some other DRM system seems to interfere with the functioning of the patch, and this is an attempt to dodge
-    it.
+   CEG or some other DRM system seems to interfere with the functioning of the patch, and this is an attempt to dodge
+   it.
  * `patch.NetPatch.reset()`, which clears any overrides set. This function is automatically called after every time the
    `SetActiveDLCAndMods` function is called for any reason to avoid any unintentional overrides.
 
