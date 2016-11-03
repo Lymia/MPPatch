@@ -22,7 +22,6 @@ if not patch.__mppatch_marker then error("Native patch not installed!") end
 This exports a few functions and tables:
 
  * `patch.version`, containing version information for the patch.
- * `patch.panic(string)`, a function allowing a Lua script to report a critical error and bail.
  * `patch.debugPrint(string)`, a function allowing a Lua script to output to `mppatch_debug.log`.
  * `patch.shared`, a table that's shared between different script contexts.
  * `patch.NetPatch`, a table contains functions that controls our modification to the `SetActiveDLCAndMods` function.
