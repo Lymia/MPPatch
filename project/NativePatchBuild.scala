@@ -169,7 +169,8 @@ object NativePatchBuild {
               Seq(steamrtSDL.value),
               Seq("-ldl"))
           }
-        val fullSourcePath = Seq(patchSourceDir.value / "common", commonIncludes.value, versionDir) ++ sourcePath
+        val fullSourcePath = Seq(patchSourceDir.value / "common", patchSourceDir.value / "inih",
+                                 commonIncludes.value, versionDir) ++ sourcePath
         val cBuildDependencies =
           fullSourcePath.flatMap(x => allFiles(x, ".c") ++ allFiles(x, ".h")) ++ sourceFiles ++ extraCDeps
         val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s"))
