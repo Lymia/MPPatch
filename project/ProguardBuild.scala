@@ -50,8 +50,7 @@ object ProguardBuild {
 
     ProguardKeys.proguard in Proguard <<= (ProguardKeys.proguard in Proguard).dependsOn(assembly)
   ) ++ inConfig(Proguard)(Seq(
-    // Package whole project into a single .jar file with Proguard.
-    ProguardKeys.proguardVersion := "5.3",
+    ProguardKeys.proguardVersion := "5.3.1",
     ProguardKeys.options ++= Seq("-verbose", "-include",
                                  (file(".") / "project" / proguardConfig.value).getCanonicalPath),
     ProguardKeys.options +=
