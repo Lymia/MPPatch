@@ -1,0 +1,3 @@
+[submodule "src/patch/native/inih"]
+	path = src/patch/native/inih
+	url = https://github.com/benhoyt/inih.git
