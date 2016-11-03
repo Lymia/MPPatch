@@ -30,7 +30,7 @@ typedef struct symbolTable_type {
 } __attribute__((packed)) symbolTable_type;
 extern symbolTable_type proxy_symbolTable[] __asm__("cif_symbolTable");
 
-__attribute__((constructor(250))) static void initProxy() {
+__attribute__((constructor(CONSTRUCTOR_PROXY_INIT))) static void initProxy() {
     debug_print("Initializing CvGameDatabase proxy.");
     for(symbolTable_type* t = proxy_symbolTable; t->exists; t++) {
         void* target = filterProxySymbol(t->target, resolveSymbol(CV_GAME_DATABASE, t->target));

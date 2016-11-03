@@ -31,13 +31,13 @@
 static PatchInformation* lGetMemoryUsage_patchInfo;
 PatchInformation* SetActiveDLCAndMods_patchInfo = 0;
 
-__attribute__((constructor(500))) static void installHooks() {
+__attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installHooks() {
     // Lua hook
     lGetMemoryUsage_patchInfo = proxyFunction(resolveSymbol(CV_MERGED_BINARY, lGetMemoryUsage_symbol),
                                              lGetMemoryUsageProxy, lGetMemoryUsage_hook_length, "lGetMemoryUsage");
     lGetMemoryUsage = (lGetMemoryUsage_t) lGetMemoryUsage_patchInfo->functionFragment->data;
 }
-__attribute__((destructor(500))) static void destroyHooks() {
+__attribute__((destructor(CONSTRUCTOR_HOOK_INIT))) static void destroyHooks() {
     unpatch(lGetMemoryUsage_patchInfo);
 }
 

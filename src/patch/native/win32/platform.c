@@ -57,7 +57,7 @@ static BinaryType detectedBinaryType;
 BinaryType getBinaryType() {
     return detectedBinaryType;
 }
-__attribute__((constructor(201))) static void initializeBinaryType() {
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void initializeBinaryType() {
     debug_print("Finding binary type");
 
     char moduleName[1024];
@@ -81,7 +81,7 @@ static bool checkFileExists(LPCTSTR szPath) {
          !(attrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 #define TARGET_LIBRARY_NAME "CvGameDatabase_Original.dll"
-__attribute__((constructor(200))) static void initializeProxy() {
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void initializeProxy() {
     debug_print("Loading original CvGameDatabase");
     if(!checkFileExists(TARGET_LIBRARY_NAME))
         fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.");
@@ -89,7 +89,7 @@ __attribute__((constructor(200))) static void initializeProxy() {
     if(baseDll == NULL)
         fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08lx)", GetLastError());
 }
-__attribute__((destructor(200))) static void deinitializeProxy() {
+__attribute__((destructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void deinitializeProxy() {
     debug_print("Unloading original CvGameDatabase");
     FreeLibrary(baseDll);
 }
@@ -115,11 +115,11 @@ void* resolveAddress(AddressDomain domain, int address) {
     fatalError("resolveAddress in unknown domain");
 }
 
-__attribute__((constructor(201))) static void initializeBinaryBase() {
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void initializeBinaryBase() {
     debug_print("Finding Civ V binary base address (to deal with ASLR)");
     binary_base_addr = GetModuleHandle(NULL);
 }
-__attribute__((constructor(201))) static void initializeConstantSymbol() {
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void initializeConstantSymbol() {
     debug_print("Loading constant symbol (to deal with ASLR/general .dll rebasing)");
     database_constant_symbol_addr = resolveSymbol(CV_GAME_DATABASE, WIN32_REF_SYMBOL_NAME);
 }

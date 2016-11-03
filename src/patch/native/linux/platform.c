@@ -90,14 +90,14 @@ void* resolveAddress(AddressDomain domain, int address) {
     return (void*) (base_offset + address);
 }
 
-__attribute__((constructor(201))) static void loadDysymHandle() {
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void loadDysymHandle() {
     debug_print("Opening handle to main binary");
     dlsymHandle = dlopen(0, RTLD_NOW);
     debug_print("Finding l_addr (to deal with ASLR)");
     struct link_map *lm = (struct link_map*) dlsymHandle;
     base_offset = lm->l_addr;
 }
-__attribute__((destructor(201))) static void closeDysymHandle() {
+__attribute__((destructor(CONSTRUCTOR_BINARY_INIT))) static void closeDysymHandle() {
     debug_print("Closing handle to main binary");
     dlclose(dlsymHandle);
 }

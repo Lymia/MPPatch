@@ -49,7 +49,7 @@ static CppList* overrideDLCList = NULL;
 static CppList* overrideModList = NULL;
 static bool overrideDLCActive  = false, overrideReloadDLC  = false, reloadDLC ;
 static bool overrideModsActive = false, overrideReloadMods = false, reloadMods;
-__attribute__((constructor(499))) static void initNetHook() {
+__attribute__((constructor(CONSTRUCTOR_EARLY_INIT))) static void initNetHook() {
     overrideDLCList = CppList_alloc();
     overrideModList = CppList_alloc();
 }
@@ -166,7 +166,7 @@ ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, Cp
     return ret;
 }
 
-__attribute__((destructor(500))) static void destroyHooks() {
+__attribute__((destructor(CONSTRUCTOR_HOOK_INIT))) static void destroyHooks() {
     spinLock();
     if(SetActiveDLCAndMods_patchInfo != 0) unpatch(SetActiveDLCAndMods_patchInfo);
     spinUnlock();

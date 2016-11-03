@@ -40,7 +40,7 @@ void* filterProxySymbol(const char* name, void* target) {
     } else return target;
 }
 PatchInformation* SetActiveDLCAndMods_patchInfo = 0;
-__attribute__((constructor(500))) static void installHooks() {
+__attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installHooks() {
     // Lua hook
     lGetMemoryUsage = resolveSymbol(CV_GAME_DATABASE, lGetMemoryUsage_symbol);
 }

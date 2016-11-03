@@ -32,7 +32,7 @@
 
 // Debug logging
 FILE* debug_log_file;
-__attribute__((constructor(150))) static void initDebugLogging() {
+__attribute__((constructor(CONSTRUCTOR_LOGGING))) static void initDebugLogging() {
     debug_log_file = fopen("mppatch_debug.log", "w");
 }
 

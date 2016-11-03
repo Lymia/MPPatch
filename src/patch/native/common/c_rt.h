@@ -30,6 +30,13 @@
 #include <time.h>
 #include "platform.h"
 
+#define CONSTRUCTOR_LOGGING           200
+#define CONSTRUCTOR_EARLY_INIT        210
+#define CONSTRUCTOR_BINARY_INIT_EARLY 300
+#define CONSTRUCTOR_BINARY_INIT       310
+#define CONSTRUCTOR_PROXY_INIT        320
+#define CONSTRUCTOR_HOOK_INIT         400
+
 extern FILE* debug_log_file;
 #define debug_print_raw(format, arg...) { \
     time_t time_val = time(NULL); \
