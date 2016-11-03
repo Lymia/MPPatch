@@ -171,7 +171,6 @@ ENTRY lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L) {
         table_setTable(L, table, "version", luaTable_versioninfo);
         table_setTable(L, table, "NetPatch", luaTable_NetPatch);
         table_setTable(L, table, "globals", luaTable_globals);
-        table_setString(L, table, "credits", patchMarkerString);
         table_setCFunction(L, table, "debugPrint", luaHook_debugPrint);
 
         lua_pushstring(L, "shared");

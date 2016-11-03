@@ -78,8 +78,6 @@ object NativePatchBuild {
     cachedGeneration(cacheDirectory, tempTarget, finalTarget,
       "#ifndef VERSION_H\n"+
       "#define VERSION_H\n"+
-      "#define patchMarkerString \"MPPatch by Lymia (lymia@lymiahugs.com)."+
-      "Website: https://github.com/Lymia/MPPatch\"\n"+
       "#define patchVersionMajor "+tryParse(major, -1)+"\n"+
       "#define patchVersionMinor "+tryParse(minor, -1)+"\n"+
       "#define patchFullVersion \""+version+"\"\n"+
