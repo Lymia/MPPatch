@@ -23,7 +23,7 @@
 package moe.lymia.mppatch.ui
 
 import java.awt.{GridBagConstraints, GridBagLayout}
-import java.nio.file.{InvalidPathException, Paths}
+import java.nio.file.Paths
 import java.util.Locale
 import javax.swing._
 
