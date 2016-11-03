@@ -30,6 +30,10 @@
 #include "platform.h"
 #include "net_hook.h"
 
+static bool installLock = false;
+#define spinUnlock() while(!__sync_bool_compare_and_swap(&installLock, true, false));
+#define spinLock()   while(!__sync_bool_compare_and_swap(&installLock, false, true));
+
 typedef struct GUID {
     uint32_t data1;
     uint16_t data2;
@@ -80,7 +84,9 @@ void NetPatch_overrideDLCList() {
 }
 
 void NetPatch_install() {
+    spinLock();
     if(SetActiveDLCAndMods_patchInfo == 0) installNetHook();
+    spinUnlock();
 }
 
 void NetPatch_reset() {
@@ -91,10 +97,12 @@ void NetPatch_reset() {
     CppList_clear(overrideDLCList);
     CppList_clear(overrideModList);
 
+    spinLock();
     if(SetActiveDLCAndMods_patchInfo != 0) {
         unpatch(SetActiveDLCAndMods_patchInfo);
         SetActiveDLCAndMods_patchInfo = 0;
     }
+    spinUnlock();
 }
 
 static void printGUID(void* ptr) {
@@ -122,9 +130,11 @@ static void debugPrintList(CppList* list, const char* header, void (*printFn)(vo
 SetActiveDLCAndMods_t SetActiveDLCAndMods;
 ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, CppList* dlcList, CppList* modList,
                                                                   char pReloadDlc, char pReloadMods) {
+    spinLock();
     PatchInformation* patchInfo = SetActiveDLCAndMods_patchInfo;
     unpatchCode(SetActiveDLCAndMods_patchInfo);
     SetActiveDLCAndMods_patchInfo = 0;
+    spinUnlock();
 
     debug_print("In SetActiveDLCAndModsProxy. (this = %p, reloadDlc = %d, reloadMods = %d)",
                 this, pReloadDlc, pReloadMods)
@@ -154,4 +164,10 @@ ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, Cp
     free(patchInfo);
     NetPatch_reset();
     return ret;
+}
+
+__attribute__((destructor(500))) static void destroyHooks() {
+    spinLock();
+    if(SetActiveDLCAndMods_patchInfo != 0) unpatch(SetActiveDLCAndMods_patchInfo);
+    spinUnlock();
 }

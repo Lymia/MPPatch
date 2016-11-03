@@ -44,9 +44,6 @@ __attribute__((constructor(500))) static void installHooks() {
     // Lua hook
     lGetMemoryUsage = resolveSymbol(CV_GAME_DATABASE, lGetMemoryUsage_symbol);
 }
-__attribute__((destructor(500))) static void destroyHooks() {
-    if(SetActiveDLCAndMods_patchInfo != 0) unpatch(SetActiveDLCAndMods_patchInfo);
-}
 
 void installNetHook() {
     BinaryType type = getBinaryType();

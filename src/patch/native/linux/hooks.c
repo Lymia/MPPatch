@@ -39,7 +39,6 @@ __attribute__((constructor(500))) static void installHooks() {
 }
 __attribute__((destructor(500))) static void destroyHooks() {
     unpatch(lGetMemoryUsage_patchInfo);
-    if(SetActiveDLCAndMods_patchInfo != 0) unpatch(SetActiveDLCAndMods_patchInfo);
 }
 
 void installNetHook() {
