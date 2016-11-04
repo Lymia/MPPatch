@@ -70,15 +70,16 @@ object DLCDataWriter {
     <Value language={x}>{string}</Value>
   }
 
-  def writeDLC(dlcBasePath: String, languageDirPath: Option[String], dlcData: DLCData) = {
+  def writeDLC(dlcBasePath: String, languageDirPath: Option[String], dlcData: DLCData, platform: Platform) = {
     val nameString = s"${dlcData.manifest.uuid.toString.replace("-", "")}_v${dlcData.manifest.version}"
 
-    val uiFiles = dlcData.data.uiFiles.map(y => y._2.map(x => (s"$dlcBasePath/${y._1}/${x._1}", x._2))).reduce(_ ++ _)
-    val newFiles = Map(s"$dlcBasePath/$nameString.Civ5Pkg" -> IOUtils.writeXMLBytes(
+    val uiFiles = dlcData.data.uiFiles.map(y => y._2.map(x =>
+      s"$dlcBasePath/${platform.mapPath(y._1)}/${platform.mapPath(x._1)}" -> x._2)).reduce(_ ++ _)
+    val newFiles = Map(s"$dlcBasePath/${platform.mapPath(s"$nameString.Civ5Pkg")}" -> IOUtils.writeXMLBytes(
       <Civ5Package>
         <GUID>{s"{${dlcData.manifest.uuid}}"}</GUID>
         <Version>{dlcData.manifest.version.toString}</Version>
-        <Name>{languageValues(s"${dlcData.manifest.uuid.toString.replace("-", "")}_v${dlcData.manifest.version}")}</Name>
+        <Name>{languageValues(nameString)}</Name>
         <Description>{languageValues(dlcData.manifest.name)}</Description>
         <Priority>{dlcData.manifest.priority.toString}</Priority>
 
@@ -101,7 +102,7 @@ object DLCDataWriter {
     ))
     val uuid_string = dlcData.manifest.uuid.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
     val languageFiles = languageDirPath.fold(Map[String, Array[Byte]]()) { languagePath =>
-      Map(s"$languagePath/${nameString}_DlcName.xml", IOUtils.writeXMLBytes(
+      Map(s"$languagePath/${platform.mapPath(s"${nameString}_DlcName.xml")}" -> IOUtils.writeXMLBytes(
         <GameData> {
           languageList.flatMap(x =>
             <NODE> {
@@ -115,7 +116,7 @@ object DLCDataWriter {
           )
         } </GameData>
       )) ++ dlcData.data.textData.map(x =>
-        s"$languagePath/${nameString}_TextData_${x._1}.xml" -> IOUtils.writeXMLBytes(x._2))
+        s"$languagePath/${platform.mapPath(s"${nameString}_TextData_${x._1}")}" -> IOUtils.writeXMLBytes(x._2))
     }
 
     languageFiles ++ newFiles ++ uiFiles : Map[String, Array[Byte]]

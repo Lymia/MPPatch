@@ -65,7 +65,7 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
     s"${x.filename}.xml" -> source.loadResource(s"${x.source}.xml")
   )).toMap
   private lazy val textFiles = patch.textFileNames.map(x =>
-    x -> XML.loadString(source.loadResource(x))
+    x.replace("/", "_") -> XML.loadString(source.loadResource(x))
   ).toMap
 
   private def loadWrapper(str: Seq[String], pf: String = "", sf: String = "") =

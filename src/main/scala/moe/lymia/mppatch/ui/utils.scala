@@ -138,17 +138,17 @@ trait FrameError[F <: Window] {
     JOptionPane.showMessageDialog(if(frame != null && frame.isVisible) frame else null, string,
                                   titleString, JOptionPane.ERROR_MESSAGE)
   }
-  protected def error[T](string: String): T = {
+  protected def error[T](string: String, ex: Option[Throwable] = None): T = {
     warn(string)
     if(frame != null) {
       frame.setVisible(false)
       frame.dispose()
     }
-    sys.error(string)
+    throw new RuntimeException(string, ex.orNull)
   }
   protected def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T = {
     e.printStackTrace()
-    error(i18n(errorString, (e.getClass+": "+e.getMessage) +: exArgs : _*))
+    error(i18n(errorString, (e.getClass+": "+e.getMessage) +: exArgs : _*), Some(e))
   }
 }
 

@@ -45,7 +45,7 @@
     </Package>
 
     <LeftoverFilter Regex="Civ5XP\.launch"/>
-    <LeftoverFilter Regex="libmppatch\.so"/>
     <LeftoverFilter Regex="Civ5XP\.orig"/>
+    <LeftoverFilter Regex="libmppatch\.so"/>
     <LeftoverFilter Regex="mppatch_config\.ini"/>
 </InstallScript>

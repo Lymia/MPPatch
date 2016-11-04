@@ -37,9 +37,12 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var targetVersion  : JTextField   = _
   private var currentStatus  : JTextField   = _
 
+  private val packages = Set("debug", "multiplayer")
+
   private val platform  = Platform.currentPlatform.getOrElse(error(i18n("error.unknownplatform")))
   private def checkPath(path: Path) =
-    Files.exists(path) && Files.isDirectory(path) && platform.checkPaths.forall(x => Files.exists(path.resolve(x)))
+    Files.exists(path) && Files.isDirectory(path) &&
+      patchPackage.script.checkFor.forall(x => Files.exists(path.resolve(x)))
   private def resolvePaths(paths: Seq[Path]) = paths.find(checkPath)
 
   private val syncLock = new Object
@@ -66,7 +69,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     if(installer != null) changeInstaller(installer.basePath)
   }
   def changePatchPackage(pack: DataSource) = syncLock synchronized {
-    patchPackage = new PatchLoader(pack)
+    patchPackage = new PatchLoader(pack, platform)
     reloadInstaller()
   }
 
@@ -86,7 +89,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   } else pathFromRegistry()
 
   private val actionUpdate = () => {
-    installer.safeUpdate()
+    installer.safeUpdate(packages)
   }
   private val actionUninstall = () => {
     installer.safeUninstall()
@@ -137,7 +140,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
         if(!isValid) setStatus("status.noprogram")
         else if(!installer.isLockAcquired) setStatus("status.inuse")
-        else installer.checkPatchStatus() match {
+        else installer.checkPatchStatus(packages) match {
           case PatchStatus.Installed =>
             setStatus("status.ready")
             installButton.setActionText("action.reinstall")
