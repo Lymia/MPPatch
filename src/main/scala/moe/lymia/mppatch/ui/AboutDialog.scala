@@ -29,18 +29,9 @@ import javax.swing.text.html.HTMLEditorKit
 import javax.swing._
 import javax.swing.event.{HyperlinkEvent, HyperlinkListener}
 
-import com.github.rjeschke.txtmark.Processor
 import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
 
 class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
-  private def renderMarkdown(resource: String) =
-    s"""<html>
-       |  <body>
-       |    ${Processor.process(IOUtils.loadResource(resource))}
-       |  </body>
-       |</html>
-     """.stripMargin
-
   private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
   private val version = VersionInfo.fromJar
   private val desktop = Desktop.getDesktop
@@ -74,10 +65,10 @@ class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog
     def setPage(pageParam: String) = {
       val page = pageParam.replaceAll("^/+", "")
       println("Setting page to: "+page)
-      editor.setText(renderMarkdown(page))
+      editor.setText(IOUtils.loadResource(page))
       editor.setCaretPosition(0)
     }
-    setPage("text/about.md")
+    setPage("text/about.html")
 
     editor.addHyperlinkListener(new HyperlinkListener {
       override def hyperlinkUpdate(e: HyperlinkEvent): Unit = {

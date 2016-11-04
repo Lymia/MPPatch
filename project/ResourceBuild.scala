@@ -21,13 +21,13 @@
  */
 
 import java.net.InetAddress
-import java.text.SimpleDateFormat
 
 import sbt._
 import sbt.Keys._
 import com.typesafe.sbt.SbtGit._
 import Config._
 import Utils._
+import com.github.rjeschke.txtmark.Processor
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -55,10 +55,10 @@ object ResourceBuild {
   import Keys._
 
   val settings = Seq(
+    // Version information
     versionFile := {
       val path = crossTarget.value / "version-resource-cache.properties"
 
-      // Generate version information file
       val properties = new java.util.Properties
       properties.put("mppatch.version.string", version.value)
       val VersionRegex(major, minor, _, patch, _, suffix) = version.value
@@ -88,13 +88,29 @@ object ResourceBuild {
       path
     },
     resourceGenerators in Compile += Def.task {
-      val basePath = (resourceManaged in Compile).value
-
-      val versionPropertiesPath = basePath / "moe" / "lymia" / "mppatch" / "version.properties"
+      val versionPropertiesPath =
+        (resourceManaged in Compile).value / "moe" / "lymia" / "mppatch" / "version.properties"
       IO.copyFile(versionFile.value, versionPropertiesPath)
-
-      // Final generated files list
       Seq(versionPropertiesPath)
+    }.taskValue,
+
+    // Render about information
+    resourceGenerators in Compile += Def.task {
+      val outPath = (resourceManaged in Compile).value / "moe" / "lymia" / "mppatch" / "text"
+
+      (for(file <- IO.listFiles(baseDirectory.value / "doc" / "about") if file.getName.endsWith(".md")) yield {
+        val markdown = IO.read(file)
+        val html = s"""<html>
+                      |  <body>
+                      |    ${Processor.process(markdown)}
+                      |  </body>
+                      |</html>
+                    """.stripMargin
+
+        val outFile = outPath / file.getName.replaceAll("\\.md$", ".html")
+        IO.write(outFile, html)
+        outFile
+      }).toSeq
     }.taskValue
   )
 }

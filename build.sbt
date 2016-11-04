@@ -55,9 +55,6 @@ lazy val mppatch = project in file(".") settings (commonSettings ++ ProguardBuil
   libraryDependencies += "org.tukaani" % "xz" % "1.5",
   shadeMappings       += "org.tukaani.xz.**" -> "moe.lymia.mppatch.lib.xz.@1",
 
-  libraryDependencies += "com.github.rjeschke" % "txtmark" % "0.13",
-  shadeMappings       += "com.github.rjeschke.txtmark.**" -> "moe.lymia.mppatch.lib.txtmark.@1",
-
   excludeFiles   := Set("library.properties", "rootdoc.txt", "scala-xml.properties"),
   proguardConfig := "installer.pro"
 ) ++ PatchBuild.settings ++ ResourceBuild.settings ++ NativePatchBuild.settings)

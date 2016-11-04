@@ -1,4 +1,4 @@
-[Return to main page.](http://fromres/text/about.md)
+[Return to main page.](http://fromres/text/about.html)
 
 ---
 
@@ -122,22 +122,6 @@ XZ for Java has been placed into the public domain.
 ### Symbola Font
 
 The Symbola font has been placed into the public domain.
-
-### txtmark
-
-Copyright (C) 2011-2015 René Jeschke &lt;rene_jeschke@yahoo.de&gt;
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-* [http://www.apache.org/licenses/LICENSE-2.0](http://fromres/text/apachev2.md)
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 
 Misc
 ====
