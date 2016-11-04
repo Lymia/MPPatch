@@ -195,7 +195,8 @@ object NativePatchBuild {
 
             cc(includePaths("-I") ++ Seq(
               "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-o", target,
-              "-fstack-protector", "-fstack-protector-all", "-D_FORTIFY_SOURCE=2", nasm_o) ++
+              "-fstack-protector", "-fstack-protector-all", "-D_FORTIFY_SOURCE=2",
+              s"-DMPPATCH_CIV_VERSION=$sha256", s"-DMPPATCH_PLATFORM=$platform", nasm_o) ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ sourceFiles)
             target
           }

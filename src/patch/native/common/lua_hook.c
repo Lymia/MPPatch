@@ -127,6 +127,8 @@ static void luaTable_versioninfo(lua_State *L, int table) {
     table_setInteger(L, table, "major", patchVersionMajor);
     table_setInteger(L, table, "minor", patchVersionMinor);
     table_setString (L, table, "versionString", patchFullVersion);
+    table_setString (L, table, "platform", MPPATCH_PLATFORM);
+    table_setString (L, table, "sha256", MPPATCH_CIV_VERSION);
 }
 
 static void luaTable_pushSharedState(lua_State *L) {
