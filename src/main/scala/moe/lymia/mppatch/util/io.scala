@@ -22,11 +22,13 @@
 
 package moe.lymia.mppatch.util
 
-import java.io.{IOException, InputStream}
+import java.io.{DataInputStream, IOException, InputStream}
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
+
+import moe.lymia.mppatch.util.common.{IOWrappers, PatchPackage}
 
 import scala.annotation.tailrec
 import scala.io.Codec
@@ -115,4 +117,25 @@ object IOUtils {
         lock.release()
       }
     }
+}
+
+trait DataSource {
+  def loadResource(name: String): String
+  def loadBinaryResource(name: String): Array[Byte]
+}
+case class ResourceDataSource(data: PatchPackage) extends DataSource {
+  override def loadResource(name: String): String = IOUtils.loadResource(name)
+  override def loadBinaryResource(name: String): Array[Byte] = IOUtils.loadBinaryResource(name)
+}
+case class MppakDataSource(data: PatchPackage) extends DataSource {
+  override def loadResource(name: String): String = data.loadResource(name)
+  override def loadBinaryResource(name: String): Array[Byte] = data.loadBinaryResource(name)
+}
+object MppakDataSource {
+  def apply(in: InputStream): MppakDataSource =
+    MppakDataSource(IOWrappers.readPatchPackage(in match {
+      case in: DataInputStream => in
+      case _ => new DataInputStream(in)
+    }))
+  def apply(resource: String): MppakDataSource = MppakDataSource(IOUtils.getResource(resource))
 }

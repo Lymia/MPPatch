@@ -22,13 +22,13 @@
 
 package moe.lymia.mppatch.ui
 
-import java.awt.{Dimension, Font, GridBagConstraints, GridBagLayout}
+import java.awt.{GridBagConstraints, GridBagLayout}
 import java.nio.file.{Files, Path, Paths}
 import java.util.Locale
 import javax.swing._
 
 import moe.lymia.mppatch.core._
-import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
+import moe.lymia.mppatch.util.{DataSource, MppakDataSource}
 
 class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var installButton  : ActionButton = _
@@ -65,12 +65,12 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   def reloadInstaller() = syncLock synchronized {
     if(installer != null) changeInstaller(installer.basePath)
   }
-  def changePatchPackage(pack: PatchFileSource) = syncLock synchronized {
+  def changePatchPackage(pack: DataSource) = syncLock synchronized {
     patchPackage = new PatchLoader(pack)
     reloadInstaller()
   }
 
-  changePatchPackage(PatchPackageLoader("mppatch.mppak"))
+  changePatchPackage(MppakDataSource("mppatch.mppak"))
 
   private def pathFromRegistry() = resolvePaths(platform.defaultSystemPaths) match {
     case Some(x) => changeInstaller(x, false)

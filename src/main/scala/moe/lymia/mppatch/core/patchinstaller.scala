@@ -202,7 +202,7 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
       Files.move(resolve(installScript.replacementTarget), patchInstallTarget)
       val patchTarget = installFile(installScript.patchTarget, loader.loadVersion(patchData))
       val additionalMap = installScript.additionalFiles.map { file =>
-        file.filename -> installFile(file.filename, loader.source.loadBinary(file.source), file.isExecutable)
+        file.filename -> installFile(file.filename, loader.source.loadBinaryResource(file.source), file.isExecutable)
       }.toMap
 
       val assets = resolve(platform.assetsPath)

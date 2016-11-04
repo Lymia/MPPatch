@@ -22,21 +22,14 @@
 
 package moe.lymia.mppatch.core
 
-import java.io.{DataInputStream, InputStream}
 import java.nio.file.Path
 import java.util.regex.Pattern
 import java.util.{Locale, UUID}
 
-import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
+import moe.lymia.mppatch.util.{DataSource, IOUtils}
 import moe.lymia.mppatch.util.XMLUtils._
-import moe.lymia.mppatch.util.common.{Crypto, IOWrappers, PatchPackage}
 
 import scala.xml.{Node, XML}
-
-trait PatchFileSource {
-  def loadResource(name: String): String
-  def loadBinary  (name: String): Array[Byte]
-}
 
 object XMLCommon {
   def loadFilename(node: Node) = getAttribute(node, "Filename")
@@ -102,7 +95,7 @@ object PatchManifest {
   }
 }
 
-class PatchLoader(val source: PatchFileSource) {
+class PatchLoader(val source: DataSource) {
   val data  = PatchManifest.loadFromXML(XML.loadString(source.loadResource("manifest.xml")))
   val patch = UIPatch.loadFromXML(XML.loadString(source.loadResource(data.uiPatch)))
 
@@ -152,18 +145,5 @@ class PatchLoader(val source: PatchFileSource) {
     versionMap.get((targetPlatform, versionName))
   def nativePatchExists(targetPlatform: String, versionName: String) =
     versionMap.contains((targetPlatform, versionName))
-  def loadVersion(patch: NativePatch) = source.loadBinary(patch.path)
-}
-
-case class PatchPackageLoader(data: PatchPackage) extends PatchFileSource {
-  override def loadResource(name: String): String = data.loadResource(name)
-  override def loadBinary(name: String): Array[Byte] = data.loadBinaryResource(name)
-}
-object PatchPackageLoader {
-  def apply(in: InputStream): PatchPackageLoader =
-    PatchPackageLoader(IOWrappers.readPatchPackage(in match {
-      case in: DataInputStream => in
-      case _ => new DataInputStream(in)
-    }))
-  def apply(resource: String): PatchPackageLoader = PatchPackageLoader(IOUtils.getResource(resource))
+  def loadVersion(patch: NativePatch) = source.loadBinaryResource(patch.path)
 }
