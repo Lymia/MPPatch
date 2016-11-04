@@ -29,11 +29,12 @@
 
 #include "c_rt.h"
 #include "platform.h"
+#include "config.h"
 
 // Debug logging
-FILE* debug_log_file;
+FILE* debug_log_file = NULL;
 __attribute__((constructor(CONSTRUCTOR_LOGGING))) static void initDebugLogging() {
-    debug_log_file = fopen("mppatch_debug.log", "w");
+    if(enableLogging) debug_log_file = fopen("mppatch_debug.log", "w");
 }
 
 // String manipulation

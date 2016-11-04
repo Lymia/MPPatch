@@ -20,6 +20,8 @@
     SOFTWARE.
 */
 
+#include <stdlib.h>
+
 #include "c_rt.h"
 #include "platform.h"
 #include "c_defines.h"
@@ -27,6 +29,7 @@
 
 #include "net_hook.h"
 #include "lua_hook.h"
+#include "config.h"
 
 #define switchOnType(type, name) ((type) == BIN_DX9    ? name##_BIN_DX9    : \
                                   (type) == BIN_DX11   ? name##_BIN_DX11   : \
@@ -34,12 +37,12 @@
                                   0)
 
 void* filterProxySymbol(const char* name, void* target) {
-    if(!strcmp(name, lGetMemoryUsage_symbol)) {
+    if(enableMultiplayerPatch && !strcmp(name, lGetMemoryUsage_symbol)) {
         debug_print("Intercepting lGetMemoryUsage proxy target.");
         return lGetMemoryUsageProxy;
     } else return target;
 }
-PatchInformation* SetActiveDLCAndMods_patchInfo = 0;
+PatchInformation* SetActiveDLCAndMods_patchInfo = NULL;
 __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installHooks() {
     // Lua hook
     lGetMemoryUsage = resolveSymbol(CV_GAME_DATABASE, lGetMemoryUsage_symbol);

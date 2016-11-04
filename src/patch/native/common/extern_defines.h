@@ -51,6 +51,7 @@ int lua_type (lua_State *L, int idx);
 
 void lua_pushstring (lua_State *L, const char *s);
 void lua_pushinteger (lua_State *L, lua_Integer n);
+void lua_pushboolean (lua_State *L, int b);
 
 typedef int (*lua_CFunction) (lua_State *L);
 void lua_pushcclosure (lua_State *L, lua_CFunction fn, int n);

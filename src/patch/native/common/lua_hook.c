@@ -37,6 +37,7 @@
 #include "version.h"
 #include "lua_hook.h"
 #include "net_hook.h"
+#include "config.h"
 
 // Setup new Lua tables
 #define LuaTableHook_REGINDEX "2c11892f-7ad1-4ea1-bc4e-770a86c387e6"
@@ -52,6 +53,11 @@ static void table_setTable(lua_State *L, int table, const char* name, void (*fn)
 static void table_setInteger(lua_State *L, int table, const char* name, lua_Integer val) {
     lua_pushstring(L, name);
     lua_pushinteger(L, val);
+    lua_rawset(L, table);
+}
+static void table_setBoolean(lua_State *L, int table, const char* name, bool val) {
+    lua_pushstring(L, name);
+    lua_pushboolean(L, val);
     lua_rawset(L, table);
 }
 static void table_setString(lua_State *L, int table, const char* name, const char* val) {
@@ -159,6 +165,12 @@ static void luaTable_globals(lua_State *L, int table) {
     lua_pop(L, 1);
 }
 
+static void luaTable_config(lua_State *L, int table) {
+    table_setBoolean(L, table, "enableLogging"         , enableLogging         );
+    table_setBoolean(L, table, "enableDebug"           , enableDebug           );
+    table_setBoolean(L, table, "enableMultiplayerPatch", enableMultiplayerPatch);
+}
+
 lGetMemoryUsage_t lGetMemoryUsage;
 ENTRY lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L) {
     if(lua_type(L, 1) == LUA_TSTRING && !strcmp(luaL_checkstring(L, 1), LuaTableHook_SENTINEL)) {
@@ -171,6 +183,7 @@ ENTRY lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L) {
         table_setTable(L, table, "version", luaTable_versioninfo);
         table_setTable(L, table, "NetPatch", luaTable_NetPatch);
         table_setTable(L, table, "globals", luaTable_globals);
+        table_setTable(L, table, "config", luaTable_config);
         table_setCFunction(L, table, "debugPrint", luaHook_debugPrint);
 
         lua_pushstring(L, "shared");

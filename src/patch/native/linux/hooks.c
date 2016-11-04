@@ -20,6 +20,8 @@
     SOFTWARE.
 */
 
+#include <stdlib.h>
+
 #include "c_rt.h"
 #include "platform.h"
 #include "c_defines.h"
@@ -27,18 +29,21 @@
 
 #include "net_hook.h"
 #include "lua_hook.h"
+#include "config.h"
 
-static PatchInformation* lGetMemoryUsage_patchInfo;
-PatchInformation* SetActiveDLCAndMods_patchInfo = 0;
+static PatchInformation* lGetMemoryUsage_patchInfo = NULL;
+PatchInformation* SetActiveDLCAndMods_patchInfo = NULL;
 
 __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installHooks() {
     // Lua hook
-    lGetMemoryUsage_patchInfo = proxyFunction(resolveSymbol(CV_MERGED_BINARY, lGetMemoryUsage_symbol),
-                                             lGetMemoryUsageProxy, lGetMemoryUsage_hook_length, "lGetMemoryUsage");
-    lGetMemoryUsage = (lGetMemoryUsage_t) lGetMemoryUsage_patchInfo->functionFragment->data;
+    if(enableMultiplayerPatch) {
+        lGetMemoryUsage_patchInfo = proxyFunction(resolveSymbol(CV_MERGED_BINARY, lGetMemoryUsage_symbol),
+                                                 lGetMemoryUsageProxy, lGetMemoryUsage_hook_length, "lGetMemoryUsage");
+        lGetMemoryUsage = (lGetMemoryUsage_t) lGetMemoryUsage_patchInfo->functionFragment->data;
+    }
 }
 __attribute__((destructor(CONSTRUCTOR_HOOK_INIT))) static void destroyHooks() {
-    unpatch(lGetMemoryUsage_patchInfo);
+    if(lGetMemoryUsage_patchInfo != NULL) unpatch(lGetMemoryUsage_patchInfo);
 }
 
 void installNetHook() {

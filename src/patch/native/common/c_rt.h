@@ -27,10 +27,13 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
-#include "platform.h"
 
-#define CONSTRUCTOR_LOGGING           200
-#define CONSTRUCTOR_EARLY_INIT        210
+#include "platform.h"
+#include "config.h"
+
+#define CONSTRUCTOR_READ_CONFIG       200
+#define CONSTRUCTOR_LOGGING           210
+#define CONSTRUCTOR_EARLY_INIT        220
 #define CONSTRUCTOR_BINARY_INIT_EARLY 300
 #define CONSTRUCTOR_BINARY_INIT       310
 #define CONSTRUCTOR_PROXY_INIT        320
@@ -45,8 +48,10 @@ extern FILE* debug_log_file;
     snprintf(debug_print_buffer, 2048, "[%s] " format "\n", time_str_tmp, ##arg); \
     debug_print_buffer[2047] = '\0'; \
     fprintf(stderr, "[MPPatch] %s", debug_print_buffer); \
-    fprintf(debug_log_file, "%s", debug_print_buffer); \
-    fflush(debug_log_file); \
+    if(debug_log_file != NULL && enableLogging) { \
+        fprintf(debug_log_file, "%s", debug_print_buffer); \
+        fflush(debug_log_file); \
+    } \
 }
 #define debug_print(format, arg...) \
     debug_print_raw("%s at %s:%u - " format, __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg)
