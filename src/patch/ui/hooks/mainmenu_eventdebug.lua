@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.canEnable then
+if _mpPatch and _mpPatch.canEnable and _mpPatch.debug then
     _mpPatch.eventList = {
         "ActivePlayerTurnEnd", "ActivePlayerTurnStart", "AddPopupTextEvent", "AddUnitMoveHexRangeHex",
         "AdvisorDisplayHide", "AdvisorDisplayShow", "AfterModsActivate", "AfterModsDeactivate", "AILeaderMessage",
