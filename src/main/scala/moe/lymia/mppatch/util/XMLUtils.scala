@@ -35,4 +35,6 @@ object XMLUtils {
 
   def getNodeText         (node: Node, tag: String)       = (node \ tag).text.trim
   def getOptionalNodeText (node: Node, tag: String)       = getOptional(node \ tag).map(_.trim)
+
+  def loadFilename        (node: Node)                    = getAttribute(node, "Filename")
 }

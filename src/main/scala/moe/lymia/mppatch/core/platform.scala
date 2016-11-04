@@ -48,19 +48,13 @@ object PlatformType {
 
 trait Platform {
   val platformName: String
-  val checkPaths: Seq[String]
-  val gameSteamID = 8930
 
   def defaultSystemPaths: Seq[Path]
-
-  def assetsPath: String
   def mapPath(name: String): String = name
 
   @tailrec final def resolve(path: Path, name: String*): Path =
     if(name.length == 1) path.resolve(mapPath(name.head))
     else resolve(path.resolve(mapPath(name.head)), name.tail: _*)
-
-  def normalizeLineEndings(name: String): String
 }
 object Platform {
   def apply(t: PlatformType) = t match {
@@ -74,7 +68,6 @@ object Platform {
 
 object Win32Platform extends Platform {
   override val platformName = "win32"
-  override val checkPaths = Seq("CvGameDatabaseWin32Final Release.dll")
 
   override def defaultSystemPaths: Seq[Path] = try {
     WindowsRegistry.HKEY_CURRENT_USER("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
@@ -86,20 +79,14 @@ object Win32Platform extends Platform {
       e.printStackTrace()
       Seq()
   }
-  override def assetsPath = "Assets"
-  override def normalizeLineEndings(name: String) =
-    name.replace("\r\n", "\n").replace("\r", "\n").replace("\n", "\r\n")
 }
 
 object LinuxPlatform extends Platform {
   override val platformName = "linux"
-  override val checkPaths = Seq("Civ5XP")
 
   private val home = Paths.get(System.getProperty("user.home"))
   override def defaultSystemPaths: Seq[Path] =
     Steam.loadLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
-  override def assetsPath = "steamassets/assets"
   override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
-  override def normalizeLineEndings(name: String) = name.replace("\r\n", "\n").replace("\r", "\n")
 }
 

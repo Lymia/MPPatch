@@ -21,13 +21,30 @@
   ~ THE SOFTWARE.
   -->
 <InstallScript>
-    <ReplacementTarget Filename="Civ5XP"/>
-    <RenameTo Filename="Civ5XP.orig"/>
-    <InstallBinary Filename="libmppatch.so"/>
-    <AdditionalFile Filename="Civ5XP" Source="install/Civ5XP.sh" SetExecutable="true"/>
-    <AdditionalFile Filename="Civ5XP.launch" Source="install/Civ5XP.launch.sh" SetExecutable="true"/>
+    <SteamId>8930</SteamId>
+    <AssetsPath Filename="steamassets/assets"/>
+    <CheckFor Filename="Civ5XP"/>
+
+    <Package Name="core">
+        <RenameFile Filename="Civ5XP" RenameTo="Civ5XP.orig"/>
+
+        <InstallBinary Filename="libmppatch.so" CheckVersion="Civ5XP.orig"/>
+        <WriteConfig Filename="mppatch_config.ini" Section="MPPatch"/>
+
+        <AdditionalFile Filename="Civ5XP" Source="install/Civ5XP.sh" SetExecutable="true"/>
+        <AdditionalFile Filename="Civ5XP.launch" Source="install/Civ5XP.launch.sh" SetExecutable="true"/>
+    </Package>
+    <Package Name="multiplayer" Depends="core">
+        <SetFlag Name="enableMultiplayerPatch"/>
+        <WriteDLC Source="ui/mppatch.xml" Target="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
+    </Package>
+    <Package Name="debug">
+        <SetFlag Name="enableLogging"/>
+        <SetFlag Name="enableDebug"/>
+    </Package>
 
     <LeftoverFilter Regex="Civ5XP\.launch"/>
     <LeftoverFilter Regex="libmppatch\.so"/>
     <LeftoverFilter Regex="Civ5XP\.orig"/>
+    <LeftoverFilter Regex="mppatch_config\.ini"/>
 </InstallScript>

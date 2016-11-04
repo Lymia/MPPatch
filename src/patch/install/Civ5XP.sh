@@ -1,4 +1,5 @@
 #!/bin/sh
 path="`dirname "$0"`"
-export LD_PRELOAD="$path/libmppatch.so"
-exec -a Civ5XP "$path/Civ5XP.orig" $*
+export LD_LIBRARY_PATH="$path:$LD_LIBRARY_PATH"
+export LD_PRELOAD="libmppatch.so"
+exec -a Civ5XP "$path/Civ5XP.orig" "$@"

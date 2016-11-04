@@ -21,7 +21,6 @@
   ~ THE SOFTWARE.
   -->
 <PatchManifest>
-    <UIPatch Filename="ui/patch.xml"/>
     <InstallScript Platform="linux" Filename="install/linux.xml"/>
     <InstallScript Platform="win32" Filename="install/win32.xml"/>
 </PatchManifest>

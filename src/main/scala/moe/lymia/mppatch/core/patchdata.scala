@@ -31,11 +31,6 @@ import moe.lymia.mppatch.util.XMLUtils._
 
 import scala.xml.{Node, XML}
 
-object XMLCommon {
-  def loadFilename(node: Node) = getAttribute(node, "Filename")
-}
-import XMLCommon._
-
 case class AdditionalFile(filename: String, source: String, isExecutable: Boolean)
 case class InstallScript(replacementTarget: String, renameTo: String, patchTarget: String,
                          additionalFiles: Seq[AdditionalFile], leftoverFilter: Seq[String]) {
@@ -51,30 +46,6 @@ object InstallScript {
                   loadFilename((xml \ "InstallBinary"    ).head),
                   (xml \ "AdditionalFile").map(loadAdditionalFile),
                   (xml \ "LeftoverFilter").map(x => getAttribute(x, "Regex")))
-}
-
-case class LuaOverride(filename: String, includes: Seq[String],
-                       injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
-case class FileWithSource(filename: String, source: String)
-case class UIPatch(dlcManifest: DLCManifest,
-                   luaPatches: Seq[LuaOverride], libraryFiles: Seq[FileWithSource],
-                   newScreenFileNames: Seq[FileWithSource], textFileNames: Seq[String])
-object UIPatch {
-  def readDLCManifest(node: Node) =
-    DLCManifest(UUID.fromString(getAttribute(node, "UUID")),
-                getAttribute(node, "Version").toInt, getAttribute(node, "Priority").toInt,
-                getAttribute(node, "ShortName"), getAttribute(node, "Name"))
-  def loadLuaOverride(node: Node) =
-    LuaOverride(loadFilename(node), (node \ "Include").map(loadFilename),
-                (node \ "InjectBefore").map(loadFilename), (node \ "InjectAfter").map(loadFilename))
-  def loadFileWithSource(node: Node) =
-    FileWithSource(loadFilename(node), (node \ "@Source").text)
-  def loadFromXML(xml: Node) =
-    UIPatch(readDLCManifest((xml \ "Info").head),
-            (xml \ "Hook"         ).map(loadLuaOverride),
-            (xml \ "Include"      ).map(loadFileWithSource),
-            (xml \ "Screen"       ).map(loadFileWithSource),
-            (xml \ "TextData"     ).map(loadFilename))
 }
 
 case class NativePatch(platform: String, version: String, path: String)
@@ -98,44 +69,6 @@ object PatchManifest {
 class PatchLoader(val source: DataSource) {
   val data  = PatchManifest.loadFromXML(XML.loadString(source.loadResource("manifest.xml")))
   val patch = UIPatch.loadFromXML(XML.loadString(source.loadResource(data.uiPatch)))
-
-  lazy val luaPatchList = patch.luaPatches.map(x => x.filename.toLowerCase(Locale.ENGLISH) -> x).toMap
-  lazy val libraryFiles = patch.libraryFiles.map(x =>
-    x.filename -> source.loadResource(x.source)
-  ).toMap
-  val newScreenFiles = patch.newScreenFileNames.flatMap(x => Seq(
-    s"${x.filename}.lua" -> source.loadResource(s"${x.source}.lua"),
-    s"${x.filename}.xml" -> source.loadResource(s"${x.source}.xml")
-  )).toMap
-  val textFiles = patch.textFileNames.map(x =>
-    x -> XML.loadString(source.loadResource(x))
-  ).toMap
-
-  private def loadWrapper(str: Seq[String], pf: String = "", sf: String = "") =
-    if(str.isEmpty) "" else {
-      pf+"--- BEGIN INJECTED MPPATCH CODE ---\n\n"+
-      str.mkString("\n")+
-      "\n--- END INJECTED MPPATCH CODE ---"+sf
-    }
-  private def getLuaFragment(path: String) = {
-    val code = source.loadResource(path)
-    "-- source file: "+path+"\n\n"+
-    code+(if(!code.endsWith("\n")) "\n" else "")
-  }
-  def patchFile(path: Path) = {
-    val fileName = path.getFileName.toString
-    luaPatchList.get(fileName.toLowerCase(Locale.ENGLISH)) match {
-      case Some(patchData) =>
-        val runtime      = s"${patchData.includes.map(x => s"include [[$x]]").mkString("\n")}\n"
-        val injectBefore = runtime +: patchData.injectBefore.map(getLuaFragment)
-        val contents     = IOUtils.readFileAsString(path)
-        val injectAfter  = patchData.injectAfter.map(getLuaFragment)
-        val finalFile    = loadWrapper(injectBefore, sf = "\n\n")+contents+loadWrapper(injectAfter, pf = "\n\n")
-        Some(finalFile)
-      case None =>
-        None
-    }
-  }
 
   def loadInstallScript(name: String) =
     data.installScripts.get(name).map(x => InstallScript.loadFromXML(XML.loadString(source.loadResource(x))))

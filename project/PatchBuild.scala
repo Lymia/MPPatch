@@ -58,7 +58,8 @@ object PatchBuild {
                                         Filename={x.file.getName}/>)}
       </PatchManifest>
 
-      val manifestFile = PatchFile("manifest.xml", xmlWriter.format(output))
+      val manifestFile = PatchFile("manifest.xml",
+                                   "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+xmlWriter.format(output))
       val versionFile  = PatchFile("version.properties", IO.readBytes(ResourceBuild.Keys.versionFile.value))
 
       // Final generated files list

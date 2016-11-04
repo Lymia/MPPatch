@@ -45,5 +45,5 @@ static int readConfig_handler(void* user, const char* section, const char* name,
 }
 
 __attribute__((constructor(CONSTRUCTOR_READ_CONFIG))) static void readConfig() {
-    if(access(CONFIG_FILENAME, F_OK) != -1) ini_parse("test.ini", readConfig_handler, NULL);
+    if(access(CONFIG_FILENAME, F_OK) != -1) ini_parse(CONFIG_FILENAME, readConfig_handler, NULL);
 }
