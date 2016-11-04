@@ -37,7 +37,7 @@ case class DLCGameplay(textData: Map[String, Node] = Map(),
                        uiFiles: Map[String, Map[String, Array[Byte]]] = Map(), uiSkins: Seq[DLCUISkin] = Nil)
 case class DLCData(manifest: DLCManifest, data: DLCGameplay)
 
-object DLCKey {
+private object DLCKey {
   private val staticInterlace =
     Seq(0x1f, 0x33, 0x93, 0xfb, 0x35, 0x0f, 0x42, 0xc7,
         0xbd, 0x50, 0xbe, 0x7a, 0xa5, 0xc2, 0x61, 0x81) map (_.toByte)
@@ -70,73 +70,66 @@ object DLCDataWriter {
     <Value language={x}>{string}</Value>
   }
 
-  private def nameStringFromManifest(manifest: DLCManifest) =
-    s"${manifest.uuid.toString.replace("-", "")}_v${manifest.version}"
+  private def populateDirectory(dlcBasePath: String, dirName: String, data: Map[String, Array[Byte]],
+                                platform: Platform) =
+    (data.map(x => (s"$dlcBasePath/$dirName/${x._1}", x._2)), <Directory>{dirName}</Directory>)
 
-  private def populateDirectory(dlcBasePath: Path, dirName: String, data: Map[String, Array[Byte]],
-                                platform: Platform): NodeSeq = {
-    val filesDirectory = platform.resolve(dlcBasePath, dirName)
-    Files.createDirectories(filesDirectory)
-    for((name, file) <- data) IOUtils.writeFile(platform.resolve(filesDirectory, name), file)
-
-    Seq(<Directory>{dirName}</Directory>)
-  }
-
-  def writeDLC(dlcBasePath: Path, languageDirPath: Option[Path], dlcData: DLCData, platform: Platform) = {
+  def writeDLC(dlcBasePath: String, languageDirPath: Option[String], dlcData: DLCData, platform: Platform) = {
     var id = 0
     def newId() = {
       id = id + 1
       id
     }
 
-    val nameString = nameStringFromManifest(dlcData.manifest)
+    val nameString = s"${dlcData.manifest.uuid.toString.replace("-", "")}_v${dlcData.manifest.version}"
 
-    val uiFileIncludes = for((dirName, contents) <- dlcData.data.uiFiles) yield
-      populateDirectory(dlcBasePath, dirName, contents, platform)
+    val uiFiles = dlcData.data.uiFiles.map(y => y._2.map(x => (s"$dlcBasePath/${y._1}/${x._1}", x._2))).reduce(_ ++ _)
+
     def writeUISkin(skin: DLCUISkin) = {
       val DLCUISkin(name, set, skinPlatform) = skin
       val dirName = s"UISkin_${name}_${set}_$skinPlatform"
       <UISkin name={name} set={set} platform={skinPlatform}>
         <Skin>
-          { uiFileIncludes }
+          { dlcData.data.uiFiles.map(x => <Directory>{x._1}</Directory>) }
         </Skin>
       </UISkin>
     }
+    val newFiles = Map(s"$dlcBasePath/$nameString.Civ5Pkg" -> IOUtils.writeXMLBytes(
+      <Civ5Package>
+        <GUID>{s"{${dlcData.manifest.uuid}}"}</GUID>
+        <Version>{dlcData.manifest.version.toString}</Version>
+        <Name>{languageValues(s"${dlcData.manifest.uuid.toString.replace("-", "")}_v${dlcData.manifest.version}")}</Name>
+        <Description>{languageValues(dlcData.manifest.name)}</Description>
+        <Priority>{dlcData.manifest.priority.toString}</Priority>
 
-    IOUtils.writeXML(platform.resolve(dlcBasePath, s"$nameString.Civ5Pkg"), <Civ5Package>
-      <GUID>{s"{${dlcData.manifest.uuid}}"}</GUID>
-      <Version>{dlcData.manifest.version.toString}</Version>
-      <Name>{languageValues(s"${dlcData.manifest.uuid.toString.replace("-", "")}_v${dlcData.manifest.version}")}</Name>
-      <Description>{languageValues(dlcData.manifest.name)}</Description>
-      <Priority>{dlcData.manifest.priority.toString}</Priority>
-
-      <SteamApp>99999</SteamApp>
-      <Ownership>FREE</Ownership>
-      <PTags>
-        <Tag>Version</Tag>
-        <Tag>Ownership</Tag>
-      </PTags>
-      <Key>{DLCKey.key(dlcData.manifest.uuid, Seq(99999), dlcData.manifest.version.toString, "FREE")}</Key>
-      { for(skin <- dlcData.data.uiSkins) yield writeUISkin(skin) }
-    </Civ5Package>)
+        <SteamApp>99999</SteamApp>
+        <Ownership>FREE</Ownership>
+        <PTags>
+          <Tag>Version</Tag>
+          <Tag>Ownership</Tag>
+        </PTags>
+        <Key>{DLCKey.key(dlcData.manifest.uuid, Seq(99999), dlcData.manifest.version.toString, "FREE")}</Key>
+        { for(skin <- dlcData.data.uiSkins) yield writeUISkin(skin) }
+      </Civ5Package>
+    ))
 
     val uuid_string = dlcData.manifest.uuid.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
-    languageDirPath.foreach { languagePath =>
-      Files.createDirectories(languagePath)
-      IOUtils.writeXML(platform.resolve(languagePath, s"${nameString}_DlcName.xml"), <GameData> {
-        languageList.flatMap(x =>
-          <NODE> {
-            <Row Tag={s"TXT_KEY_${uuid_string}_NAME"}>
-              <Text>{dlcData.manifest.shortName}</Text>
-            </Row>
-            <Row Tag={s"TXT_KEY_${uuid_string}_DESCRIPTION"}>
-              <Text>{dlcData.manifest.name}</Text>
-            </Row>
-          } </NODE>.copy(label = s"Language_$x")
-        )
-      } </GameData>)
-      for((name, data) <- dlcData.data.textData)
-        IOUtils.writeXML(platform.resolve(languagePath, s"${nameString}_TextData_$name.xml"), data)
+    val languageFiles = languageDirPath.fold(Map[String, Array[Byte]]()) { languagePath =>
+      Map(s"$languagePath/${nameString}_DlcName.xml", IOUtils.writeXMLBytes(
+        <GameData> {
+          languageList.flatMap(x =>
+            <NODE> {
+              <Row Tag={s"TXT_KEY_${uuid_string}_NAME"}>
+                <Text>{dlcData.manifest.shortName}</Text>
+              </Row>
+              <Row Tag={s"TXT_KEY_${uuid_string}_DESCRIPTION"}>
+                <Text>{dlcData.manifest.name}</Text>
+              </Row>
+            } </NODE>.copy(label = s"Language_$x")
+          )
+        } </GameData>
+      )) ++ dlcData.data.textData.map(x =>
+        s"$languagePath/${nameString}_TextData_${x._1}.xml" -> IOUtils.writeXMLBytes(x._2))
     }
   }
 }

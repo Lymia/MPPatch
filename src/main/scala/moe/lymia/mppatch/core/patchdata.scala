@@ -22,58 +22,90 @@
 
 package moe.lymia.mppatch.core
 
-import java.nio.file.Path
 import java.util.regex.Pattern
-import java.util.{Locale, UUID}
 
-import moe.lymia.mppatch.util.{DataSource, IOUtils}
+import moe.lymia.mppatch.util.DataSource
 import moe.lymia.mppatch.util.XMLUtils._
 
 import scala.xml.{Node, XML}
 
+case class RenameFile(filename: String, renameTo: String)
+case class InstallBinary(filename: String, checkVersion: String)
+case class WriteConfig(filename: String, section: String)
 case class AdditionalFile(filename: String, source: String, isExecutable: Boolean)
-case class InstallScript(replacementTarget: String, renameTo: String, patchTarget: String,
-                         additionalFiles: Seq[AdditionalFile], leftoverFilter: Seq[String]) {
-  lazy val leftoverRegex = leftoverFilter.map(x => Pattern.compile(x))
-  def isLeftoverFile(x: String) = leftoverRegex.exists(_.matcher(x).matches())
-}
-object InstallScript {
+case class WriteDLC(source: String, target: String, textData: String)
+case class Package(name: String, dependencies: Set[String],
+                   renames: Seq[RenameFile], installBinary: Seq[InstallBinary], writeConfig: Seq[WriteConfig],
+                   additionalFile: Seq[AdditionalFile], writeDLC: Seq[WriteDLC], setFlags: Set[String])
+object Package {
   def loadAdditionalFile(xml: Node) =
     AdditionalFile(loadFilename(xml), getAttribute(xml, "Source"), getBoolAttribute(xml, "SetExecutable"))
+  def loadWriteDLC(xml: Node) =
+    WriteDLC(getAttribute(xml, "Source"), getAttribute(xml, "Target"), getAttribute(xml, "TextData"))
   def loadFromXML(xml: Node) =
-    InstallScript(loadFilename((xml \ "ReplacementTarget").head),
-                  loadFilename((xml \ "RenameTo"         ).head),
-                  loadFilename((xml \ "InstallBinary"    ).head),
-                  (xml \ "AdditionalFile").map(loadAdditionalFile),
+    Package(getAttribute(xml, "Name"),
+            getOptionalAttribute(xml, "Depends").fold(Set[String]())(_.split(",").toSet),
+            (xml \ "RenameFile"    ).map(x => RenameFile(loadFilename(x), getAttribute(x, "RenameTo"))),
+            (xml \ "InstallBinary" ).map(x => InstallBinary(loadFilename(xml), getAttribute(xml, "CheckVersion"))),
+            (xml \ "WriteConfig"   ).map(x => WriteConfig(loadFilename(xml), getAttribute(xml, "Section"))),
+            (xml \ "AdditionalFile").map(loadAdditionalFile),
+            (xml \ "WriteDLC"      ).map(loadWriteDLC),
+            (xml \ "SetFlag"       ).map(x => getAttribute(x, "Name")).toSet)
+}
+
+case class PackageSet(packages: Set[Package]) {
+  lazy val renames        = packages.flatMap(_.renames       )
+  lazy val installBianry  = packages.flatMap(_.installBinary )
+  lazy val writeConfig    = packages.flatMap(_.writeConfig   )
+  lazy val additionalFile = packages.flatMap(_.additionalFile)
+  lazy val writeDLC       = packages.flatMap(_.writeDLC      )
+  lazy val setFlags       = packages.flatMap(_.setFlags      )
+}
+case class InstallScript(steamId: Int, assetsPath: String, checkFor: Set[String], packages: Map[String, Package],
+                         leftoverFilter: Seq[String]) {
+  private lazy val leftoverRegex = leftoverFilter.map(x => Pattern.compile(x))
+  def isLeftoverFile(x: String) = leftoverRegex.exists(_.matcher(x).matches())
+
+  def loadPackage(name: String) = packages.getOrElse(name, sys.error("no such package "+name))
+  @annotation.tailrec final def loadPackages(toLoad: Set[String], packages: Set[Package] = Set()): PackageSet = {
+    val loaded = packages.map(_.name)
+    if(loaded == toLoad) PackageSet(packages)
+    else {
+      val newPackages = (toLoad -- loaded).map(loadPackage)
+      loadPackages(toLoad ++ newPackages.flatMap(_.dependencies), packages ++ newPackages)
+    }
+  }
+}
+object InstallScript {
+  def loadFromXML(xml: Node) =
+    InstallScript(getNodeText(xml, "SteamId").toInt,
+                  (xml \ "AssetsPath").map(loadFilename).head,
+                  (xml \ "CheckFor").map(loadFilename).toSet,
+                  (xml \ "Package").map(Package.loadFromXML).map(x => x.name -> x).toMap,
                   (xml \ "LeftoverFilter").map(x => getAttribute(x, "Regex")))
 }
 
 case class NativePatch(platform: String, version: String, path: String)
-case class PatchManifest(patchVersion: String, timestamp: Long, uiPatch: String,
+case class PatchManifest(patchVersion: String, timestamp: Long,
                          nativePatches: Seq[NativePatch], installScripts: Map[String, String])
 object PatchManifest {
-  def loadNativePatch(node: Node) =
-    NativePatch(getAttribute(node, "Platform"), getAttribute(node, "Version"), getAttribute(node, "Filename"))
-  def loadInstallScript(node: Node) =
-    getAttribute(node, "Platform") -> loadFilename(node)
+  def loadNativePatch(xml: Node) =
+    NativePatch(getAttribute(xml, "Platform"), getAttribute(xml, "Version"), getAttribute(xml, "Filename"))
   def loadFromXML(xml: Node) = {
     val manifestVersion = getAttribute(xml, "ManifestVersion")
     if(manifestVersion != "0") sys.error("Unknown ManifestVersion: "+manifestVersion)
     PatchManifest(getAttribute(xml, "PatchVersion"), getAttribute(xml, "Timestamp").toLong,
-                  (xml \ "UIPatch"      ).map(loadFilename).head,
                   (xml \ "NativePatch"  ).map(loadNativePatch),
-                  (xml \ "InstallScript").map(loadInstallScript).toMap)
+                  (xml \ "InstallScript").map(x => getAttribute(x, "Platform") -> loadFilename(x)).toMap)
   }
 }
 
-class PatchLoader(val source: DataSource) {
-  val data  = PatchManifest.loadFromXML(XML.loadString(source.loadResource("manifest.xml")))
-  val patch = UIPatch.loadFromXML(XML.loadString(source.loadResource(data.uiPatch)))
+class PatchLoader(val source: DataSource, platform: Platform) {
+  lazy val data   = PatchManifest.loadFromXML(XML.loadString(source.loadResource("manifest.xml")))
+  lazy val script =
+    data.installScripts.get(platform.platformName).map(x => InstallScript.loadFromXML(source.loadXML(x)))
 
-  def loadInstallScript(name: String) =
-    data.installScripts.get(name).map(x => InstallScript.loadFromXML(XML.loadString(source.loadResource(x))))
-
-  val versionMap = data.nativePatches.map(x => (x.platform, x.version) -> x).toMap
+  private val versionMap = data.nativePatches.map(x => (x.platform, x.version) -> x).toMap
   def getNativePatch(targetPlatform: String, versionName: String) =
     versionMap.get((targetPlatform, versionName))
   def nativePatchExists(targetPlatform: String, versionName: String) =
