@@ -20,8 +20,7 @@
     SOFTWARE.
 */
 
-#ifndef C_RT_H
-#define C_RT_H
+#pragma once
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -71,5 +70,3 @@ void patchJmpInstruction(void* fromAddress, void* toAddress, const char* logReas
 PatchInformation* proxyFunction(void* fromAddress, void* toAddress, int patchBytes, const char* logReason);
 void unpatchCode(PatchInformation* data);
 void unpatch(PatchInformation* data);
-
-#endif /* C_RT_H */

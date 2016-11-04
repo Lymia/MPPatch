@@ -20,8 +20,7 @@
     SOFTWARE.
 */
 
-#ifndef EXTERN_DEFINES_H
-#define EXTERN_DEFINES_H
+#pragma once
 
 // Lua library components
 typedef struct lua_State lua_State;
@@ -56,5 +55,3 @@ void lua_pushinteger (lua_State *L, lua_Integer n);
 typedef int (*lua_CFunction) (lua_State *L);
 void lua_pushcclosure (lua_State *L, lua_CFunction fn, int n);
 #define lua_pushcfunction(L,f)  lua_pushcclosure(L,f,0)
-
-#endif /* EXTERN_DEFINES_H */

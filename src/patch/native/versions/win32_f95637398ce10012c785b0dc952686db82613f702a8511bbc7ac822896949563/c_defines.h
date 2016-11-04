@@ -20,8 +20,7 @@
     SOFTWARE.
 */
 
-#ifndef C_DEFINES_H
-#define C_DEFINES_H
+#pragma once
 
 #define lGetMemoryUsage_symbol                     "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z"
 
@@ -38,6 +37,3 @@
 #define WIN32_REF_SYMBOL_ADDR 0x100062D0
 
 #define WIN32_BINARY_BASE 0x00400000
-
-#endif /* C_DEFINES_H */
-

@@ -20,14 +20,10 @@
     SOFTWARE.
 */
 
-#ifndef C_DEFINES_H
-#define C_DEFINES_H
+#pragma once
 
 #define lGetMemoryUsage_symbol          "_ZN8Database9Scripting3Lua15lGetMemoryUsageEP9lua_State"
 #define lGetMemoryUsage_hook_length     7
 
 #define SetActiveDLCAndMods_symbol      "_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb"
 #define SetActiveDLCAndMods_hook_length 10
-
-#endif /* C_DEFINES_H */
-

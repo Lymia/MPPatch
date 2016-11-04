@@ -20,8 +20,7 @@
     SOFTWARE.
 */
 
-#ifndef PLATFORM_H
-#define PLATFORM_H
+#pragma once
 
 #include <stddef.h>
 #include "platform_defines.h"
@@ -59,5 +58,3 @@ CppListLink* CppList_end(CppList* list);
 int CppList_size(CppList* list);
 void CppList_clear(CppList* list);
 void CppList_free(CppList* list);
-
-#endif /* PLATFORM_H */

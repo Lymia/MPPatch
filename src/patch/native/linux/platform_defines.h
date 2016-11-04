@@ -20,8 +20,7 @@
     SOFTWARE.
 */
 
-#ifndef PLATFORM_DEFINES_H
-#define PLATFORM_DEFINES_H
+#pragma once
 
 #include "c_defines.h"
 
@@ -36,5 +35,3 @@ typedef struct CppListLink {
 } CppListLink;
 
 typedef CppListLink CppList;
-
-#endif /* PLATFORM_DEFINES_H */

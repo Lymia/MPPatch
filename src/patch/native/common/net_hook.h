@@ -20,8 +20,7 @@
     SOFTWARE.
 */
 
-#ifndef NET_HOOK_H
-#define NET_HOOK_H
+#pragma once
 
 #include "c_rt.h"
 #include "platform.h"
@@ -45,6 +44,3 @@ extern PatchInformation* SetActiveDLCAndMods_patchInfo;
 extern SetActiveDLCAndMods_t SetActiveDLCAndMods;
 
 void installNetHook();
-
-#endif /* NET_HOOK_H */
-

@@ -20,8 +20,7 @@
     SOFTWARE.
 */
 
-#ifndef LUA_HOOK_H
-#define LUA_HOOK_H
+#pragma once
 
 #include "platform.h"
 #include "extern_defines.h"
@@ -29,6 +28,3 @@
 lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L);
 typedef int lGetMemoryUsage_attributes (*lGetMemoryUsage_t)(lua_State *L);
 extern lGetMemoryUsage_t lGetMemoryUsage;
-
-#endif /* LUA_HOOK_H */
-

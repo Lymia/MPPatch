@@ -20,8 +20,7 @@
     SOFTWARE.
 */
 
-#ifndef PLATFORM_DEFINES_H
-#define PLATFORM_DEFINES_H
+#pragma once
 
 #define lGetMemoryUsage_attributes     __cdecl
 #define SetActiveDLCAndMods_attributes __thiscall
@@ -40,5 +39,3 @@ typedef struct CppList {
     CppListLink* head;
     int length;
 } CppList;
-
-#endif /* PLATFORM_DEFINES_H */
