@@ -55,5 +55,7 @@ object Preferences {
     def value_=(t: T) = prefs.put(name, encoder.encode(t))
   }
 
-  val installationDirectory = new PreferenceKey[String]("installationDirectory")
+  val installationDirectory  = new PreferenceKey[String ]("installationDirectory")
+  val enableDebug            = new PreferenceKey[Boolean]("enableDebug", false)
+  val enableMultiplayerPatch = new PreferenceKey[Boolean]("enableMultiplayerPatch", true)
 }

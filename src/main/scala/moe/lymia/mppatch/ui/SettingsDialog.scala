@@ -30,8 +30,13 @@ import javax.swing._
 class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
   private var installPath: JTextField = _
 
+  private var enableDebug: JCheckBox = _
+
   private def applySettings(): Unit = {
     main.changeInstaller(Paths.get(installPath.getText))
+
+    Preferences.enableDebug.value = enableDebug.isSelected
+
     main.update()
   }
   private def closeWindow() = {
@@ -44,8 +49,8 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     frame.setLayout(new GridBagLayout())
 
-    frame.subFrame(constraints(fill = GridBagConstraints.BOTH)) { textOptions =>
-      installPath = textOptions.gridButtonTextRow(0, "path", "browse") {
+    frame.subFrame(constraints(fill = GridBagConstraints.BOTH)) { options =>
+      installPath = options.gridButtonTextRow(0, "path", "browse") {
         val installer = main.getInstaller
         val chooser = new JFileChooser()
         if(installer != null) chooser.setCurrentDirectory(installer.basePath.toFile)
@@ -58,7 +63,15 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
         case null => installPath.setText("")
         case installer => installPath.setText(installer.basePath.toString)
       }
+
+      enableDebug = options.gridCheckRow(1, "debug")
+      enableDebug.setSelected(Preferences.enableDebug.value)
+
+      equalHeight(enableDebug, installPath)
     }
+
+    frame.add(new JSeparator(), constraints(gridy = 1, weighty = 1, fill = GridBagConstraints.BOTH,
+                                            insets = insets(top = 2, bottom = 2)))
 
     frame.subFrame(constraints(gridy = 2, fill = GridBagConstraints.BOTH)) { frameButtons =>
       frameButtons.add(new JPanel, constraints(weightx = 1))
@@ -78,7 +91,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       })
       frameButtons.add(ok, constraints(gridx = 3))
 
-      equalWidth(apply, cancel, ok)
+      equalButtonWidth(apply, cancel, ok)
     }
   }
 }

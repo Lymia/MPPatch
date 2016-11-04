@@ -65,12 +65,20 @@ trait FrameUtils {
 
     button
   }
-  protected def equalWidth(component: JComponent*) = {
+  protected def equalButtonWidth(component: JComponent*) = {
     val maxWidth = component.map(_.getMinimumSize.getWidth).max.toInt + 20
     for(c <- component) {
       val height = c.getMinimumSize.getHeight.toInt
       c.setMinimumSize  (new Dimension(maxWidth, height))
       c.setPreferredSize(new Dimension(maxWidth, height))
+    }
+  }
+  protected def equalHeight(component: JComponent*) = {
+    val maxHeight = component.map(_.getPreferredSize.getHeight).max.toInt
+    for(c <- component) {
+      val width = c.getPreferredSize.getWidth.toInt
+      c.setMinimumSize  (new Dimension(width, maxHeight))
+      c.setPreferredSize(new Dimension(width, maxHeight))
     }
   }
 
@@ -90,7 +98,8 @@ trait I18NFrameUtils extends FrameUtils { this: I18NTrait =>
     def gridLabel(row: Int, labelStr: String) = {
       val label = new JLabel()
       label.setText(i18n(s"label.$labelStr"))
-      c.add(label, constraints(gridy = row, insets = insets(left = 3, right = 4),
+      if(i18n.hasKey(s"tooltip.$labelStr")) label.setToolTipText(i18n(s"tooltip.$labelStr"))
+      c.add(label, constraints(gridy = row, insets = insets(left = 3, right = 6),
                                anchor = GridBagConstraints.LINE_START))
     }
     def gridTextField(row: Int, width: Int = 2) = {
@@ -100,6 +109,12 @@ trait I18NFrameUtils extends FrameUtils { this: I18NTrait =>
       c.add(textField, constraints(gridx = 1, gridy = row, gridwidth = width, weightx = 1,
                                    fill = GridBagConstraints.BOTH))
       textField
+    }
+    def gridCheckBox(row: Int, labelStr: String) = {
+      val checkBox = new JCheckBox()
+      checkBox.setToolTipText(i18n(s"tooltip.$labelStr"))
+      c.add(checkBox, constraints(gridx = 1, gridy = row, anchor = GridBagConstraints.LINE_START))
+      checkBox
     }
     def iconButton(col: Int, row: Int, str: String)(f: => Unit) = {
       val button = new JButton()
@@ -113,6 +128,10 @@ trait I18NFrameUtils extends FrameUtils { this: I18NTrait =>
     def gridTextRow(row: Int, labelStr: String) = {
       gridLabel(row, labelStr)
       gridTextField(row)
+    }
+    def gridCheckRow(row: Int, labelStr: String) = {
+      gridLabel(row, labelStr)
+      gridCheckBox(row, labelStr)
     }
     def gridButtonTextRow(row: Int, labelStr: String, icon: String)(f: => Unit) = {
       gridLabel(row, labelStr)

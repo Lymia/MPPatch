@@ -37,7 +37,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var targetVersion  : JTextField   = _
   private var currentStatus  : JTextField   = _
 
-  private val packages = Set("debug", "multiplayer")
+  private def packages = {
+    val debug       = if(Preferences.enableDebug.value           ) Set("debug")       else Set[String]()
+    val multiplayer = if(Preferences.enableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
+    debug ++ multiplayer
+  }
 
   private val platform  = Platform.currentPlatform.getOrElse(error(i18n("error.unknownplatform")))
   private def checkPath(path: Path) =
@@ -143,6 +147,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
         else installer.checkPatchStatus(packages) match {
           case PatchStatus.Installed =>
             setStatus("status.ready")
+            installButton.setActionText("action.reinstall")
+            installButton.setEnabled(true)
+            uninstallButton.setEnabled(true)
+          case PatchStatus.PackageChange =>
+            setStatus("status.settingchange")
             installButton.setActionText("action.reinstall")
             installButton.setEnabled(true)
             uninstallButton.setEnabled(true)
