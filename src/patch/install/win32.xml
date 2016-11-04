@@ -24,11 +24,12 @@
     <SteamId>8930</SteamId>
     <AssetsPath Filename="Assets"/>
     <CheckFor Filename="CvGameDatabaseWin32Final Release.dll"/>
+    <VersionFrom Filename="CvGameDatabaseWin32Final Release.dll"/>
 
     <Package Name="multiplayer">
         <RenameFile Filename="CvGameDatabaseWin32Final Release.dll" RenameTo="CvGameDatabase_Original.dll"/>
 
-        <InstallBinary Filename="CvGameDatabaseWin32Final Release.dll" CheckVersion="CvGameDatabase_Original.dll"/>
+        <InstallBinary Filename="CvGameDatabaseWin32Final Release.dll"/>
         <WriteConfig Filename="mppatch_config.ini" Section="MPPatch"/>
         <WriteDLC Source="ui/mppatch.xml" Target="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
 

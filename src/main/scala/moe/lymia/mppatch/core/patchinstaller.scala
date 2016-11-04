@@ -34,9 +34,6 @@ import scala.xml.Node
 private object PathNames {
   val patchStateFilename = "mppatch_install_state.xml"
   val patchLockFilename  = ".mppatch_installer_lock"
-
-  val dlcInstallPath     = "DLC/MpPatch"
-  val dlcTextPath        = "Gameplay/XML/NewText/mppatch_textdata.xml"
 }
 
 sealed trait PatchStatus
@@ -99,9 +96,7 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
   private var fileLock: FileLock = _
   private var manualLock = false
 
-  def isLockAcquired = syncLock synchronized {
-    fileLock != null
-  }
+  def isLockAcquired = syncLock synchronized { fileLock != null }
   def acquireLock(manualLock: Boolean = true) = syncLock synchronized {
     if(fileLock != null) {
       if(!this.manualLock && manualLock) this.manualLock = true

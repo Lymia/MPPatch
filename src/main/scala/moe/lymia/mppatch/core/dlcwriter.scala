@@ -70,30 +70,10 @@ object DLCDataWriter {
     <Value language={x}>{string}</Value>
   }
 
-  private def populateDirectory(dlcBasePath: String, dirName: String, data: Map[String, Array[Byte]],
-                                platform: Platform) =
-    (data.map(x => (s"$dlcBasePath/$dirName/${x._1}", x._2)), <Directory>{dirName}</Directory>)
-
-  def writeDLC(dlcBasePath: String, languageDirPath: Option[String], dlcData: DLCData, platform: Platform) = {
-    var id = 0
-    def newId() = {
-      id = id + 1
-      id
-    }
-
+  def writeDLC(dlcBasePath: String, languageDirPath: Option[String], dlcData: DLCData) = {
     val nameString = s"${dlcData.manifest.uuid.toString.replace("-", "")}_v${dlcData.manifest.version}"
 
     val uiFiles = dlcData.data.uiFiles.map(y => y._2.map(x => (s"$dlcBasePath/${y._1}/${x._1}", x._2))).reduce(_ ++ _)
-
-    def writeUISkin(skin: DLCUISkin) = {
-      val DLCUISkin(name, set, skinPlatform) = skin
-      val dirName = s"UISkin_${name}_${set}_$skinPlatform"
-      <UISkin name={name} set={set} platform={skinPlatform}>
-        <Skin>
-          { dlcData.data.uiFiles.map(x => <Directory>{x._1}</Directory>) }
-        </Skin>
-      </UISkin>
-    }
     val newFiles = Map(s"$dlcBasePath/$nameString.Civ5Pkg" -> IOUtils.writeXMLBytes(
       <Civ5Package>
         <GUID>{s"{${dlcData.manifest.uuid}}"}</GUID>
@@ -109,10 +89,16 @@ object DLCDataWriter {
           <Tag>Ownership</Tag>
         </PTags>
         <Key>{DLCKey.key(dlcData.manifest.uuid, Seq(99999), dlcData.manifest.version.toString, "FREE")}</Key>
-        { for(skin <- dlcData.data.uiSkins) yield writeUISkin(skin) }
+        {
+          for(DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins) yield
+            <UISkin name={name} set={set} platform={skinPlatform}>
+              <Skin>
+                { dlcData.data.uiFiles.map(x => <Directory>{x._1}</Directory>) }
+              </Skin>
+            </UISkin>
+        }
       </Civ5Package>
     ))
-
     val uuid_string = dlcData.manifest.uuid.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
     val languageFiles = languageDirPath.fold(Map[String, Array[Byte]]()) { languagePath =>
       Map(s"$languagePath/${nameString}_DlcName.xml", IOUtils.writeXMLBytes(
@@ -131,5 +117,7 @@ object DLCDataWriter {
       )) ++ dlcData.data.textData.map(x =>
         s"$languagePath/${nameString}_TextData_${x._1}.xml" -> IOUtils.writeXMLBytes(x._2))
     }
+
+    languageFiles ++ newFiles ++ uiFiles : Map[String, Array[Byte]]
   }
 }
