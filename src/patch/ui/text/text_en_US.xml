@@ -7,8 +7,8 @@
             <Text>MpPatch disabled</Text>
         </Row>
         <Row Tag="TXT_KEY_MPPATCH_BINARY_NOT_PATCHED">
-            <!-- Used when the MpPatch .dll/.so patch isn't installed. -->
-            <Text>MpPatch binary patch not installed</Text>
+            <!-- Used when the MpPatch .dll/.so patch isn't installed, or is an unexpected version. -->
+            <Text>MpPatch binary patch error</Text>
         </Row>
         <Row Tag="TXT_KEY_MPPATCH_UNKNOWN_FAILURE">
             <!-- Used when MpPatch isn't loaded, but the source of the failure could not be determined. -->

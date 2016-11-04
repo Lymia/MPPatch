@@ -28,6 +28,7 @@
     <Include Filename="mppatch_utils.lua"    Source="ui/lib/mppatch_utils.lua"   />
     <Include Filename="mppatch_modutils.lua" Source="ui/lib/mppatch_modutils.lua"/>
     <Include Filename="mppatch_uiutils.lua"  Source="ui/lib/mppatch_uiutils.lua" />
+    <Include Filename="mppatch_version.lua"  Source="ui/lib/mppatch_version.lua" />
 
     <TextData Filename="ui/text/text_en_US.xml"/>
 

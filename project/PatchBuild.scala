@@ -58,12 +58,18 @@ object PatchBuild {
                                         Filename={x.file.getName}/>)}
       </PatchManifest>
 
+      val buildIdInfo = PatchFile("ui/lib/mppatch_version.lua",
+        """-- Generated from PatchBuild.scala
+          |_mpPatch.version = {}
+          |_mpPatch.version.buildId = {}
+        """.stripMargin + versions.map(x =>
+          s"_mpPatch.version.buildId.${x.platform}_${x.version} = [[${x.buildId}]]").mkString("\n"))
       val manifestFile = PatchFile("manifest.xml",
                                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+xmlWriter.format(output))
       val versionFile  = PatchFile("version.properties", IO.readBytes(ResourceBuild.Keys.versionFile.value))
 
       // Final generated files list
-      (versionFile +: manifestFile +: (patchFiles ++ copiedFiles)).toMap
+      (buildIdInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles)).toMap
     },
     resourceGenerators in Compile += Def.task {
       val basePath = (resourceManaged in Compile).value

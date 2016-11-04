@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import java.util.UUID
+
 import sbt._
 import sbt.Keys._
 import Config._
@@ -85,7 +87,7 @@ object NativePatchBuild {
     )
   }
 
-  case class PatchFile(platform: String, version: String, file: File)
+  case class PatchFile(platform: String, version: String, file: File, buildId: String)
   object Keys {
     val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
     val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
@@ -176,7 +178,6 @@ object NativePatchBuild {
         val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s"))
         def includePaths(flag: String) = fullSourcePath.flatMap(x => Seq(flag, dir(x)))
 
-        val target = patchDirectory / (version+"_"+progVersion+binaryExtension)
         val versionStr = "version_"+version
         val buildTmp = patchBuildDir.value / versionStr
         IO.createDirectory(buildTmp)
@@ -189,19 +190,30 @@ object NativePatchBuild {
                                          patchSourceDir.value / "common" / "as_entry.s"))
           output
         }
+
+        val targetDir = patchDirectory / version
+        val targetFile = targetDir / ("mppatch_"+version+binaryExtension)
+        val buildIdFile = targetDir / "buildid.txt"
         val outputPath =
           trackDependencies(patchCacheDir.value / (versionStr + "_c_out"), cBuildDependencies.toSet + nasm_o) {
             logger.info("Compiling binary patch for version "+version)
+            val buildId = UUID.randomUUID()
+
+            if(targetDir.exists) IO.delete(targetDir)
+            targetDir.mkdirs()
+
+            IO.write(buildIdFile, buildId.toString)
 
             cc(includePaths("-I") ++ Seq(
-              "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-o", target,
+              "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-o", targetFile,
               "-fstack-protector", "-fstack-protector-all", "-D_FORTIFY_SOURCE=2",
-              "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"", nasm_o) ++
+              "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
+              "-DMPPATCH_BUILDID=\""+buildId+"\"", nasm_o) ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ sourceFiles)
-            target
+            targetDir
           }
 
-        PatchFile(platform, sha256, outputPath)
+        PatchFile(platform, sha256, targetFile, IO.read(buildIdFile))
       }
       patches.toSeq
     }

@@ -18,29 +18,52 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-_mpPatch = {}
-_mpPatch._mt = {}
-setmetatable(_mpPatch, _mpPatch._mt)
-
-local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70")
-
-if not patch.__mppatch_marker then
+local function createTable()
+    _mpPatch = {}
+    _mpPatch._mt = {}
+    setmetatable(_mpPatch, _mpPatch._mt)
+end
+local function patchCriticalError(error, statusMarker)
+    createTable()
+    print("[MPPatch] Cannot load due to critical error: "..error)
     _mpPatch.enabled = false
     _mpPatch.canEnable = false
+    if statusMarker then _mpPatch[statusMarker] = true end
     function _mpPatch._mt.__index(_, k)
         error("Access to field "..k.." in MpPatch runtime without patch installed.")
     end
+    function _mpPatch._mt.__newindex(_, k, v)
+        error("Write to field "..k.." in MpPatch runtime without patch installed.")
+    end
+end
+
+local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70")
+if not patch.__mppatch_marker then
+    patchCriticalError("Could not load binary patch.")
     return
 end
 
+createTable()
 _mpPatch.patch = patch
-_mpPatch.versionString = patch.version.versionString
+
+do
+    include "mppatch_version.lua"
+    if not _mpPatch.version then
+        patchCriticalError("Could not load version information.")
+        return
+    end
+    local platformString = patch.version.platform.."_"..patch.version.sha256
+    local expectedBuildId = _mpPatch.version.buildId[platformString]
+    if not expectedBuildId or expectedBuildId ~= patch.version.buildId then
+        patchCriticalError("BuildID mismatch.")
+        return
+    end
+end
 
 _mpPatch.context = "<init>"
 _mpPatch.uuid = "df74f698-2343-11e6-89c4-8fef6d8f889e"
 _mpPatch.enabled = ContentManager.IsActive(_mpPatch.uuid, ContentType.GAMEPLAY)
 _mpPatch.canEnable = true
-
 function _mpPatch.debugPrint(...)
     local args = {...}
     local accum = ""
@@ -53,7 +76,7 @@ function _mpPatch.debugPrint(...)
         if i ~= count then accum = accum .. "\t" end
     end
 
-    print(accum)
+    print("[MPPatch] "..accum)
     patch.debugPrint(_mpPatch.fullPath..": "..accum)
 end
 
