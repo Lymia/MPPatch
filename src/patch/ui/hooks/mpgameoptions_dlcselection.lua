@@ -1,11 +1,10 @@
-if _mpPatch and _mpPatch.canEnable then
+if _mpPatch and _mpPatch.loaded then
     local RefreshGameOptionsOld = RefreshGameOptions
     function RefreshGameOptions()
         RefreshGameOptionsOld()
 
         -- find mod dependencies
         local dlcDependencies = _mpPatch.getModDependencies(Modding.GetActivatedMods())
-        local mpPatchUUID = _mpPatch.normalizeDlcName(_mpPatch.uuid)
 
         -- original code from mpgameoptions.lua
         g_DLCAllowedManager:ResetInstances()
@@ -14,9 +13,7 @@ if _mpPatch and _mpPatch.canEnable then
         for row in GameInfo.DownloadableContent() do
             local normId = _mpPatch.normalizeDlcName(row.PackageID)
 
-            if normId == mpPatchUUID then
-                PreGame.SetDLCAllowed(row.PackageID, false)
-            elseif row.IsBaseContentUpgrade == 0 then
+            if row.IsBaseContentUpgrade == 0 then
                 local dlcEntries = g_DLCAllowedManager:GetInstance()
                 local dlcEntryDisabled = not canEditDLC
 

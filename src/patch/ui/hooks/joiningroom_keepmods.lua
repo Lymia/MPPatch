@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.canEnable then
+if _mpPatch and _mpPatch.loaded then
     local IsHotLoad = ContextPtr.IsHotLoad
     _mpPatch.patch.globals.rawset(ContextPtr, "IsHotLoad", function(this, ...)
         return IsHotLoad(this, ...) and not _mpPatch.isModding

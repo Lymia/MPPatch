@@ -37,33 +37,6 @@ case class DLCGameplay(textData: Map[String, Node] = Map(),
                        uiFiles: Map[String, Map[String, Array[Byte]]] = Map(), uiSkins: Seq[DLCUISkin] = Nil)
 case class DLCData(manifest: DLCManifest, data: DLCGameplay)
 
-private object DLCKey {
-  private val staticInterlace =
-    Seq(0x1f, 0x33, 0x93, 0xfb, 0x35, 0x0f, 0x42, 0xc7,
-        0xbd, 0x50, 0xbe, 0x7a, 0xa5, 0xc2, 0x61, 0x81) map (_.toByte)
-  private val staticInterlaceStream = Stream.from(0) map (x => staticInterlace(x%staticInterlace.length))
-  private def interlaceData(data: Array[Byte]) =
-    data.zip(staticInterlaceStream).flatMap(x => Seq(x._1, x._2))
-
-  private def encodeLe32(i: Int) =
-    Array(i&0xFF, (i>>8)&0xFF, (i>>16)&0xFF, (i>>24)&0xFF)
-  private def encodeBe32(i: Int) = encodeLe32(i).reverse
-  private def encodeLe16(i: Int) =
-    Array(i&0xFF, (i>>8)&0xFF)
-  private def encodeUUID(u: UUID) =
-    (encodeLe32(((u.getMostSignificantBits >>32) & 0xFFFFFFFF).toInt) ++
-     encodeLe16(((u.getMostSignificantBits >>16) &     0xFFFF).toInt) ++
-     encodeLe16(((u.getMostSignificantBits >> 0) &     0xFFFF).toInt) ++
-     encodeBe32(((u.getLeastSignificantBits>>32) & 0xFFFFFFFF).toInt) ++
-     encodeBe32(((u.getLeastSignificantBits>> 0) & 0xFFFFFFFF).toInt)).map(_.toByte)
-  private def encodeNumber(i: Int) = i.toString.getBytes(StandardCharsets.US_ASCII).toSeq
-
-  def key(u: UUID, sid: Seq[Int], ptags: String*) = {
-    val data = sid.map(encodeNumber) ++ ptags.map(_.getBytes(StandardCharsets.UTF_8).toSeq)
-    Crypto.md5_hex(interlaceData(encodeUUID(u) ++ data.fold(Seq())(_ ++ _)))
-  }
-}
-
 object DLCDataWriter {
   private val languageList = Seq("en_US","fr_FR","de_DE","es_ES","it_IT","ru_RU","ja_JP","pl_PL","ko_KR","zh_Hant_HK")
   private def languageValues(string: String) = languageList.map { x =>
@@ -89,7 +62,6 @@ object DLCDataWriter {
           <Tag>Version</Tag>
           <Tag>Ownership</Tag>
         </PTags>
-        <Key>{DLCKey.key(dlcData.manifest.uuid, Seq(99999), dlcData.manifest.version.toString, "FREE")}</Key>
         {
           for(DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins) yield
             <UISkin name={name} set={set} platform={skinPlatform}>
@@ -102,20 +74,7 @@ object DLCDataWriter {
     ))
     val uuid_string = dlcData.manifest.uuid.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
     val languageFiles = languageDirPath.fold(Map[String, Array[Byte]]()) { languagePath =>
-      Map(s"$languagePath/${platform.mapPath(s"${nameString}_DlcName.xml")}" -> IOUtils.writeXMLBytes(
-        <GameData> {
-          languageList.flatMap(x =>
-            <NODE> {
-              <Row Tag={s"TXT_KEY_${uuid_string}_NAME"}>
-                <Text>{dlcData.manifest.shortName}</Text>
-              </Row>
-              <Row Tag={s"TXT_KEY_${uuid_string}_DESCRIPTION"}>
-                <Text>{dlcData.manifest.name}</Text>
-              </Row>
-            } </NODE>.copy(label = s"Language_$x")
-          )
-        } </GameData>
-      )) ++ dlcData.data.textData.map(x =>
+      dlcData.data.textData.map(x =>
         s"$languagePath/${platform.mapPath(s"${nameString}_TextData_${x._1}")}" -> IOUtils.writeXMLBytes(x._2))
     }
 

@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
+if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     _mpPatch.setBIsModding()
 
     local function cancelOverride()

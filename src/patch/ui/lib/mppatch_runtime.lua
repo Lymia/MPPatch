@@ -26,8 +26,7 @@ end
 local function patchCriticalError(error, statusMarker)
     createTable()
     print("[MPPatch] Cannot load due to critical error: "..error)
-    _mpPatch.enabled = false
-    _mpPatch.canEnable = false
+    _mpPatch.loaded = false
     if statusMarker then _mpPatch[statusMarker] = true end
     function _mpPatch._mt.__index(_, k)
         error("Access to field "..k.." in MpPatch runtime without patch installed.")
@@ -62,9 +61,7 @@ end
 
 _mpPatch.versionString = patch.version.versionString
 _mpPatch.context = "<init>"
-_mpPatch.uuid = "df74f698-2343-11e6-89c4-8fef6d8f889e"
-_mpPatch.enabled = ContentManager.IsActive(_mpPatch.uuid, ContentType.GAMEPLAY)
-_mpPatch.canEnable = true
+_mpPatch.loaded = true
 _mpPatch.debug = patch.config.enableDebug
 function _mpPatch.debugPrint(...)
     local args = {...}

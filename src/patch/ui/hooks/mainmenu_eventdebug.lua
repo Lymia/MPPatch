@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.canEnable and _mpPatch.debug then
+if _mpPatch and _mpPatch.loaded and _mpPatch.debug then
     pcall(function()
         _mpPatch.eventList = {
             "ActivePlayerTurnEnd", "ActivePlayerTurnStart", "AddPopupTextEvent", "AddUnitMoveHexRangeHex",
