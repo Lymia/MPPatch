@@ -1,3 +1,4 @@
+include:lua.h
 symbol:lua_gettop:__attribute__((cdecl)):int:lua_State* L:CV_MERGED_BINARY:*
 symbol:lua_createtable:__attribute__((cdecl)):void:lua_State* L, int narr, int nrec:CV_MERGED_BINARY:*
 symbol:lua_rawset:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*
@@ -6,6 +7,7 @@ symbol:luaL_checkinteger:__attribute__((cdecl)):lua_Integer:lua_State* L, int na
 symbol:lua_pushstring:__attribute__((cdecl)):void:lua_State* L, const char* s:CV_MERGED_BINARY:*
 symbol:lua_pushinteger:__attribute__((cdecl)):void:lua_State* L, lua_Integer n:CV_MERGED_BINARY:*
 symbol:lua_pushcclosure:__attribute__((cdecl)):void:lua_State* L, lua_CFunction fn, int n:CV_MERGED_BINARY:*
+symbol:lua_pushboolean:__attribute__((cdecl)):void:lua_State* L, int b:CV_MERGED_BINARY:*
 symbol:lua_settop:__attribute__((cdecl)):void :lua_State* L, int index:CV_MERGED_BINARY:*
 symbol:lua_pushvalue:__attribute__((cdecl)):void :lua_State* L, int index:CV_MERGED_BINARY:*
 symbol:lua_gettable:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*
@@ -13,4 +15,3 @@ symbol:lua_settable:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGE
 symbol:lua_type:__attribute__((cdecl)):int:lua_State* L, int index:CV_MERGED_BINARY:*
 symbol:lua_getfenv:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*
 symbol:lua_insert:__attribute__((cdecl)):void:lua_State* L, int index:CV_MERGED_BINARY:*
-symbol:lua_pushboolean:__attribute__((cdecl)):void:lua_State* L, int b:CV_MERGED_BINARY:*

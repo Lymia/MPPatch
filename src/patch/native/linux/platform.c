@@ -92,7 +92,8 @@ void* resolveAddress(AddressDomain domain, int address) {
 
 __attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void loadDysymHandle() {
     debug_print("Opening handle to main binary");
-    dlsymHandle = dlopen(0, RTLD_NOW);
+    dlsymHandle = dlopen(NULL, RTLD_NOW);
+    if(dlsymHandle == NULL) fatalError("Could not open handle to main binary: %s", dlerror());
     debug_print("Finding l_addr (to deal with ASLR)");
     struct link_map *lm = (struct link_map*) dlsymHandle;
     base_offset = lm->l_addr;

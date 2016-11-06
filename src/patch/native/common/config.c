@@ -31,6 +31,7 @@
 bool enableLogging = false;
 bool enableDebug = false;
 bool enableMultiplayerPatch = false;
+bool enableLuaJIT = false;
 
 static int readConfig_handler(void* user, const char* section, const char* name, const char* value) {
     bool isFlagSet = strcmp(value, "true") == 0;
@@ -39,6 +40,7 @@ static int readConfig_handler(void* user, const char* section, const char* name,
          if (CFG_MATCH("MPPatch", "enableLogging"         )) enableLogging          = isFlagSet;
     else if (CFG_MATCH("MPPatch", "enableDebug"           )) enableDebug            = isFlagSet;
     else if (CFG_MATCH("MPPatch", "enableMultiplayerPatch")) enableMultiplayerPatch = isFlagSet;
+    else if (CFG_MATCH("MPPatch", "enableLuaJIT"          )) enableLuaJIT           = isFlagSet;
     #undef CFG_MATCH
 
     return 1;

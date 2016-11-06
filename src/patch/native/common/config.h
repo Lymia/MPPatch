@@ -29,3 +29,4 @@
 extern bool enableLogging;
 extern bool enableDebug;
 extern bool enableMultiplayerPatch;
+extern bool enableLuaJIT;

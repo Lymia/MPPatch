@@ -26,7 +26,6 @@
 #include <string.h>
 
 #include "c_rt.h"
-#include "extern_defines.h"
 #include "platform.h"
 #include "net_hook.h"
 

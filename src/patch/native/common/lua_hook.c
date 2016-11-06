@@ -33,11 +33,13 @@
 
 #include "c_rt.h"
 #include "c_defines.h"
-#include "extern_defines.h"
 #include "version.h"
 #include "lua_hook.h"
 #include "net_hook.h"
 #include "config.h"
+
+#include "lua.h"
+#include "lauxlib.h"
 
 // Setup new Lua tables
 #define LuaTableHook_REGINDEX "2c11892f-7ad1-4ea1-bc4e-770a86c387e6"
@@ -146,7 +148,7 @@ static void luaTable_pushSharedState(lua_State *L) {
     }
 }
 
-static const char* copyList[] = {"rawset", "rawget", NULL};
+static const char* copyList[] = {"rawset", "rawget"};
 static void lua_pushGlobals(lua_State *L) {
     lua_pushstring(L, ""); // S
     lua_pushstring(L, "gsub"); // S S
@@ -158,7 +160,7 @@ static void lua_pushGlobals(lua_State *L) {
 static void luaTable_globals(lua_State *L, int table) {
     lua_pushGlobals(L);
     int globals = lua_gettop(L);
-    for(int i=0; copyList[i] != NULL; i++) {
+    for(int i=0; i < sizeof(copyList) / sizeof(const char*); i++) {
         const char* name = copyList[i];
         lua_pushstring(L, name);
         lua_pushstring(L, name);

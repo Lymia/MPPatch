@@ -25,7 +25,6 @@
 #include "c_rt.h"
 #include "platform.h"
 #include "c_defines.h"
-#include "extern_defines.h"
 
 #include "net_hook.h"
 #include "lua_hook.h"

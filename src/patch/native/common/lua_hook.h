@@ -23,7 +23,7 @@
 #pragma once
 
 #include "platform.h"
-#include "extern_defines.h"
+#include "lua.h"
 
 lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L);
 typedef int lGetMemoryUsage_attributes (*lGetMemoryUsage_t)(lua_State *L);

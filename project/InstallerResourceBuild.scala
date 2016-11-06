@@ -31,7 +31,7 @@ import com.github.rjeschke.txtmark.Processor
 
 import scala.collection.mutable.ArrayBuffer
 
-object ResourceBuild {
+object InstallerResourceBuild {
   private def tryProperty(s: => String) = try {
     val str = s
     if(str == null) "<null>" else str
@@ -50,11 +50,11 @@ object ResourceBuild {
   }
 
   object Keys {
-    val versionFile     = TaskKey[File]("resource-version-file")
+    val versionFile = TaskKey[File]("resource-version-file")
   }
   import Keys._
 
-  val settings = Seq(
+  val settings = PatchBuild.settings ++ NativePatchBuild.settings ++ LuaJITBuild.settings ++ Seq(
     // Version information
     versionFile := {
       val path = crossTarget.value / "version-resource-cache.properties"

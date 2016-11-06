@@ -47,26 +47,30 @@ object NativePatchBuild {
   // Codegen for the proxy files.
   def generateProxyDefine(file: File, target: File) {
     val lines = IO.readLines(file).filter(_.nonEmpty)
-    val proxies = for(Array(t, name, attr, ret, signature, domain, sym) <- lines.map(_.trim.split(":"))) yield {
-      val functionDef =
-        s"""// Proxy for $name
-           |typedef $attr $ret (*${name}_fn) ($signature);
-           |static ${name}_fn ${name}_ptr;
-           |$ret $name($signature) {
-           |  return ${name}_ptr(${signature.split(",").map(_.trim.split(" ").last).mkString(", ")});
-           |}
-        """.stripMargin
-      val initString = s"  ${name}_ptr = (${name}_fn) ${
-        if(t == "offset") s"resolveAddress($domain, ${name}_offset);"
-        else if(t == "symbol") s"""resolveSymbol($domain, "${if(sym == "*") name else sym}");"""
-        else sys.error(s"Unknown proxy type $t")
-      }"
-      (functionDef, initString)
+    val proxies = for(arr <- lines.map(_.trim.split(":"))) yield arr.head match {
+      case "offset" | "symbol" =>
+        val Array(t, name, attr, ret, signature, domain, sym) = arr
+        val functionDef =
+          s"""// Proxy for $name
+             |typedef $attr $ret (*${name}_fn) ($signature);
+             |static ${name}_fn ${name}_ptr;
+             |$ret $name($signature) {
+             |  return ${name}_ptr(${signature.split(",").map(_.trim.split(" ").last).mkString(", ")});
+             |}
+          """.stripMargin
+        val initString = s"  ${name}_ptr = (${name}_fn) ${
+          if(t == "offset") s"resolveAddress($domain, ${name}_offset);"
+          else if(t == "symbol") s"""resolveSymbol($domain, "${if(sym == "*") name else sym}");"""
+          else sys.error(s"Unknown proxy type $t")
+        }"
+        (functionDef, initString)
+      case "include" =>
+        ("#include \""+arr(1)+"\"", "// no init for include")
+      case t => sys.error(s"Unknown proxy type $t")
     }
 
     IO.write(target, "#include \"c_rt.h\"\n"+
-      "#include \"c_defines.h\"\n"+
-      "#include \"extern_defines.h\"\n\n"+
+      "#include \"c_defines.h\"\n\n"+
       proxies.map(_._1).mkString("\n")+"\n\n"+
       "__attribute__((constructor(400))) static void loadGeneratedExternSymbols() {\n"+
       proxies.map(_._2).mkString("\n")+"\n"+
@@ -150,7 +154,6 @@ object NativePatchBuild {
 
     nativeVersions := {
       val patchDirectory = patchBuildDir.value / "output"
-      val progVersion    = version.value
       val logger         = streams.value.log
 
       IO.createDirectory(patchDirectory)
@@ -164,19 +167,21 @@ object NativePatchBuild {
             case "win32" => (mingw_gcc _, "win32", ".dll",
               Seq(patchSourceDir.value / "win32"), Seq(win32ExternDef.value),
               allFiles(win32Directory.value, ".dll"),
-              Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
-                  "-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat"))
+              Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup") ++
+              config_win32_secureFlags)
             case "linux" => (gcc       _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux", steamrtSDLDev.value), Seq(linuxExternDef.value),
               Seq(steamrtSDL.value),
-              Seq("-ldl"))
+              Seq("-ldl") ++ config_linux_secureFlags)
           }
         val fullSourcePath = Seq(patchSourceDir.value / "common", patchSourceDir.value / "inih",
                                  commonIncludes.value, versionDir) ++ sourcePath
+        val fullIncludePath = fullSourcePath :+ LuaJITBuild.Keys.luajitIncludes.value
         val cBuildDependencies =
-          fullSourcePath.flatMap(x => allFiles(x, ".c") ++ allFiles(x, ".h")) ++ sourceFiles ++ extraCDeps
+          fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ fullIncludePath.flatMap(x => allFiles(x, ".h")) ++
+          sourceFiles ++ extraCDeps
         val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s"))
-        def includePaths(flag: String) = fullSourcePath.flatMap(x => Seq(flag, dir(x)))
+        def includePaths(flag: String) = fullIncludePath.flatMap(x => Seq(flag, dir(x)))
 
         val versionStr = "version_"+version
         val buildTmp = patchBuildDir.value / versionStr
@@ -205,10 +210,9 @@ object NativePatchBuild {
             IO.write(buildIdFile, buildId.toString)
 
             cc(includePaths("-I") ++ Seq(
-              "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-o", targetFile,
-              "-fstack-protector", "-fstack-protector-all", "-D_FORTIFY_SOURCE=2",
+              "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-o", targetFile, "-fvisibility=hidden",
               "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
-              "-DMPPATCH_BUILDID=\""+buildId+"\"", nasm_o) ++
+              "-DMPPATCH_BUILDID=\""+buildId+"\"", nasm_o) ++ config_common_secureFlags ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ sourceFiles)
             targetDir
           }

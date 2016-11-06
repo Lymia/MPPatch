@@ -35,6 +35,11 @@
 
         <SetFlag Name="enableMultiplayerPatch"/>
     </Package>
+    <Package Name="luajit">
+        <SetFlag Name="enableLuajit"/>
+        <RenameFile Filename="lua51_Win32.dll" RenameTo="lua51_Win32.dll.bak"/>
+        <AdditionalFile Filename="lua51_Win32.dll" Source="native/luajit_win32.dll"/>
+    </Package>
     <Package Name="debug">
         <SetFlag Name="enableLogging"/>
         <SetFlag Name="enableDebug"/>

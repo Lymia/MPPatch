@@ -29,7 +29,7 @@
     <Package Name="core">
         <RenameFile Filename="Civ5XP" RenameTo="Civ5XP.orig"/>
 
-        <InstallBinary Filename="libmppatch.so"/>
+        <InstallBinary Filename="mppatch_core.so"/>
         <WriteConfig Filename="mppatch_config.ini" Section="MPPatch"/>
 
         <AdditionalFile Filename="Civ5XP" Source="install/Civ5XP.sh" SetExecutable="true"/>
@@ -38,6 +38,10 @@
     <Package Name="multiplayer" Depends="core">
         <SetFlag Name="enableMultiplayerPatch"/>
         <WriteDLC Source="ui/mppatch.xml" Target="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
+    </Package>
+    <Package Name="luajit" Depends="core">
+        <SetFlag Name="enableLuaJIT"/>
+        <AdditionalFile Filename="mppatch_luajit.so" Source="native/luajit_linux.so"/>
     </Package>
     <Package Name="debug">
         <SetFlag Name="enableLogging"/>

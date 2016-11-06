@@ -49,14 +49,17 @@ object PatchBuild {
 
       val versions = NativePatchBuild.Keys.nativeVersions.value
       val patchFiles = for(version <- versions)
-        yield PatchFile(version.file.getName, IO.readBytes(version.file))
+        yield PatchFile("native/"+version.file.getName, IO.readBytes(version.file))
       val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
       val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
                                   Timestamp={System.currentTimeMillis().toString}>
         {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
         {versions.map(x => <NativePatch Platform={x.platform} Version={x.version}
-                                        Filename={x.file.getName}/>)}
+                                        Filename={s"native/${x.file.getName}"}/>)}
       </PatchManifest>
+
+      val luajitFiles = for(platform <- LuaJITBuild.Keys.luajitFiles.value)
+        yield PatchFile("native/"+platform.file.getName, IO.readBytes(platform.file))
 
       val buildIdInfo = PatchFile("ui/lib/mppatch_version.lua",
         """-- Generated from PatchBuild.scala
@@ -66,10 +69,10 @@ object PatchBuild {
           s"_mpPatch.version.buildId.${x.platform}_${x.version} = [[${x.buildId}]]").mkString("\n"))
       val manifestFile = PatchFile("manifest.xml",
                                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+xmlWriter.format(output))
-      val versionFile  = PatchFile("version.properties", IO.readBytes(ResourceBuild.Keys.versionFile.value))
+      val versionFile  = PatchFile("version.properties", IO.readBytes(InstallerResourceBuild.Keys.versionFile.value))
 
       // Final generated files list
-      (buildIdInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles)).toMap
+      (buildIdInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles ++ luajitFiles)).toMap
     },
     resourceGenerators in Compile += Def.task {
       val basePath = (resourceManaged in Compile).value
