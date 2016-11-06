@@ -90,7 +90,7 @@ function _mpPatch.getModDependencies(modList)
 end
 
 -- UUID encoding/decoding for storing a mod list in PreGame's options table
-local uuidRegex = ("("..("[0-9a-zA-Z]"):rep(4)..")"):rep(8)
+local uuidRegex = ("("..("[0-9a-fA-F]"):rep(4)..")"):rep(8)
 local function encodeUUID(uuidString)
     uuidString = uuidString:gsub("-", "")
     local uuids = {uuidString:match(uuidRegex)}

@@ -15,7 +15,7 @@ if _mpPatch and _mpPatch.canEnable then
             local normId = _mpPatch.normalizeDlcName(row.PackageID)
 
             if normId == mpPatchUUID then
-                -- ignore MPPatch
+                PreGame.SetDLCAllowed(row.PackageID, false)
             elseif row.IsBaseContentUpgrade == 0 then
                 local dlcEntries = g_DLCAllowedManager:GetInstance()
                 local dlcEntryDisabled = not canEditDLC
@@ -44,7 +44,6 @@ if _mpPatch and _mpPatch.canEnable then
                 PreGame.SetDLCAllowed(row.PackageID, true)
             end
         end
-        PreGame.SetDLCAllowed(mpPatchUUID, _mpPatch.areModsEnabled)
 
         for _, v in ipairs({Controls.CityStateStack, Controls.DropDownOptionsStack, Controls.VictoryConditionsStack,
                             Controls.MaxTurnStack, Controls.TurnTimerStack, Controls.GameOptionsStack,

@@ -39,7 +39,7 @@
         <Include Filename="mppatch_runtime.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_printversion.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_status.lua"/>
-        <InjectAfter Filename="ui/hooks/mainmenu_ensuredisable.lua"/>
+        <InjectAfter Filename="ui/hooks/mainmenu_disabledlc.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_eventdebug.lua"/>
     </Hook>
     <Hook Filename="ContentSwitch.lua">
@@ -63,6 +63,7 @@
     <Hook Filename="MPGameSetupScreen.lua">
         <Include Filename="mppatch_runtime.lua"/>
         <InjectBefore Filename="ui/hooks/common_setbismodding.lua"/>
+        <InjectAfter  Filename="ui/hooks/mpgamesetupscreen_enabledlc.lua"/>
     </Hook>
 
     <!-- Multiplayer lobby modifications -->
