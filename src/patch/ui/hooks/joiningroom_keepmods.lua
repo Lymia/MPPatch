@@ -5,6 +5,11 @@ if _mpPatch and _mpPatch.canEnable then
     end)
 
     Modding = _mpPatch.hookTable(Modding, {ActivateAllowedDLC = function(...)
+        for _,v in ipairs(ContentManager.GetAllPackageIDs()) do
+            _mpPatch.debugPrint("Allowed DLC:")
+            _mpPatch.debugPrint(" - "..v..": "..tostring(PreGame.IsDLCAllowed(v)))
+        end
+
         _mpPatch.overrideModsFromPreGame()
         return Modding._super.ActivateAllowedDLC(...)
     end})
