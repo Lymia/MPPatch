@@ -85,7 +85,7 @@ if _mpPatch and _mpPatch.enabled and _mpPatch.isModding then
     _mpPatch.patch.globals.rawset(UIManager, "DequeuePopup", function(this, ...)
         local context = ...
         cancelOverride()
-        return DequeuePopup(UIManager, ...)
+        return DequeuePopup(this, ...)
     end)
 end
 

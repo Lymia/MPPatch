@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.enabled then
+if _mpPatch and _mpPatch.canEnable then
     _mpPatch.loadElementFromProxy("mppatch_multiplayerproxy", "ModMultiplayerSelectScreen")
 
     Controls.MultiPlayerButton:RegisterCallback(Mouse.eLClick, function()

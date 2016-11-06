@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.enabled and ContextPtr:GetID() == "ModMultiplayerSelectScreen" then
+if _mpPatch and _mpPatch.canEnable and ContextPtr:GetID() == "ModMultiplayerSelectScreen" then
     Modding = _mpPatch.hookTable(Modding, {
         ActivateDLC = function(...)
             _mpPatch.overrideModsFromActivatedList()

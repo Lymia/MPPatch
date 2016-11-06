@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.enabled then
+if _mpPatch and _mpPatch.canEnable then
     local RefreshGameOptionsOld = RefreshGameOptions
     function RefreshGameOptions()
         RefreshGameOptionsOld()

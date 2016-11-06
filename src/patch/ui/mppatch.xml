@@ -39,7 +39,7 @@
         <Include Filename="mppatch_runtime.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_printversion.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_status.lua"/>
-        <InjectAfter Filename="ui/hooks/mainmenu_resetpatch.lua"/>
+        <InjectAfter Filename="ui/hooks/mainmenu_ensuredisable.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_eventdebug.lua"/>
     </Hook>
     <Hook Filename="ContentSwitch.lua">
