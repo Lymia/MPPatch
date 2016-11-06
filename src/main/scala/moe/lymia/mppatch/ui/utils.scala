@@ -73,14 +73,6 @@ trait FrameUtils {
       c.setPreferredSize(new Dimension(maxWidth, height))
     }
   }
-  protected def equalHeight(component: JComponent*) = {
-    val maxHeight = component.map(_.getPreferredSize.getHeight).max.toInt
-    for(c <- component) {
-      val width = c.getPreferredSize.getWidth.toInt
-      c.setMinimumSize  (new Dimension(width, maxHeight))
-      c.setPreferredSize(new Dimension(width, maxHeight))
-    }
-  }
 
   protected implicit class ContainerExtension(c: Container) {
     def subFrame(constraints: GridBagConstraints)(f: JPanel => Unit) = {

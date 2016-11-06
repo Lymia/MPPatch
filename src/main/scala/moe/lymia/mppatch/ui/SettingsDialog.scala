@@ -30,12 +30,22 @@ import javax.swing._
 class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
   private var installPath: JTextField = _
 
-  private var enableDebug: JCheckBox = _
+  private var enableDebug           : JCheckBox = _
+  private var enableMultiplayerPatch: JCheckBox = _
+  private var enableLuaJIT          : JCheckBox = _
 
+  private def validateSettings() = {
+    if(!enableMultiplayerPatch.isSelected && !enableLuaJIT.isSelected) {
+      warn(i18n("error.nothingenabled"))
+      false
+    } else true
+  }
   private def applySettings(): Unit = {
     main.changeInstaller(Paths.get(installPath.getText))
 
-    Preferences.enableDebug.value = enableDebug.isSelected
+    Preferences.enableDebug           .value = enableDebug           .isSelected
+    Preferences.enableMultiplayerPatch.value = enableMultiplayerPatch.isSelected
+    Preferences.enableLuaJIT          .value = enableLuaJIT          .isSelected
 
     main.update()
   }
@@ -67,7 +77,11 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       enableDebug = options.gridCheckRow(1, "debug")
       enableDebug.setSelected(Preferences.enableDebug.value)
 
-      equalHeight(enableDebug, installPath)
+      enableMultiplayerPatch = options.gridCheckRow(2, "modding")
+      enableMultiplayerPatch.setSelected(Preferences.enableMultiplayerPatch.value)
+
+      enableLuaJIT = options.gridCheckRow(3, "luajit")
+      enableLuaJIT.setSelected(Preferences.enableLuaJIT.value)
     }
 
     frame.add(new JSeparator(), constraints(gridy = 1, weighty = 1, fill = GridBagConstraints.BOTH,
@@ -77,7 +91,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       frameButtons.add(new JPanel, constraints(weightx = 1))
 
       val apply = new ActionButton(false)
-      apply.setAction("action.apply", () => applySettings())
+      apply.setAction("action.apply", () => if(validateSettings()) applySettings())
       frameButtons.add(apply, constraints(gridx = 1))
 
       val cancel = new ActionButton(false)
@@ -85,7 +99,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       frameButtons.add(cancel, constraints(gridx = 2))
 
       val ok = new ActionButton(false)
-      ok.setAction("action.ok", () => {
+      ok.setAction("action.ok", () => if(validateSettings()) {
         applySettings()
         closeWindow()
       })

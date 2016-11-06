@@ -40,7 +40,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private def packages = {
     val debug       = if(Preferences.enableDebug.value           ) Set("debug")       else Set[String]()
     val multiplayer = if(Preferences.enableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
-    debug ++ multiplayer
+    val luajit      = if(Preferences.enableLuaJIT.value          ) Set("luajit")      else Set[String]()
+    debug ++ multiplayer ++ luajit
   }
 
   private val platform  = Platform.currentPlatform.getOrElse(error(i18n("error.unknownplatform")))
