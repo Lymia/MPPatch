@@ -44,7 +44,7 @@ if _mpPatch and _mpPatch.canEnable then
                 PreGame.SetDLCAllowed(row.PackageID, true)
             end
         end
-        PreGame.SetDLCAllowed(_mpPatch.uuid, _mpPatch.areModsEnabled)
+        PreGame.SetDLCAllowed(mpPatchUUID, _mpPatch.areModsEnabled)
 
         for _, v in ipairs({Controls.CityStateStack, Controls.DropDownOptionsStack, Controls.VictoryConditionsStack,
                             Controls.MaxTurnStack, Controls.TurnTimerStack, Controls.GameOptionsStack,
