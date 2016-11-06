@@ -49,7 +49,7 @@ class VersionInfo(properties: VersionInfoSource) {
   lazy val isDirty       = properties("mppatch.version.clean", "false") == "false"
 
   lazy val buildDate     = new Date(properties("build.time", "0").toLong)
-  lazy val buildUser     = properties("build.userstring", "<unknown>")
+  lazy val buildUser     = properties("build.user", "<unknown>")
 }
 object VersionInfo {
   def loadFromResource(resource: String) = {

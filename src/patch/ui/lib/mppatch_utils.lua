@@ -33,3 +33,11 @@ function _mpPatch.map(list, fn)
     end
     return newList
 end
+
+function _mpPatch.version.get(string)
+    return _mpPatch.version.info[string]
+end
+
+function _mpPatch.version.getBoolean(string)
+    return get(string) == "true"
+end

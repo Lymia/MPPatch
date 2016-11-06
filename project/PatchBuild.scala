@@ -66,7 +66,9 @@ object PatchBuild {
           |_mpPatch.version = {}
           |_mpPatch.version.buildId = {}
         """.stripMargin + versions.map(x =>
-          s"_mpPatch.version.buildId.${x.platform}_${x.version} = [[${x.buildId}]]").mkString("\n"))
+          s"_mpPatch.version.buildId.${x.platform}_${x.version} = [[${x.buildId}]]").mkString("\n") + "\n" +
+        "_mpPatch.version.info = {}\n" + InstallerResourceBuild.Keys.versionData.value.map(x =>
+          s"_mpPatch.version.info[ [[${x._1}]] ] = [[${x._2.replace("]]", "]]..\"]]\"..[[")}]]").mkString("\n"))
       val manifestFile = PatchFile("manifest.xml",
                                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+xmlWriter.format(output))
       val versionFile  = PatchFile("version.properties", IO.readBytes(InstallerResourceBuild.Keys.versionFile.value))

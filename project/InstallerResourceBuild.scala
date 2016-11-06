@@ -21,6 +21,8 @@
  */
 
 import java.net.InetAddress
+import java.text.DateFormat
+import java.util.Locale
 
 import sbt._
 import sbt.Keys._
@@ -36,7 +38,9 @@ object InstallerResourceBuild {
     val str = s
     if(str == null) "<null>" else str
   } catch {
-    case t: Throwable => s"<unknown (${t.getClass.getName}: ${t.getMessage})>"
+    case t: Throwable =>
+      t.printStackTrace()
+      s"<unknown>"
   }
   private def propertyFromProcess(proc: String*) = tryProperty {
     val output = new ArrayBuffer[String]()
@@ -50,39 +54,45 @@ object InstallerResourceBuild {
   }
 
   object Keys {
+    val versionData = TaskKey[Map[String, String]]("resource-version-data")
     val versionFile = TaskKey[File]("resource-version-file")
   }
   import Keys._
 
   val settings = PatchBuild.settings ++ NativePatchBuild.settings ++ LuaJITBuild.settings ++ Seq(
-    // Version information
+    versionData := {
+      val VersionRegex(major, minor, _, patch, _, suffix) = version.value
+      val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)
+      Map(
+        "mppatch.version.string" -> version.value,
+        "mppatch.version.major"  -> major,
+        "mppatch.version.minor"  -> minor,
+        "mppatch.version.patch"  -> patch,
+        "mppatch.version.suffix" -> suffix,
+        "mppatch.version.commit" -> git.gitHeadCommit.value.getOrElse("<unknown>"),
+        "mppatch.version.clean"  -> (!git.gitUncommittedChanges.value).toString,
+
+        "build.os"               -> tryProperty { System.getProperty("os.name") },
+        "build.user"             -> tryProperty { System.getProperty("user.name")+"@"+
+                                                  InetAddress.getLocalHost.getHostName },
+        "build.time"             -> new java.util.Date().getTime.toString,
+        "build.timestr"          -> dateFormat.format(new java.util.Date()),
+        "build.path"             -> baseDirectory.value.getAbsolutePath,
+        "build.treestatus"       -> propertyFromProcess("git", "status", "--porcelain"),
+  
+        "build.version.uname"    -> propertyFromProcess("uname", "-a"),
+        "build.version.distro"   -> tryProperty { IO.read(file("/etc/os-release")) },
+        "build.version.sbt"      -> sbtVersion.value,
+        "build.version.nasm"     -> propertyFromProcess(config_nasm, "-v"),
+        "build.version.gcc"      -> propertyFromProcess(config_linux_gcc, "-v"),
+        "build.version.mingw"    -> propertyFromProcess(config_mingw_gcc, "-v")
+      )
+    },
     versionFile := {
       val path = crossTarget.value / "version-resource-cache.properties"
 
       val properties = new java.util.Properties
-      properties.put("mppatch.version.string", version.value)
-      val VersionRegex(major, minor, _, patch, _, suffix) = version.value
-      properties.put("mppatch.version.major" , major)
-      properties.put("mppatch.version.minor" , minor)
-      properties.put("mppatch.version.patch" , patch)
-      properties.put("mppatch.version.suffix", suffix)
-      properties.put("mppatch.version.commit", git.gitHeadCommit.value getOrElse "<unknown>")
-      properties.put("mppatch.version.clean" , (!git.gitUncommittedChanges.value).toString)
-
-      properties.put("build.os"        , tryProperty { System.getProperty("os.name") })
-      properties.put("build.userstring", tryProperty { System.getProperty("user.name")+"@"+
-                                                       InetAddress.getLocalHost.getHostName })
-      properties.put("build.hostaddr"  , tryProperty { InetAddress.getLocalHost.getHostAddress })
-      properties.put("build.time"      , new java.util.Date().getTime.toString)
-      properties.put("build.path"      , baseDirectory.value.getAbsolutePath)
-      properties.put("build.treestatus", propertyFromProcess("git", "status", "--porcelain"))
-
-      properties.put("build.version.uname" , propertyFromProcess("uname", "-a"))
-      properties.put("build.version.distro", tryProperty { IO.read(file("/etc/os-release")) })
-      properties.put("build.version.sbt"   , sbtVersion.value)
-      properties.put("build.version.nasm"  , propertyFromProcess(config_nasm, "-v"))
-      properties.put("build.version.gcc"   , propertyFromProcess(config_linux_gcc, "-v"))
-      properties.put("build.version.mingw" , propertyFromProcess(config_mingw_gcc, "-v"))
+      for((k, v) <- versionData.value) properties.put(k, v)
       IO.write(properties, "MPPatch build information", path)
 
       path
