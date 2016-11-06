@@ -3,4 +3,4 @@
 	url = https://github.com/benhoyt/inih.git
 [submodule "src/patch/native/luajit"]
 	path = src/patch/native/luajit
-	url = http://luajit.org/git/luajit-2.0.git
+	url = https://github.com/LuaJIT/LuaJIT.git
