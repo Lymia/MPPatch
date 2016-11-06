@@ -60,6 +60,7 @@ do
     end
 end
 
+_mpPatch.versionString = patch.version.versionString
 _mpPatch.context = "<init>"
 _mpPatch.uuid = "df74f698-2343-11e6-89c4-8fef6d8f889e"
 _mpPatch.enabled = ContentManager.IsActive(_mpPatch.uuid, ContentType.GAMEPLAY)
