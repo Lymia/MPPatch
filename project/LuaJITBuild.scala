@@ -28,7 +28,7 @@ import Utils._
 object LuaJITBuild {
   val coreCount = java.lang.Runtime.getRuntime.availableProcessors
   def make(dir: File, actions: Seq[String], env: Map[String, String]) =
-    runProcess(config_make +: "-C" +: dir.toString +: "-j" +: coreCount.toString +:
+    runProcess(config_make +: "--trace" +: "-C" +: dir.toString +: "-j" +: coreCount.toString +:
                (actions ++ env.map(x => s"${x._1}=${x._2}")))
 
   case class LuaJITPatchFile(platform: String, file: File)
@@ -57,12 +57,13 @@ object LuaJITBuild {
           platform match {
             case "win32" =>
               (Map("HOST_CC" -> (config_linux_gcc+" -m32"), "CROSS" -> config_mingw_prefix,
-                   "TARGET_SYS" -> "Windows"), "src/lua51.dll", ".dll", config_win32_secureFlags)
+                   "TARGET_SYS" -> "Windows"), "src/lua51.dll", ".dll",
+               Seq("-static-libgcc") ++ config_win32_secureFlags)
             case "linux" =>
               (Map("CC" -> (config_linux_gcc+" -m32")), "src/libluajit.so", ".so", config_linux_secureFlags)
           }
-        val allFlags = ("-flto" +: (config_common_secureFlags ++ flags)).mkString(" ")
-        val env = Map("TARGET_CFLAGS" -> allFlags, "TARGET_LDFLAGS" -> ("-O2 "+allFlags)) ++ platformEnv
+        val allFlags = ("-O2" +: "-flto" +: (config_common_secureFlags ++ flags)).mkString(" ")
+        val env = Map("TARGET_FLAGS" -> allFlags) ++ platformEnv
         val excludeDeps = Set(
           "lj_bcdef.h", "lj_ffdef.h", "lj_libdef.h", "lj_recdef.h", "lj_folddef.h", "buildvm_arch.h", "vmdef.lua"
         )

@@ -167,8 +167,8 @@ object NativePatchBuild {
             case "win32" => (mingw_gcc _, "win32", ".dll",
               Seq(patchSourceDir.value / "win32"), Seq(win32ExternDef.value),
               allFiles(win32Directory.value, ".dll"),
-              Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup") ++
-              config_win32_secureFlags)
+              Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
+                  "-static-libgcc") ++ config_win32_secureFlags)
             case "linux" => (gcc       _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux", steamrtSDLDev.value), Seq(linuxExternDef.value),
               Seq(steamrtSDL.value),
