@@ -34,6 +34,7 @@
 
         <AdditionalFile Filename="Civ5XP" Source="install/Civ5XP.sh" SetExecutable="true"/>
         <AdditionalFile Filename="Civ5XP.launch" Source="install/Civ5XP.launch.sh" SetExecutable="true"/>
+        <AdditionalFile Filename="Civ5XP.dbg" Source="install/Civ5XP.dbg.sh" SetExecutable="true"/>
     </Package>
     <Package Name="multiplayer" Depends="core">
         <SetFlag Name="enableMultiplayerPatch"/>

@@ -70,7 +70,7 @@ __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installLuaJIT() 
             if(patchSym  == NULL) debug_print("WARNING: Symbol %s does not exist in LuaJIT binary.", symbol);
             if(targetSym == NULL || patchSym == NULL) continue;
 
-            luaJITHooks[i] = proxyFunction(targetSym, patchSym, 5, symbol);
+            luaJITHooks[i] = proxyFunction(targetSym, patchSym, 0, symbol);
         }
     }
 }

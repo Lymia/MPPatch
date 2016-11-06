@@ -52,14 +52,12 @@ if _mpPatch and _mpPatch.canEnable and _mpPatch.debug then
         _mpPatch.patch.shared.eventHookInstalled = true
 
         local _mpPatch, unpack = _mpPatch, unpack
+        _mpPatch.debugPrint("Enabling event logging...")
         for _, event in ipairs(_mpPatch.eventList) do
             local eventObj = Events[event]
-            if excludeList[event] then
-                _mpPatch.debugPrint("Event "..event.." ignored for logging.")
-            elseif not eventObj then
+            if not eventObj then
                 _mpPatch.debugPrint("Could not log event "..event.." (does not exist)")
-            else
-                _mpPatch.debugPrint("Logging event "..event)
+            elseif not excludeList[event] then
                 eventObj.Add(function(...)
                     local args = {...}
                     _mpPatch.debugPrint("Got event: "..event.."\n",unpack(args))

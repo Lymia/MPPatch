@@ -97,14 +97,17 @@ PatchInformation* proxyFunction(void* fromAddress, void* toAddress, int patchByt
     info->offset = fromAddress;
     memcpy(info->oldData, fromAddress, 5);
 
-    info->functionFragment = executable_malloc(patchBytes + 5);
-    memcpy(info->functionFragment->data, fromAddress, patchBytes);
-
     char buffer[1024];
-    snprintf(buffer, 1024, "function fragment epilogue for %s", logReason);
-    writeJmpInstruction(info->functionFragment->data + patchBytes, fromAddress + patchBytes, buffer);
 
-    executable_prepare(info->functionFragment);
+    if(patchBytes != 0) {
+        info->functionFragment = executable_malloc(patchBytes + 5);
+        memcpy(info->functionFragment->data, fromAddress, patchBytes);
+
+        snprintf(buffer, 1024, "function fragment epilogue for %s", logReason);
+        writeJmpInstruction(info->functionFragment->data + patchBytes, fromAddress + patchBytes, buffer);
+
+        executable_prepare(info->functionFragment);
+    } else info->functionFragment = NULL;
 
     snprintf(buffer, 1024, "hook for %s", logReason);
     patchJmpInstruction(fromAddress, toAddress, buffer);
@@ -120,6 +123,6 @@ void unpatchCode(PatchInformation* info) {
 }
 void unpatch(PatchInformation* info) {
     unpatchCode(info);
-    executable_free(info->functionFragment);
+    if(info->functionFragment != NULL) executable_free(info->functionFragment);
     free(info);
 }

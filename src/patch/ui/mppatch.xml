@@ -37,11 +37,13 @@
     <!-- Basic frontend hooks -->
     <Hook Filename="MainMenu.lua">
         <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/mainmenu_printversion.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_status.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_resetpatch.lua"/>
         <InjectAfter Filename="ui/hooks/mainmenu_eventdebug.lua"/>
     </Hook>
     <Hook Filename="ContentSwitch.lua">
+        <Include Filename="mppatch_runtime.lua"/>
         <InjectAfter Filename="ui/hooks/contentswitch_debug.lua"/>
     </Hook>
 

@@ -148,7 +148,7 @@ static void luaTable_pushSharedState(lua_State *L) {
     }
 }
 
-static const char* copyList[] = {"rawset", "rawget"};
+static const char* copyList[] = { "rawset", "rawget" };
 static void lua_pushGlobals(lua_State *L) {
     lua_pushstring(L, ""); // S
     lua_pushstring(L, "gsub"); // S S
@@ -174,6 +174,7 @@ static void luaTable_config(lua_State *L, int table) {
     table_setBoolean(L, table, "enableLogging"         , enableLogging         );
     table_setBoolean(L, table, "enableDebug"           , enableDebug           );
     table_setBoolean(L, table, "enableMultiplayerPatch", enableMultiplayerPatch);
+    table_setBoolean(L, table, "enableLuaJIT"          , enableLuaJIT          );
 }
 
 lGetMemoryUsage_t lGetMemoryUsage;
@@ -190,6 +191,19 @@ ENTRY lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L) {
         table_setTable(L, table, "globals", luaTable_globals);
         table_setTable(L, table, "config", luaTable_config);
         table_setCFunction(L, table, "debugPrint", luaHook_debugPrint);
+
+        lua_pushGlobals(L);
+        int globals = lua_gettop(L);
+        lua_pushstring(L, "jit");
+        lua_gettable(L, globals);
+        int jit = lua_gettop(L);
+        if(lua_toboolean(L, jit)) {
+            lua_pushstring(L, "luajit_version");
+            lua_pushstring(L, "version");
+            lua_gettable(L, jit);
+            lua_rawset(L, table);
+        }
+        lua_pop(L, 2);
 
         lua_pushstring(L, "shared");
         luaTable_pushSharedState(L);

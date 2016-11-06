@@ -74,7 +74,7 @@ function _mpPatch.debugPrint(...)
         if k > count then count = k end
     end
     for i=1,count do
-        accum = accum .. args[i]
+        accum = accum .. tostring(args[i])
         if i ~= count then accum = accum .. "\t" end
     end
 
@@ -87,6 +87,5 @@ include "mppatch_utils.lua"
 include "mppatch_modutils.lua"
 include "mppatch_uiutils.lua"
 
-_mpPatch.debugPrint("MPPatch runtime loaded")
 _mpPatch.context = _mpPatch.fullPath
-_mpPatch.debugPrint("Current UI path: ".._mpPatch.context)
+_mpPatch.debugPrint("MPPatch runtime loaded in ".._mpPatch.context)

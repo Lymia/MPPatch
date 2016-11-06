@@ -28,6 +28,8 @@ This exports a few functions and tables:
  * `patch.NetPatch`, a table contains functions that controls our modification to the `SetActiveDLCAndMods` function.
  * `patch.globals`, a table containing global functions normally unavailable to Lua code that our UI patch uses.
    Currently, the `rawget` and `rawset` functions are exposed through this table.
+ * `patch.luajit_version`, a string containing the contents of `jit.version` if LuaJIT is running, or `nil` if C Lua
+   is running.
 
 Our patch to `SetActiveDLCandMods` fundamentally works by replacing the arguments to the functions in a way controlled
 by Lua code. These functions are exported in the `patch.NetPatch` table, containing the following functions:
