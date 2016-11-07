@@ -36,10 +36,6 @@ if _mpPatch and _mpPatch.loaded then
                     joinFailed(table.concat(messageTable, "[NEWLINE]"))
                     return
                 end
-
-                _mpPatch.debugPrint("Activating mods and DLC...")
-                Modding.ActivateAllowedDLC()
-                Events.SystemUpdateUI(SystemUpdateUIType.RestoreUI, "StagingRoom")
             end
 
             enterLobby()
