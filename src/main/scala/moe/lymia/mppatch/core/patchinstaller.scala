@@ -229,7 +229,9 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
       case None => sys.error("could not load patch state")
       case Some(patchState) =>
         for(RenameData(replacement, original) <- patchState.renames)
-          if(validatePatchFile(original) && !validatePatchFile(replacement)) {
+          if(validatePatchFile(original) && !validatePatchFile(replacement) &&
+             Files.exists(basePath.resolve(replacement.path)) &&
+             Files.isRegularFile(basePath.resolve(replacement.path))) {
             Files.delete(basePath.resolve(original.path))
             Files.move(basePath.resolve(replacement.path), basePath.resolve(original.path))
           }
