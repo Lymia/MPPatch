@@ -25,13 +25,14 @@ if _mpPatch and _mpPatch.loaded then
                         table.insert(missingModList, mod.Name)
                         missingText = " (is missing)"
                     end
+                    _mpPatch.debugPrint("==DEBUG==", mod.ID, mod.Version, mod.Name)
                     _mpPatch.debugPrint("- "..mod.Name..missingText)
                 end
                 -- TODO: Check for DLCs/mod compatibility
                 if #missingModList > 0 then
                     local messageTable = {Locale.Lookup("TXT_KEY_MPPATCH_MOD_MISSING")}
                     for _, name in ipairs(missingModList) do
-                        table.insert(messageTable, "[ICON_BULLET]"..v.Name:gsub("%[", "("):gsub("%]", ")"))
+                        table.insert(messageTable, "[ICON_BULLET]"..name:gsub("%[", "("):gsub("%]", ")"))
                     end
                     joinFailed(table.concat(messageTable, "[NEWLINE]"))
                     return
