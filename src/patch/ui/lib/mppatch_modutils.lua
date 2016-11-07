@@ -58,12 +58,15 @@ function _mpPatch.getModName(uuid, version)
     return details.Name or "<unknown mod "..uuid.." v"..version..">"
 end
 
-local modInstalledQuery = [[select count(*) from Mods where ModID = ? and Version = ? and Installed = 1]]
-function _mpPatch.isModInstalled(uuid, version)
-    for row in DB.Query(modInstalledQuery, uuid, version) do
-        return row.count > 0
+_mpPatch._mt.registerLazyVal("installedMods", function()
+    local installed = {}
+    for _, v in pairs(Modding.GetInstalledMods()) do
+        installed[v.ID.."_"..v.Version] = true
     end
-    return false
+    return installed
+end)
+function _mpPatch.isModInstalled(uuid, version)
+    return not not _mppatch.installedMods[uuid.."_"..version]
 end
 
 -- Mod dependency listing
