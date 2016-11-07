@@ -66,7 +66,7 @@ _mpPatch._mt.registerLazyVal("installedMods", function()
     return installed
 end)
 function _mpPatch.isModInstalled(uuid, version)
-    return not not _mppatch.installedMods[uuid.."_"..version]
+    return not not _mpPatch.installedMods[uuid.."_"..version]
 end
 
 -- Mod dependency listing
