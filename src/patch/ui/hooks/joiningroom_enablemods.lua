@@ -21,11 +21,10 @@ if _mpPatch and _mpPatch.loaded then
                 _mpPatch.debugPrint("Enabled mods for room:")
                 for _, mod in ipairs(_mpPatch.decodeModsList()) do
                     local missingText = ""
-                    if not Modding.IsModInstalled(mod.ID, mod.Version) then
+                    if not _mpPatch.isModInstalled(mod.ID, mod.Version) then
                         table.insert(missingModList, mod.Name)
                         missingText = " (is missing)"
                     end
-                    _mpPatch.debugPrint("==DEBUG==", mod.ID, mod.Version, mod.Name)
                     _mpPatch.debugPrint("- "..mod.Name..missingText)
                 end
                 -- TODO: Check for DLCs/mod compatibility

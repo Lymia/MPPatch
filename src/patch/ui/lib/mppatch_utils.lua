@@ -34,10 +34,31 @@ function _mpPatch.map(list, fn)
     return newList
 end
 
+-- Version utils
 function _mpPatch.version.get(string)
     return _mpPatch.version.info[string]
 end
 
 function _mpPatch.version.getBoolean(string)
     return get(string) == "true"
+end
+
+-- Pregame utils
+--
+-- There's a bug in CvPreGame.cpp (available in the SDK) where it passes the result of strlen to strncmp, in a way
+-- where it doesn't check for the C string terminator in some cases. This works around it.
+--
+-- In particlar, if you already have an option "_foo", the option "_foooooooooo" will match it, as it will only check
+-- the first four characters, and not the terminator.
+--
+-- We use nonprinting characters to try and try and ensure this bug doesn't cause us any trouble.
+
+local function mungeName(name)
+    return "\8MPPATCH\8"..name.."\8\8"
+end
+function _mpPatch.getGameOption(name)
+    return PreGame.GetGameOption(mungeName(name))
+end
+function _mpPatch.setGameOption(name, value)
+    return PreGame.SetGameOption(mungeName(name), value)
 end

@@ -58,6 +58,14 @@ function _mpPatch.getModName(uuid, version)
     return details.Name or "<unknown mod "..uuid.." v"..version..">"
 end
 
+local modInstalledQuery = [[select count(*) from Mods where ModID = ? and Version = ? and Installed = 1]]
+function _mpPatch.isModInstalled(uuid, version)
+    for row in DB.Query(modInstalledQuery, uuid, version) do
+        return row.count > 0
+    end
+    return false
+end
+
 -- Mod dependency listing
 function _mpPatch.normalizeDlcName(name)
     return name:gsub("-", ""):upper()
@@ -103,52 +111,52 @@ end
 
 -- Enroll/decode mods into the PreGame option table
 _mpPatch._mt.registerProperty("isModding", function()
-    return PreGame.GetGameOption("_MPPATCH_HAS_MODS") == 1
+    return _mpPatch.getGameOption("HAS_MODS") == 1
 end)
 
 local function enrollModName(id, name)
-    PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_NAME_LENGTH", #name)
+    _mpPatch.setGameOption("MOD_"..id.."_NAME_LENGTH", #name)
     for i=1,#name do
-        PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_NAME_"..i, name:byte(i))
+        _mpPatch.setGameOption("MOD_"..id.."_NAME_"..i, name:byte(i))
     end
 end
 local function enrollMod(id, uuid, version)
     local modName = _mpPatch.getModName(uuid, version)
     _mpPatch.debugPrint("- Enrolling mod "..modName)
-    PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_VERSION", version)
+    _mpPatch.setGameOption("MOD_"..id.."_VERSION", version)
     for i, v in ipairs(encodeUUID(uuid)) do
-        PreGame.SetGameOption("_MPPATCH_MOD_"..id.."_"..i, v)
+        _mpPatch.setGameOption("MOD_"..id.."_"..i, v)
     end
     enrollModName(id, modName)
 end
 function _mpPatch.enrollModsList(modList)
     _mpPatch.debugPrint("Enrolling mods...")
     if #modList > 0 then
-        PreGame.SetGameOption("_MPPATCH_HAS_MODS", 1)
-        PreGame.SetGameOption("_MPPATCH_MOD_COUNT", #modList)
+        _mpPatch.setGameOption("HAS_MODS", 1)
+        _mpPatch.setGameOption("MOD_COUNT", #modList)
         for i, v in ipairs(modList) do
             enrollMod(i, v.ID, v.Version)
         end
     else
-        PreGame.SetGameOption("_MPPATCH_HAS_MODS", 0)
+        _mpPatch.setGameOption("HAS_MODS", 0)
     end
 end
 
 local function decodeModName(id)
     local charTable = {}
-    for i=1,PreGame.GetGameOption("_MPPATCH_MOD_"..id.."_NAME_LENGTH") do
-        charTable[i] = string.char(PreGame.GetGameOption("_MPPATCH_MOD_"..id.."_NAME_"..i))
+    for i=1,_mpPatch.getGameOption("MOD_"..id.."_NAME_LENGTH") do
+        charTable[i] = string.char(_mpPatch.getGameOption("MOD_"..id.."_NAME_"..i))
     end
     return table.concat(charTable)
 end
 local function decodeMod(id)
     local uuidTable = {}
     for i=1,8 do
-        uuidTable[i] = PreGame.GetGameOption("_MPPATCH_MOD_"..id.."_"..i)
+        uuidTable[i] = _mpPatch.getGameOption("MOD_"..id.."_"..i)
     end
     return {
         ID      = decodeUUID(uuidTable),
-        Version = PreGame.GetGameOption("_MPPATCH_MOD_"..id.."_VERSION"),
+        Version = _mpPatch.getGameOption("MOD_"..id.."_VERSION"),
         Name    = decodeModName(id)
     }
 end
@@ -156,7 +164,7 @@ function _mpPatch.decodeModsList()
     if not _mpPatch.isModding then return nil end
 
     local modList = {}
-    for i=1,PreGame.GetGameOption("_MPPATCH_MOD_COUNT") do
+    for i=1,_mpPatch.getGameOption("MOD_COUNT") do
         modList[i] = decodeMod(i)
     end
     return modList
