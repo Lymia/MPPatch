@@ -1,3 +1,7 @@
 if _mpPatch and _mpPatch.loaded then
-    _mpPatch.debugPrint("Content switch.")
+    ContextPtr:SetShowHideHandler(function(isHide, _)
+        if not isHide then
+            _mpPatch.debugPrint("Content switch.")
+        end
+    end)
 end
