@@ -19,7 +19,7 @@ if _mpPatch and _mpPatch.loaded then
             if _mpPatch.isModding then
                 local missingModList = {}
                 _mpPatch.debugPrint("Enabled mods for room:")
-                for _, mod in ipairs(decodeModsList()) do
+                for _, mod in ipairs(_mpPatch.decodeModsList()) do
                     local missingText = ""
                     if not Modding.IsModInstalled(mod.ID, mod.Version) then
                         table.insert(missingModList, mod.Name)
@@ -27,7 +27,7 @@ if _mpPatch and _mpPatch.loaded then
                     end
                     _mpPatch.debugPrint("- "..mod.Name..missingText)
                 end
-                -- TODO: Check for
+                -- TODO: Check for DLCs/mod compatibility
                 if #missingModList > 0 then
                     local messageTable = {Locale.Lookup("TXT_KEY_MPPATCH_MOD_MISSING")}
                     for _, name in ipairs(missingModList) do
