@@ -72,7 +72,7 @@
     </Hook>
     <Hook Filename="JoiningRoom.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/joiningroom_keepmods.lua"/>
+        <InjectAfter Filename="ui/hooks/joiningroom_enablemods.lua"/>
     </Hook>
     <Hook Filename="StagingRoom.lua">
         <Include Filename="mppatch_runtime.lua"/>
