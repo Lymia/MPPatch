@@ -20,7 +20,7 @@
         <!-- These strings are used by the joining room -->
         <Row Tag="TXT_KEY_MPPATCH_MOD_MISSING">
             <!-- This is used when the user tries to join a room that uses mods they don't have installed. -->
-            <Text>This room cannot be joined because the following mods aren't installed:</Text>
+            <Text>You cannot join this room because the following mods aren't installed:</Text>
         </Row>
     </Language_en_US>
 </GameData>
