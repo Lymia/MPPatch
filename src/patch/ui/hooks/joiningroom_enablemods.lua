@@ -39,6 +39,7 @@ if _mpPatch and _mpPatch.loaded then
 
                 _mpPatch.debugPrint("Activating mods and DLC...")
                 Modding.ActivateAllowedDLC()
+                Events.SystemUpdateUI(SystemUpdateUIType.RestoreUI, "StagingRoom")
             end
 
             enterLobby()
