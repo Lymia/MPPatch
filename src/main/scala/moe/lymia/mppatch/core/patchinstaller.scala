@@ -45,6 +45,7 @@ object PatchStatus {
   case object PackageChange   extends PatchStatus
   case object NeedsUpdate     extends PatchStatus
   case object TargetUpdated   extends PatchStatus
+  case object FilesCorrupted  extends PatchStatus
   case object NeedsCleanup    extends PatchStatus
   case object NeedsValidation extends PatchStatus
 }
@@ -169,13 +170,14 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
       case Some(patchState) =>
         if((detectedPatchFiles.toSet -- patchState.expectedFiles).nonEmpty) PatchStatus.NeedsCleanup
         else {
+          val originalFilesOK = patchState.renames.map(_.originalFile).forall(validatePatchFile)
           if(!patchState.renames.map(_.replacedFile).forall(x => Files.exists(basePath.resolve(x.path))) ||
-             !patchState.renames.map(_.originalFile).forall(validatePatchFile) ||
-             !patchState.nonreplacementFiles.forall(validatePatchFile))
-            PatchStatus.NeedsCleanup
-          else if(!patchState.renames.map(_.replacedFile).forall(validatePatchFile))
+             !originalFilesOK ||
+             !patchState.nonreplacementFiles.forall(validatePatchFile)) {
+            if(originalFilesOK) PatchStatus.FilesCorrupted else PatchStatus.NeedsValidation
+          } else if(!patchState.renames.map(_.replacedFile).forall(validatePatchFile)) {
             PatchStatus.TargetUpdated
-          else loader.getNativePatch(patchState.sha256) match {
+          } else loader.getNativePatch(patchState.sha256) match {
             case Some(version) =>
               if(patchState.installedTimestamp != loader.data.timestamp ||
                  patchState.installedVersion != loader.data.patchVersion)
@@ -243,7 +245,8 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
   def cleanupPatch() = lock { }
   def safeUpdate(packages: Set[String]) = lock {
     intCheckPatchStatus(packages) match {
-      case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate =>
+      case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate |
+           PatchStatus.FilesCorrupted =>
         uninstallPatch()
         installPatch(packages)
       case PatchStatus.NotInstalled(true) =>
@@ -256,7 +259,7 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
       case PatchStatus.NotInstalled(_) =>
         // do nothing
       case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate |
-           PatchStatus.CanUninstall | PatchStatus.TargetUpdated =>
+           PatchStatus.CanUninstall | PatchStatus.TargetUpdated | PatchStatus.FilesCorrupted =>
         uninstallPatch()
       case _ => sys.error("cannot safely uninstall")
     }

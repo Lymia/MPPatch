@@ -161,6 +161,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
             installButton.setActionText(if(installer.isDowngrade) "action.downgrade" else "action.update")
             installButton.setEnabled(true)
             uninstallButton.setEnabled(true)
+          case PatchStatus.FilesCorrupted =>
+            setStatus("status.filescorrupted")
+            installButton.setActionText("action.repair")
+            installButton.setEnabled(true)
+            uninstallButton.setEnabled(true)
           case PatchStatus.NotInstalled(true) =>
             setStatus("status.notinstalled")
             installButton.setEnabled(true)
