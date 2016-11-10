@@ -22,7 +22,8 @@
 
 package moe.lymia.mppatch.ui
 
-import java.awt.{GridBagConstraints, GridBagLayout}
+import java.awt.{Desktop, GridBagConstraints, GridBagLayout}
+import java.io.File
 import java.nio.file.Paths
 import java.util.Locale
 import javax.swing._
@@ -34,9 +35,11 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
   private var enableMultiplayerPatch: JCheckBox = _
   private var enableLuaJIT          : JCheckBox = _
 
+  private val desktop = Desktop.getDesktop
+
   private def validateSettings() = {
     if(!enableMultiplayerPatch.isSelected && !enableLuaJIT.isSelected) {
-      warn(i18n("error.nothingenabled"))
+      warn("error.nothingenabled")
       false
     } else true
   }
@@ -88,24 +91,29 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
                                             insets = insets(top = 2, bottom = 2)))
 
     frame.subFrame(constraints(gridy = 2, fill = GridBagConstraints.BOTH)) { frameButtons =>
-      frameButtons.add(new JPanel, constraints(weightx = 1))
+      val viewLog = new ActionButton(false)
+      viewLog.setAction("action.viewlog", () => desktop.open(InstallerMain.logFile))
+      frameButtons.add(viewLog, constraints())
+
+      frameButtons.add(new JPanel, constraints(gridx = 1, weightx = 1))
 
       val apply = new ActionButton(false)
       apply.setAction("action.apply", () => if(validateSettings()) applySettings())
-      frameButtons.add(apply, constraints(gridx = 1))
+      frameButtons.add(apply, constraints(gridx = 2))
 
       val cancel = new ActionButton(false)
       cancel.setAction("action.cancel", () => closeWindow())
-      frameButtons.add(cancel, constraints(gridx = 2))
+      frameButtons.add(cancel, constraints(gridx = 3))
 
       val ok = new ActionButton(false)
       ok.setAction("action.ok", () => if(validateSettings()) {
         applySettings()
         closeWindow()
       })
-      frameButtons.add(ok, constraints(gridx = 3))
+      frameButtons.add(ok, constraints(gridx = 4))
 
-      equalButtonWidth(apply, cancel, ok)
+      sizeButtons(viewLog)
+      sizeButtons(apply, cancel, ok)
     }
   }
 }

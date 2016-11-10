@@ -64,28 +64,30 @@ object InstallerResourceBuild {
       val VersionRegex(major, minor, _, patch, _, suffix) = version.value
       val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)
       Map(
-        "mppatch.version.string" -> version.value,
-        "mppatch.version.major"  -> major,
-        "mppatch.version.minor"  -> minor,
-        "mppatch.version.patch"  -> patch,
-        "mppatch.version.suffix" -> suffix,
-        "mppatch.version.commit" -> git.gitHeadCommit.value.getOrElse("<unknown>"),
-        "mppatch.version.clean"  -> (!git.gitUncommittedChanges.value).toString,
+        "mppatch.version.string"    -> version.value,
+        "mppatch.version.major"     -> major,
+        "mppatch.version.minor"     -> minor,
+        "mppatch.version.patch"     -> patch,
+        "mppatch.version.suffix"    -> suffix,
+        "mppatch.version.commit"    -> git.gitHeadCommit.value.getOrElse("<unknown>"),
+        "mppatch.version.clean"     -> (!git.gitUncommittedChanges.value).toString,
 
-        "build.os"               -> tryProperty { System.getProperty("os.name") },
-        "build.user"             -> tryProperty { System.getProperty("user.name")+"@"+
+        "build.os"                  -> tryProperty { System.getProperty("os.name") },
+        "build.user"                -> tryProperty { System.getProperty("user.name")+"@"+
                                                   InetAddress.getLocalHost.getHostName },
-        "build.time"             -> new java.util.Date().getTime.toString,
-        "build.timestr"          -> dateFormat.format(new java.util.Date()),
-        "build.path"             -> baseDirectory.value.getAbsolutePath,
-        "build.treestatus"       -> propertyFromProcess("git", "status", "--porcelain"),
+        "build.time"                -> new java.util.Date().getTime.toString,
+        "build.timestr"             -> dateFormat.format(new java.util.Date()),
+        "build.path"                -> baseDirectory.value.getAbsolutePath,
+        "build.treestatus"          -> propertyFromProcess("git", "status", "--porcelain"),
   
-        "build.version.uname"    -> propertyFromProcess("uname", "-a"),
-        "build.version.distro"   -> tryProperty { IO.read(file("/etc/os-release")) },
-        "build.version.sbt"      -> sbtVersion.value,
-        "build.version.nasm"     -> propertyFromProcess(config_nasm, "-v"),
-        "build.version.gcc"      -> propertyFromProcess(config_linux_gcc, "-v"),
-        "build.version.mingw"    -> propertyFromProcess(config_mingw_gcc, "-v")
+        "build.version.uname"       -> propertyFromProcess("uname", "-a"),
+        "build.version.distro"      -> tryProperty { IO.read(file("/etc/os-release")) },
+        "build.version.sbt"         -> sbtVersion.value,
+        "build.version.nasm"        -> propertyFromProcess(config_nasm, "-v"),
+        "build.version.gcc.short"   -> propertyFromProcess(config_linux_gcc, "--version").split("\n").head,
+        "build.version.gcc"         -> propertyFromProcess(config_linux_gcc, "-v"),
+        "build.version.mingw.short" -> propertyFromProcess(config_mingw_gcc, "--version").split("\n").head,
+        "build.version.mingw"       -> propertyFromProcess(config_mingw_gcc, "-v")
       )
     },
     versionFile := {

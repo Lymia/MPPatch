@@ -27,7 +27,7 @@ import java.awt._
 import java.util.Locale
 import javax.swing._
 
-import moe.lymia.mppatch.util.{Logging, VersionInfo}
+import moe.lymia.mppatch.util.{SimpleLogger, VersionInfo}
 import moe.lymia.mppatch.util.io.IOUtils
 
 import scala.language.implicitConversions
@@ -36,6 +36,15 @@ object FrameUtils {
   lazy val symbolFont = Font.createFont(Font.TRUETYPE_FONT, IOUtils.getResource("text/Symbola_hint_subset.ttf"))
 }
 import FrameUtils._
+
+trait HasLogger {
+  def log = SimpleLogger
+}
+
+trait I18NTrait {
+  protected def locale: Locale
+  protected lazy val i18n = I18N(locale)
+}
 
 trait FrameUtils {
   protected def insets(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) =
@@ -66,7 +75,7 @@ trait FrameUtils {
 
     button
   }
-  protected def equalButtonWidth(component: JComponent*) = {
+  protected def sizeButtons(component: JComponent*) = {
     val maxWidth = component.map(_.getMinimumSize.getWidth).max.toInt + 20
     for(c <- component) {
       val height = c.getMinimumSize.getHeight.toInt
@@ -86,7 +95,7 @@ trait FrameUtils {
   }
 }
 
-trait I18NFrameUtils extends FrameUtils { this: I18NTrait =>
+trait I18NFrameUtils extends FrameUtils with I18NTrait {
   protected implicit class I18NContainerExtension(c: Container) {
     def gridLabel(row: Int, labelStr: String) = {
       val label = new JLabel()
@@ -135,39 +144,38 @@ trait I18NFrameUtils extends FrameUtils { this: I18NTrait =>
   }
 }
 
-trait I18NTrait {
-  protected def locale: Locale
-  protected lazy val i18n = I18N(locale)
-}
-
-trait FrameError[F <: Window] {
+trait FrameError[F <: Window] extends HasLogger {
   protected def frame: F
   protected def i18n: I18N
 
-  protected def titleString = i18n("title", VersionInfo.fromJar.versionString)
+  protected def titleString = i18n("title", VersionInfo.versionString)
 
-  protected def warn(string: String, needPrint: Boolean = true) = {
-    if(needPrint) Logging.warn(string)
+  private def warn0(format: String, needPrint: Boolean, data: Seq[Any]) = {
+    val string = i18n(format, data: _*)
+    if(needPrint) log.warn(string)
     JOptionPane.showMessageDialog(if(frame != null && frame.isVisible) frame else null, string,
                                   titleString, JOptionPane.ERROR_MESSAGE)
   }
-  protected def error[T](string: String, ex: Option[Throwable] = None): T = {
-    warn(string, false)
+  protected def warn(string: String, data: Any*) = warn0(string, true, data)
+  private def error0[T](format: String, ex: Option[Throwable], data: Seq[Any]): T = {
+    val string = i18n(format, data: _*)
+    warn(format, false, data)
     if(frame != null) {
       frame.setVisible(false)
       frame.dispose()
     }
     ex match {
-      case Some(t) => Logging.error(string, t)
-      case None    => Logging.error(string)
+      case Some(t) => log.error(string, t)
+      case None    => log.error(string)
     }
     throw new RuntimeException(string, ex.orNull)
   }
+  protected def error[T](string: String, data: Any*) = error0(string, None, data)
   protected def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T =
-    error(i18n(errorString, (e.getClass+": "+e.getMessage) +: exArgs : _*), Some(e))
+    error(errorString, Some(e), (e.getClass+": "+e.getMessage) +: exArgs)
 }
 
-trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with I18NTrait {
+trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasLogger {
   protected var frame: F = _
   def getFrame = frame
 
@@ -188,7 +196,9 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with I18N
 
     setAction(FrameBase.this.action { e =>
       try {
+        log.info("Executing: "+i18n(text+".continuous")+"...")
         action()
+        log.info(i18n(text+".completed"))
         if(showCompleteMessage && i18n.hasKey(text+".completed"))
           JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
       } catch {

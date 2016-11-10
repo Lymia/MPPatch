@@ -22,14 +22,20 @@
 
 package moe.lymia.mppatch.ui
 
-import java.io.{FileOutputStream, FileWriter, OutputStreamWriter, PrintWriter}
+import java.io.{File, FileOutputStream, OutputStreamWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
-import java.util.Locale
+import java.text.DateFormat
+import java.util.{Date, Locale}
 import javax.swing.{JFrame, UIManager}
 
-import moe.lymia.mppatch.util.Logging
+import moe.lymia.mppatch.util.{Logger, SimpleLogger, VersionInfo}
 
+object InstallerMain {
+  val logFile = new File("mppatch_installer.log")
+}
 class InstallerMain extends FrameError[JFrame] with I18NTrait {
+  private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)
+
   protected def locale = Locale.getDefault
   override protected def frame: JFrame = null
 
@@ -37,10 +43,35 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
     System.setProperty("awt.useSystemAAFontSettings","on")
     System.setProperty("swing.aatext", "true")
 
-    Logging.addLogger(new PrintWriter(new OutputStreamWriter(
-      new FileOutputStream("mppatch_installer.log", true), StandardCharsets.UTF_8)))
+    SimpleLogger.addLogger(new PrintWriter(new OutputStreamWriter(
+      new FileOutputStream(InstallerMain.logFile, true), StandardCharsets.UTF_8)))
+
+    val line = Seq.fill(80)("=").mkString("")
+    log.logRaw("")
+    log.logRaw(line)
+    log.logRaw(s"MPPatch version ${VersionInfo.versionString}")
+    log.logRaw(s"Revision ${VersionInfo.commit.substring(0, 8)}${if(VersionInfo.isDirty) " (dirty)" else ""}, "+
+                   s"built on ${dateFormat.format(VersionInfo.buildDate)} by ${VersionInfo.buildUser}")
+    log.logRaw("")
 
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+
+    val versionData = Seq(
+      "Build Date"  -> Logger.dateFormat.format(VersionInfo.buildDate),
+      "Revision"    -> VersionInfo.commit,
+      "Tree Status" -> VersionInfo.treeStatus
+    )
+    val headerLength = versionData.map(_._1.length).max
+    val indent = Seq.fill(headerLength + 2)(" ").mkString("")
+    val formatStr = s"%-${headerLength}s: %s"
+    for((k, v) <- versionData) {
+      val lines = v.split("\n")
+      log.logRaw(formatStr.format(k, lines.head))
+      for(l <- lines.tail) log.logRaw(indent + l)
+    }
+    log.logRaw(line)
+    log.logRaw("")
+
 
     new MainFrame(locale).showForm()
   } catch {

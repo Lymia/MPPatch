@@ -44,7 +44,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     debug ++ multiplayer ++ luajit
   }
 
-  private val platform  = Platform.currentPlatform.getOrElse(error(i18n("error.unknownplatform")))
+  private val platform  = Platform.currentPlatform.getOrElse(error("error.unknownplatform"))
   private def checkPath(path: Path) =
     Files.exists(path) && Files.isDirectory(path) &&
       patchPackage.script.checkFor.forall(x => Files.exists(path.resolve(x)))
@@ -58,6 +58,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   def getPatch = patchPackage
   def getInstaller = installer
   def changeInstaller(path: Path, changeByUser: Boolean = true): Unit = syncLock synchronized {
+    log.info(s"Changing installer path to ${path.toString}")
     val instance = new PatchInstaller(path, patchPackage, platform)
     isUserChange = changeByUser
     if(Files.exists(path)) {
@@ -68,12 +69,16 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
         if(changeByUser) Preferences.installationDirectory.value = path.toFile.toString
       }
       installer = instance
-    } else installer = null
+    } else {
+      log.warn("- Directory does not exist!")
+      installer = null
+    }
   }
   def reloadInstaller() = syncLock synchronized {
     if(installer != null) changeInstaller(installer.basePath)
   }
   def changePatchPackage(pack: DataSource) = syncLock synchronized {
+    log.info("Changing patch package...")
     patchPackage = new PatchLoader(pack, platform)
     reloadInstaller()
   }
@@ -94,13 +99,13 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   } else pathFromRegistry()
 
   private val actionUpdate = () => {
-    installer.safeUpdate(packages)
+    installer.safeUpdate(packages) : Unit
   }
   private val actionUninstall = () => {
-    installer.safeUninstall()
+    installer.safeUninstall() : Unit
   }
   private val actionCleanup = () => {
-    installer.cleanupPatch()
+    installer.cleanupPatch() : Unit
   }
 
   protected def buildForm() {

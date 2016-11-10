@@ -24,48 +24,67 @@ package moe.lymia.mppatch.util
 
 import java.io.{OutputStreamWriter, PrintWriter, Writer}
 import java.nio.charset.StandardCharsets
-import java.text.DateFormat
-import java.util.{Date, Locale}
+import java.text.SimpleDateFormat
+import java.util.{Date, TimeZone}
+
+object Logger {
+  val dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+  dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"))
+}
 
 trait Logger {
-  protected def dateFormat   = DateFormat.getDateInstance(DateFormat.LONG, Locale.US)
-  protected def formatString = "[%s] %5s - %s"
+  protected def dateFormat = Logger.dateFormat
+  protected def formatString = "[%s/%5s] %s"
 
   def logRaw(s: String)
-  def logFormat(format: String, vals: Any*)
   def logException(t: Throwable)
+  def flush()
 
   def log(format: String, level: String, vals: Any*) =
-    logFormat(formatString.format(dateFormat.format(new Date()) +: level +: vals: _*))
-  def info (format: String, vals: Any*) = log(format, "INFO" , vals: _*)
-  def warn (format: String, vals: Any*) = log(format, "WARN" , vals: _*)
-  def error(format: String, vals: Any*) = log(format, "ERROR", vals: _*)
+    logRaw(formatString.format(dateFormat.format(new Date()), level, format.format(vals: _*)))
 
-  def info(format: String, t: Throwable, vals: Any*) = {
+  def info (format: String, vals: Any*): Unit = log(format, "INFO" , vals: _*)
+  def warn (format: String, vals: Any*): Unit = log(format, "WARN" , vals: _*)
+  def error(format: String, vals: Any*): Unit = log(format, "ERROR", vals: _*)
+
+  def info (str: String): Unit = info ("%s", str)
+  def warn (str: String): Unit = warn ("%s", str)
+  def error(str: String): Unit = error("%s", str)
+
+  def info(format: String, t: Throwable, vals: Any*): Unit = {
     info(format, vals: _*)
     logException(t)
   }
-  def warn(format: String, t: Throwable, vals: Any*) = {
+  def warn(format: String, t: Throwable, vals: Any*): Unit = {
     warn(format, vals: _*)
     logException(t)
   }
-  def error(format: String, t: Throwable, vals: Any*) = {
+  def error(format: String, t: Throwable, vals: Any*): Unit = {
     error(format, vals: _*)
     logException(t)
   }
+
+  def info (str: String, t: Throwable): Unit = info ("%s", t, str)
+  def warn (str: String, t: Throwable): Unit = warn ("%s", t, str)
+  def error(str: String, t: Throwable): Unit = error("%s", t, str)
 }
 
 class SimpleLogger(writers: Writer*) extends Logger {
   private val loggers = new scala.collection.mutable.ArrayBuffer[PrintWriter]()
-  def addLogger(w: Writer) = loggers += (w match {
+  def addLogger(w: Writer) = loggers.append(w match {
     case p: PrintWriter => p
     case _ => new PrintWriter(w)
   })
-  writers.map(addLogger)
+  writers.foreach(addLogger)
 
-  def logRaw(s: String) = loggers.foreach(_.println(s))
-  def logFormat(format: String, vals: Any*) = logRaw(format.format(vals: _*))
-  def logException(t: Throwable) = loggers.foreach(t.printStackTrace)
+  def flush() = loggers.foreach(_.flush())
+  def logRaw(s: String) = {
+    loggers.foreach(_.println(s))
+    flush()
+  }
+  def logException(t: Throwable) = {
+    loggers.foreach(t.printStackTrace)
+    flush()
+  }
 }
-
-object Logging extends SimpleLogger(new OutputStreamWriter(System.out, StandardCharsets.UTF_8))
+object SimpleLogger extends SimpleLogger(new OutputStreamWriter(System.out, StandardCharsets.UTF_8))

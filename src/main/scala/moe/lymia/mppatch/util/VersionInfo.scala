@@ -29,6 +29,17 @@ import moe.lymia.mppatch.util.io.IOUtils
 trait VersionInfoSource {
   def apply(key: String, default: String): String
 }
+object VersionInfoSource {
+  def getPropertySource(resource: String) = {
+    val stream = IOUtils.getResource(resource)
+    if(stream == null) NullSource else {
+      val prop = new Properties()
+      prop.load(stream)
+      PropertiesSource(prop)
+    }
+  }
+}
+
 object NullSource extends VersionInfoSource {
   def apply(key: String, default: String) = default
 }
@@ -40,28 +51,29 @@ case class PropertiesSource(prop: Properties) extends VersionInfoSource {
 }
 
 class VersionInfo(properties: VersionInfoSource) {
-  lazy val majorVersion  = properties("mppatch.version.major","-1").toInt
-  lazy val minorVersion  = properties("mppatch.version.minor","-1").toInt
-  lazy val patchVersion  = properties("mppatch.version.patch","0").toInt
+  def this(resource: String) = this(VersionInfoSource.getPropertySource(resource))
 
-  lazy val versionSuffix = properties("mppatch.version.suffix","0")
-  lazy val commit        = properties("mppatch.version.commit","unknown")
-  lazy val treeStatus    = properties("mppatch.version.treestatus","unknown")
-  lazy val versionString = properties("mppatch.version.string","unknown")
+  lazy val majorVersion  = properties("mppatch.version.major", "-1").toInt
+  lazy val minorVersion  = properties("mppatch.version.minor", "-1").toInt
+  lazy val patchVersion  = properties("mppatch.version.patch", "0").toInt
+
+  lazy val versionSuffix = properties("mppatch.version.suffix", "0")
+  lazy val commit        = properties("mppatch.version.commit", "<unknown>")
+  lazy val treeStatus    = {
+    val raw = properties("build.treestatus", "<unknown>")
+    if(raw.trim.isEmpty) "<clean>" else raw
+  }
+  lazy val versionString = properties("mppatch.version.string", "<unknown>")
   lazy val isDirty       = properties("mppatch.version.clean", "false") == "false"
+
+  lazy val gccVersion    = properties("build.version.gcc.short", "<unknown>")
+  lazy val nasmVersion   = properties("build.version.nasm", "<unknown>")
+  lazy val mingwVersion  = properties("build.version.mingw.short", "<unknown>")
+  lazy val sbtVersion    = properties("build.version.sbt", "<unknown>")
 
   lazy val buildDate     = new Date(properties("build.time", "0").toLong)
   lazy val buildUser     = properties("build.user", "<unknown>")
 }
-object VersionInfo {
-  def loadFromResource(resource: String) = {
-    val stream = IOUtils.getResource(resource)
-    new VersionInfo(if(stream == null) NullSource else {
-      val prop = new Properties()
-      prop.load(stream)
-      PropertiesSource(prop)
-    })
-  }
-
-  val fromJar = loadFromResource("version.properties")
+object VersionInfo extends VersionInfo("version.properties") {
+  def loadFromResource(resource: String) = new VersionInfo(VersionInfoSource.getPropertySource(resource))
 }
