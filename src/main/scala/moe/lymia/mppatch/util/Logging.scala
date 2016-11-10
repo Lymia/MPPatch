@@ -22,23 +22,50 @@
 
 package moe.lymia.mppatch.util
 
+import java.io.{OutputStreamWriter, PrintWriter, Writer}
+import java.nio.charset.StandardCharsets
 import java.text.DateFormat
 import java.util.{Date, Locale}
 
-object Logging {
-  private val loggers = new scala.collection.mutable.ArrayBuffer[String => Unit]()
-  def addLogger(l: String => Unit) = loggers += l
-  addLogger(x => println(x))
+trait Logger {
+  protected def dateFormat   = DateFormat.getDateInstance(DateFormat.LONG, Locale.US)
+  protected def formatString = "[%s] %5s - %s"
 
-  private val dateFormat   = DateFormat.getDateInstance(DateFormat.LONG, Locale.US)
-  private val formatString = "[%s] %5s - %s"
-
-  def logRaw(s: String) = loggers.foreach(_(s))
-  def logFormat(format: String, vals: Any*) = logRaw(format.format(vals: _*))
+  def logRaw(s: String)
+  def logFormat(format: String, vals: Any*)
+  def logException(t: Throwable)
 
   def log(format: String, level: String, vals: Any*) =
     logFormat(formatString.format(dateFormat.format(new Date()) +: level +: vals: _*))
-  def info(format: String, vals: Any*) = log(format, "INFO", vals: _*)
-  def warn(format: String, vals: Any*) = log(format, "WARN", vals: _*)
+  def info (format: String, vals: Any*) = log(format, "INFO" , vals: _*)
+  def warn (format: String, vals: Any*) = log(format, "WARN" , vals: _*)
   def error(format: String, vals: Any*) = log(format, "ERROR", vals: _*)
+
+  def info(format: String, t: Throwable, vals: Any*) = {
+    info(format, vals: _*)
+    logException(t)
+  }
+  def warn(format: String, t: Throwable, vals: Any*) = {
+    warn(format, vals: _*)
+    logException(t)
+  }
+  def error(format: String, t: Throwable, vals: Any*) = {
+    error(format, vals: _*)
+    logException(t)
+  }
 }
+
+class SimpleLogger(writers: Writer*) extends Logger {
+  private val loggers = new scala.collection.mutable.ArrayBuffer[PrintWriter]()
+  def addLogger(w: Writer) = loggers += (w match {
+    case p: PrintWriter => p
+    case _ => new PrintWriter(w)
+  })
+  writers.map(addLogger)
+
+  def logRaw(s: String) = loggers.foreach(_.println(s))
+  def logFormat(format: String, vals: Any*) = logRaw(format.format(vals: _*))
+  def logException(t: Throwable) = loggers.foreach(t.printStackTrace)
+}
+
+object Logging extends SimpleLogger(new OutputStreamWriter(System.out, StandardCharsets.UTF_8))

@@ -27,7 +27,7 @@ import java.awt._
 import java.util.Locale
 import javax.swing._
 
-import moe.lymia.mppatch.util.VersionInfo
+import moe.lymia.mppatch.util.{Logging, VersionInfo}
 import moe.lymia.mppatch.util.io.IOUtils
 
 import scala.language.implicitConversions
@@ -146,22 +146,25 @@ trait FrameError[F <: Window] {
 
   protected def titleString = i18n("title", VersionInfo.fromJar.versionString)
 
-  protected def warn(string: String) = {
+  protected def warn(string: String, needPrint: Boolean = true) = {
+    if(needPrint) Logging.warn(string)
     JOptionPane.showMessageDialog(if(frame != null && frame.isVisible) frame else null, string,
                                   titleString, JOptionPane.ERROR_MESSAGE)
   }
   protected def error[T](string: String, ex: Option[Throwable] = None): T = {
-    warn(string)
+    warn(string, false)
     if(frame != null) {
       frame.setVisible(false)
       frame.dispose()
     }
+    ex match {
+      case Some(t) => Logging.error(string, t)
+      case None    => Logging.error(string)
+    }
     throw new RuntimeException(string, ex.orNull)
   }
-  protected def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T = {
-    e.printStackTrace()
+  protected def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T =
     error(i18n(errorString, (e.getClass+": "+e.getMessage) +: exArgs : _*), Some(e))
-  }
 }
 
 trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with I18NTrait {

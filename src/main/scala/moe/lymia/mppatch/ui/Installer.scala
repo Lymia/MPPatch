@@ -22,8 +22,12 @@
 
 package moe.lymia.mppatch.ui
 
+import java.io.{FileOutputStream, FileWriter, OutputStreamWriter, PrintWriter}
+import java.nio.charset.StandardCharsets
 import java.util.Locale
 import javax.swing.{JFrame, UIManager}
+
+import moe.lymia.mppatch.util.Logging
 
 class InstallerMain extends FrameError[JFrame] with I18NTrait {
   protected def locale = Locale.getDefault
@@ -32,7 +36,12 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
   def main(args: Array[String]): Unit = try {
     System.setProperty("awt.useSystemAAFontSettings","on")
     System.setProperty("swing.aatext", "true")
+
+    Logging.addLogger(new PrintWriter(new OutputStreamWriter(
+      new FileOutputStream("mppatch_installer.log", true), StandardCharsets.UTF_8)))
+
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+
     new MainFrame(locale).showForm()
   } catch {
     case e: Exception => dumpException("error.genericerror", e)

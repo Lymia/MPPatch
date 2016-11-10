@@ -25,7 +25,7 @@ package moe.lymia.mppatch.core
 import java.nio.file.{Path, Paths}
 import java.util.Locale
 
-import moe.lymia.mppatch.util.Steam
+import moe.lymia.mppatch.util.{Logging, Steam}
 import moe.lymia.mppatch.util.win32.WindowsRegistry
 
 import scala.annotation.tailrec
@@ -76,8 +76,7 @@ object Win32Platform extends Platform {
     WindowsRegistry.HKEY_CURRENT_USER("Software\\Firaxis\\Civilization5", "LastKnownPath").map(x => Paths.get(x)).toSeq
   } catch {
     case e: Exception =>
-      System.err.println("Could not load default system paths from registery.")
-      e.printStackTrace()
+      Logging.error("Could not load default system paths from registery.", e)
       Seq()
   }
 }
