@@ -60,12 +60,12 @@
         <Include Filename="mppatch_runtime.lua"/>
         <InjectAfter Filename="ui/hooks/lobby_skip.lua"/>
     </Hook>
-    <Hook Filename="MPGameSetupScreen.lua">
-        <Include Filename="mppatch_runtime.lua"/>
-        <InjectBefore Filename="ui/hooks/common_setbismodding.lua"/>
-    </Hook>
 
     <!-- Multiplayer lobby modifications -->
+    <Hook Filename="MPGameSetupScreen.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectBefore Filename="ui/hooks/mpgamesetupscreen_settitle.lua"/>
+    </Hook>
     <Hook Filename="MPGameOptions.lua">
         <Include Filename="mppatch_runtime.lua"/>
         <InjectAfter Filename="ui/hooks/mpgameoptions_dlcselection.lua"/>
