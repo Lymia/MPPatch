@@ -20,26 +20,25 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util.common
+package moe.lymia.mppatch.util
 
-import java.security.MessageDigest
+import java.text.DateFormat
+import java.util.{Date, Locale}
 
-object  Crypto {
-  def digest(algorithm: String, data: Array[Byte]) = {
-    val md = MessageDigest.getInstance(algorithm)
-    val hash = md.digest(data)
-    hash
-  }
-  def hexdigest(algorithm: String, data: Array[Byte]) =
-    digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
+object Logging {
+  private val loggers = new scala.collection.mutable.ArrayBuffer[String => Unit]()
+  def addLogger(l: String => Unit) = loggers += l
+  addLogger(x => println(x))
 
-  def md5_hex   (data: Array[Byte]) = hexdigest("MD5"    , data)
-  def sha1_hex  (data: Array[Byte]) = hexdigest("SHA-1"  , data)
-  def sha256_hex(data: Array[Byte]) = hexdigest("SHA-256", data)
-  def sha512_hex(data: Array[Byte]) = hexdigest("SHA-512", data)
+  private val dateFormat   = DateFormat.getDateInstance(DateFormat.LONG, Locale.US)
+  private val formatString = "[%s] %5s - %s"
 
-  def md5   (data: Array[Byte]) = digest("MD5"    , data)
-  def sha1  (data: Array[Byte]) = digest("SHA-1"  , data)
-  def sha256(data: Array[Byte]) = digest("SHA-256", data)
-  def sha512(data: Array[Byte]) = digest("SHA-512", data)
+  def logRaw(s: String) = loggers.foreach(_(s))
+  def logFormat(format: String, vals: Any*) = logRaw(format.format(vals: _*))
+
+  def log(format: String, level: String, vals: Any*) =
+    logFormat(formatString.format(dateFormat.format(new Date()) +: level +: vals: _*))
+  def info(format: String, vals: Any*) = log(format, "INFO", vals: _*)
+  def warn(format: String, vals: Any*) = log(format, "WARN", vals: _*)
+  def error(format: String, vals: Any*) = log(format, "ERROR", vals: _*)
 }

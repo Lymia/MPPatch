@@ -26,8 +26,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
-import moe.lymia.mppatch.util.IOUtils
-import moe.lymia.mppatch.util.common.Crypto
+import moe.lymia.mppatch.util.{Crypto, IOUtils}
 
 import scala.xml.{Node, NodeSeq}
 

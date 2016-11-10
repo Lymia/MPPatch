@@ -25,8 +25,7 @@ package moe.lymia.mppatch.core
 import java.nio.file.attribute.PosixFilePermission._
 import java.nio.file.{Files, Path}
 
-import moe.lymia.mppatch.util.common.Crypto
-import moe.lymia.mppatch.util.{FileLock, IOUtils, XMLUtils}
+import moe.lymia.mppatch.util.{Crypto, FileLock, IOUtils, XMLUtils}
 
 import scala.collection.JavaConverters._
 import scala.xml.Node
