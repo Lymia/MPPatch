@@ -26,8 +26,8 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
-import moe.lymia.mppatch.util.{DataSource, IOUtils}
-import moe.lymia.mppatch.util.XMLUtils._
+import moe.lymia.mppatch.util.io._
+import moe.lymia.mppatch.util.io.XMLUtils._
 
 import scala.xml.{Node, XML}
 

@@ -22,13 +22,11 @@
 
 package moe.lymia.mppatch.core
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
-import moe.lymia.mppatch.util.{Crypto, IOUtils}
+import moe.lymia.mppatch.util.io._
 
-import scala.xml.{Node, NodeSeq}
+import scala.xml.Node
 
 case class DLCUISkin(name: String, set: String, platform: String)
 case class DLCManifest(uuid: UUID, version: Int, priority: Int, shortName: String, name: String)

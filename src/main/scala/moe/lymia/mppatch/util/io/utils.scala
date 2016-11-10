@@ -20,21 +20,18 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util
+package moe.lymia.mppatch.util.io
 
-import java.io.{DataInputStream, IOException, InputStream}
+import java.io.{IOException, InputStream}
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
 
-import moe.lymia.mppatch.util.common.{IOWrappers, PatchPackage}
-
 import scala.annotation.tailrec
+import scala.collection.JavaConverters._
 import scala.io.Codec
 import scala.xml.{Node, PrettyPrinter, XML}
-
-import scala.collection.JavaConverters._
 
 class FileLock(lockFile: Path) {
   private val channel  = FileChannel.open(lockFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
@@ -56,7 +53,7 @@ object IOUtils {
   def getResourceURL(s: String) = getClass.getResource(resPath + s)
   def getResource(s: String) = getClass.getResourceAsStream(resPath + s)
   def resourceExists(s: String) = getResource(s) != null
-  def loadFromStream(s: InputStream) = io.Source.fromInputStream(s)(Codec.UTF8).mkString
+  def loadFromStream(s: InputStream) = scala.io.Source.fromInputStream(s)(Codec.UTF8).mkString
   def loadBinaryFromStream(s: InputStream) = Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
   def loadResource(s: String) = loadFromStream(getResource(s))
   def loadBinaryResource(s: String) = loadBinaryFromStream(getResource(s))
@@ -121,26 +118,4 @@ object IOUtils {
         lock.release()
       }
     }
-}
-
-trait DataSource {
-  def loadResource(name: String): String
-  def loadXML(name: String) = XML.loadString(loadResource(name))
-  def loadBinaryResource(name: String): Array[Byte]
-}
-case class ResourceDataSource(data: PatchPackage) extends DataSource {
-  override def loadResource(name: String): String = IOUtils.loadResource(name)
-  override def loadBinaryResource(name: String): Array[Byte] = IOUtils.loadBinaryResource(name)
-}
-case class MppakDataSource(data: PatchPackage) extends DataSource {
-  override def loadResource(name: String): String = data.loadResource(name)
-  override def loadBinaryResource(name: String): Array[Byte] = data.loadBinaryResource(name)
-}
-object MppakDataSource {
-  def apply(in: InputStream): MppakDataSource =
-    MppakDataSource(IOWrappers.readPatchPackage(in match {
-      case in: DataInputStream => in
-      case _ => new DataInputStream(in)
-    }))
-  def apply(resource: String): MppakDataSource = MppakDataSource(IOUtils.getResource(resource))
 }

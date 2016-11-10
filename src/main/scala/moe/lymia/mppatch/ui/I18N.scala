@@ -27,9 +27,8 @@ import java.nio.charset.StandardCharsets
 import java.text.MessageFormat
 import java.util.{Locale, Properties}
 
-import moe.lymia.mppatch.util.IOUtils
+import moe.lymia.mppatch.util.io.IOUtils
 
-import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
 case class I18N(locale: Locale, map: Map[String, String]) {

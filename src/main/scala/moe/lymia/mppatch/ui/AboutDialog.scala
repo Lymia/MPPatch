@@ -29,7 +29,8 @@ import javax.swing.text.html.HTMLEditorKit
 import javax.swing._
 import javax.swing.event.{HyperlinkEvent, HyperlinkListener}
 
-import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
+import moe.lymia.mppatch.util.VersionInfo
+import moe.lymia.mppatch.util.io.IOUtils
 
 class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
   private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)

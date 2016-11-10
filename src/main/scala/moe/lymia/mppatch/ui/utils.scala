@@ -27,7 +27,8 @@ import java.awt._
 import java.util.Locale
 import javax.swing._
 
-import moe.lymia.mppatch.util.{IOUtils, VersionInfo}
+import moe.lymia.mppatch.util.VersionInfo
+import moe.lymia.mppatch.util.io.IOUtils
 
 import scala.language.implicitConversions
 

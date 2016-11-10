@@ -24,6 +24,8 @@ package moe.lymia.mppatch.util
 
 import java.util.{Date, Properties}
 
+import moe.lymia.mppatch.util.io.IOUtils
+
 trait VersionInfoSource {
   def apply(key: String, default: String): String
 }

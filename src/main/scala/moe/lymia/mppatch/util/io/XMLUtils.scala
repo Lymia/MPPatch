@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util
+package moe.lymia.mppatch.util.io
 
 import scala.xml.{Node, NodeSeq}
 
