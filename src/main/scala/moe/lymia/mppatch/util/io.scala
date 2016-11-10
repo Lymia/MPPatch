@@ -34,6 +34,8 @@ import scala.annotation.tailrec
 import scala.io.Codec
 import scala.xml.{Node, PrettyPrinter, XML}
 
+import scala.collection.JavaConverters._
+
 class FileLock(lockFile: Path) {
   private val channel  = FileChannel.open(lockFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE)
   private val lock     = Option(channel.tryLock)
@@ -68,7 +70,7 @@ object IOUtils {
   def readFileAsBytes(path: Path) = Files.readAllBytes(path)
   def readFileAsString(path: Path) = new String(readFileAsBytes(path), StandardCharsets.UTF_8)
 
-  def listFiles(path: Path) = Files.list(path).toArray.map(_.asInstanceOf[Path])
+  def listFiles(path: Path) = iterableAsScalaIterableConverter(path).asScala.toSeq
   def listFileNames(path: Path) = listFiles(path).map(_.getFileName.toString)
 
   val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)

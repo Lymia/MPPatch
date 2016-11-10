@@ -100,11 +100,11 @@ public class Loader {
         return new RuntimeException(error, e);
     }
 
-    private static boolean isJava8() {
+    private static boolean isJava7() {
         String version = System.getProperty("java.version");
         String[] components = version.split("\\.");
         return Integer.parseInt(components[0]) > 1 ||
-               (Integer.parseInt(components[0]) == 1 && Integer.parseInt(components[1]) >= 8);
+               (Integer.parseInt(components[0]) == 1 && Integer.parseInt(components[1]) >= 7);
     }
 
     public static void main(String[] args) {
@@ -115,14 +115,14 @@ public class Loader {
             e.printStackTrace();
         }
 
-        boolean isJava8;
+        boolean isJava7;
         try {
-            isJava8 = isJava8();
+            isJava7 = isJava7();
         } catch (Exception e) {
             throw error("Could not parse JVM version", e);
         }
 
-        if(!isJava8) throw error("Java 1.8 or later is required to run this program.", null);
+        if(!isJava7) throw error("Java 1.7 or later is required to run this program.", null);
 
         new Loader().startPackedProgram(args);
     }
