@@ -58,7 +58,7 @@
     </Hook>
     <Hook Filename="Lobby.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/common_setbismodding.lua"/>
+        <InjectAfter Filename="ui/hooks/lobby_skip.lua"/>
     </Hook>
     <Hook Filename="MPGameSetupScreen.lua">
         <Include Filename="mppatch_runtime.lua"/>
