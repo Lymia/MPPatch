@@ -24,8 +24,9 @@ function _mpPatch.overrideWithModList(list)
     _mpPatch.debugPrint("Overriding mods...")
     patch.NetPatch.reset()
     for _, mod in ipairs(list) do
-        _mpPatch.debugPrint("- Adding mod ".._mpPatch.getModName(mod.ID, mod.Version).."...")
-        patch.NetPatch.pushMod(mod.ID, mod.Version)
+        local id = mod.ID or mod.ModID
+        _mpPatch.debugPrint("- Adding mod ".._mpPatch.getModName(id, mod.Version).."...")
+        patch.NetPatch.pushMod(id, mod.Version)
     end
     patch.NetPatch.overrideModList()
     patch.NetPatch.install()
