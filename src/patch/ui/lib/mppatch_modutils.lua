@@ -48,6 +48,12 @@ function _mpPatch.overrideModsFromSaveFile(file)
         _mpPatch.overrideWithModList(requiredMods)
     end
 end
+function _mpPatch.overrideModsFromCloudSave(file)
+    local _, requiredMods = Modding.GetCloudSaveRequirements(file)
+    if type(requiredMods) == "table" then
+        _mpPatch.overrideWithModList(requiredMods)
+    end
+end
 
 _mpPatch._mt.registerProperty("areModsEnabled", function()
     return #Modding.GetActivatedMods() > 0
