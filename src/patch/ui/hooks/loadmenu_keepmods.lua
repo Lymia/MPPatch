@@ -3,11 +3,15 @@ if _mpPatch and _mpPatch.loaded and ContextPtr:GetID() == "MPLoadGameScreen" the
     for _, funcName in ipairs({"HostServerGame", "HostInternetGame", "HostHotSeatGame", "HostLANGame"}) do
         local func = Matchmaking[funcName]
         override[funcName] = function(...)
-            if not g_ShowCloudSaves then
-                _mpPatch.overrideModsFromSaveFile(g_FileList[g_iSelected])
+            local loadFile
+            if g_ShowCloudSaves then
+                loadFile = Steam.GetCloudSaveFileName(g_iSelected)
             else
-                _mpPatch.overrideModsFromCloudSave(g_iSelected)
+                loadFile = g_FileList[g_iSelected]
             end
+            local header = PreGame.GetFileHeader(loadFile)
+            _mpPatch.overrideWithModList(header.ActivatedMods)
+
             local ret = {func(...)}
             PreGame.SetPersistSettings(false)
             _mpPatch.enrollModsList(Modding.GetActivatedMods())

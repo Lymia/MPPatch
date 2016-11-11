@@ -42,18 +42,6 @@ function _mpPatch.overrideModsFromPreGame()
         _mpPatch.overrideWithModList(modList)
     end
 end
-function _mpPatch.overrideModsFromSaveFile(file)
-    local _, requiredMods = Modding.GetSavedGameRequirements(file)
-    if type(requiredMods) == "table" then
-        _mpPatch.overrideWithModList(requiredMods)
-    end
-end
-function _mpPatch.overrideModsFromCloudSave(file)
-    local _, requiredMods = Modding.GetCloudSaveRequirements(file)
-    if type(requiredMods) == "table" then
-        _mpPatch.overrideWithModList(requiredMods)
-    end
-end
 
 _mpPatch._mt.registerProperty("areModsEnabled", function()
     return #Modding.GetActivatedMods() > 0
