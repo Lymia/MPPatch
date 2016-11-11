@@ -12,7 +12,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
 
     PreGame = _mpPatch.hookTable(PreGame, {GetCivilization = function(...)
         local civ = PreGame._super.GetCivilization(...)
-        if civ ~= -1 and not GameInfo.Civilizations[civIndex] then
+        if civ ~= -1 and not GameInfo.Civilizations[civ] then
             return -1
         end
         return civ
