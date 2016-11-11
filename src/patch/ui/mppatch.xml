@@ -70,6 +70,10 @@
         <Include Filename="mppatch_runtime.lua"/>
         <InjectAfter Filename="ui/hooks/mpgameoptions_dlcselection.lua"/>
     </Hook>
+    <Hook Filename="LoadMenu.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/loadmenu_keepmods.lua"/>
+    </Hook>
     <Hook Filename="JoiningRoom.lua">
         <Include Filename="mppatch_runtime.lua"/>
         <InjectAfter Filename="ui/hooks/joiningroom_enablemods.lua"/>
