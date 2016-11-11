@@ -16,7 +16,7 @@
 #########################
 
 -allowaccessmodification
--optimizationpasses 5
+-optimizationpasses 2
 
 # Disable optimizations that can make stack traces harder to read.
 -optimizations !method/inlining/unique,!method/inlining/short,!class/merging/*,*
