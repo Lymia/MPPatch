@@ -46,7 +46,7 @@ object NullSource extends VersionInfoSource {
 case class PropertiesSource(prop: Properties) extends VersionInfoSource {
   def apply(key: String, default: String) = {
     val p = prop.getProperty(key)
-    if(p == null || p.isEmpty) default else p
+    if(p == null || p.trim.isEmpty) default else p
   }
 }
 
@@ -59,10 +59,7 @@ class VersionInfo(properties: VersionInfoSource) {
 
   lazy val versionSuffix = properties("mppatch.version.suffix", "0")
   lazy val commit        = properties("mppatch.version.commit", "<unknown>")
-  lazy val treeStatus    = {
-    val raw = properties("build.treestatus", "<unknown>")
-    if(raw.trim.isEmpty) "<clean>" else raw
-  }
+  lazy val treeStatus    = properties("build.treestatus", "<clean>")
   lazy val versionString = properties("mppatch.version.string", "<unknown>")
   lazy val isDirty       = properties("mppatch.version.clean", "false") == "false"
 
