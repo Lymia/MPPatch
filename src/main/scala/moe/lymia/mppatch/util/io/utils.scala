@@ -67,7 +67,7 @@ object IOUtils {
   def readFileAsBytes(path: Path) = Files.readAllBytes(path)
   def readFileAsString(path: Path) = new String(readFileAsBytes(path), StandardCharsets.UTF_8)
 
-  def listFiles(path: Path) = iterableAsScalaIterableConverter(path).asScala.toSeq
+  def listFiles(path: Path) = Files.newDirectoryStream(path).asScala.toSeq
   def listFileNames(path: Path) = listFiles(path).map(_.getFileName.toString)
 
   val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
