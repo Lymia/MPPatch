@@ -65,7 +65,7 @@ object IOWrappers {
     out.writeInt(patchPackageVersion)
     writeXZ(out) { out =>
       out.writeInt(data.data.size)
-      for((k, v) <- data.data) {
+      for((k, v) <- data.data.toSeq.sortBy(_._1)) {
         out.writeUTF(k)
         writeArray(out, v)
       }
