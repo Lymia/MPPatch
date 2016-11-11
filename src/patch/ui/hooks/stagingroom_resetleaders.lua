@@ -1,10 +1,20 @@
 if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
-    local function OnSystemUpdateUI(uiType, screen)
+    Events.SystemUpdateUI.Add(function (uiType, screen)
         if not ContextPtr:IsHidden() and uiType == SystemUpdateUIType.RestoreUI and screen == "StagingRoom" then
             _mpPatch.debugPrint("Executing OnPreGameDirty.")
             OnPreGameDirty()
         end
-    end
-    Events.SystemUpdateUI.Add(OnSystemUpdateUI)
-end
+    end)
 
+    function ValidateCivSelections()
+        -- do nothing
+    end
+
+    PreGame = _mpPatch.hookTable(PreGame, {GetCivilization = function(...)
+        local civ = PreGame._super.GetCivilization(...)
+        if civ ~= -1 and not GameInfo.Civilizations[civIndex] then
+            return -1
+        end
+        return civ
+    end})
+end
