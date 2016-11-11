@@ -5,6 +5,6 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
             OnPreGameDirty()
         end
     end
-    Events.GameMessageChat.Add(OnSystemUpdateUI)
+    Events.SystemUpdateUI.Add(OnSystemUpdateUI)
 end
 
