@@ -80,6 +80,7 @@
     </Hook>
     <Hook Filename="StagingRoom.lua">
         <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/stagingroom_setupchat.lua"/>
         <InjectAfter Filename="ui/hooks/stagingroom_keepmods.lua"/>
         <InjectAfter Filename="ui/hooks/stagingroom_resetleaders.lua"/>
     </Hook>

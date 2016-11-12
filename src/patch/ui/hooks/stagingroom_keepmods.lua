@@ -20,10 +20,15 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     end})
 
     -- Protocol for ensuring non-host players will override the mod list.
-    local confirmChat = "mppatch:gamelaunchcountdown:WgUUz7wWuxWFmjY02WFS0mka53nFDzJvD00zmuQHKyJT2wNHuWZvrDcejHv5rTyl"
-
     local gameLaunchSet = false
     local gameLaunchCountdown = 3
+
+    local confirmChat = _mpPatch.registerChatCommand("38da087c-a87d-11e6-964a-4f29d2bc02a6", function(_, id)
+        if id == m_HostID and not Matchmaking.IsHost() then
+            gameLaunchSet = true
+            _mpPatch.overrideModsFromPreGame()
+        end
+    end)
 
     local StartCountdownOld = StartCountdown
     function StartCountdown(...)
@@ -56,29 +61,13 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
         if PreGame.IsHotSeatGame() then
             return LaunchGameOld(...)
         else
-            SendChat(confirmChat)
+            confirmChat()
             ContextPtr:ClearUpdate()
             gameLaunchSet = true
             ContextPtr:SetUpdate(LaunchGameCountdown)
         end
     end
     Controls.LaunchButton:RegisterCallback(Mouse.eLClick, LaunchGame)
-
-    local OnChatOld = OnChat
-    function OnChat(...)
-        local fromPlayer, _, text = ...
-        if not ContextPtr:IsHidden() and m_PlayerNames[fromPlayer] and
-           fromPlayer == m_HostID and text == confirmChat then
-            if not Matchmaking.IsHost() then
-                gameLaunchSet = true
-                _mpPatch.overrideModsFromPreGame()
-            end
-            return
-        end
-        return OnChatOld(...)
-    end
-    Events.GameMessageChat.Remove(OnChatOld)
-    Events.GameMessageChat.Add(OnChat)
 
     -- Ensure the NetPatch hook doesn't end up escaping the UI.
     local DequeuePopup = UIManager.DequeuePopup

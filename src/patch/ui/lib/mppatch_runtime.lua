@@ -83,6 +83,7 @@ include "mppatch_mtutils.lua"
 include "mppatch_utils.lua"
 include "mppatch_modutils.lua"
 include "mppatch_uiutils.lua"
+include "mppatch_chatprotocol.lua"
 
 _mpPatch.context = _mpPatch.fullPath
 _mpPatch.debugPrint("MPPatch runtime loaded in ".._mpPatch.context)
