@@ -39,6 +39,7 @@ function _mpPatch.interceptChatFunction(fn, noCheckHide)
             if textHead == marker then
                 local split = textTail:find(":")
                 local command, data = textTail:sub(1, split - 1), textTail:sub(split + 1)
+                _mpPatch.debugPrint("Got MPPatch chat command: "..command..", data = "..data)
                 local fn = chatProtocolCommands[command]
                 if not fn then
                     return

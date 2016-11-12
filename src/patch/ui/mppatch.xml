@@ -23,12 +23,13 @@
 <UIPatch>
     <Info UUID="df74f698-2343-11e6-89c4-8fef6d8f889e" Version="1" Priority="1" Name="MPPatch" ShortName="MPPatch"/>
 
-    <Include Filename="mppatch_runtime.lua"  Source="ui/lib/mppatch_runtime.lua" />
-    <Include Filename="mppatch_mtutils.lua"  Source="ui/lib/mppatch_mtutils.lua" />
-    <Include Filename="mppatch_utils.lua"    Source="ui/lib/mppatch_utils.lua"   />
-    <Include Filename="mppatch_modutils.lua" Source="ui/lib/mppatch_modutils.lua"/>
-    <Include Filename="mppatch_uiutils.lua"  Source="ui/lib/mppatch_uiutils.lua" />
-    <Include Filename="mppatch_version.lua"  Source="ui/lib/mppatch_version.lua" />
+    <Include Filename="mppatch_runtime.lua"       Source="ui/lib/mppatch_runtime.lua"      />
+    <Include Filename="mppatch_mtutils.lua"       Source="ui/lib/mppatch_mtutils.lua"      />
+    <Include Filename="mppatch_utils.lua"         Source="ui/lib/mppatch_utils.lua"        />
+    <Include Filename="mppatch_modutils.lua"      Source="ui/lib/mppatch_modutils.lua"     />
+    <Include Filename="mppatch_uiutils.lua"       Source="ui/lib/mppatch_uiutils.lua"      />
+    <Include Filename="mppatch_version.lua"       Source="ui/lib/mppatch_version.lua"      />
+    <Include Filename="mppatch_chatprotocol.lua"  Source="ui/lib/mppatch_chatprotocol.lua" />
 
     <TextData Filename="ui/text/text_en_US.xml"/>
 
