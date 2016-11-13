@@ -69,7 +69,6 @@ object DLCDataWriter {
         }
       </Civ5Package>
     ))
-    val uuid_string = dlcData.manifest.uuid.toString.replace("-", "").toUpperCase(Locale.ENGLISH)
     val languageFiles = languageDirPath.fold(Map[String, Array[Byte]]()) { languagePath =>
       dlcData.data.textData.map(x =>
         s"$languagePath/${platform.mapPath(s"${nameString}_TextData_${x._1}")}" -> IOUtils.writeXMLBytes(x._2))

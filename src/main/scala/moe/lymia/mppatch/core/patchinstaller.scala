@@ -174,16 +174,14 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
   private def intCheckPatchStatus(packages: Set[String]) = {
     log.info("Checking patch status...")
 
-    def body(): PatchStatus = {
+    def body() = {
       val leftoverFiles = loader.cleanup.checkFile.filter(x => Files.exists(basePath.resolve(x)))
 
-      if(!Files.exists(patchStatePath)) return {
+      if(!Files.exists(patchStatePath)) {
         if(!Files.exists(basePath.resolve(loader.script.versionFrom))) PatchStatus.NeedsValidation
         else if(leftoverFiles.nonEmpty) PatchStatus.NeedsCleanup
         else PatchStatus.NotInstalled(isVersionKnown(loader.script.versionFrom))
-      }
-
-      loadPatchState() match {
+      } else loadPatchState() match {
         case Some(patchState) =>
           val leftoverSet = leftoverFiles.toSet -- patchState.expectedPaths
           if(leftoverSet.nonEmpty) {
@@ -210,6 +208,7 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
         case None => PatchStatus.NeedsCleanup
       }
     }
+
     val ret = body()
     log.info("Status: "+ret)
     ret

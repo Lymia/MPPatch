@@ -59,9 +59,11 @@ object NativePatchBuild {
              |}
           """.stripMargin
         val initString = s"  ${name}_ptr = (${name}_fn) ${
-          if(t == "offset") s"resolveAddress($domain, ${name}_offset);"
-          else if(t == "symbol") s"""resolveSymbol($domain, "${if(sym == "*") name else sym}");"""
-          else sys.error(s"Unknown proxy type $t")
+          t match {
+            case "offset" => s"resolveAddress($domain, ${name}_offset);"
+            case "symbol" => s"""resolveSymbol($domain, "${if(sym == "*") name else sym}");"""
+            case _        => sys.error(s"Unknown proxy type $t")
+          }
         }"
         (functionDef, initString)
       case "include" =>

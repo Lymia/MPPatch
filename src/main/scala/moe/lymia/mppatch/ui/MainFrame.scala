@@ -55,7 +55,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var patchPackage: PatchLoader = _
   private var isUserChange = false
   private var isValid = false
-  private var installer: PatchInstaller = _
+  private var installer: Option[PatchInstaller] = _
+  private def getInstallerUnsafe = installer.getOrElse(sys.error("installer does not exist"))
   def getPatch = patchPackage
   def getInstaller = installer
   def changeInstaller(path: Path, changeByUser: Boolean = true): Unit = syncLock synchronized {
@@ -64,19 +65,19 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     isUserChange = changeByUser
     if(Files.exists(path)) {
       isValid = checkPath(path)
-      if(installer != null) installer.releaseLock()
+      installer.foreach(_.releaseLock())
       if(isValid) {
         instance.acquireLock()
         if(changeByUser) Preferences.installationDirectory.value = path.toFile.toString
       }
-      installer = instance
+      installer = Some(instance)
     } else {
       log.warn("- Directory does not exist!")
-      installer = null
+      installer = None
     }
   }
   def reloadInstaller() = syncLock synchronized {
-    if(installer != null) changeInstaller(installer.basePath)
+    installer.foreach(i => changeInstaller(i.basePath))
   }
   def changePatchPackage(pack: DataSource) = syncLock synchronized {
     log.info("Changing patch package...")
@@ -102,7 +103,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var lastPatchStatus: Option[PatchStatus] = _
   private def checkPatchStatus() = {
     val flag = lastPatchStatus match {
-      case Some(x) => installer != null && installer.checkPatchStatus(packages) == x
+      case Some(x) => installer.fold(false)(_.checkPatchStatus(packages) == x)
       case None    => false
     }
     if(!flag) warn("error.statuschanged")
@@ -110,20 +111,20 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   }
   private val actionUpdate = () => {
     if(checkPatchStatus()) {
-      installer.safeUpdate(packages)
+      getInstallerUnsafe.safeUpdate(packages)
       true
     } else false
   }
   private val actionUninstall = () => {
     if(checkPatchStatus()) {
-      installer.safeUninstall()
+      getInstallerUnsafe.safeUninstall()
       true
     } else false
   }
   private def actionValidate0() = {
     val ret = JOptionPane.showConfirmDialog(frame, i18n("validate.confirm"), titleString, JOptionPane.YES_NO_OPTION)
     if(ret == JOptionPane.OK_OPTION) {
-      installer.cleanupPatch()
+      getInstallerUnsafe.cleanupPatch()
       Steam.validateGameFiles(patchPackage.script.steamId)
       JOptionPane.showMessageDialog(frame, i18n("validate.wait"), titleString, JOptionPane.INFORMATION_MESSAGE)
       reloadInstaller()
@@ -137,8 +138,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   }
   private val actionCleanup = () => {
     if(checkPatchStatus()) {
-      installer.cleanupPatch()
-      installer.checkPatchStatus(packages) match {
+      getInstallerUnsafe.cleanupPatch()
+      getInstallerUnsafe.checkPatchStatus(packages) match {
         case PatchStatus.NeedsValidation | PatchStatus.NotInstalled(false) =>
           actionValidate0()
         case _ =>
@@ -184,10 +185,10 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     lastPatchStatus = None
 
     installer match {
-      case null =>
+      case None =>
         currentVersion.setText(i18n("status.dir.noversion"))
         setStatus(if(isUserChange) "status.doesnotexist" else "status.cannotfind")
-      case _ =>
+      case Some(installer) =>
         currentVersion.setText(installer.installedVersion.fold(i18n("status.dir.noversion"))(identity))
 
         if(!isValid) {
