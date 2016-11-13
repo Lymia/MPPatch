@@ -38,7 +38,7 @@
     </Package>
     <Package Name="multiplayer" Depends="core">
         <SetFlag Name="enableMultiplayerPatch"/>
-        <WriteDLC Source="ui/mppatch.xml" Target="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
+        <WriteDLC Source="ui/mppatch.xml" Target="dlc/mppatch" TextData="gameplay/xml/newtext/mppatch_textdata"/>
     </Package>
     <Package Name="luajit" Depends="core">
         <SetFlag Name="enableLuaJIT"/>
@@ -49,8 +49,14 @@
         <SetFlag Name="enableDebug"/>
     </Package>
 
-    <LeftoverFilter Regex="Civ5XP\.launch"/>
-    <LeftoverFilter Regex="Civ5XP\.orig"/>
-    <LeftoverFilter Regex="libmppatch\.so"/>
-    <LeftoverFilter Regex="mppatch_config\.ini"/>
+    <Cleanup>
+        <RenameIfExists Filename="Civ5XP.orig" RenameTo="Civ5XP"/>
+        <CheckFile Filename="Civ5XP.launch"/>
+        <CheckFile Filename="Civ5XP.orig"/>
+        <CheckFile Filename="Civ5XP.dbg"/>
+        <CheckFile Filename="libmppatch.so"/>
+        <CheckFile Filename="mppatch_config.ini"/>
+        <CheckFile Filename="steamassets/assets/dlc/mppatch"/>
+        <CheckFile Filename="steamassets/assets/gameplay/xml/newtext/mppatch_textdata"/>
+    </Cleanup>
 </InstallScript>

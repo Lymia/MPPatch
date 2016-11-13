@@ -28,6 +28,7 @@ import java.util.Locale
 import javax.swing._
 
 import moe.lymia.mppatch.core._
+import moe.lymia.mppatch.util.Steam
 import moe.lymia.mppatch.util.io.{DataSource, MppakDataSource}
 
 class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
@@ -108,13 +109,43 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     flag
   }
   private val actionUpdate = () => {
-    if(checkPatchStatus()) installer.safeUpdate(packages) : Unit
+    if(checkPatchStatus()) {
+      installer.safeUpdate(packages)
+      true
+    } else false
   }
   private val actionUninstall = () => {
-    if(checkPatchStatus()) installer.safeUninstall() : Unit
+    if(checkPatchStatus()) {
+      installer.safeUninstall()
+      true
+    } else false
+  }
+  private def actionValidate0() = {
+    val ret = JOptionPane.showConfirmDialog(frame, i18n("validate.confirm"), titleString, JOptionPane.YES_NO_OPTION)
+    if(ret == JOptionPane.OK_OPTION) {
+      installer.cleanupPatch()
+      Steam.validateGameFiles(patchPackage.script.steamId)
+      JOptionPane.showMessageDialog(frame, i18n("validate.wait"), titleString, JOptionPane.INFORMATION_MESSAGE)
+      reloadInstaller()
+    }
+  }
+  private val actionValidate = () => {
+    if(checkPatchStatus()) {
+      actionValidate0()
+      true
+    } else false
   }
   private val actionCleanup = () => {
-    if(checkPatchStatus()) installer.cleanupPatch() : Unit
+    if(checkPatchStatus()) {
+      installer.cleanupPatch()
+      installer.checkPatchStatus(packages) match {
+        case PatchStatus.NeedsValidation | PatchStatus.NotInstalled(false) =>
+          actionValidate0()
+        case _ =>
+          // ignored
+      }
+      true
+    } else false
   }
 
   protected def buildForm() {
@@ -143,10 +174,10 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private def setStatus(text: String) = currentStatus.setText(i18n(text))
   override def update() = {
     installButton.setEnabled(false)
-    installButton.setAction("action.install", actionUpdate)
+    installButton.setStatusAction("action.install", actionUpdate)
 
     uninstallButton.setEnabled(false)
-    uninstallButton.setAction("action.uninstall", actionUninstall)
+    uninstallButton.setStatusAction("action.uninstall", actionUninstall)
 
     targetVersion.setText(patchPackage.data.patchVersion)
 
@@ -159,8 +190,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
       case _ =>
         currentVersion.setText(installer.installedVersion.fold(i18n("status.dir.noversion"))(identity))
 
-        if(!isValid) setStatus("status.noprogram")
-        else if(!installer.isLockAcquired) setStatus("status.inuse")
+        if(!isValid) {
+          setStatus("status.noprogram")
+          uninstallButton.setAction("action.validate", () => actionValidate0())
+          uninstallButton.setEnabled(true)
+        } else if(!installer.isLockAcquired) setStatus("status.inuse")
         else {
           val status = installer.checkPatchStatus(packages)
           lastPatchStatus = Some(status)
@@ -188,8 +222,14 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
             case PatchStatus.NotInstalled(true) =>
               setStatus("status.notinstalled")
               installButton.setEnabled(true)
-            case PatchStatus.NotInstalled(false) =>
-              setStatus("status.unknownversion")
+            case PatchStatus.NeedsCleanup =>
+              setStatus("status.needscleanup")
+              uninstallButton.setStatusAction("action.cleanup", actionCleanup)
+              uninstallButton.setEnabled(true)
+            case PatchStatus.NeedsValidation | PatchStatus.NotInstalled(false) =>
+              setStatus("status.needsvalidation")
+              uninstallButton.setStatusAction("action.validate", actionValidate)
+              uninstallButton.setEnabled(true)
             case x => setStatus("unknown state: "+x)
           }
         }

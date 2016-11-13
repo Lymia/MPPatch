@@ -56,8 +56,9 @@ private case class PatchState(versionFrom: String, sha256: String,
                               packages: Set[String], renames: Seq[RenameData],
                               additionalFiles: Seq[PatchFile], additionalDirectories: Seq[String],
                               installedVersion: String, installedTimestamp: Long) {
-  lazy val expectedFiles =
-    (additionalFiles.map(_.path) ++ renames.map(_.replacedFile.path) ++ renames.map(_.originalFile.path)).toSet
+  lazy val expectedPaths =
+    (additionalFiles.map(_.path) ++ renames.map(_.replacedFile.path) ++ renames.map(_.originalFile.path) ++
+     additionalDirectories).toSet
   lazy val replacementTargets = renames.map(_.replacedFile.path).toSet
   lazy val nonreplacementFiles = additionalFiles.filter(x => !replacementTargets.contains(x.path))
 }
@@ -174,18 +175,21 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
     log.info("Checking patch status...")
 
     def body(): PatchStatus = {
-      val detectedPatchFiles = IOUtils.listFileNames(basePath).filter(loader.isLeftoverFile)
+      val leftoverFiles = loader.cleanup.checkFile.filter(x => Files.exists(basePath.resolve(x)))
 
       if(!Files.exists(patchStatePath)) return {
         if(!Files.exists(basePath.resolve(loader.script.versionFrom))) PatchStatus.NeedsValidation
-        else if(detectedPatchFiles.nonEmpty) PatchStatus.NeedsCleanup
+        else if(leftoverFiles.nonEmpty) PatchStatus.NeedsCleanup
         else PatchStatus.NotInstalled(isVersionKnown(loader.script.versionFrom))
       }
 
       loadPatchState() match {
         case Some(patchState) =>
-          if((detectedPatchFiles.toSet -- patchState.expectedFiles).nonEmpty) PatchStatus.NeedsCleanup
-          else {
+          val leftoverSet = leftoverFiles.toSet -- patchState.expectedPaths
+          if(leftoverSet.nonEmpty) {
+            log.info(s"- Leftover files: [${leftoverSet.mkString(", ")}]")
+            PatchStatus.NeedsCleanup
+          } else {
             val originalFilesOK = patchState.renames.map(_.originalFile).forall(validatePatchFile)
             if(!patchState.renames.map(_.replacedFile).forall(x => Files.exists(basePath.resolve(x.path))) ||
                !originalFilesOK ||
@@ -285,7 +289,26 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
   }
 
   def checkPatchStatus(packages: Set[String]) = lock { intCheckPatchStatus(packages) }
-  def cleanupPatch() = lock { }
+  def cleanupPatch() = lock {
+    loadPatchState() match {
+      case None =>
+      case Some(_) => uninstallPatch()
+    }
+    log.info("Cleaning up remaining files...")
+    for(RenameFile(from, to) <- loader.cleanup.rename) {
+      log.info(s"- Renaming $from -> $to...")
+      if(Files.exists(basePath.resolve(from))) {
+        if(Files.exists(basePath.resolve(to))) IOUtils.deleteDirectory(basePath.resolve(to))
+        Files.move(basePath.resolve(from), basePath.resolve(to))
+      }
+    }
+    for(file <- loader.cleanup.checkFile) {
+      log.info(s"- Deleting $file...")
+      IOUtils.deleteDirectory(basePath.resolve(file))
+    }
+    log.info("- Cleaning up patch state file")
+    IOUtils.deleteDirectory(patchStatePath)
+  }
   def safeUpdate(packages: Set[String]) = lock {
     intCheckPatchStatus(packages) match {
       case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate |

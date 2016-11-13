@@ -191,15 +191,15 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
   }
 
   protected class ActionButton(showCompleteMessage: Boolean = true) extends JButton {
-    var action: () => Unit = () => error("no action registered")
-    var text  : String     = "<no action>"
+    var action: () => Boolean = () => error("no action registered")
+    var text  : String        = "<no action>"
 
     setAction(FrameBase.this.action { e =>
       try {
         log.info("Executing: "+i18n(text+".continuous")+"...")
-        action()
+        val actionStatus = action()
         log.info(i18n(text+".completed"))
-        if(showCompleteMessage && i18n.hasKey(text+".completed"))
+        if(actionStatus && showCompleteMessage && i18n.hasKey(text+".completed"))
           JOptionPane.showMessageDialog(frame, i18n(text+".completed"))
       } catch {
         case e: Exception =>
@@ -215,6 +215,10 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
       if(i18n.hasKey(name+".tooltip")) setToolTipText(i18n(name+".tooltip"))
     }
     def setAction(name: String, action: () => Unit): Unit = {
+      this.action = () => { action(); true }
+      setActionText(name)
+    }
+    def setStatusAction(name: String, action: () => Boolean): Unit = {
       this.action = action
       setActionText(name)
     }

@@ -45,6 +45,13 @@
         <SetFlag Name="enableDebug"/>
     </Package>
 
-    <LeftoverFilter Regex="CvGameDatabase_Original\.dll"/>
-    <LeftoverFilter Regex="mppatch_config\.ini"/>
+    <Cleanup>
+        <RenameIfExists Filename="CvGameDatabase_Original.dll" RenameTo="CvGameDatabaseWin32Final Release.dll"/>
+        <RenameIfExists Filename="lua51_Win32.dll.bak" RenameTo="lua51_Win32.dll"/>
+        <CheckFile Filename="lua51_Win32.dll.bak"/>
+        <CheckFile Filename="CvGameDatabase_Original.dll"/>
+        <CheckFile Filename="mppatch_config.ini"/>
+        <CheckFile Filename="steamassets/assets/DLC/MPPatch"/>
+        <CheckFile Filename="steamassets/assets/Gameplay/XML/NewText/MPPatch_TextData"/>
+    </Cleanup>
 </InstallScript>

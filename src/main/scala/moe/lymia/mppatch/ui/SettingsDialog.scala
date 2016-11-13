@@ -66,7 +66,8 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       installPath = options.gridButtonTextRow(0, "path", "browse") {
         val installer = main.getInstaller
         val chooser = new JFileChooser()
-        if(installer != null) chooser.setCurrentDirectory(installer.basePath.toFile)
+        val installPathFile = new File(installPath.getText)
+        if(installPath.getText.trim.nonEmpty && installPathFile.exists) chooser.setCurrentDirectory(installPathFile)
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
         if(chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
           installPath.setText(chooser.getSelectedFile.toString)
