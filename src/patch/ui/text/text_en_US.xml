@@ -22,5 +22,15 @@
             <!-- This is used when the user tries to join a room that uses mods they don't have installed. -->
             <Text>You cannot join this room because the following mods aren't installed:</Text>
         </Row>
+
+        <!-- These strings are used by the main mods menu -->
+        <Row Tag="TXT_KEY_MPPATCH_NO_SINGLEPLAYER_SUPPORT">
+            <!-- This is used when a mod does not support singleplayer. -->
+            <Text>The following mods do not support singleplayer:</Text>
+        </Row>
+        <Row Tag="TXT_KEY_MPPATCH_NO_MULTIPLAYER_SUPPORT">
+            <!-- This is used when a mod does not support multiplayer. -->
+            <Text>The following mods do not support multiplayer:</Text>
+        </Row>
     </Language_en_US>
 </GameData>
