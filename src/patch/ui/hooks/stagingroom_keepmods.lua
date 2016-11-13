@@ -31,10 +31,15 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
         end
     end)
 
+    local function doReset()
+        _mpPatch.resetUI()
+        _mpPatch.patch.NetPatch.reset()
+    end
+
     local HandleExitRequestOld = HandleExitRequest
     function HandleExitRequest(...)
         if gameLaunchSet then return end
-        _mpPatch.resetUI()
+        doReset()
         return HandleExitRequestOld(...)
     end
 
@@ -64,7 +69,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     _mpPatch.patch.globals.rawset(UIManager, "DequeuePopup", function(this, ...)
         local context = ...
         if context == ContextPtr then
-            _mpPatch.resetUI()
+            doReset()
         end
         return DequeuePopup(this, ...)
     end)

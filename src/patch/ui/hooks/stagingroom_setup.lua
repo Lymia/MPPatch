@@ -22,7 +22,6 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     end
 
     _mpPatch.addResetHook(function()
-        _mpPatch.patch.NetPatch.reset()
         StopCountdown()
     end)
 end
