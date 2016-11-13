@@ -70,10 +70,6 @@ function _mpPatch.normalizeDlcName(name)
 end
 function _mpPatch.getModDependencies(modList)
     local dlcDependencies = {}
-    for row in GameInfo.DownloadableContent() do
-        dlcDependencies[_mpPatch.normalizeDlcName(row.PackageID)] = {}
-    end
-
     for _, mod in ipairs(modList) do
         local info = { ID = mod.ID, Version = mod.Version, Name = _mpPatch.getModName(mod.ID, mod.Version) }
         for _, assoc in ipairs(Modding.GetDlcAssociations(mod.ID, mod.Version)) do
@@ -84,14 +80,14 @@ function _mpPatch.getModDependencies(modList)
                     end
                 else
                     local normName = _mpPatch.normalizeDlcName(assoc.PackageID)
-                    if dlcDependencies[normName] then
-                        table.insert(dlcDependencies[normName], info)
+                    if not dlcDependencies[normName] then
+                        dlcDependencies[normName] = {}
                     end
+                    table.insert(dlcDependencies[normName], info)
                 end
             end
         end
     end
-
     return dlcDependencies
 end
 
