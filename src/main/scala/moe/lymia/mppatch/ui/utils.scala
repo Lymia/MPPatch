@@ -159,7 +159,7 @@ trait FrameError[F <: Window] extends HasLogger {
   protected def warn(string: String, data: Any*) = warn0(string, true, data)
   private def error0[T](format: String, ex: Option[Throwable], data: Seq[Any]): T = {
     val string = i18n(format, data: _*)
-    warn(format, false, data)
+    warn0(format, false, data)
     if(frame != null) {
       frame.setVisible(false)
       frame.dispose()
