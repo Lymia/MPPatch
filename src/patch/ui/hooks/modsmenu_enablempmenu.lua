@@ -9,8 +9,8 @@ if _mpPatch and _mpPatch.loaded then
     local function getModMessage(name, title)
         local mods = {}
         for _, v in ipairs(Modding.GetActivatedMods()) do
-            if Modding.GetModProperty(v.ID, v.Version, name) ~= 1 then
-                table.insert(mods, "[BULLET]".._mpPatch.getModName(v.ID, v.Version))
+            if Modding.GetModProperty(v.ID, v.Version, name) ~= "1" then
+                table.insert(mods, "[ICON_BULLET]".._mpPatch.getModName(v.ID, v.Version))
             end
         end
         if #mods == 0 then
