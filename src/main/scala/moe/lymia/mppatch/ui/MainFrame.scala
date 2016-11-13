@@ -55,7 +55,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var patchPackage: PatchLoader = _
   private var isUserChange = false
   private var isValid = false
-  private var installer: Option[PatchInstaller] = _
+  private var installer: Option[PatchInstaller] = None
   private def getInstallerUnsafe = installer.getOrElse(sys.error("installer does not exist"))
   def getPatch = patchPackage
   def getInstaller = installer

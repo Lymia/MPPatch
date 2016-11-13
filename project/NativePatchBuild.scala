@@ -80,7 +80,7 @@ object NativePatchBuild {
   }
 
   // Codegen for version header
-  def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: Exception => default }
+  def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: NumberFormatException => default }
   def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
     val VersionRegex(major, minor, _, _, _, _) = version
     cachedGeneration(cacheDirectory, tempTarget, finalTarget,
@@ -189,7 +189,7 @@ object NativePatchBuild {
         val buildTmp = patchBuildDir.value / versionStr
         IO.createDirectory(buildTmp)
 
-        val nasm_o = trackDependencies(patchCacheDir.value / (versionStr + "_nasm_o"), sBuildDependencies.toSet) {
+        val nasmOut = trackDependencies(patchCacheDir.value / (versionStr + "_nasm_o"), sBuildDependencies.toSet) {
           logger.info("Compiling as_entry.o for version "+version)
 
           val output = buildTmp / "as_entry.o"
@@ -202,7 +202,7 @@ object NativePatchBuild {
         val targetFile = targetDir / ("mppatch_"+version+binaryExtension)
         val buildIdFile = targetDir / "buildid.txt"
         val outputPath =
-          trackDependencies(patchCacheDir.value / (versionStr + "_c_out"), cBuildDependencies.toSet + nasm_o) {
+          trackDependencies(patchCacheDir.value / (versionStr + "_c_out"), cBuildDependencies.toSet + nasmOut) {
             logger.info("Compiling binary patch for version "+version)
             val buildId = UUID.randomUUID()
 
@@ -214,7 +214,7 @@ object NativePatchBuild {
             cc(includePaths("-I") ++ Seq(
               "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-o", targetFile, "-fvisibility=hidden",
               "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
-              "-DMPPATCH_BUILDID=\""+buildId+"\"", nasm_o) ++ config_common_secureFlags ++
+              "-DMPPATCH_BUILDID=\""+buildId+"\"", nasmOut) ++ config_common_secureFlags ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ sourceFiles)
             targetDir
           }

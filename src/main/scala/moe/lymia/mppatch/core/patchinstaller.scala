@@ -106,27 +106,29 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
   private val patchLockPath  = basePath.resolve(patchLockFilename)
 
   private val syncLock = new Object
-  private var fileLock: FileLock = _
+  private var fileLock: Option[FileLock] = None
   private var manualLock = false
 
-  def isLockAcquired = syncLock synchronized { fileLock != null }
+  def isLockAcquired = syncLock synchronized { fileLock.isDefined }
   def acquireLock(manualLock: Boolean = true) = syncLock synchronized {
-    if(fileLock != null) {
-      if(!this.manualLock && manualLock) this.manualLock = true
-      true
-    } else IOUtils.lock(patchLockPath) match {
-      case Some(lock) =>
-        fileLock = lock
-        this.manualLock = manualLock
+    fileLock match {
+      case Some(_) =>
+        if(!this.manualLock && manualLock) this.manualLock = true
         true
-      case None =>
-        false
+      case None => IOUtils.lock(patchLockPath) match {
+        case Some(lock) =>
+          fileLock = Some(lock)
+          this.manualLock = manualLock
+          true
+        case None =>
+          false
+      }
     }
   }
   def releaseLock() = syncLock synchronized {
-    if(fileLock != null) {
-      fileLock.release()
-      fileLock = null
+    fileLock.foreach { lock =>
+      lock.release()
+      fileLock = None
       manualLock = false
     }
   }
