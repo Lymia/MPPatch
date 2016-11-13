@@ -13,8 +13,6 @@ if _mpPatch and _mpPatch.loaded and ContextPtr:GetID() == "MPLoadGameScreen" the
             _mpPatch.overrideWithModList(header.ActivatedMods)
 
             local ret = {func(...)}
-            PreGame.SetPersistSettings(false)
-            _mpPatch.enrollModsList(Modding.GetActivatedMods())
             return unpack(ret)
         end
     end
