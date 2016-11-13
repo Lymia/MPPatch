@@ -172,7 +172,7 @@ trait FrameError[F <: Window] extends HasLogger {
   }
   protected def error[T](string: String, data: Any*) = error0(string, None, data)
   protected def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T =
-    error(errorString, Some(e), (e.getClass+": "+e.getMessage) +: exArgs)
+    error0(errorString, Some(e), (e.getClass+": "+e.getMessage) +: exArgs)
 }
 
 trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasLogger {
