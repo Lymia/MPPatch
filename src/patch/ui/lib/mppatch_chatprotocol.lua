@@ -21,11 +21,25 @@
 local marker = "mppatch_command:yLsMoqQAirGJ4RBQv8URAwcu6RXdqN6v:"
 
 local chatProtocolCommands = {}
-function _mpPatch.registerChatCommand(id, fn)
-    chatProtocolCommands[id] = fn
-    return function(data)
-        _mpPatch.sendChatCommand(id, data)
+function _mpPatch.registerChatCommand(id)
+    local handlers = {}
+    chatProtocolCommands[id] = function(...)
+        for _, handler in ipairs(handlers) do
+            handler(...)
+        end
     end
+    return setmetatable({
+        send = function(data)
+            _mpPatch.debugPrint("Sending MPPatch chat command: "..id..", data = "..data)
+            _mpPatch.sendChatCommand(id, data)
+        end,
+        registerHandler = function(fn)
+            _mpPatch.debugPrint("Registering handler for chat command "..id)
+            table.insert(handlers, fn)
+        end
+    }, {
+      __call = function(t, ...) return t.send(...) end
+    })
 end
 function _mpPatch.sendChatCommand(id, data)
     Network.SendChat(marker..id..":"..(data or ""))
@@ -55,3 +69,8 @@ function _mpPatch.interceptChatFunction(fn, condition, noCheckHide)
     Events.GameMessageChat.Add(chatFn)
     return chatFn
 end
+
+-- commands
+_mpPatch.net = {}
+_mpPatch.net.sendPlayerData       = _mpPatch.registerChatCommand("sendPlayerData"      )
+_mpPatch.net.startLaunchCountdown = _mpPatch.registerChatCommand("startLaunchCountdown")

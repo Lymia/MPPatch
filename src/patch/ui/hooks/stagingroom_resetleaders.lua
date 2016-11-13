@@ -1,5 +1,5 @@
 if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
-    local requestPlayerInfo = _mpPatch.registerChatCommand("requestPlayerInfo", function()
+    _mpPatch.net.sendPlayerData.registerHandler(function()
         if Matchmaking.IsHost() then
             Network.BroadcastPlayerInfo()
         end
@@ -9,7 +9,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
         if not ContextPtr:IsHidden() and not Matchmaking.IsHost() and
            uiType == SystemUpdateUIType.RestoreUI and screen == "StagingRoom" then
             _mpPatch.debugPrint("Requesting user info update.")
-            requestPlayerInfo()
+            _mpPatch.net.sendPlayerData()
         end
     end)
 end

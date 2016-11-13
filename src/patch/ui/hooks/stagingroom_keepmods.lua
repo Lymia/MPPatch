@@ -23,7 +23,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     local gameLaunchSet = false
     local gameLaunchCountdown = 3
 
-    local doClientOverride = _mpPatch.registerChatCommand("doClientOverride", function(_, id)
+    _mpPatch.net.startLaunchCountdown.registerHandler(function(_, id)
         if id == m_HostID and not Matchmaking.IsHost() then
             gameLaunchSet = true
             _mpPatch.overrideModsFromPreGame()
@@ -61,7 +61,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
         if PreGame.IsHotSeatGame() then
             return LaunchGameOld(...)
         else
-            doClientOverride()
+            _mpPatch.net.startLaunchCountdown()
             ContextPtr:ClearUpdate()
             gameLaunchSet = true
             ContextPtr:SetUpdate(LaunchGameCountdown)
