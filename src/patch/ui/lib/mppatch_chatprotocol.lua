@@ -30,7 +30,7 @@ function _mpPatch.registerChatCommand(id)
     end
     return setmetatable({
         send = function(data)
-            _mpPatch.debugPrint("Sending MPPatch chat command: "..id..", data = "..data)
+            _mpPatch.debugPrint("Sending MPPatch chat command: "..id..", data = "..(data or "<no data>"))
             _mpPatch.sendChatCommand(id, data)
         end,
         registerHandler = function(fn)
