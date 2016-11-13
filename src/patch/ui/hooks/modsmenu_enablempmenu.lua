@@ -1,11 +1,6 @@
 if _mpPatch and _mpPatch.loaded then
     _mpPatch.loadElementFromProxy("mppatch_multiplayerproxy", "ModMultiplayerSelectScreen")
 
-    Controls.MultiPlayerButton:RegisterCallback(Mouse.eLClick, function()
-        UIManager:QueuePopup(Controls.ModMultiplayerSelectScreen, PopupPriority.ModMultiplayerSelectScreen)
-    end)
-    Controls.MultiPlayerButton:SetHide(false)
-
     local function getModMessage(name, title)
         local mods = {}
         for _, v in ipairs(Modding.GetActivatedMods()) do
@@ -36,12 +31,12 @@ if _mpPatch and _mpPatch.loaded then
     end
     Controls.SinglePlayerButton:RegisterCallback(Mouse.eLClick, OnSinglePlayerClick)
 
-    local OnMultiPlayerClickOld = OnMultiPlayerClick
     function OnMultiPlayerClick(...)
         showMessage("SupportsMultiplayer" , "TXT_KEY_MPPATCH_NO_MULTIPLAYER_SUPPORT" )
-        return OnMultiPlayerClickOld(...)
+        UIManager:QueuePopup(Controls.ModMultiplayerSelectScreen, PopupPriority.ModMultiplayerSelectScreen)
     end
     Controls.MultiPlayerButton:RegisterCallback(Mouse.eLClick, OnMultiPlayerClick)
+    Controls.MultiPlayerButton:SetHide(false)
 
     local function onShowHideHook()
         setTooltip(Controls.SinglePlayerButton, "SupportsSinglePlayer", "TXT_KEY_MPPATCH_NO_SINGLEPLAYER_SUPPORT")
