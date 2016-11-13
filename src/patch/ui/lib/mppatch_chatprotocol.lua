@@ -31,10 +31,11 @@ function _mpPatch.sendChatCommand(id, data)
     Network.SendChat(marker..id..":"..(data or ""))
 end
 
-function _mpPatch.interceptChatFunction(fn, noCheckHide)
+function _mpPatch.interceptChatFunction(fn, condition, noCheckHide)
+    condition = condition or function() return true end
     local function chatFn(...)
         local fromPlayer, _, text = ...
-        if (noCheckHide or not ContextPtr:IsHidden()) and m_PlayerNames[fromPlayer] then
+        if (noCheckHide or not ContextPtr:IsHidden()) and condition(fromPlayer) then
             local textHead, textTail = text:sub(1, marker:len()), text:sub(marker:len() + 1)
             if textHead == marker then
                 local split = textTail:find(":")
