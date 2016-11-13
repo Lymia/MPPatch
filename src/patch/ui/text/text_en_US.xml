@@ -24,6 +24,10 @@
         </Row>
 
         <!-- These strings are used by the main mods menu -->
+        <Row Tag="TXT_KEY_MPPATCH_WARNING_PREFIX">
+            <!-- This is shown before text boxes for the following two lines. -->
+            <Text>WARNING![NEWLINE]</Text>
+        </Row>
         <Row Tag="TXT_KEY_MPPATCH_NO_SINGLEPLAYER_SUPPORT">
             <!-- This is used when a mod does not support singleplayer. -->
             <Text>The following mods do not support singleplayer:</Text>
