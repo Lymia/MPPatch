@@ -31,7 +31,7 @@ object WindowsRegistry {
   private val KEY_READ       = 0x20019
 
   private type Dynamic = DynamicReflectiveProxy
-  private def toCString(s: String) = (s.getBytes(StandardCharsets.UTF_8) :+ 0.toByte).toArray
+  private def toCString(s: String) = s.getBytes(StandardCharsets.UTF_8) :+ 0.toByte
   private def fromCString(s: Array[Byte]) = new String(s, StandardCharsets.UTF_8).replaceAll("\u0000.*", "")
   private def withKey[A](hive: Hive, key: String, access: Int)(f: Int => A) = {
     val Array(handle, success) = hive.h.WindowsRegOpenKey(hive.hiveId, toCString(key), access).get[Array[Int]]

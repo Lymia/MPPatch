@@ -63,7 +63,7 @@ public class Loader {
 
         ClassLoader loader;
         try {
-            loader = new URLClassLoader(new URL[]{tempJarFile.toURL()}, getClass().getClassLoader());
+            loader = new URLClassLoader(new URL[]{tempJarFile.toURI().toURL()}, getClass().getClassLoader());
         } catch (MalformedURLException e) {
             throw error("unexpected error", e);
         }
