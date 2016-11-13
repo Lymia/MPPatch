@@ -44,7 +44,9 @@ case class I18N(locale: Locale, map: Map[String, String]) {
 object I18N {
   def loadI18NData(sourceFile: String): Map[String, String] = {
     val prop = new Properties()
-    prop.load(new InputStreamReader(IOUtils.getResource(sourceFile), StandardCharsets.UTF_8))
+    val reader = new InputStreamReader(IOUtils.getResource(sourceFile), StandardCharsets.UTF_8)
+    prop.load(reader)
+    reader.close()
 
     val includes = prop.getProperty("includes")
     val includeData = if(includes != null && includes.trim.nonEmpty) {

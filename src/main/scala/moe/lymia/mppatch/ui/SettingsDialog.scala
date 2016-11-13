@@ -64,7 +64,6 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
 
     frame.subFrame(constraints(fill = GridBagConstraints.BOTH)) { options =>
       installPath = options.gridButtonTextRow(0, "path", "browse") {
-        val installer = main.getInstaller
         val chooser = new JFileChooser()
         val installPathFile = new File(installPath.getText)
         if(installPath.getText.trim.nonEmpty && installPathFile.exists) chooser.setCurrentDirectory(installPathFile)
@@ -74,8 +73,8 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       }
       installPath.setEditable(true)
       main.getInstaller match {
-        case null => installPath.setText("")
-        case installer => installPath.setText(installer.basePath.toString)
+        case None => installPath.setText("")
+        case Some(installer) => installPath.setText(installer.basePath.toString)
       }
 
       enableDebug = options.gridCheckRow(1, "debug")

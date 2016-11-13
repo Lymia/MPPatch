@@ -32,7 +32,7 @@ object DynamicReflectiveProxy {
   def apply(x: Any): DynamicReflectiveProxy = x match {
     case x: Array[AnyRef] => new DynamicReflectiveArrayProxy(x.asInstanceOf[Array[Any]])
     case null             => null
-    case x: Any           => new DynamicReflectiveProxy(x.asInstanceOf[AnyRef])
+    case x                => new DynamicReflectiveProxy(x.asInstanceOf[AnyRef])
   }
 
   def static[T : ClassTag]: DynamicReflectiveProxy =
