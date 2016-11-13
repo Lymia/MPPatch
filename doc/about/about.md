@@ -1,4 +1,5 @@
-Legal information can be found [here](http://fromres/text/legal.html).
+Legal information can be found [here](http://fromres/text/legal.html).  
+Source code for this program can be found [here](https://github.com/Lymia/MPPatch).
 
 **Contributors**
 
