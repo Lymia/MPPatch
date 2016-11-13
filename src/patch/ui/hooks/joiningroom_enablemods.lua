@@ -28,6 +28,8 @@ if _mpPatch and _mpPatch.loaded then
     function OnConnectionCompete()
         if not Matchmaking.IsHost() then
             if _mpPatch.isModding then
+                _mpPatch.net.clientIsPatched(_mpPatch.protocolVersion)
+
                 local modList = _mpPatch.decodeModsList()
 
                 local missingMods = {}

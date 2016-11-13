@@ -70,7 +70,11 @@ function _mpPatch.interceptChatFunction(fn, condition, noCheckHide)
     return chatFn
 end
 
+-- protocol information
+_mpPatch.protocolVersion = "0.1"
+
 -- commands
 _mpPatch.net = {}
 _mpPatch.net.sendPlayerData       = _mpPatch.registerChatCommand("sendPlayerData"      )
 _mpPatch.net.startLaunchCountdown = _mpPatch.registerChatCommand("startLaunchCountdown")
+_mpPatch.net.clientIsPatched      = _mpPatch.registerChatCommand("clientIsPatched"     )
