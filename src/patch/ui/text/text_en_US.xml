@@ -22,6 +22,10 @@
             <!-- This is used when the user tries to join a room that uses mods they don't have installed. -->
             <Text>You cannot join this room because the following mods aren't installed:</Text>
         </Row>
+        <Row Tag="TXT_KEY_MPPATCH_DLC_MISSING">
+            <!-- This is used when the user tries to join a room that uses DLC they don't have installed. -->
+            <Text>You cannot join this room because the following DLC aren't installed:</Text>
+        </Row>
 
         <!-- These strings are used by the main mods menu -->
         <Row Tag="TXT_KEY_MPPATCH_WARNING_PREFIX">
