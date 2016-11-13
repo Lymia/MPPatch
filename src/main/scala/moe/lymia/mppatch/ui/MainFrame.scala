@@ -98,14 +98,23 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     }
   } else pathFromRegistry()
 
+  private var lastPatchStatus: Option[PatchStatus] = _
+  private def checkPatchStatus() = {
+    val flag = lastPatchStatus match {
+      case Some(x) => installer != null && installer.checkPatchStatus(packages) == x
+      case None    => false
+    }
+    if(!flag) warn("error.statuschanged")
+    flag
+  }
   private val actionUpdate = () => {
-    installer.safeUpdate(packages) : Unit
+    if(checkPatchStatus()) installer.safeUpdate(packages) : Unit
   }
   private val actionUninstall = () => {
-    installer.safeUninstall() : Unit
+    if(checkPatchStatus()) installer.safeUninstall() : Unit
   }
   private val actionCleanup = () => {
-    installer.cleanupPatch() : Unit
+    if(checkPatchStatus()) installer.cleanupPatch() : Unit
   }
 
   protected def buildForm() {
@@ -141,6 +150,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
     targetVersion.setText(patchPackage.data.patchVersion)
 
+    lastPatchStatus = None
+
     installer match {
       case null =>
         currentVersion.setText(i18n("status.dir.noversion"))
@@ -150,33 +161,37 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
         if(!isValid) setStatus("status.noprogram")
         else if(!installer.isLockAcquired) setStatus("status.inuse")
-        else installer.checkPatchStatus(packages) match {
-          case PatchStatus.Installed =>
-            setStatus("status.ready")
-            installButton.setActionText("action.reinstall")
-            installButton.setEnabled(true)
-            uninstallButton.setEnabled(true)
-          case PatchStatus.PackageChange =>
-            setStatus("status.settingchange")
-            installButton.setActionText("action.reinstall")
-            installButton.setEnabled(true)
-            uninstallButton.setEnabled(true)
-          case PatchStatus.NeedsUpdate =>
-            setStatus(if(installer.isDowngrade) "status.candowngrade" else "status.needsupdate")
-            installButton.setActionText(if(installer.isDowngrade) "action.downgrade" else "action.update")
-            installButton.setEnabled(true)
-            uninstallButton.setEnabled(true)
-          case PatchStatus.FilesCorrupted =>
-            setStatus("status.filescorrupted")
-            installButton.setActionText("action.repair")
-            installButton.setEnabled(true)
-            uninstallButton.setEnabled(true)
-          case PatchStatus.NotInstalled(true) =>
-            setStatus("status.notinstalled")
-            installButton.setEnabled(true)
-          case PatchStatus.NotInstalled(false) =>
-            setStatus("status.unknownversion")
-          case x => setStatus("unknown state: "+x)
+        else {
+          val status = installer.checkPatchStatus(packages)
+          lastPatchStatus = Some(status)
+          status match {
+            case PatchStatus.Installed =>
+              setStatus("status.ready")
+              installButton.setActionText("action.reinstall")
+              installButton.setEnabled(true)
+              uninstallButton.setEnabled(true)
+            case PatchStatus.PackageChange =>
+              setStatus("status.settingchange")
+              installButton.setActionText("action.reinstall")
+              installButton.setEnabled(true)
+              uninstallButton.setEnabled(true)
+            case PatchStatus.NeedsUpdate =>
+              setStatus(if(installer.isDowngrade) "status.candowngrade" else "status.needsupdate")
+              installButton.setActionText(if(installer.isDowngrade) "action.downgrade" else "action.update")
+              installButton.setEnabled(true)
+              uninstallButton.setEnabled(true)
+            case PatchStatus.FilesCorrupted =>
+              setStatus("status.filescorrupted")
+              installButton.setActionText("action.repair")
+              installButton.setEnabled(true)
+              uninstallButton.setEnabled(true)
+            case PatchStatus.NotInstalled(true) =>
+              setStatus("status.notinstalled")
+              installButton.setEnabled(true)
+            case PatchStatus.NotInstalled(false) =>
+              setStatus("status.unknownversion")
+            case x => setStatus("unknown state: "+x)
+          }
         }
     }
   }
