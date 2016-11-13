@@ -14,10 +14,10 @@ if _mpPatch and _mpPatch.loaded then
         Matchmaking.LeaveMultiplayerGame()
         UIManager:DequeuePopup(ContextPtr)
     end
-    local function checkTable(table, key)
-        if #table > 0 then
+    local function checkTable(names, key)
+        if #names > 0 then
             local messageTable = {Locale.Lookup(key)}
-            for _, name in ipairs(table) do
+            for _, name in ipairs(names) do
                 table.insert(messageTable, "[ICON_BULLET]"..name:gsub("%[", "("):gsub("%]", ")"))
             end
             joinFailed(table.concat(messageTable, "[NEWLINE]"))
