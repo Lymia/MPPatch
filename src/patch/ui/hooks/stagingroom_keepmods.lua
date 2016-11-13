@@ -26,7 +26,6 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
 
     _mpPatch.net.startLaunchCountdown.registerHandler(function(_, id)
         if id == m_HostID and not Matchmaking.IsHost() then
-            setGameLaunch()
             _mpPatch.overrideModsFromPreGame()
         end
     end)
