@@ -25,8 +25,8 @@ local rawset = _mpPatch.patch.globals.rawset
 local indexers = {}
 function _mpPatch._mt.__index(_, k)
     for _, fn in ipairs(indexers) do
-        local v = fn(k)
-        if v ~= nil then return v end
+        local hasValue, v = fn(k)
+        if hasValue then return v end
     end
     error("Access to unknown field "..k.." in MpPatch runtime.")
 end
@@ -53,7 +53,7 @@ _mpPatch._mt.registerIndexer(function(k)
     if fn then
         local v = fn()
         _mpPatch[k] = v
-        return v
+        return true, v
     end
 end)
 function _mpPatch._mt.registerLazyVal(k, fn)
@@ -65,7 +65,7 @@ local properties = {}
 _mpPatch._mt.registerIndexer(function(k)
     local p = properties[k]
     if p then
-        return p.read()
+        return true, p.read()
     end
 end)
 _mpPatch._mt.registerNewIndexer(function(k, v)
