@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
+if _mpPatch_activateFrontEnd then
     local playerMap = {}
     _mpPatch.addResetHook(function()
         playerMap = {}

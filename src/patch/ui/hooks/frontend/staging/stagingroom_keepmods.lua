@@ -1,11 +1,5 @@
-if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
+if _mpPatch_activateFrontEnd then
     _mpPatch.setBIsModding()
-
-    -- Hook simple modding functions.
-    Modding = _mpPatch.hookTable(Modding, {ActivateAllowedDLC = function(...)
-        _mpPatch.overrideModsFromPreGame()
-        return Modding._super.ActivateAllowedDLC(...)
-    end})
 
     Matchmaking = _mpPatch.hookTable(Matchmaking, {LaunchMultiplayerGame = function(...)
         _mpPatch.overrideModsFromPreGame()

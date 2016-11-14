@@ -81,9 +81,17 @@
     </Hook>
     <Hook Filename="StagingRoom.lua">
         <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/common/stagingroom_common.lua"/>
         <InjectAfter Filename="ui/hooks/frontend/staging/stagingroom_setup.lua"/>
         <InjectAfter Filename="ui/hooks/frontend/staging/stagingroom_keepmods.lua"/>
         <InjectAfter Filename="ui/hooks/frontend/staging/stagingroom_resetleaders.lua"/>
         <InjectAfter Filename="ui/hooks/frontend/staging/stagingroom_kickunpatched.lua"/>
+        <InjectAfter Filename="ui/hooks/ingame/stagingroom_suppresscommands.lua"/>
+    </Hook>
+
+    <!-- Ingame hooks -->
+    <Hook Filename="DiploCorner.lua">
+        <Include Filename="mppatch_runtime.lua"/>
+        <InjectAfter Filename="ui/hooks/ingame/diplocorner_suppresscommands.lua"/>
     </Hook>
 </UIPatch>

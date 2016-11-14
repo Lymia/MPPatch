@@ -1,4 +1,4 @@
-if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
+if _mpPatch_activateFrontEnd then
     OnChat = _mpPatch.interceptChatFunction(OnChat, function(fromPlayer)
         return not not m_PlayerNames[fromPlayer]
     end)
