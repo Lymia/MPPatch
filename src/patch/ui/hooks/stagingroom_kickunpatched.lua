@@ -9,6 +9,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
             for player, _ in pairs(playerMap) do
                 playerMap[player] = playerMap[player] - timeDiff
                 if playerMap[player] <= 0 then
+                    _mpPatch.debugPrint("Kicking player "..player.." for (presumably) not having MPPatch.")
                     Matchmaking.KickPlayer(player)
                     playerMap[player] = nil
                 end
