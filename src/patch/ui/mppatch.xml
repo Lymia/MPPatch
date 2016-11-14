@@ -38,52 +38,52 @@
     <!-- Basic frontend hooks -->
     <Hook Filename="MainMenu.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/mainmenu_printversion.lua"/>
-        <InjectAfter Filename="ui/hooks/mainmenu_status.lua"/>
-        <InjectAfter Filename="ui/hooks/mainmenu_resetpatch.lua"/>
-        <InjectAfter Filename="ui/hooks/mainmenu_eventdebug.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/mainmenu/mainmenu_printversion.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/mainmenu/mainmenu_status.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/mainmenu/mainmenu_resetpatch.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/mainmenu/mainmenu_eventdebug.lua"/>
     </Hook>
     <Hook Filename="ContentSwitch.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/contentswitch_debug.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/mainmenu/contentswitch_debug.lua"/>
     </Hook>
 
     <!-- Multiplayer/Mods frontend hooks -->
     <Hook Filename="ModsMenu.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/modsmenu_enablempmenu.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/modsmenu/modsmenu_enablempmenu.lua"/>
     </Hook>
     <Hook Filename="MultiplayerSelect.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/multiplayerselect_keepmods.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/modsmenu/multiplayerselect_keepmods.lua"/>
     </Hook>
     <Hook Filename="Lobby.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/lobby_skip.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/modsmenu/lobby_skip.lua"/>
     </Hook>
 
     <!-- Multiplayer lobby modifications -->
     <Hook Filename="MPGameSetupScreen.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectBefore Filename="ui/hooks/mpgamesetupscreen_settitle.lua"/>
+        <InjectBefore Filename="ui/hooks/frontend/staging/mpgamesetupscreen_settitle.lua"/>
     </Hook>
     <Hook Filename="MPGameOptions.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/mpgameoptions_dlcselection.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/staging/mpgameoptions_dlcselection.lua"/>
     </Hook>
     <Hook Filename="LoadMenu.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/loadmenu_keepmods.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/staging/loadmenu_keepmods.lua"/>
     </Hook>
     <Hook Filename="JoiningRoom.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/joiningroom_enablemods.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/staging/joiningroom_enablemods.lua"/>
     </Hook>
     <Hook Filename="StagingRoom.lua">
         <Include Filename="mppatch_runtime.lua"/>
-        <InjectAfter Filename="ui/hooks/stagingroom_setup.lua"/>
-        <InjectAfter Filename="ui/hooks/stagingroom_keepmods.lua"/>
-        <InjectAfter Filename="ui/hooks/stagingroom_resetleaders.lua"/>
-        <InjectAfter Filename="ui/hooks/stagingroom_kickunpatched.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/staging/stagingroom_setup.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/staging/stagingroom_keepmods.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/staging/stagingroom_resetleaders.lua"/>
+        <InjectAfter Filename="ui/hooks/frontend/staging/stagingroom_kickunpatched.lua"/>
     </Hook>
 </UIPatch>
