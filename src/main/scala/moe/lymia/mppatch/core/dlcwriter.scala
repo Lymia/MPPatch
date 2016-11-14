@@ -63,7 +63,7 @@ object DLCDataWriter {
           for(DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins) yield
             <UISkin name={name} set={set} platform={skinPlatform}>
               <Skin>
-                { dlcData.data.uiFiles.map(x => <Directory>{x._1}</Directory>) }
+                { dlcData.data.uiFiles.filter(_._2.nonEmpty).map(x => <Directory>{x._1}</Directory>) }
               </Skin>
             </UISkin>
         }
