@@ -25,7 +25,7 @@ package moe.lymia.mppatch.util.common
 import java.io._
 import java.nio.charset.StandardCharsets
 
-import org.tukaani.xz.{LZMA2Options, XZInputStream, XZOutputStream}
+import org.tukaani.xz._
 
 case class PatchPackage(data: Map[String, Array[Byte]]) {
   def loadResource(name: String) = new String(data(name), StandardCharsets.UTF_8)
@@ -44,9 +44,11 @@ object IOWrappers {
   }
 
   // XZ compression
-  val xzOptions = new LZMA2Options(9)
-  def writeXZ(out: DataOutputStream)(f: DataOutputStream => Unit) = {
-    val xzOut   = new XZOutputStream(out, xzOptions)
+  val lzmaOptions  = new LZMA2Options(7)
+  val xzBCJOptions = Array[FilterOptions](new X86Options, lzmaOptions)
+  val xzOptions    = Array[FilterOptions](lzmaOptions)
+  def writeXZ(out: DataOutputStream, useBCJ: Boolean = false)(f: DataOutputStream => Unit) = {
+    val xzOut   = new XZOutputStream(out, if(useBCJ) xzBCJOptions else xzOptions, XZ.CHECK_SHA256)
     val dataOut = new DataOutputStream(xzOut)
     f(dataOut)
     dataOut.flush()
@@ -54,7 +56,9 @@ object IOWrappers {
   }
   def readXZ[T](in: DataInputStream)(f: DataInputStream => T) = {
     val inStream = new XZInputStream(in)
-    f(new DataInputStream(inStream))
+    val out = f(new DataInputStream(inStream))
+    if(inStream.read() != -1) sys.error("Expected EOF")
+    out
   }
 
   // Patch package writer
@@ -63,7 +67,7 @@ object IOWrappers {
   def writePatchPackage(out: DataOutputStream, data: PatchPackage) = {
     out.writeUTF(patchPackageHeader)
     out.writeInt(patchPackageVersion)
-    writeXZ(out) { out =>
+    writeXZ(out, true) { out =>
       out.writeInt(data.data.size)
       for((k, v) <- data.data.toSeq.sortBy(_._1)) {
         out.writeUTF(k)
