@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <headerType>gui</headerType>
+  <jre>
+    <minVersion>1.7.0</minVersion>
+  </jre>
+  <singleInstance>
+    <mutexName>moe.lymia.mppatch.Launch4JStartupMutex</mutexName>
+    <windowTitle>MPPatch Installer</windowTitle>
+  </singleInstance>
+  <versionInfo>
+    <fileDescription>MPPatch Installer</fileDescription>
+    <productName>MPPatch Installer</productName>
+    <copyright>Lymia</copyright>
+  </versionInfo>
+</launch4jConfig>

@@ -38,4 +38,7 @@ object Config {
   val config_steam_sdlbin_path = "libsdl2_2.0.3+steamrt1+srt4_i386.deb"
   val config_steam_sdldev_path = "libsdl2-dev_2.0.3+steamrt1+srt4_i386.deb"
   val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
+
+  // hardcoded mirror because rediection handling is :(
+  val config_launch4j_url      = "https://pilotfiber.dl.sourceforge.net/project/launch4j/launch4j-3/3.9/launch4j-3.9-linux.tgz"
 }

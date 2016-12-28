@@ -22,10 +22,10 @@
 
 import sbt._
 import sbt.Keys._
-import com.typesafe.sbt.SbtGit.GitKeys
 import com.typesafe.sbt.SbtProguard._
 
 import Config._
+import Utils._
 
 import ProguardBuild.Keys._
 import LoaderBuild.Keys._
@@ -37,7 +37,18 @@ val commonSettings = versionWithGit ++ Seq(
   organization := "moe.lymia",
   homepage := Some(url("https://github.com/Lymia/MPPatch")),
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
-  GitKeys.baseVersion in ThisBuild := version_baseVersion,
+
+  // Git versioning
+  git.baseVersion := version_baseVersion,
+  git.uncommittedSignifier := Some("DIRTY"),
+  git.formattedShaVersion := {
+    val base = git.baseVersion.?.value
+    val suffix = git.makeUncommittedSignifierSuffix(git.gitUncommittedChanges.value, git.uncommittedSignifier.value)
+    git.gitHeadCommit.value map { rawSha =>
+      val sha = rawSha.substring(0, 8)
+      git.defaultFormatShaVersion(base, sha, suffix)
+    }
+  },
 
   // Scala configuration
   scalaVersion := config_scalaVersion,
@@ -70,13 +81,17 @@ lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBu
   loaderExclude += "moe/lymia/mppatch/mppatch.mppak"
 ))
 
+Launch4JBuild.settings
+Launch4JBuild.Keys.launch4jSourceJar := (Keys.`package` in Compile in loader).value
+
 // Build distribution file
 InputKey[Unit]("dist") := {
-  val path   = crossTarget.value / "dist"
+  val path = crossTarget.value / "dist"
   def copy(source: File) = {
     val output = path / source.getName
     IO.copyFile(source, output)
     output
   }
   streams.value.log.info(s"Output packed to: ${copy((Keys.`package` in Compile in loader).value)}")
+  streams.value.log.info(s"Launch4J .exe written to: ${copy(Launch4JBuild.Keys.launch4jOutput.value)}")
 }
