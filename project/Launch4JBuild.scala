@@ -42,6 +42,7 @@ object Launch4JBuild {
 
     val launch4jFinalConfig  = TaskKey[(File, File)]("launch4j-final-config")
     val launch4jConfig       = TaskKey[File]("launch4j-config")
+    val launch4jManifest     = TaskKey[File]("launch4j-manifest")
     val launch4jSourceJar    = TaskKey[File]("launch4j-source-jar")
 
     val launch4jOutput       = TaskKey[File]("launch4j-output")
@@ -56,6 +57,7 @@ object Launch4JBuild {
       dir
     },
     launch4jConfig := baseDirectory.value / "project" / "launch4j.xml",
+    launch4jManifest := baseDirectory.value / "project" / "launch4j.manifest",
     launch4jFinalConfig := {
       val outDir = launch4jDir.value / "out"
       if(!outDir.exists) outDir.mkdirs()
@@ -71,8 +73,9 @@ object Launch4JBuild {
       val VersionRegex(major, minor, _, patch, _, suffix) = version.value
       val versionString = s"$major.$minor.$patch.0"
 
-      config.setJar    (jarFile)
-      config.setOutfile(outDir / s"$jarFileShortName.exe")
+      config.setJar     (jarFile)
+      config.setOutfile (outDir / s"$jarFileShortName.exe")
+      config.setManifest(launch4jManifest.value)
 
       config.getVersionInfo.setFileVersion      (versionString)
       config.getVersionInfo.setTxtFileVersion   (version.value)
