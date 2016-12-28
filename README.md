@@ -13,7 +13,7 @@ will take a while.
 Compiling
 ---------
 
-MPPatch can only be built on Unix systems. The build scripts have only been tested on the distributions listed below,
+MPPatch can only be built on Linux systems. The build scripts have only been tested on the distributions listed below,
 and have only been extensively tested on Arch Linux. You are on your own for other distributions.
 
 On Ubuntu, you will need the following packages: `openjdk-8-jdk sbt mingw-w64 nasm`. In addition, on 64-bit systems you
