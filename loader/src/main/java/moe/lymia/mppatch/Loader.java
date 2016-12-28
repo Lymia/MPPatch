@@ -33,11 +33,13 @@ import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 
-public class Loader {
+public final class Loader implements Runnable {
     private static final Pack200.Unpacker unpacker = Pack200.newUnpacker();
 
     private File tempJarFile;
     private String mainClass;
+
+    private URLClassLoader loader = null;
 
     private void loadPack200(InputStream in) throws IOException {
         tempJarFile = File.createTempFile("mppatch-installer-", ".jar");
@@ -55,13 +57,16 @@ public class Loader {
     }
 
     private void startPackedProgram(String[] args) {
+        Thread shutdownHook = new Thread(this);
+        shutdownHook.setName("Loader shutdown hook");
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+
         try {
             loadPack200(getClass().getClassLoader().getResourceAsStream("moe/lymia/mppatch/installer.pack"));
         } catch (IOException e) {
             throw error("Could not parse pack200 contents.", e);
         }
 
-        ClassLoader loader;
         try {
             loader = new URLClassLoader(new URL[]{tempJarFile.toURI().toURL()}, getClass().getClassLoader());
         } catch (MalformedURLException e) {
@@ -86,9 +91,7 @@ public class Loader {
 
         try {
             m.invoke(null, new Object[] { args });
-        } catch (InvocationTargetException e) {
-            throw error("Failed to call main method.", e);
-        } catch (IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             throw error("Failed to call main method.", e);
         }
     }
@@ -100,11 +103,18 @@ public class Loader {
         return new RuntimeException(error, e);
     }
 
-    private static boolean isJava7() {
-        String version = System.getProperty("java.version");
-        String[] components = version.split("\\.");
-        return Integer.parseInt(components[0]) > 1 ||
-               (Integer.parseInt(components[0]) == 1 && Integer.parseInt(components[1]) >= 7);
+    @Override
+    public void run() {
+        if(loader != null) try {
+            loader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        loader = null;
+
+        if(tempJarFile != null) {
+            tempJarFile.delete();
+        }
     }
 
     public static void main(String[] args) {
@@ -114,15 +124,6 @@ public class Loader {
             System.err.println("Warning: Failed to set system Look and Feel.");
             e.printStackTrace();
         }
-
-        boolean isJava7;
-        try {
-            isJava7 = isJava7();
-        } catch (Exception e) {
-            throw error("Could not parse JVM version", e);
-        }
-
-        if(!isJava7) throw error("Java 1.7 or later is required to run this program.", null);
 
         new Loader().startPackedProgram(args);
     }
