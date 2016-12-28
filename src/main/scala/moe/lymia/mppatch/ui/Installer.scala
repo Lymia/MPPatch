@@ -73,7 +73,7 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
     log.logRaw("")
 
 
-    new MainFrame(locale).showForm()
+    new MainFrame(locale, args.length > 0 && args(0) == "--launch-from-exe").showForm()
   } catch {
     case e: Exception => dumpException("error.genericerror", e)
   }

@@ -31,7 +31,7 @@ import moe.lymia.mppatch.core._
 import moe.lymia.mppatch.util.Steam
 import moe.lymia.mppatch.util.io.{DataSource, MppakDataSource}
 
-class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
+class MainFrame(val locale: Locale, val isExeLaunch: Boolean) extends FrameBase[JFrame] {
   private var installButton  : ActionButton = _
   private var uninstallButton: ActionButton = _
   private var currentVersion : JTextField   = _
