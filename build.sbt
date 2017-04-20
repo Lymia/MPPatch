@@ -52,8 +52,7 @@ val commonSettings = versionWithGit ++ Seq(
 
   // Scala configuration
   scalaVersion := config_scalaVersion,
-  scalacOptions ++= ("-Xlint -Yclosure-elim -target:jvm-1.7 -optimize -deprecation -unchecked "+
-                     "-Ydead-code -Yinline -Yinline-handlers").split(" ").toSeq,
+  scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:classpath -deprecation -unchecked".split(" ").toSeq,
   crossPaths := false
 )
 
@@ -74,7 +73,7 @@ lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBu
   name := "mppatch",
   autoScalaLibrary := false,
 
-  javacOptions ++= Seq("-source", "1.7", "-target", "1.7"),
+  javacOptions ++= Seq("-source", "1.5", "-target", "1.5"),
 
   loaderSourceJar := (ProguardKeys.proguard in Proguard in mppatch).value.head,
   loaderTargetPath := "moe/lymia/mppatch/installer.pack",

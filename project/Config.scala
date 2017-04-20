@@ -21,7 +21,7 @@
  */
 
 object Config {
-  val config_scalaVersion = "2.11.8"
+  val config_scalaVersion = "2.12.2"
 
   val config_home_url     = "https://github.com/Lymia/MPPatch"
 

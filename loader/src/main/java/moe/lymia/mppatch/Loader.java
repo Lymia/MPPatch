@@ -33,7 +33,7 @@ import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 
-public final class Loader implements Runnable {
+final class Loader implements Runnable {
     private static final Pack200.Unpacker unpacker = Pack200.newUnpacker();
 
     private File tempJarFile;
@@ -91,7 +91,9 @@ public final class Loader implements Runnable {
 
         try {
             m.invoke(null, new Object[] { args });
-        } catch (InvocationTargetException | IllegalAccessException e) {
+        } catch (InvocationTargetException e) {
+            throw error("Failed to call main method.", e);
+        } catch (IllegalAccessException e) {
             throw error("Failed to call main method.", e);
         }
     }
@@ -99,22 +101,35 @@ public final class Loader implements Runnable {
     private static RuntimeException error(String error, Exception e) {
         JOptionPane.showMessageDialog(null, "Could not start MPPatch installer:\n"+error, "MPPatch Installer",
                                       JOptionPane.ERROR_MESSAGE);
-        e.printStackTrace();
+        if(e != null) e.printStackTrace();
         return new RuntimeException(error, e);
     }
 
-    @Override
+    // Shutdown hook
     public void run() {
         if(loader != null) try {
-            loader.close();
-        } catch (IOException e) {
+            // This should always exist as the loader checks if the JVM version is 1.8+ before here.
+            loader.getClass().getMethod("close").invoke(loader);
+        } catch (IllegalAccessException e) {
+            throw error("Unexpected error: Could not close URLClassLoader.", e);
+        } catch (NoSuchMethodException e) {
+            throw error("Unexpected error: Could not close URLClassLoader.", e);
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
         loader = null;
 
         if(tempJarFile != null) {
+            //noinspection ResultOfMethodCallIgnored
             tempJarFile.delete();
         }
+    }
+
+    private static boolean isJava8() {
+        String version = System.getProperty("java.version");
+        String[] components = version.split("\\.");
+        return Integer.parseInt(components[0]) > 1 ||
+               (Integer.parseInt(components[0]) == 1 && Integer.parseInt(components[1]) >= 8);
     }
 
     public static void main(String[] args) {
@@ -124,6 +139,15 @@ public final class Loader implements Runnable {
             System.err.println("Warning: Failed to set system Look and Feel.");
             e.printStackTrace();
         }
+
+        boolean isJava8;
+        try {
+            isJava8 = isJava8();
+        } catch (Exception e) {
+            throw error("Could not parse JVM version", e);
+        }
+
+        if(!isJava8) throw error("Java 8 or later is required to run this program.", null);
 
         new Loader().startPackedProgram(args);
     }
