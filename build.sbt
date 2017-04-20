@@ -60,10 +60,10 @@ val commonSettings = versionWithGit ++ Seq(
 lazy val mppatch = project in file(".") settings (commonSettings ++ ProguardBuild.settings ++ Seq(
   name := "mppatch-nopack",
 
-  libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
+  libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
   shadeMappings       += "scala.**" -> "moe.lymia.mppatch.lib.scala.@1",
 
-  libraryDependencies += "org.tukaani" % "xz" % "1.5",
+  libraryDependencies += "org.tukaani" % "xz" % "1.6",
   shadeMappings       += "org.tukaani.xz.**" -> "moe.lymia.mppatch.lib.xz.@1",
 
   excludeFiles   := Set("library.properties", "rootdoc.txt", "scala-xml.properties"),
