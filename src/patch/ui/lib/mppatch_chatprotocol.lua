@@ -18,7 +18,7 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-local marker = "mppatch_command:yLsMoqQAirGJ4RBQv8URAwcu6RXdqN6v:"
+local marker = "mppatch_command:8f671fc2-cd03-11e6-9c65-00e09c101bf5:"
 
 local chatProtocolCommands = {}
 function _mpPatch.registerChatCommand(id)
@@ -45,11 +45,11 @@ function _mpPatch.sendChatCommand(id, data)
     Network.SendChat(marker..id..":"..(data or ""))
 end
 
-function _mpPatch.interceptChatFunction(fn, condition, noCheckHide)
+function _mpPatch.interceptChatFunction(fn, condition, chatCondition, noCheckHide)
     condition = condition or function() return true end
     local function chatFn(...)
-        local fromPlayer, _, text = ...
-        if (noCheckHide or not ContextPtr:IsHidden()) and condition(fromPlayer) then
+        local _, _, text = ...
+        if (noCheckHide or not ContextPtr:IsHidden()) and condition(...) then
             local textHead, textTail = text:sub(1, marker:len()), text:sub(marker:len() + 1)
             if textHead == marker then
                 local split = textTail:find(":")
@@ -63,7 +63,7 @@ function _mpPatch.interceptChatFunction(fn, condition, noCheckHide)
                 end
             end
         end
-        if fn then return fn(...) end
+        if fn and chatCondition(...) then return fn(...) end
     end
     if fn then Events.GameMessageChat.Remove(fn) end
     Events.GameMessageChat.Add(chatFn)
@@ -75,6 +75,7 @@ _mpPatch.protocolVersion = "0.1"
 
 -- commands
 _mpPatch.net = {}
+_mpPatch.net.skipNextChat         = _mpPatch.registerChatCommand("skipNextChat"        )
 _mpPatch.net.sendPlayerData       = _mpPatch.registerChatCommand("sendPlayerData"      )
 _mpPatch.net.startLaunchCountdown = _mpPatch.registerChatCommand("startLaunchCountdown")
 _mpPatch.net.clientIsPatched      = _mpPatch.registerChatCommand("clientIsPatched"     )

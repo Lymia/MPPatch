@@ -27,6 +27,16 @@
             <Text>You cannot join this room because the following DLC aren't installed:</Text>
         </Row>
 
+        <!-- These strings are used by the staging room -->
+        <Row Tag="TXT_KEY_MPPATCH_JOIN_WARNING_1">
+            <!-- This is used to warn users without MPPatch installed that it is in use. -->
+            <Text>This lobby uses MPPatch to allow for modded multiplayer. You do not seem to have MPPatch installed, you will be kicked in 30 seconds or when the game starts.</Text>
+        </Row>
+        <Row Tag="TXT_KEY_MPPATCH_JOIN_WARNING_2">
+            <!-- This is used to warn users without MPPatch installed that it is in use. -->
+            <Text>You can download it at: </Text>
+        </Row>
+
         <!-- These strings are used by the main mods menu -->
         <Row Tag="TXT_KEY_MPPATCH_WARNING_PREFIX">
             <!-- This is shown before text boxes for the following two lines. -->

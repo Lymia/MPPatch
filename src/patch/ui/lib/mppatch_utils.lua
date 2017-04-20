@@ -43,6 +43,31 @@ function _mpPatch.version.getBoolean(string)
     return get(string) == "true"
 end
 
+-- Event utils
+local eventTable = {}
+local function newEvent()
+    local events = {}
+    return setmetatable({
+        registerHandler = function(fn)
+            table.insert(events, fn)
+        end
+    }, {
+        __call = function(t, ...)
+            for _, fn in ipairs(events) do
+                fn(...)
+            end
+        end
+    })
+end
+_mpPatch.event = setmetatable({}, {
+    __index = function(_, k)
+        if not eventTable[k] then
+            eventTable[k] = newEvent()
+        end
+        return eventTable[k]
+    end
+})
+
 -- Pregame utils
 --
 -- There's a bug in CvPreGame.cpp (available in the SDK) where it passes the result of strlen to strncmp, in a way

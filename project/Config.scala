@@ -23,6 +23,8 @@
 object Config {
   val config_scalaVersion = "2.11.8"
 
+  val config_home_url     = "https://github.com/Lymia/MPPatch"
+
   val config_make         = "make"
   val config_mingw_prefix = "i686-w64-mingw32-"
   val config_mingw_gcc    = config_mingw_prefix+"gcc"

@@ -17,6 +17,14 @@ if _mpPatch_activateFrontEnd then
         end
     end)
 
+    _mpPatch.event.kickAllUnpatched.registerHandler(function()
+        for player, _ in pairs(playerMap) do
+            _mpPatch.debugPrint("Kicking player "..player.." for (presumably) not having MPPatch. (Game starting)")
+            Matchmaking.KickPlayer(player)
+            playerMap[player] = nil
+        end
+    end)
+
     _mpPatch.net.clientIsPatched.registerHandler(function(_, playerID)
         if Matchmaking.IsHost() then
             playerMap[playerID] = nil
@@ -26,8 +34,16 @@ if _mpPatch_activateFrontEnd then
     local OnConnectOld = OnConnect
     function OnConnect(...)
         if not ContextPtr:IsHidden() and Matchmaking.IsHost() then
-            local playerID = ...
-            playerMap[playerID] = 3
+            local playerId = ...
+            _mpPatch.net.skipNextChat()
+
+            local header = ""
+            if m_PlayerNames[playerId] then
+                header = "@"..tostring(m_PlayerNames[playerId])..": "
+            end
+
+            Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING"))
+            playerMap[playerId] = 30
         end
         return OnConnectOld(...)
     end
