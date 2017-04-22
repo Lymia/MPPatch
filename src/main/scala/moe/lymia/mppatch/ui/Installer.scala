@@ -57,6 +57,7 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
     UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
 
     val versionData = Seq(
+      "Build ID"    -> VersionInfo.buildID,
       "Build Date"  -> Logger.dateFormat.format(VersionInfo.buildDate),
       "Revision"    -> VersionInfo.commit,
       "Tree Status" -> VersionInfo.treeStatus

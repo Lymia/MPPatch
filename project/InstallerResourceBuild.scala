@@ -23,6 +23,7 @@
 import java.net.InetAddress
 import java.text.DateFormat
 import java.util.Locale
+import java.util.UUID
 
 import sbt._
 import sbt.Keys._
@@ -74,6 +75,7 @@ object InstallerResourceBuild {
 
         "mppatch.url"               -> config_home_url,
 
+        "build.id"                  -> UUID.randomUUID().toString,
         "build.os"                  -> tryProperty { System.getProperty("os.name") },
         "build.user"                -> tryProperty { System.getProperty("user.name")+"@"+
                                                   InetAddress.getLocalHost.getHostName },

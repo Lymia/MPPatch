@@ -68,6 +68,7 @@ class VersionInfo(properties: VersionInfoSource) {
   lazy val mingwVersion  = properties("build.version.mingw.short", "<unknown>")
   lazy val sbtVersion    = properties("build.version.sbt", "<unknown>")
 
+  lazy val buildID       = properties("build.id", "<unknown>")
   lazy val buildDate     = new Date(properties("build.time", "0").toLong)
   lazy val buildUser     = properties("build.user", "<unknown>")
 }
