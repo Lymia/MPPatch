@@ -44,9 +44,9 @@ object IOWrappers {
   }
 
   // XZ compression
-  val lzmaOptions  = new LZMA2Options(7)
-  val xzBCJOptions = Array[FilterOptions](new X86Options, lzmaOptions)
-  val xzOptions    = Array[FilterOptions](lzmaOptions)
+  private val lzmaOptions  = new LZMA2Options(7)
+  private val xzBCJOptions = Array[FilterOptions](new X86Options, lzmaOptions)
+  private val xzOptions    = Array[FilterOptions](lzmaOptions)
   def writeXZ(out: DataOutputStream, useBCJ: Boolean = false)(f: DataOutputStream => Unit) = {
     val xzOut   = new XZOutputStream(out, if(useBCJ) xzBCJOptions else xzOptions, XZ.CHECK_SHA256)
     val dataOut = new DataOutputStream(xzOut)
@@ -62,8 +62,8 @@ object IOWrappers {
   }
 
   // Patch package writer
-  val patchPackageHeader  = "MpPatchPackage"
-  val patchPackageVersion = 0
+  private val patchPackageHeader  = "MpPatchPackage"
+  private val patchPackageVersion = 0
   def writePatchPackage(out: DataOutputStream, data: PatchPackage) = {
     out.writeUTF(patchPackageHeader)
     out.writeInt(patchPackageVersion)
