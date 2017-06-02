@@ -41,7 +41,7 @@ object PlatformType {
     val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
          if(os.contains("windows")) Win32
     else if(os.contains("linux"  )) Linux
-    else if(os.contains("mac   " ) ||
+    else if(os.contains("mac"    ) ||
             os.contains("darwin" )) MacOSX
     else                           Other
   }
