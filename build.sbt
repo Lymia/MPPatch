@@ -39,7 +39,7 @@ val commonSettings = versionWithGit ++ Seq(
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
 
   // Git versioning
-  git.baseVersion := version_baseVersion,
+  git.baseVersion := "0.1.0",
   git.uncommittedSignifier := Some("DIRTY"),
   git.formattedShaVersion := {
     val base = git.baseVersion.?.value
@@ -51,7 +51,7 @@ val commonSettings = versionWithGit ++ Seq(
   },
 
   // Scala configuration
-  scalaVersion := config_scalaVersion,
+  scalaVersion := "2.12.2",
   scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:classpath -deprecation -unchecked".split(" ").toSeq,
   crossPaths := false
 )

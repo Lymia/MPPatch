@@ -21,10 +21,6 @@
  */
 
 object Config {
-  val config_scalaVersion = "2.12.2"
-
-  val config_home_url     = "https://github.com/Lymia/MPPatch"
-
   val config_make         = "make"
   val config_mingw_prefix = "i686-w64-mingw32-"
   val config_mingw_gcc    = config_mingw_prefix+"gcc"
@@ -35,12 +31,9 @@ object Config {
   val config_linux_secureFlags  = Seq("-Wl,-z,now", "-Wl,-z,relro")
   val config_common_secureFlags = Seq("-fstack-protector", "-fstack-protector-strong", "-D_FORTIFY_SOURCE=2")
 
-  val version_baseVersion  = "0.1.0"
-
   val config_steam_sdlbin_path = "libsdl2_2.0.3+steamrt1+srt4_i386.deb"
   val config_steam_sdldev_path = "libsdl2-dev_2.0.3+steamrt1+srt4_i386.deb"
   val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
 
-  // hardcoded mirror because rediection handling is :(
-  val config_launch4j_url      = "https://pilotfiber.dl.sourceforge.net/project/launch4j/launch4j-3/3.9/launch4j-3.9-linux.tgz"
+  val config_launch4j_url = "https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.9/launch4j-3.9-linux.tgz"
 }
