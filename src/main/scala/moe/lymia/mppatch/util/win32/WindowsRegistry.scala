@@ -76,8 +76,6 @@ object WindowsRegistry {
       implicitly[RegistryKeyType[T]].writeKey(this, key, value, data)
     def update[T: RegistryKeyType](key: String, value: String, data: T) = writeKey[T](key, value, data)
   }
-  lazy val HKEY_CURRENT_USER  = Hive(0x80000001, "HKEY_CURRENT_USER",
-                                     DynamicReflectiveProxy(Preferences.systemRoot()))
-  lazy val HKEY_LOCAL_MACHINE = Hive(0x80000002, "HKEY_LOCAL_MACHINE",
-                                     DynamicReflectiveProxy(Preferences.userRoot()))
+  lazy val HKCU = Hive(0x80000001, "HKEY_CURRENT_USER" , DynamicReflectiveProxy(Preferences.systemRoot()))
+  lazy val HKLM = Hive(0x80000002, "HKEY_LOCAL_MACHINE", DynamicReflectiveProxy(Preferences.userRoot  ()))
 }

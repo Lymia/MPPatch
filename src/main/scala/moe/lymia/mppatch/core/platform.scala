@@ -39,10 +39,10 @@ object PlatformType {
 
   lazy val currentPlatform = {
     val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
-    if(os.contains("mac"   ) ||
-       os.contains("darwin")) MacOSX
-    else if(os.contains("win"   )) Win32
-    else if(os.contains("linux" )) Linux
+         if(os.contains("windows")) Win32
+    else if(os.contains("linux"  )) Linux
+    else if(os.contains("mac   " ) ||
+            os.contains("darwin" )) MacOSX
     else                           Other
   }
 }
@@ -71,9 +71,9 @@ object Win32Platform extends Platform {
   override val platformName = "win32"
 
   override def defaultSystemPaths: Seq[Path] = try {
-    WindowsRegistry.HKEY_CURRENT_USER("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
+    WindowsRegistry.HKCU("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
       x => Steam.loadLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
-    WindowsRegistry.HKEY_CURRENT_USER("Software\\Firaxis\\Civilization5", "LastKnownPath").map(x => Paths.get(x)).toSeq
+    WindowsRegistry.HKCU("Software\\Firaxis\\Civilization5", "LastKnownPath").map(x => Paths.get(x)).toSeq
   } catch {
     case e: Exception =>
       SimpleLogger.error("Could not load default system paths from registery.", e)
