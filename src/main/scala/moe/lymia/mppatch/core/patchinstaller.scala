@@ -318,7 +318,7 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
   def safeUpdate(packages: Set[String]) = lock {
     intCheckPatchStatus(packages) match {
       case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate |
-           PatchStatus.FilesCorrupted =>
+           PatchStatus.FilesCorrupted | PatchStatus.TargetUpdated | PatchStatus.FilesValidated =>
         uninstallPatch()
         installPatch(packages)
       case PatchStatus.NotInstalled(true) =>
@@ -331,7 +331,8 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
       case PatchStatus.NotInstalled(_) =>
         // do nothing
       case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate |
-           PatchStatus.CanUninstall | PatchStatus.UnknownUpdate | PatchStatus.FilesCorrupted =>
+           PatchStatus.CanUninstall | PatchStatus.UnknownUpdate | PatchStatus.FilesCorrupted |
+           PatchStatus.TargetUpdated | PatchStatus.FilesValidated =>
         uninstallPatch()
       case _ => sys.error("cannot safely uninstall")
     }
