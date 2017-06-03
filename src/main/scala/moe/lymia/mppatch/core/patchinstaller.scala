@@ -44,7 +44,9 @@ object PatchStatus {
   case object CanUninstall    extends PatchStatus
   case object PackageChange   extends PatchStatus
   case object NeedsUpdate     extends PatchStatus
+  case object FilesValidated  extends PatchStatus
   case object TargetUpdated   extends PatchStatus
+  case object UnknownUpdate   extends PatchStatus
   case object FilesCorrupted  extends PatchStatus
   case object NeedsCleanup    extends PatchStatus
   case object NeedsValidation extends PatchStatus
@@ -139,25 +141,26 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
     out
   }
 
-  private def validatePatchFile(file: PatchFile) = {
-    val path = basePath.resolve(file.path)
+  private def validatePatchFile(pathName: String, expectedSha256: String): Boolean = {
+    val path = basePath.resolve(pathName)
     if(!Files.exists(path)) {
-      log.warn(s"- File ${file.path} is missing")
+      log.warn(s"- File $pathName is missing")
       false
     } else if(!Files.isRegularFile(path)) {
-      log.warn(s"- File ${file.path} is not a regular file")
+      log.warn(s"- File $pathName is not a regular file")
       false
     } else {
       val sha256 = Crypto.sha256_hex(Files.readAllBytes(path))
-      if(sha256 != file.expectedSha256) {
-        log.warn(s"- File ${file.path} failed to validate. (Actual sha256: $sha256, expected: ${file.expectedSha256}")
+      if(sha256 != expectedSha256) {
+        log.warn(s"- File $pathName failed to validate. (Actual sha256: $sha256, expected: $expectedSha256")
         false
       } else {
-        log.info(s"- File ${file.path} successflly validated.")
+        log.info(s"- File $pathName successflly validated.")
         true
       }
     }
   }
+  private def validatePatchFile(file: PatchFile): Boolean = validatePatchFile(file.path, file.expectedSha256)
 
   private def isVersionKnown(path: String) =
     loader.nativePatchExists(Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
@@ -196,7 +199,9 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
                !patchState.nonreplacementFiles.forall(validatePatchFile)) {
               if(originalFilesOK) PatchStatus.FilesCorrupted else PatchStatus.NeedsValidation
             } else if(!patchState.renames.map(_.replacedFile).forall(validatePatchFile)) {
-              PatchStatus.TargetUpdated
+              if(validatePatchFile(patchState.versionFrom, patchState.sha256)) PatchStatus.FilesValidated
+              else if(isVersionKnown(patchState.versionFrom)) PatchStatus.TargetUpdated
+              else PatchStatus.UnknownUpdate
             } else loader.getNativePatch(patchState.sha256) match {
               case Some(version) =>
                 if(patchState.installedTimestamp != loader.data.timestamp ||
@@ -326,7 +331,7 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
       case PatchStatus.NotInstalled(_) =>
         // do nothing
       case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate |
-           PatchStatus.CanUninstall | PatchStatus.TargetUpdated | PatchStatus.FilesCorrupted =>
+           PatchStatus.CanUninstall | PatchStatus.UnknownUpdate | PatchStatus.FilesCorrupted =>
         uninstallPatch()
       case _ => sys.error("cannot safely uninstall")
     }

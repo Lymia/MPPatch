@@ -223,6 +223,20 @@ class MainFrame(val locale: Locale, val isExeLaunch: Boolean) extends FrameBase[
             case PatchStatus.NotInstalled(true) =>
               setStatus("status.notinstalled")
               installButton.setEnabled(true)
+            case PatchStatus.FilesValidated =>
+              setStatus("status.filesvalidated")
+              installButton.setActionText("action.reinstall")
+              installButton.setEnabled(true)
+              uninstallButton.setEnabled(true)
+            case PatchStatus.TargetUpdated =>
+              setStatus("status.targetupdated")
+              installButton.setActionText("action.update")
+              installButton.setEnabled(true)
+              uninstallButton.setEnabled(true)
+            case PatchStatus.UnknownUpdate =>
+              setStatus("status.unknownupdate")
+              uninstallButton.setActionText("action.cleanup")
+              uninstallButton.setEnabled(true)
             case PatchStatus.NeedsCleanup =>
               setStatus("status.needscleanup")
               uninstallButton.setStatusAction("action.cleanup", actionCleanup)
