@@ -12,5 +12,10 @@
     <fileDescription>MPPatch Installer</fileDescription>
     <productName>MPPatch Installer</productName>
     <copyright>Lymia</copyright>
+    <trademarks>MPPatch is licenced under the terms of the MIT License.</trademarks>
   </versionInfo>
+  <messages>
+    <jreVersionErr>This application requires Java 8 or later to run.
+Minimum version:</jreVersionErr>
+  </messages>
 </launch4jConfig>
