@@ -117,18 +117,19 @@ local function mungeName(name)
     return "MPP\8"..name.."\8"
 end
 local function decode32(v)
-  if v < 0 then
-    return 0x100000000 + v
-  else
-    return v
-  end
+    if v == nil then return nil end
+    if v < 0 then
+        return 0x100000000 + v
+    else
+        return v
+    end
 end
 local function encode32(v)
-  if v > 0x7FFFFFFF then
-    return v - 0x100000000
-  else
-    return v
-  end
+    if v > 0x7FFFFFFF then
+        return v - 0x100000000
+    else
+        return v
+    end
 end
 function _mpPatch.getGameOption(name)
     return decode32(PreGame.GetGameOption(mungeName(name)))
