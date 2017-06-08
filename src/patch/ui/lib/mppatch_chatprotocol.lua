@@ -46,7 +46,8 @@ function _mpPatch.sendChatCommand(id, data)
 end
 
 function _mpPatch.interceptChatFunction(fn, condition, chatCondition, noCheckHide)
-    condition = condition or function() return true end
+    condition     = condition     or function() return true end
+    chatCondition = chatCondition or function() return true end
     local function chatFn(...)
         local _, _, text = ...
         if (noCheckHide or not ContextPtr:IsHidden()) and condition(...) then
