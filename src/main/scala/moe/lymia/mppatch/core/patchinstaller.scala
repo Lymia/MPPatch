@@ -281,8 +281,17 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
           IOUtils.deleteDirectory(basePath.resolve(name))
         } else log.warn(s"- File $name is missing.")
         for(RenameData(replacement, original) <- patchState.renames) {
-          log.info(s"- Renaming ${original.path} -> ${replacement.path}")
-          Files.move(basePath.resolve(original.path), basePath.resolve(replacement.path))
+          val originalPath = basePath.resolve(original.path)
+          val replacementPath = basePath.resolve(replacement.path)
+
+          if(Files.exists(replacementPath)) {
+            log.info(s"- Deleting leftover file ${replacement.path}")
+            Files.delete(replacementPath)
+          }
+          if(Files.exists(originalPath)) {
+            log.info(s"- Renaming ${original.path} -> ${replacement.path}")
+            Files.move(originalPath, replacementPath)
+          } else log.info(s"- File ${original.path} is missing.")
         }
         for(name <- patchState.additionalDirectories.reverse) if(Files.exists(basePath.resolve(name))) {
           log.info(s"- Deleting directory $name")
