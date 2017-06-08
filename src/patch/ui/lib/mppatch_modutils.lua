@@ -182,13 +182,13 @@ local function decodeModName(id)
     while i > 0 do
         local current = (j - 1) * 4 + 1
 
-        local v = string.char(_mpPatch.getGameOption(encodeNumber(id).."_N"..encodeNumber(j)))
+        local v = _mpPatch.getGameOption(encodeNumber(id).."_N"..encodeNumber(j))
         local a, b, c, d = math.floor(v / 0x1000000) % 0x100, math.floor(v / 0x10000) % 0x100,
                            math.floor(v / 0x100) % 0x100, v % 0x100
-        if i >= 1 then charTable[current + 0] = a end
-        if i >= 2 then charTable[current + 1] = b end
-        if i >= 3 then charTable[current + 2] = c end
-        if i >= 4 then charTable[current + 3] = d end
+        if i >= 1 then charTable[current + 0] = string.char(a) end
+        if i >= 2 then charTable[current + 1] = string.char(b) end
+        if i >= 3 then charTable[current + 2] = string.char(c) end
+        if i >= 4 then charTable[current + 3] = string.char(d) end
 
         i = i - 4
         j = j + 1
