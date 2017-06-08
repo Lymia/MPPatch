@@ -73,7 +73,7 @@ function _mpPatch.interceptChatFunction(fn, condition, chatCondition, noCheckHid
 end
 
 -- protocol information
-_mpPatch.protocolVersion = "0.1"
+_mpPatch.protocolVersion = "0"
 
 -- commands
 _mpPatch.net = {}

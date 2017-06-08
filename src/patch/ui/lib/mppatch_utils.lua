@@ -109,13 +109,30 @@ _mpPatch.event = setmetatable({}, {
 -- the first four characters, and not the terminator.
 --
 -- We use nonprinting characters to try and try and ensure this bug doesn't cause us any trouble.
+--
+-- In addition, the values of options are encoded as signed 32-bit integers. To make handling in Lua code easier,
+-- we encode/decode them into unsigned 32-bit integers.
 
 local function mungeName(name)
-    return "\8MPPATCH\8"..name.."\8\8"
+    return "MPP\8"..name.."\8"
+end
+local function decode32(v)
+  if v < 0 then
+    return 0x100000000 + v
+  else
+    return v
+  end
+end
+local function encode32(v)
+  if v > 0x7FFFFFFF then
+    return v - 0x100000000
+  else
+    return v
+  end
 end
 function _mpPatch.getGameOption(name)
-    return PreGame.GetGameOption(mungeName(name))
+    return decode32(PreGame.GetGameOption(mungeName(name)))
 end
 function _mpPatch.setGameOption(name, value)
-    return PreGame.SetGameOption(mungeName(name), value)
+    return PreGame.SetGameOption(mungeName(name), encode32(value))
 end
