@@ -22,23 +22,23 @@
   -->
 <InstallScript>
     <SteamId>8930</SteamId>
-    <AssetsPath Filename="Assets"/>
-    <CheckFor Filename="CvGameDatabaseWin32Final Release.dll"/>
-    <VersionFrom Filename="CvGameDatabaseWin32Final Release.dll"/>
+    <AssetsPath Path="Assets"/>
+    <CheckFor Path="CvGameDatabaseWin32Final Release.dll"/>
+    <VersionFrom Path="CvGameDatabaseWin32Final Release.dll"/>
 
     <Package Name="multiplayer">
-        <RenameFile Filename="CvGameDatabaseWin32Final Release.dll" RenameTo="CvGameDatabase_Original.dll"/>
+        <RenameFile Path="CvGameDatabaseWin32Final Release.dll" RenameTo="CvGameDatabase_Original.dll"/>
 
-        <InstallBinary Filename="CvGameDatabaseWin32Final Release.dll"/>
-        <WriteConfig Filename="mppatch_config.ini" Section="MPPatch"/>
-        <WriteDLC Source="ui/mppatch.xml" Target="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
+        <InstallBinary Path="CvGameDatabaseWin32Final Release.dll"/>
+        <WriteConfig Path="mppatch_config.ini" Section="MPPatch"/>
+        <WriteDLC Source="ui/mppatch.xml" DLCData="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
 
         <SetFlag Name="enableMultiplayerPatch"/>
     </Package>
     <Package Name="luajit">
-        <SetFlag Name="enableLuajit"/>
-        <RenameFile Filename="lua51_Win32.dll" RenameTo="lua51_Win32.dll.bak"/>
-        <AdditionalFile Filename="lua51_Win32.dll" Source="native/luajit_win32.dll"/>
+        <SetFlag Name="enableLuaJIT"/>
+        <RenameFile Path="lua51_Win32.dll" RenameTo="lua51_Win32.dll.bak"/>
+        <AdditionalFile Path="lua51_Win32.dll" Source="native/luajit_win32.dll"/>
     </Package>
     <Package Name="debug">
         <SetFlag Name="enableLogging"/>
@@ -46,12 +46,12 @@
     </Package>
 
     <Cleanup>
-        <RenameIfExists Filename="CvGameDatabase_Original.dll" RenameTo="CvGameDatabaseWin32Final Release.dll"/>
-        <RenameIfExists Filename="lua51_Win32.dll.bak" RenameTo="lua51_Win32.dll"/>
-        <CheckFile Filename="lua51_Win32.dll.bak"/>
-        <CheckFile Filename="CvGameDatabase_Original.dll"/>
-        <CheckFile Filename="mppatch_config.ini"/>
-        <CheckFile Filename="steamassets/assets/DLC/MPPatch"/>
-        <CheckFile Filename="steamassets/assets/Gameplay/XML/NewText/MPPatch_TextData"/>
+        <RenameIfExists Path="CvGameDatabase_Original.dll" RenameTo="CvGameDatabaseWin32Final Release.dll"/>
+        <RenameIfExists Path="lua51_Win32.dll.bak" RenameTo="lua51_Win32.dll"/>
+        <CheckFile Path="lua51_Win32.dll.bak"/>
+        <CheckFile Path="CvGameDatabase_Original.dll"/>
+        <CheckFile Path="mppatch_config.ini"/>
+        <CheckFile Path="steamassets/assets/DLC/MPPatch"/>
+        <CheckFile Path="steamassets/assets/Gameplay/XML/NewText/MPPatch_TextData"/>
     </Cleanup>
 </InstallScript>

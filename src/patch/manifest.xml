@@ -21,6 +21,6 @@
   ~ THE SOFTWARE.
   -->
 <PatchManifest>
-    <InstallScript Platform="linux" Filename="install/linux.xml"/>
-    <InstallScript Platform="win32" Filename="install/win32.xml"/>
+    <InstallScript Platform="linux" Source="install/linux.xml"/>
+    <InstallScript Platform="win32" Source="install/win32.xml"/>
 </PatchManifest>

@@ -125,6 +125,10 @@ static int luaHook_debugPrint(lua_State *L) {
     debug_print("%s", luaL_checkstring(L, 1));
     return 0;
 }
+static int luaHook_getGlobals(lua_State *L) {
+    lua_pushvalue(L, LUA_GLOBALSINDEX);
+    return 1;
+}
 static void luaTable_versioninfo(lua_State *L, int table) {
     table_setInteger(L, table, "major", patchVersionMajor);
     table_setInteger(L, table, "minor", patchVersionMinor);
@@ -191,6 +195,7 @@ ENTRY lGetMemoryUsage_attributes int lGetMemoryUsageProxy(lua_State *L) {
         table_setTable(L, table, "globals", luaTable_globals);
         table_setTable(L, table, "config", luaTable_config);
         table_setCFunction(L, table, "debugPrint", luaHook_debugPrint);
+        table_setCFunction(L, table, "getGlobals", luaHook_getGlobals);
 
         lua_pushGlobals(L);
         int globals = lua_gettop(L);

@@ -28,13 +28,15 @@ object XMLUtils {
   def getOptional(nodes: NodeSeq) =
     if(nodes.isEmpty) None else Some(nodes.text)
 
-  def getAttributeNode    (node: Node, attribute: String) = node \ s"@$attribute"
-  def getAttribute        (node: Node, attribute: String) = getAttributeNode(node, attribute).text
-  def getBoolAttribute    (node: Node, attribute: String) = getAttributeNode(node, attribute).nonEmpty
-  def getOptionalAttribute(node: Node, attribute: String) = getOptional(getAttributeNode(node, attribute))
+  def getAttributeNodes   (node: Node, attribute: String) = node \ s"@$attribute"
+  def getBoolAttribute    (node: Node, attribute: String) = getAttributeNodes(node, attribute).nonEmpty
+  def getOptionalAttribute(node: Node, attribute: String) = getOptional(getAttributeNodes(node, attribute))
+  def getAttribute        (node: Node, attribute: String) =
+    getOptionalAttribute(node, attribute).getOrElse(sys.error(s"No such attribute '$attribute'"))
 
   def getNodeText         (node: Node, tag: String)       = (node \ tag).text.trim
   def getOptionalNodeText (node: Node, tag: String)       = getOptional(node \ tag).map(_.trim)
 
-  def loadFilename        (node: Node)                    = getAttribute(node, "Filename")
+  def loadPath            (node: Node)                    = getAttribute(node, "Path")
+  def loadSource          (node: Node)                    = getAttribute(node, "Source")
 }

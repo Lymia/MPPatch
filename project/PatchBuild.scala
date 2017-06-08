@@ -55,7 +55,7 @@ object PatchBuild {
                                   Timestamp={System.currentTimeMillis().toString}>
         {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
         {versions.map(x => <NativePatch Platform={x.platform} Version={x.version}
-                                        Filename={s"native/${x.file.getName}"}/>)}
+                                        Source={s"native/${x.file.getName}"}/>)}
       </PatchManifest>
 
       val luajitFiles = for(platform <- LuaJITBuild.Keys.luajitFiles.value)

@@ -18,6 +18,10 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
+-- globals from patch
+local rawset = _mpPatch.patch.globals.rawset
+
+-- Hook tools
 function _mpPatch.hookTable(table, hooks)
     return setmetatable({}, {__index = function(_, k)
         if hooks[k] then return hooks[k] end
@@ -32,6 +36,33 @@ function _mpPatch.map(list, fn)
         newList[k] = fn(v)
     end
     return newList
+end
+
+-- Soft hook utils
+local globalMetatableSetupComplete = false
+local interceptGlobalWriteHooks = {}
+local function setupGlobalMetatable()
+    if globalMetatableSetupComplete then
+        local _G = _mpPatch.patch.getGlobals()
+        local mt = getmetatable(_G)
+        if not mt then
+            mt = {}
+            setmetatable(_G, {})
+
+            mt.__newindex = function(t, k, v)
+                local hook = interceptGlobalWriteHooks[k]
+                if hook then
+                    v = hook(v)
+                end
+                return rawset(t, k, v)
+            end
+        end
+        globalMetatableSetupComplete = true
+    end
+end
+function _mpPatch.interceptGlobalWrite(name, fn)
+    setupGlobalMetatable()
+    interceptGlobalWriteHooks[name] = fn
 end
 
 -- Version utils

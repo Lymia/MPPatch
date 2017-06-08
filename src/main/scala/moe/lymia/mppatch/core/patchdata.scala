@@ -24,7 +24,6 @@ package moe.lymia.mppatch.core
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import java.util.regex.Pattern
 
 import moe.lymia.mppatch.util.io._
 import moe.lymia.mppatch.util.io.XMLUtils._
@@ -33,7 +32,7 @@ import scala.xml.{Node, XML}
 
 case class RenameFile(filename: String, renameTo: String)
 object RenameFile {
-  def loadFromXML(xml: Node) = RenameFile(loadFilename(xml), getAttribute(xml, "RenameTo"))
+  def loadFromXML(xml: Node) = RenameFile(loadPath(xml), getAttribute(xml, "RenameTo"))
 }
 
 case class WriteConfig(filename: String, section: String)
@@ -44,15 +43,15 @@ case class Package(name: String, dependencies: Set[String],
                    additionalFile: Seq[AdditionalFile], writeDLC: Seq[WriteDLC], setFlags: Set[String])
 object Package {
   def loadAdditionalFile(xml: Node) =
-    AdditionalFile(loadFilename(xml), getAttribute(xml, "Source"), getBoolAttribute(xml, "SetExecutable"))
+    AdditionalFile(loadPath(xml), loadSource(xml), getBoolAttribute(xml, "SetExecutable"))
   def loadWriteDLC(xml: Node) =
-    WriteDLC(getAttribute(xml, "Source"), getAttribute(xml, "Target"), getAttribute(xml, "TextData"))
+    WriteDLC(loadSource(xml), getAttribute(xml, "DLCData"), getAttribute(xml, "TextData"))
   def loadFromXML(xml: Node) =
     Package(getAttribute(xml, "Name"),
             getOptionalAttribute(xml, "Depends").fold(Set[String]())(_.split(",").toSet),
             (xml \ "RenameFile"    ).map(RenameFile.loadFromXML),
-            (xml \ "InstallBinary" ).map(loadFilename),
-            (xml \ "WriteConfig"   ).map(x => WriteConfig(loadFilename(x), getAttribute(x, "Section"))),
+            (xml \ "InstallBinary" ).map(loadPath),
+            (xml \ "WriteConfig"   ).map(x => WriteConfig(loadPath(x), getAttribute(x, "Section"))),
             (xml \ "AdditionalFile").map(loadAdditionalFile),
             (xml \ "WriteDLC"      ).map(loadWriteDLC),
             (xml \ "SetFlag"       ).map(x => getAttribute(x, "Name")).toSet)
@@ -62,7 +61,7 @@ case class CleanupData(rename: Seq[RenameFile], checkFile: Seq[String])
 object CleanupData {
   def loadFromXML(xml: Node) =
     CleanupData((xml \ "RenameIfExists").map(RenameFile.loadFromXML),
-                  (xml \ "CheckFile"     ).map(loadFilename))
+                (xml \ "CheckFile"     ).map(loadPath))
 }
 
 case class InstallScript(steamId: Int, assetsPath: String, checkFor: Set[String], packages: Map[String, Package],
@@ -81,25 +80,25 @@ case class InstallScript(steamId: Int, assetsPath: String, checkFor: Set[String]
 object InstallScript {
   def loadFromXML(xml: Node) =
     InstallScript(getNodeText(xml, "SteamId").toInt,
-                  (xml \ "AssetsPath"         ).map(loadFilename).head,
-                  (xml \ "CheckFor"           ).map(loadFilename).toSet,
+                  (xml \ "AssetsPath"         ).map(loadPath).head,
+                  (xml \ "CheckFor"           ).map(loadPath).toSet,
                   (xml \ "Package"            ).map(Package.loadFromXML).map(x => x.name -> x).toMap,
                   (xml \ "Cleanup"            ).map(CleanupData.loadFromXML).head,
-                  (xml \ "VersionFrom"        ).map(loadFilename).head)
+                  (xml \ "VersionFrom"        ).map(loadPath).head)
 }
 
-case class NativePatch(platform: String, version: String, path: String)
+case class NativePatch(platform: String, version: String, source: String)
 case class PatchManifest(patchVersion: String, timestamp: Long,
                          nativePatches: Seq[NativePatch], installScripts: Map[String, String])
 object PatchManifest {
   def loadNativePatch(xml: Node) =
-    NativePatch(getAttribute(xml, "Platform"), getAttribute(xml, "Version"), getAttribute(xml, "Filename"))
+    NativePatch(getAttribute(xml, "Platform"), getAttribute(xml, "Version"), loadSource(xml))
   def loadFromXML(xml: Node) = {
     val manifestVersion = getAttribute(xml, "ManifestVersion")
     if(manifestVersion != "0") sys.error("Unknown ManifestVersion: "+manifestVersion)
     PatchManifest(getAttribute(xml, "PatchVersion"), getAttribute(xml, "Timestamp").toLong,
                   (xml \ "NativePatch"  ).map(loadNativePatch),
-                  (xml \ "InstallScript").map(x => getAttribute(x, "Platform") -> loadFilename(x)).toMap)
+                  (xml \ "InstallScript").map(x => getAttribute(x, "Platform") -> loadSource(x)).toMap)
   }
 }
 
@@ -147,5 +146,5 @@ class PatchLoader(val source: DataSource, val platform: Platform) {
     versionMap.get((platform.platformName, versionName))
   def nativePatchExists(versionName: String) =
     versionMap.contains((platform.platformName, versionName))
-  def loadVersion(patch: NativePatch) = source.loadBinaryResource(patch.path)
+  def loadVersion(patch: NativePatch) = source.loadBinaryResource(patch.source)
 }
