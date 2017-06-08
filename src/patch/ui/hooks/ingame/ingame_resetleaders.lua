@@ -18,21 +18,6 @@
 -- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 -- THE SOFTWARE.
 
-do
-    include "mppatch_softhook_info.lua"
-    if _mpPatch_SoftHookInfo and ContextPtr and ContextPtr:GetID() then
-        local contextId = ContextPtr:GetID()
-        local data = _mpPatch_SoftHookInfo[contextId]
-        if data and not data.loaded then
-            print("[MPPatch] Loading soft hook for context "..contextId.."'")
-
-            data.loaded = true
-            for _, v in ipairs(data.include) do
-                include(v)
-            end
-            for _, v in ipairs(data.inject) do
-                include(v)
-            end
-        end
-    end
+if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
+    _mpPatch.hooks.protocol_resetleaders()
 end

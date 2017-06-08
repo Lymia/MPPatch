@@ -79,6 +79,8 @@ function _mpPatch.debugPrint(...)
     patch.debugPrint(_mpPatch.fullPath..": "..accum)
 end
 
+_mpPatch.hooks = {}
+
 include "mppatch_mtutils.lua"
 include "mppatch_utils.lua"
 include "mppatch_modutils.lua"

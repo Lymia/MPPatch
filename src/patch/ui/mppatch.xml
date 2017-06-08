@@ -89,6 +89,7 @@
     <Hook Filename="StagingRoom.lua">
         <Include Filename="mppatch_runtime.lua"/>
         <InjectAfter Source="ui/hooks/common/stagingroom_common.lua"/>
+        <InjectAfter Source="ui/hooks/common/protocol_resetleaders.lua"/>
         <InjectAfter Source="ui/hooks/frontend/staging/stagingroom_setup.lua"/>
         <InjectAfter Source="ui/hooks/frontend/staging/stagingroom_keepmods.lua"/>
         <InjectAfter Source="ui/hooks/frontend/staging/stagingroom_resetleaders.lua"/>
@@ -97,7 +98,12 @@
     </Hook>
 
     <!-- Ingame hooks -->
-    <SoftHook ScreenID="DiploCorner.lua">
+    <SoftHook ScreenID="InGame">
+        <Include Filename="mppatch_runtime.lua"/>
+        <Inject Source="ui/hooks/common/protocol_resetleaders.lua"/>
+        <Inject Source="ui/hooks/ingame/ingame_resetleaders.lua"/>
+    </SoftHook>
+    <SoftHook ScreenID="DiploCorner">
         <Include Filename="mppatch_runtime.lua"/>
         <Inject Source="ui/hooks/ingame/diplocorner_suppresscommands.lua"/>
     </SoftHook>

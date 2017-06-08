@@ -1,9 +1,5 @@
 if _mpPatch_activateFrontEnd then
-    _mpPatch.net.sendPlayerData.registerHandler(function()
-        if Matchmaking.IsHost() then
-            Network.BroadcastPlayerInfo()
-        end
-    end)
+    _mpPatch.hooks.protocol_resetleaders()
 
     Events.SystemUpdateUI.Add(function (uiType, screen)
         if not ContextPtr:IsHidden() and not Matchmaking.IsHost() and
