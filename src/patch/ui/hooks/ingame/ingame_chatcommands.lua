@@ -20,4 +20,5 @@
 
 if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     _mpPatch.hooks.protocol_resetleaders()
+    _mpPatch.interceptChatFunction()
 end

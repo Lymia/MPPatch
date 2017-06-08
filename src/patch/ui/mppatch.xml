@@ -101,7 +101,7 @@
     <SoftHook ScreenID="InGame">
         <Include Filename="mppatch_runtime.lua"/>
         <Inject Source="ui/hooks/common/protocol_resetleaders.lua"/>
-        <Inject Source="ui/hooks/ingame/ingame_resetleaders.lua"/>
+        <Inject Source="ui/hooks/ingame/ingame_chatcommands.lua"/>
     </SoftHook>
     <SoftHook ScreenID="DiploCorner">
         <Include Filename="mppatch_runtime.lua"/>

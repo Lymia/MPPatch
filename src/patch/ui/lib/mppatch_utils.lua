@@ -42,7 +42,7 @@ end
 local globalMetatableSetupComplete = false
 local interceptGlobalWriteHooks = {}
 local function setupGlobalMetatable()
-    if globalMetatableSetupComplete then
+    if not globalMetatableSetupComplete then
         local _G = _mpPatch.patch.getGlobals()
         local mt = getmetatable(_G)
         if not mt then
