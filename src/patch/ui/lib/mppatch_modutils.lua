@@ -199,7 +199,7 @@ end
 local function decodeMod(id)
     local uuidTable = {}
     for i=1,4 do
-        uuidTable[i] = _mpPatch.getGameOption(encodeNumber(id).."_U"..i)
+        uuidTable[i] = _mpPatch.getGameOption(encodeNumber(id).."_"..i)
     end
     return {
         ID      = decodeUUID(uuidTable),
