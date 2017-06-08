@@ -24,13 +24,15 @@ do
         local contextId = ContextPtr:GetID()
         local data = _mpPatch_SoftHookInfo[contextId]
         if data and not data.loaded then
-            print("[MPPatch] Loading soft hook for context '"..contextId.."'")
+            print("[MPPatch] Loading soft hook for context "..contextId.."...")
 
             data.loaded = true
             for _, v in ipairs(data.include) do
+                print("[MPPatch] - Loading include "..v)
                 include(v)
             end
             for _, v in ipairs(data.inject) do
+                print("[MPPatch] - Injecting "..v)
                 include(v)
             end
         end
