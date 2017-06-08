@@ -47,11 +47,12 @@ local function setupGlobalMetatable()
         local mt = getmetatable(_G)
         if not mt then
             mt = {}
-            setmetatable(_G, {})
+            setmetatable(_G, mt)
 
             mt.__newindex = function(t, k, v)
                 local hook = interceptGlobalWriteHooks[k]
                 if hook then
+                    _mpPatch.debugPrint("Intercepting write to _G."..k)
                     v = hook(v)
                 end
                 return rawset(t, k, v)
