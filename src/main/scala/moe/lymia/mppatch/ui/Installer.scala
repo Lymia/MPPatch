@@ -25,7 +25,7 @@ package moe.lymia.mppatch.ui
 import java.io.{File, FileOutputStream, OutputStreamWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
 import java.text.DateFormat
-import java.util.{Date, Locale}
+import java.util.Locale
 import javax.swing.{JFrame, UIManager}
 
 import moe.lymia.mppatch.util.{Logger, SimpleLogger, VersionInfo}

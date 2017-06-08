@@ -22,7 +22,7 @@
 
 package moe.lymia.mppatch.core
 
-import java.util.{Locale, UUID}
+import java.util.UUID
 
 import moe.lymia.mppatch.util.io._
 
