@@ -131,6 +131,10 @@ end
 -- $id_$i  = block $i of mod $id's uuid
 -- $id_N#  = the length of mod $id's name
 -- $id_N$i = data block $i for mod $id's name
+--
+-- $id and $i are encoded using encodeNumber in each of these functions. The UUID is encoded as 4 32-bit integers,
+-- representing the whole UUID as a big endian 128-bit integer, and the mod's name is encoded into ceil(len / 4)
+-- data blocks.
 
 _mpPatch._mt.registerProperty("isModding", function()
     return _mpPatch.getGameOption("?") == 1
