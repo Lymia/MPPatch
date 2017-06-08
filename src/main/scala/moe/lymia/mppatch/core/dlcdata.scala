@@ -80,27 +80,27 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
     x.replace("/", "_") -> XML.loadString(source.loadResource(x))
   ).toMap
 
-  private lazy val softPatchInjectFileList = patch.luaSoftHooks.flatMap(_.inject).distinct
-  private lazy val softPatchInjectFileNameMap = softPatchInjectFileList.zipWithIndex.map(x =>
+  private lazy val softHookInjectFileList = patch.luaSoftHooks.flatMap(_.inject).distinct
+  private lazy val softHookInjectFileNameMap = softHookInjectFileList.zipWithIndex.map(x =>
     x._1 -> s"${patch.softHookInfo.patchPrefix}${x._2}_${x._1.split("/").last}").toMap
-  private lazy val softPatchInfoFragments = patch.luaSoftHooks.map { x =>
+  private lazy val softHookInfoFragments = patch.luaSoftHooks.map { x =>
     val subtableName = s"${patch.softHookInfo.namespace}[ ${quoteLua(x.id)} ]"
     s"""$subtableName = {}
        |$subtableName.include = {${x.includes.map(quoteLua).mkString(", ")}}
-       |$subtableName.inject = {${x.inject.map(softPatchInjectFileNameMap).map(quoteLua).mkString(", ")}}
+       |$subtableName.inject = {${x.inject.map(softHookInjectFileNameMap).map(quoteLua).mkString(", ")}}
      """.stripMargin
   }
-  private lazy val softPatchInfo = {
+  private lazy val softHookInfo = {
     val tableName = patch.softHookInfo.namespace
     s"""if not $tableName then
        |  $tableName = {}
        |
-       |  ${softPatchInfoFragments.map(_.replace("\n", "\n  ")).mkString("\n  ").trim}
+       |  ${softHookInfoFragments.map(_.replace("\n", "\n  ")).mkString("\n  ").trim}
        |end
      """.stripMargin
   }
-  private lazy val softPatchFiles = softPatchInjectFileNameMap.map(x => x._2 -> source.loadResource(x._1)) ++ Map(
-    patch.softHookInfo.infoTarget -> softPatchInfo
+  private lazy val softHookFiles = softHookInjectFileNameMap.map(x => x._2 -> source.loadResource(x._1)) ++ Map(
+    patch.softHookInfo.infoTarget -> softHookInfo
   )
 
   private def loadWrapper(str: Seq[String], pf: String = "", sf: String = "") =
@@ -141,10 +141,10 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
     DLCData(patch.dlcManifest,
             DLCGameplay(textData = textFiles,
                         uiFiles = Map(
-                          "LuaPatches"  -> prepareList(findPathTargets(assetsPath, platform, "UI")),
-                          "Runtime"     -> prepareList(libraryFiles),
-                          "SoftPatches" -> prepareList(softPatchFiles),
-                          "Screens"     -> prepareList(newScreenFiles)
+                          "LuaPatches" -> prepareList(findPathTargets(assetsPath, platform, "UI")),
+                          "Runtime"    -> prepareList(libraryFiles),
+                          "SoftHooks"  -> prepareList(softHookFiles),
+                          "Screens"    -> prepareList(newScreenFiles)
                         ),
                         uiSkins = Seq(DLCUISkin("MPPatch", "BaseGame", "Common"))))
   }
