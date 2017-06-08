@@ -1,18 +1,11 @@
 if _mpPatch_activateFrontEnd then
-    local skipNextLine = {}
+    _mpPatch.hooks.protocol_chathandler_setupHooks()
 
-    OnChat = _mpPatch.interceptChatFunction(OnChat, function(fromPlayer)
+    OnChat = _mpPatch.hooks.protocol_chathandler_new(OnChat, function(fromPlayer)
         return not not m_PlayerNames[fromPlayer]
-    end, function(fromPlayer)
-        if skipNextLine[fromPlayer] then
-            skipNextLine[fromPlayer] = nil
-            return false
-        else
-            return true
-        end
     end)
-    _mpPatch.hookUpdate()
 
+    _mpPatch.hookUpdate()
     local countdownRunning = false
     _mpPatch.addUpdateHook(function(...)
         if not ContextPtr:IsHidden() and countdownRunning then
@@ -20,15 +13,10 @@ if _mpPatch_activateFrontEnd then
         end
     end)
 
-    _mpPatch.net.skipNextChat.registerHandler(function(_, fromPlayer)
-        skipNextLine[fromPlayer] = true
-    end)
-
     local OnDisconnectOld = OnDisconnect
     function OnDisconnect(...)
-        if not ContextPtr:IsHidden() and Matchmaking.IsHost() then
-            local playerID = ...
-            skipNextLine[playerID] = nil
+        if not ContextPtr:IsHidden() then
+            _mpPatch.hooks.protocol_chathandler_onDisconnect(...)
         end
         return OnDisconnectOld(...)
     end
