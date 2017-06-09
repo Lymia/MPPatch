@@ -1,14 +1,44 @@
-if _mpPatch then
+if _mpPatch and _mpPatch.loaded then
     local playerMap = {}
+
+    local getPlayerName, joinWarning1Ending
+    function _mpPatch.hooks.protocol_kickunpached_init(pGetPlayerName, pIsInGame)
+        getPlayerName = pGetPlayerName
+        joinWarning1Ending = Locale.Lookup(isInGame and "TXT_KEY_MPPATCH_JOIN_WARNING_1_INGAME"
+                                                    or  "TXT_KEY_MPPATCH_JOIN_WARNING_1_STAGING")
+    end
+
+    local website = _mpPatch.version.info["mppatch.website"] or "<unknown>"
+    local function getHeader(playerId)
+        local header = ""
+        if getPlayerName then
+            local name = getPlayerName(playerId)
+            if name then
+                header = "@"..tostring(name)..": "
+            end
+        end
+        return header
+    end
 
     function _mpPatch.hooks.protocol_kickunpached_installHooks()
         _mpPatch.addResetHook(function()
             playerMap = {}
         end)
 
-        _mpPatch.net.clientIsPatched.registerHandler(function(_, playerID)
+        _mpPatch.net.clientIsPatched.registerHandler(function(protocolVersion, playerID)
             if Matchmaking.IsHost() then
-                playerMap[playerID] = nil
+                if protocolVersion == _mpPatch.protocolVersion then
+                    playerMap[playerID] = nil
+                else
+                    local header = getHeader(playerId)
+
+                    _mpPatch.skipNextChatIfVersion(_mpPatch.protocolVersion)
+                    Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_OUTDATED").." "..
+                                     joinWarning1Ending)
+
+                    _mpPatch.skipNextChatIfVersion(_mpPatch.protocolVersion)
+                    Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_2")..website)
+                end
             end
         end)
 
@@ -48,20 +78,13 @@ if _mpPatch then
         end
     end
 
-    function _mpPatch.hooks.protocol_kickunpached_onJoin(playerId, getPlayerName, isInGame)
+    function _mpPatch.hooks.protocol_kickunpached_onJoin(playerId)
         if Matchmaking.IsHost() then
-            local header = ""
-            if getPlayerName then
-                local name = getPlayerName(playerId)
-                if name then
-                    header = "@"..tostring(name)..": "
-                end
-            end
-
-            local website = _mpPatch.version.info["mppatch.website"] or "<unknown>"
+            local header = getHeader(playerId)
 
             _mpPatch.net.skipNextChat(2)
-            Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_"..(isInGame and "INGAME" or "FRONTEND")))
+            Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_NOT_INSTALLED").." "..
+                             joinWarning1Ending)
             Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_2")..website)
 
             playerMap[playerId] = 30

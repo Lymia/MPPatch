@@ -27,6 +27,12 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     _mpPatch.hooks.protocol_resetleaders()
     _mpPatch.interceptChatFunction()
 
+    _mpPatch.hooks.protocol_kickunpached_init(function(id)
+        local player = Players[id]
+        if player then
+            return Players[id]:GetName()
+        end
+    end, true)
     _mpPatch.hooks.protocol_kickunpached_installHooks()
 
     _mpPatch.addUpdateHook(function(timeDiff)
@@ -52,7 +58,6 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
             lastNotificationPlayer = nil
         end
     end
-
 
     Events.MultiplayerHotJoinStarted.Add(checkLastNotificationPlayer(function(player)
         _mpPatch.hooks.protocol_kickunpached_onJoin(player)

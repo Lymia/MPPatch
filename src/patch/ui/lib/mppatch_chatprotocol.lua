@@ -77,7 +77,8 @@ _mpPatch.protocolVersion = "0"
 
 -- commands
 _mpPatch.net = {}
-_mpPatch.net.skipNextChat         = _mpPatch.registerChatCommand("skipNextChat"        )
-_mpPatch.net.sendPlayerData       = _mpPatch.registerChatCommand("sendPlayerData"      )
-_mpPatch.net.startLaunchCountdown = _mpPatch.registerChatCommand("startLaunchCountdown")
-_mpPatch.net.clientIsPatched      = _mpPatch.registerChatCommand("clientIsPatched"     )
+_mpPatch.net.skipNextChat          = _mpPatch.registerChatCommand("skipNextChat"         )
+_mpPatch.net.skipNextChatIfVersion = _mpPatch.registerChatCommand("skipNextChatIfVersion")
+_mpPatch.net.sendPlayerData        = _mpPatch.registerChatCommand("sendPlayerData"       )
+_mpPatch.net.startLaunchCountdown  = _mpPatch.registerChatCommand("startLaunchCountdown" )
+_mpPatch.net.clientIsPatched       = _mpPatch.registerChatCommand("clientIsPatched"      )

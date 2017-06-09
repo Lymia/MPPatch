@@ -1,9 +1,14 @@
-if _mpPatch then
+if _mpPatch and _mpPatch.loaded then
     local skipNextLine = {}
 
     function _mpPatch.hooks.protocol_chathandler_setupHooks()
         _mpPatch.net.skipNextChat.registerHandler(function(data, fromPlayer)
             skipNextLine[fromPlayer] = tonumber(data)
+        end)
+        _mpPatch.net.skipNextChatIfVersion.registerHandler(function(data, fromPlayer)
+            if data == _mpPatch.protocolVersion then
+                skipNextLine[fromPlayer] = 1
+            end
         end)
         _mpPatch.addResetHook(function()
             skipNextLine = {}
