@@ -114,7 +114,7 @@ object InstallerResourceBuild {
     resourceGenerators in Compile += Def.task {
       val outPath = (resourceManaged in Compile).value / "moe" / "lymia" / "mppatch" / "text"
 
-      (for(file <- IO.listFiles(baseDirectory.value / "doc" / "about") if file.getName.endsWith(".md")) yield {
+      (for(file <- IO.listFiles(baseDirectory.value / "project" / "about") if file.getName.endsWith(".md")) yield {
         val markdown = IO.read(file)
         val html = s"""<html>
                       |  <body>
