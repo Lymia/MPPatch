@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright (c) 2015-2017 Lymia Alusyia <lymia@lymiahugs.com>
+  ~ Copyright (c) 2015-2016 Lymia Alusyia <lymia@lymiahugs.com>
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@
     <Include Filename="mppatch_mtutils.lua"       Source="ui/lib/mppatch_mtutils.lua"      />
     <Include Filename="mppatch_utils.lua"         Source="ui/lib/mppatch_utils.lua"        />
     <Include Filename="mppatch_modutils.lua"      Source="ui/lib/mppatch_modutils.lua"     />
+    <Include Filename="mppatch_serialize.lua"     Source="ui/lib/mppatch_serialize.lua"    />
     <Include Filename="mppatch_uiutils.lua"       Source="ui/lib/mppatch_uiutils.lua"      />
     <Include Filename="mppatch_version.lua"       Source="ui/lib/mppatch_version.lua"      />
     <Include Filename="mppatch_chatprotocol.lua"  Source="ui/lib/mppatch_chatprotocol.lua" />
@@ -105,6 +106,7 @@
         <Inject Source="ui/hooks/common/protocol_resetleaders.lua"/>
         <Inject Source="ui/hooks/common/protocol_kickunpatched.lua"/>
         <Inject Source="ui/hooks/ingame/ingame_chatcommands.lua"/>
+        <Inject Source="ui/hooks/common/eventsdebug.lua"/>
     </SoftHook>
     <SoftHook ScreenID="DiploCorner">
         <Include Filename="mppatch_runtime.lua"/>
