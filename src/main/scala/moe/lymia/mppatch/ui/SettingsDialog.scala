@@ -32,6 +32,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
   private var installPath: JTextField = _
 
   private var enableDebug           : JCheckBox = _
+  private var enableLogging         : JCheckBox = _
   private var enableMultiplayerPatch: JCheckBox = _
   private var enableLuaJIT          : JCheckBox = _
 
@@ -47,6 +48,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
     main.changeInstaller(Paths.get(installPath.getText))
 
     Preferences.enableDebug           .value = enableDebug           .isSelected
+    Preferences.enableLogging         .value = enableLogging         .isSelected
     Preferences.enableMultiplayerPatch.value = enableMultiplayerPatch.isSelected
     Preferences.enableLuaJIT          .value = enableLuaJIT          .isSelected
 
@@ -77,14 +79,17 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
         case Some(installer) => installPath.setText(installer.basePath.toString)
       }
 
-      enableDebug = options.gridCheckRow(1, "debug")
-      enableDebug.setSelected(Preferences.enableDebug.value)
+      enableLogging = options.gridCheckRow(1, "logging")
+      enableLogging.setSelected(Preferences.enableLogging.value)
 
       enableMultiplayerPatch = options.gridCheckRow(2, "modding")
       enableMultiplayerPatch.setSelected(Preferences.enableMultiplayerPatch.value)
 
       enableLuaJIT = options.gridCheckRow(3, "luajit")
       enableLuaJIT.setSelected(Preferences.enableLuaJIT.value)
+
+      enableDebug = options.gridCheckRow(4, "debug")
+      enableDebug.setSelected(Preferences.enableDebug.value)
     }
 
     frame.add(new JSeparator(), constraints(gridy = 1, weighty = 1, fill = GridBagConstraints.BOTH,

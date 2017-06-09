@@ -40,8 +40,10 @@
         <RenameFile Path="lua51_Win32.dll" RenameTo="lua51_Win32.dll.bak"/>
         <AdditionalFile Path="lua51_Win32.dll" Source="native/luajit_win32.dll"/>
     </Package>
-    <Package Name="debug">
+    <Package Name="logging">
         <SetFlag Name="enableLogging"/>
+    </Package>
+    <Package Name="debug">
         <SetFlag Name="enableDebug"/>
     </Package>
 

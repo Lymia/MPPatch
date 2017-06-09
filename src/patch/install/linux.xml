@@ -44,8 +44,10 @@
         <SetFlag Name="enableLuaJIT"/>
         <AdditionalFile Path="mppatch_luajit.so" Source="native/luajit_linux.so"/>
     </Package>
-    <Package Name="debug">
+    <Package Name="logging">
         <SetFlag Name="enableLogging"/>
+    </Package>
+    <Package Name="debug">
         <SetFlag Name="enableDebug"/>
     </Package>
 

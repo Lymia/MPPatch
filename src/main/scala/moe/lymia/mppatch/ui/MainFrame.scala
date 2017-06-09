@@ -39,10 +39,11 @@ class MainFrame(val locale: Locale, val isExeLaunch: Boolean) extends FrameBase[
   private var currentStatus  : JTextField   = _
 
   private def packages = {
-    val debug       = if(Preferences.enableDebug.value           ) Set("debug")       else Set[String]()
+    val logging     = if(Preferences.enableLogging.value         ) Set("logging")     else Set[String]()
     val multiplayer = if(Preferences.enableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
     val luajit      = if(Preferences.enableLuaJIT.value          ) Set("luajit")      else Set[String]()
-    debug ++ multiplayer ++ luajit
+    val debug       = if(Preferences.enableDebug.value           ) Set("debug")       else Set[String]()
+    debug ++ multiplayer ++ luajit ++ logging
   }
 
   private val platform  = Platform.currentPlatform.getOrElse(error("error.unknownplatform"))

@@ -57,6 +57,7 @@ object Preferences {
 
   val installationDirectory  = new PreferenceKey[String ]("installationDirectory")
   val enableDebug            = new PreferenceKey[Boolean]("enableDebug", false)
+  val enableLogging          = new PreferenceKey[Boolean]("enableLogging", true)
   val enableMultiplayerPatch = new PreferenceKey[Boolean]("enableMultiplayerPatch", true)
   val enableLuaJIT           = new PreferenceKey[Boolean]("enableLuaJIT", true)
 }
