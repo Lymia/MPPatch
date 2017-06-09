@@ -32,8 +32,9 @@ import moe.lymia.mppatch.util.io.XMLUtils._
 import scala.xml.{Node, XML}
 
 case class LuaSoftHook(id: String, includes: Seq[String], inject: Seq[String])
+case class LuaOverrideInject(source: String, inline: Boolean)
 case class LuaOverride(filename: String, includes: Seq[String],
-                       injectBefore: Seq[String] = Seq(), injectAfter: Seq[String] = Seq())
+                       injectBefore: Seq[LuaOverrideInject] = Seq(), injectAfter: Seq[LuaOverrideInject] = Seq())
 case class FileWithSource(filename: String, source: String)
 case class SoftHookInfo(namespace: String, infoTarget: String, patchPrefix: String)
 case class UIPatch(dlcManifest: DLCManifest, softHookInfo: SoftHookInfo,
@@ -45,9 +46,10 @@ object UIPatch {
     DLCManifest(UUID.fromString(getAttribute(node, "UUID")),
                 getAttribute(node, "Version").toInt, getAttribute(node, "Priority").toInt,
                 getAttribute(node, "ShortName"), getAttribute(node, "Name"))
+  def loadInject(node: Node) = LuaOverrideInject(loadSource(node), getBoolAttribute(node, "Inline"))
   def loadLuaOverride(node: Node) =
     LuaOverride(loadFilename(node), (node \ "Include").map(loadFilename),
-                (node \ "InjectBefore").map(loadSource), (node \ "InjectAfter").map(loadSource))
+                (node \ "InjectBefore").map(loadInject), (node \ "InjectAfter").map(loadInject))
   def loadLuaSoftHook(node: Node) =
     LuaSoftHook(getAttribute(node, "ScreenID"), (node \ "Include").map(loadFilename),
                 (node \ "Inject").map(loadSource))
@@ -80,14 +82,17 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
     x.replace("/", "_") -> XML.loadString(source.loadResource(x))
   ).toMap
 
-  private lazy val softHookInjectFileList = patch.luaSoftHooks.flatMap(_.inject).distinct
-  private lazy val softHookInjectFileNameMap = softHookInjectFileList.zipWithIndex.map(x =>
+  private lazy val patchFileList =
+    (patch.luaSoftHooks.flatMap(_.inject) ++
+     patch.luaPatches.flatMap(x => (x.injectAfter ++ x.injectBefore).filter(!_.inline).map(_.source))).distinct
+  private lazy val patchFileMap = patchFileList.zipWithIndex.map(x =>
     x._1 -> s"${patch.softHookInfo.patchPrefix}${x._2}_${x._1.split("/").last}").toMap
+
   private lazy val softHookInfoFragments = patch.luaSoftHooks.map { x =>
     val subtableName = s"${patch.softHookInfo.namespace}[ ${quoteLua(x.id)} ]"
     s"""$subtableName = {}
        |$subtableName.include = {${x.includes.map(quoteLua).mkString(", ")}}
-       |$subtableName.inject = {${x.inject.map(softHookInjectFileNameMap).map(quoteLua).mkString(", ")}}
+       |$subtableName.inject = {${x.inject.map(patchFileMap).map(quoteLua).mkString(", ")}}
      """.stripMargin
   }
   private lazy val softHookInfo = {
@@ -99,7 +104,7 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
        |end
      """.stripMargin
   }
-  private lazy val softHookFiles = softHookInjectFileNameMap.map(x => x._2 -> source.loadResource(x._1)) ++ Map(
+  private lazy val softHookFiles = patchFileMap.map(x => x._2 -> source.loadResource(x._1)) ++ Map(
     patch.softHookInfo.infoTarget -> softHookInfo
   )
 
@@ -109,10 +114,15 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
       str.mkString("\n")+
       "\n--- END INJECTED MPPATCH CODE ---"+sf
     }
-  private def getLuaFragment(path: String) = {
-    val code = source.loadResource(path)
-    "-- source file: "+path+"\n\n"+
-    code+(if(!code.endsWith("\n")) "\n" else "")
+  private def getLuaFragment(inject: LuaOverrideInject) = {
+    if(!inject.inline) {
+      s"include ${quoteLua(patchFileMap(inject.source))}\n"
+    } else {
+      val code = source.loadResource(inject.source)
+      s"-- source file: ${inject.source} --\n\n"+
+      code+(if(!code.endsWith("\n")) "\n" else "")+
+      s"\n-- end source file: ${inject.source} --\n"
+    }
   }
   private def patchFile(path: Path) = {
     val fileName = path.getFileName.toString
@@ -141,10 +151,10 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
     DLCData(patch.dlcManifest,
             DLCGameplay(textData = textFiles,
                         uiFiles = Map(
-                          "LuaPatches" -> prepareList(findPathTargets(assetsPath, platform, "UI")),
-                          "Runtime"    -> prepareList(libraryFiles),
-                          "SoftHooks"  -> prepareList(softHookFiles),
-                          "Screens"    -> prepareList(newScreenFiles)
+                          "LuaOverrides" -> prepareList(findPathTargets(assetsPath, platform, "UI")),
+                          "Runtime"      -> prepareList(libraryFiles),
+                          "Patches"      -> prepareList(softHookFiles),
+                          "Screens"      -> prepareList(newScreenFiles)
                         ),
                         uiSkins = Seq(DLCUISkin("MPPatch", "BaseGame", "Common"))))
   }

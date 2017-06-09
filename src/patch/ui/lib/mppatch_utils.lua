@@ -70,6 +70,17 @@ function _mpPatch.interceptGlobalWrite(name, fn)
     setupGlobalMetatable()
     interceptGlobalWriteHooks[name] = fn
 end
+function _mpPatch.hookGlobalFunction(name, fn)
+    _mpPatch.interceptGlobalWrite(name,  function(origFn)
+        return function(...)
+            local v = fn(...)
+            if not v then
+                return origFn(...)
+            end
+            return v
+        end
+    end)
+end
 
 -- Version utils
 function _mpPatch.version.get(string)

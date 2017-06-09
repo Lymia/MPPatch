@@ -44,29 +44,23 @@ if _mpPatch and _mpPatch.loaded then
         end
     end
 
-    local OnSinglePlayerClickOld = OnSinglePlayerClick
-    function OnSinglePlayerClick(...)
+    _mpPatch.hookGlobalFunction("OnSinglePlayerClick", function()
         showMessage("SupportsSinglePlayer", "TXT_KEY_MPPATCH_NO_SINGLEPLAYER_SUPPORT")
-        return OnSinglePlayerClickOld(...)
-    end
-    Controls.SinglePlayerButton:RegisterCallback(Mouse.eLClick, OnSinglePlayerClick)
-
-    function OnMultiPlayerClick(...)
+    end)
+    _mpPatch.hookGlobalFunction("OnMultiPlayerClick", function()
         showMessage("SupportsMultiplayer" , "TXT_KEY_MPPATCH_NO_MULTIPLAYER_SUPPORT" )
-        UIManager:QueuePopup(Controls.ModMultiplayerSelectScreen, PopupPriority.ModMultiplayerSelectScreen)
-    end
-    Controls.MultiPlayerButton:RegisterCallback(Mouse.eLClick, OnMultiPlayerClick)
-    Controls.MultiPlayerButton:SetHide(false)
+    end)
 
-    local function onShowHideHook()
+    local function onShowHide()
         setTooltip(Controls.SinglePlayerButton, "SupportsSinglePlayer", "TXT_KEY_MPPATCH_NO_SINGLEPLAYER_SUPPORT")
         setTooltip(Controls.MultiPlayerButton , "SupportsMultiplayer" , "TXT_KEY_MPPATCH_NO_MULTIPLAYER_SUPPORT" )
+        Controls.MultiPlayerButton:SetHide(false)
     end
     Modding = _mpPatch.hookTable(Modding, {
         AllEnabledModsContainPropertyValue = function(...)
             local name = ...
             if name == "SupportsSinglePlayer" then
-                onShowHideHook()
+                onShowHide()
                 return true
             elseif name == "SupportsMultiplayer" then
                 return true
