@@ -17,7 +17,17 @@
             <Text>This DLC cannot be disabled because the following mods depend on it:</Text>
         </Row>
 
+        <!-- These strings are used by the save loading dialog -->
+        <Row Tag="TXT_KEY_MPPATCH_SERIALIZATION_VERSION_ERROR_SAVE">
+            <!-- This is used when the user tries to join a room that uses a later version of MPPatch. -->
+            <Text>You cannot load this save because it uses a newer version of MPPatch.[NEWLINE]Please update MPPatch.</Text>
+        </Row>
+
         <!-- These strings are used by the joining room -->
+        <Row Tag="TXT_KEY_MPPATCH_SERIALIZATION_VERSION_ERROR_ROOM">
+            <!-- This is used when the user tries to join a room that uses a later version of MPPatch. -->
+            <Text>You cannot join this room because it uses a newer version of MPPatch.[NEWLINE]Please update MPPatch.</Text>
+        </Row>
         <Row Tag="TXT_KEY_MPPATCH_MOD_MISSING">
             <!-- This is used when the user tries to join a room that uses mods they don't have installed. -->
             <Text>You cannot join this room because the following mods aren't installed:</Text>

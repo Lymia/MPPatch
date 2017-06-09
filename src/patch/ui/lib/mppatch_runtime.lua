@@ -84,6 +84,7 @@ _mpPatch.hooks = {}
 include "mppatch_mtutils.lua"
 include "mppatch_utils.lua"
 include "mppatch_modutils.lua"
+include "mppatch_serialize.lua"
 include "mppatch_uiutils.lua"
 include "mppatch_chatprotocol.lua"
 

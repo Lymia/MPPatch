@@ -28,6 +28,11 @@ if _mpPatch and _mpPatch.loaded then
     function OnConnectionCompete()
         if not Matchmaking.IsHost() then
             if _mpPatch.isModding then
+                if not _mpPatch.isSupportedVersion then
+                    joinFailed(Locale.Lookup("TXT_KEY_MPPATCH_SERIALIZATION_VERSION_ERROR_ROOM"))
+                    return
+                end
+
                 _mpPatch.net.clientIsPatched(_mpPatch.protocolVersion)
 
                 local modList = _mpPatch.decodeModsList()

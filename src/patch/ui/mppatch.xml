@@ -28,6 +28,7 @@
     <Include Filename="mppatch_mtutils.lua"       Source="ui/lib/mppatch_mtutils.lua"      />
     <Include Filename="mppatch_utils.lua"         Source="ui/lib/mppatch_utils.lua"        />
     <Include Filename="mppatch_modutils.lua"      Source="ui/lib/mppatch_modutils.lua"     />
+    <Include Filename="mppatch_serialize.lua"     Source="ui/lib/mppatch_serialize.lua"    />
     <Include Filename="mppatch_uiutils.lua"       Source="ui/lib/mppatch_uiutils.lua"      />
     <Include Filename="mppatch_version.lua"       Source="ui/lib/mppatch_version.lua"      />
     <Include Filename="mppatch_chatprotocol.lua"  Source="ui/lib/mppatch_chatprotocol.lua" />
