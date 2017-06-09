@@ -25,7 +25,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     end)
 
     _mpPatch.hooks.protocol_resetleaders()
-    _mpPatch.interceptChatFunction()
+    Events.GameMessageChat.Add(_mpPatch.interceptChatFunction())
 
     _mpPatch.hooks.protocol_kickunpached_init(function(id)
         local player = Players[id]
