@@ -16,7 +16,7 @@ if _mpPatch and _mpPatch.loaded then
     end
 
     function _mpPatch.hooks.protocol_chathandler_new(fn, condition, chatCondition, noCheckHide)
-        _mpPatch.interceptChatFunction(fn, condition, function(...)
+        return _mpPatch.interceptChatFunction(fn, condition, function(...)
             local fromPlayer = ...
             if skipNextLine[fromPlayer] and skipNextLine[fromPlayer] > 0 then
                 skipNextLine[fromPlayer] = skipNextLine[fromPlayer] - 1
