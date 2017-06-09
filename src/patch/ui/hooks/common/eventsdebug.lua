@@ -74,7 +74,9 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.debug then
             "UnitVisibilityChanged", "UserRequestClose", "VisibilityUpdated", "WarStateChanged", "WonderStateChanged",
             "WonderTogglePlacement", "WonderTypeChanged", "WorldMouseOver"
         }
-        local excludeList = { LocalMachineAppUpdate = true, KeyUpEvent = true, GameMessageChat = true }
+        local excludeList = { LocalMachineAppUpdate = true, KeyUpEvent = true, SerialEventMouseOverHex = true,
+                              WorldMouseOver = true, UnitVisibilityChanged = true, VisibilityUpdated = true }
+        local excludePrefixes = { "SerialEventCamera", "Camera", "Show" }
 
         local testEventHandlerPing = "7f176dfe-4d49-11e7-b2f0-62ba1ac45905"
         local testEventHandlerPong = "9eb4260c-4d49-11e7-bc4d-62ba1ac45905"
@@ -98,10 +100,16 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.debug then
                 if not eventObj then
                     _mpPatch.debugPrint("Could not log event "..event.." (does not exist)")
                 elseif not excludeList[event] then
-                    eventObj.Add(function(...)
-                        local args = {...}
-                        _mpPatch.debugPrint("Got event: "..event.."\n",unpack(args))
-                    end)
+                    local isExcluded = false
+                    for _, prefix in ipairs(excludePrefixes) do
+                        isExcluded = isExcluded or _mpPatch.strStarts(event, prefix)
+                    end
+                    if not isExcluded then
+                        eventObj.Add(function(...)
+                            local args = {...}
+                            _mpPatch.debugPrint("Got event: "..event.."\n",unpack(args))
+                        end)
+                    end
                 end
             end
             Event.LuaEvent.Add(function(event)

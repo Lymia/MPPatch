@@ -21,7 +21,7 @@
 -- globals from patch
 local rawset = _mpPatch.patch.globals.rawset
 
--- Hook tools
+-- Misc utils
 function _mpPatch.hookTable(table, hooks)
     return setmetatable({}, {__index = function(_, k)
         if hooks[k] then return hooks[k] end
@@ -37,6 +37,11 @@ function _mpPatch.map(list, fn)
     end
     return newList
 end
+
+function _mpPatch.strStarts(str, prefix)
+   return str:sub(1, prefix:len()) == prefix
+end
+
 
 -- Soft hook utils
 local globalMetatableSetupComplete = false
