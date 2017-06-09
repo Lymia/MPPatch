@@ -12,12 +12,24 @@ if _mpPatch then
             end
         end)
 
+        local function checkPlayerId(player, reason)
+            if playerMap[player] then
+                _mpPatch.debugPrint("Kicking player "..player.." for (presumably) not having MPPatch. ("..reason..")")
+                Matchmaking.KickPlayer(player)
+                playerMap[player] = nil
+            end
+        end
+
+        _mpPatch.event.kickIfUnpatched.registerHandler(function(player, reason)
+            if Matchmaking.IsHost() then
+                checkPlayerId(player, reason)
+            end
+        end)
+
         _mpPatch.event.kickAllUnpatched.registerHandler(function(reason)
             if Matchmaking.IsHost() then
                 for player, _ in pairs(playerMap) do
-                    _mpPatch.debugPrint("Kicking player "..player.." for (presumably) not having MPPatch. ("..reason..")")
-                    Matchmaking.KickPlayer(player)
-                    playerMap[player] = nil
+                    checkPlayerId(player, reason)
                 end
             end
         end)

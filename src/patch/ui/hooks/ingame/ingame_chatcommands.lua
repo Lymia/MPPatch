@@ -26,4 +26,42 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
 
     _mpPatch.hooks.protocol_resetleaders()
     _mpPatch.interceptChatFunction()
+
+    _mpPatch.hooks.protocol_kickunpached_installHooks()
+
+    _mpPatch.addUpdateHook(function(timeDiff)
+        _mpPatch.hooks.protocol_kickunpached_onUpdate(timeDiff)
+    end)
+
+    local lastNotificationPlayer
+    Events.NotificationAdded.Add(function(id, type, toolTip, strSummary, iGameValue, iExtraGameData, ePlayer)
+        if type == NotificationTypes.NOTIFICATION_PLAYER_CONNECTING or
+           type == NotificationTypes.NOTIFICATION_PLAYER_RECONNECTED then
+            lastNotificationPlayer = ePlayer
+        else
+            lastNotificationPlayer = nil
+        end
+    end)
+    local function checkLastNotificationPlayer(fn)
+        return function()
+            if lastNotificationPlayer == nil then
+                _mpPatch.debugPrint("No last notification player ID available! Maybe using an unofficial game .dll?")
+                return
+            end
+            fn(lastNotificationPlayer)
+            lastNotificationPlayer = nil
+        end
+    end
+
+
+    Events.MultiplayerHotJoinStarted.Add(checkLastNotificationPlayer(function(player)
+        _mpPatch.hooks.protocol_kickunpached_onJoin(player)
+    end))
+    Events.MultiplayerGamePlayerDisconnected.Add(function(player)
+        _mpPatch.hooks.protocol_kickunpached_onDisconnect(player)
+    end)
+    Events.MultiplayerHotJoinCompleted.Add(checkLastNotificationPlayer(function(player)
+        _mpPatch.event.kickIfUnpatched(player, "Hotjoin completed")
+    end))
+
 end
