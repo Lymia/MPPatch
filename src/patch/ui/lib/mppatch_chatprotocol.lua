@@ -67,8 +67,6 @@ function _mpPatch.interceptChatFunction(fn, condition, chatCondition, noCheckHid
         end
         if fn and chatCondition(...) then return fn(...) end
     end
-    if fn then Events.GameMessageChat.Remove(fn) end
-    Events.GameMessageChat.Add(chatFn)
     return chatFn
 end
 

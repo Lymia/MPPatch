@@ -1,9 +1,11 @@
 if _mpPatch_activateFrontEnd then
     _mpPatch.hooks.protocol_chathandler_setupHooks()
 
+    Events.GameMessageChat.Remove(OnChat)
     OnChat = _mpPatch.hooks.protocol_chathandler_new(OnChat, function(fromPlayer)
         return not not m_PlayerNames[fromPlayer]
     end)
+    Events.GameMessageChat.Add(OnChat)
 
     _mpPatch.hookUpdate()
     local countdownRunning = false
