@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import java.security.MessageDigest
+
 import sbt._
 import sbt.Keys._
 import Config._
@@ -92,6 +94,17 @@ object Launch4JBuild {
     launch4jDownloadPath := launch4jDir.value / "launch4j.tgz",
     launch4jDownloadTgz := {
       if(!launch4jDownloadPath.value.exists) IO.download(new URL(config_launch4j_url), launch4jDownloadPath.value)
+
+      def sha256_hex(data: Array[Byte]) = {
+        val md = MessageDigest.getInstance("SHA-256")
+        val hash = md.digest(data)
+        hash.map(x => "%02x".format(x)).reduce(_ + _)
+      }
+
+      val gotChecksum = sha256_hex(IO.readBytes(launch4jDownloadPath.value))
+      if(gotChecksum != config_launch4j_Checksum)
+        sys.error(s"Launch4J checksum error: got $gotChecksum, expected $config_launch4j_Checksum")
+
       launch4jDownloadPath.value
     },
     launch4jBinary := extractLaunch4J(launch4jDownloadTgz.value, launch4jDir.value / "bin") / "launch4j" / "launch4j",

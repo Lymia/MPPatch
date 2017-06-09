@@ -35,5 +35,6 @@ object Config {
   val config_steam_sdldev_path = "libsdl2-dev_2.0.3+steamrt1+srt4_i386.deb"
   val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
 
-  val config_launch4j_url = "https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.9/launch4j-3.9-linux.tgz"
+  val config_launch4j_url      = "https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.9/launch4j-3.9-linux.tgz"
+  val config_launch4j_Checksum = "e6e9a83927585d16efcb82f41d4ae480f14eccc19ced611a59f31fffb5ca549b"
 }
