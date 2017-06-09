@@ -36,7 +36,7 @@ if _mpPatch_activateFrontEnd then
         if not ContextPtr:IsHidden() and gameLaunchSet then
             gameLaunchCountdown = gameLaunchCountdown - timeDiff
             if gameLaunchCountdown <= 0 then
-                _mpPatch.event.kickAllUnpatched()
+                _mpPatch.event.kickAllUnpatched("Game starting")
                 LaunchGameOld()
                 _mpPatch.resetUI()
             end

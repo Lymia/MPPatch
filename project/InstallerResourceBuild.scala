@@ -73,6 +73,8 @@ object InstallerResourceBuild {
         "mppatch.version.commit"    -> git.gitHeadCommit.value.getOrElse("<unknown>"),
         "mppatch.version.clean"     -> (!git.gitUncommittedChanges.value).toString,
 
+        "mppatch.website"           -> homepage.value.getOrElse("<unknown>"),
+
         "build.id"                  -> UUID.randomUUID().toString,
         "build.os"                  -> tryProperty { System.getProperty("os.name") },
         "build.user"                -> tryProperty { System.getProperty("user.name")+"@"+

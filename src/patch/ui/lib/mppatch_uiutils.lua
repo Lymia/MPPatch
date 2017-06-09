@@ -53,15 +53,17 @@ end
 -- Update function hooking
 local hooks = {}
 local hookLevels = {}
-local function onUpdate(...)
+function _mpPatch.onUpdate(...)
     for _, level in ipairs(hookLevels) do
         for _, hook in ipairs(hooks[level]) do
-            if hook(...) then return end
+            if hook(...) then
+                return true
+            end
         end
     end
 end
 function _mpPatch.hookUpdate()
-    ContextPtr:SetUpdate(onUpdate)
+    ContextPtr:SetUpdate(_mpPatch.onUpdate)
 end
 function _mpPatch.unhookUpdate()
     ContextPtr:ClearUpdate()

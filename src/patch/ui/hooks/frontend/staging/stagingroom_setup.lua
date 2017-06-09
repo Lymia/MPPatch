@@ -13,20 +13,17 @@ if _mpPatch_activateFrontEnd then
         end
     end)
 
-    local OnDisconnectOld = OnDisconnect
-    function OnDisconnect(...)
+    Events.MultiplayerGamePlayerDisconnected.Add(function(...)
         if not ContextPtr:IsHidden() then
             _mpPatch.hooks.protocol_chathandler_onDisconnect(...)
         end
-        return OnDisconnectOld(...)
-    end
-    Events.MultiplayerGamePlayerDisconnected.Remove(OnDisconnectOld)
-    Events.MultiplayerGamePlayerDisconnected.Add(OnDisconnect)
+    end)
 
     function StartCountdown()
         g_fCountdownTimer = 10
         countdownRunning = true
     end
+
     function StopCountdown()
         Controls.CountdownButton:SetHide(true)
         g_fCountdownTimer = -1

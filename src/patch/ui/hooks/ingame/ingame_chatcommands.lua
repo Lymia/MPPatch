@@ -19,6 +19,11 @@
 -- THE SOFTWARE.
 
 if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
+    _mpPatch.interceptGlobalWrite("OnUpdate", function(OnUpdate)
+        _mpPatch.addUpdateHook(OnUpdate)
+        return _mpPatch.onUpdate
+    end)
+
     _mpPatch.hooks.protocol_resetleaders()
     _mpPatch.interceptChatFunction()
 end
