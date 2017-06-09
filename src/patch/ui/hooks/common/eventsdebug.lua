@@ -75,11 +75,24 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.debug then
             "WonderTogglePlacement", "WonderTypeChanged", "WorldMouseOver"
         }
         local excludeList = { LocalMachineAppUpdate = true, KeyUpEvent = true, GameMessageChat = true }
-        if not _mpPatch.patch.shared.eventHookInstalled then
-            _mpPatch.patch.shared.eventHookInstalled = true
 
+        local testEventHandlerPing = "7f176dfe-4d49-11e7-b2f0-62ba1ac45905"
+        local testEventHandlerPong = "9eb4260c-4d49-11e7-bc4d-62ba1ac45905"
+
+        local eventHookIsActive = false
+        local function LuaEventHandler(event)
+            if event == testEventHandlerPong then
+                eventHookIsActive = true
+            end
+        end
+        Events.LuaEvent.Add(LuaEventHandler)
+        Events.LuaEvent(testEventHandlerPing)
+        Events.LuaEvent.Remove(LuaEventHandler)
+
+        if not eventHookIsActive then
             local _mpPatch, unpack = _mpPatch, unpack
             _mpPatch.debugPrint("Enabling event logging...")
+
             for _, event in ipairs(eventList) do
                 local eventObj = Events[event]
                 if not eventObj then
@@ -91,6 +104,13 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.debug then
                     end)
                 end
             end
+            Event.LuaEvent.Add(function(event)
+                if event == testEventHandlerPing then
+                    Event.LuaEvent(testEventHandlerPong)
+                end
+            end)
+        else
+            _mpPatch.debugPrint("Event logging already enabled.")
         end
     end)
 end

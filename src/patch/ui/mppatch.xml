@@ -48,7 +48,7 @@
         <InjectAfter Source="ui/hooks/frontend/mainmenu/mainmenu_printversion.lua"/>
         <InjectAfter Source="ui/hooks/frontend/mainmenu/mainmenu_status.lua"/>
         <InjectAfter Source="ui/hooks/frontend/mainmenu/mainmenu_resetpatch.lua"/>
-        <InjectAfter Source="ui/hooks/frontend/mainmenu/mainmenu_eventdebug.lua"/>
+        <InjectAfter Source="ui/hooks/common/eventsdebug.lua"/>
     </Hook>
     <Hook Filename="ContentSwitch.lua">
         <Include Filename="mppatch_runtime.lua"/>
@@ -105,6 +105,7 @@
         <Inject Source="ui/hooks/common/protocol_resetleaders.lua"/>
         <Inject Source="ui/hooks/common/protocol_kickunpatched.lua"/>
         <Inject Source="ui/hooks/ingame/ingame_chatcommands.lua"/>
+        <Inject Source="ui/hooks/common/eventsdebug.lua"/>
     </SoftHook>
     <SoftHook ScreenID="DiploCorner">
         <Include Filename="mppatch_runtime.lua"/>
