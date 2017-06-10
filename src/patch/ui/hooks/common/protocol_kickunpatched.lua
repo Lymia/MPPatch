@@ -48,11 +48,11 @@ if _mpPatch and _mpPatch.loaded then
         local joinWarning1Ending = Locale.ConvertTextKey(warning1TxtKey, timer)
 
         if isOutdated[playerId] then
-            _mpPatch.skipNextChatIfVersion(_mpPatch.protocolVersion)
+            _mpPatch.net.skipNextChatIfVersion(_mpPatch.protocolVersion)
             Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_OUTDATED").." "..
                              joinWarning1Ending)
 
-            _mpPatch.skipNextChatIfVersion(_mpPatch.protocolVersion)
+            _mpPatch.net.skipNextChatIfVersion(_mpPatch.protocolVersion)
         else
             _mpPatch.net.skipNextChat(2)
             Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_NOT_INSTALLED").." "..
