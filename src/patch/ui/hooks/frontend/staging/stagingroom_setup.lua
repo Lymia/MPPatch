@@ -29,7 +29,7 @@ if _mpPatch_activateFrontEnd then
 
     _mpPatch.hookUpdate()
     local countdownRunning = false
-    _mpPatch.addUpdateHook(function(...)
+    _mpPatch.event.update.registerHandler(function(...)
         if not ContextPtr:IsHidden() and countdownRunning then
             OnUpdate(...)
         end

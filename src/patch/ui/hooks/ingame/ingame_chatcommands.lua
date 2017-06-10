@@ -20,7 +20,7 @@
 
 if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     _mpPatch.interceptGlobalWrite("OnUpdate", function(OnUpdate)
-        _mpPatch.addUpdateHook(OnUpdate)
+        _mpPatch.event.update.registerHandler(OnUpdate)
         return _mpPatch.onUpdate
     end)
 
@@ -35,7 +35,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     end, true)
     _mpPatch.hooks.protocol_kickunpached_installHooks()
 
-    _mpPatch.addUpdateHook(function(timeDiff)
+    _mpPatch.event.update.registerHandler(function(timeDiff)
         _mpPatch.hooks.protocol_kickunpached_onUpdate(timeDiff)
     end)
 

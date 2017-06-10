@@ -24,7 +24,7 @@ if _mpPatch_activateFrontEnd then
     end)
     _mpPatch.hooks.protocol_kickunpached_installHooks()
 
-    _mpPatch.addUpdateHook(function(timeDiff)
+    _mpPatch.event.update.registerHandler(function(timeDiff)
         if not ContextPtr:IsHidden() then
             _mpPatch.hooks.protocol_kickunpached_onUpdate(timeDiff)
         end

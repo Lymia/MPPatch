@@ -51,29 +51,9 @@ function _mpPatch.setBIsModding()
 end
 
 -- Update function hooking
-local hooks = {}
-local hookLevels = {}
-function _mpPatch.onUpdate(...)
-    for _, level in ipairs(hookLevels) do
-        for _, hook in ipairs(hooks[level]) do
-            if hook(...) then
-                return true
-            end
-        end
-    end
-end
 function _mpPatch.hookUpdate()
-    ContextPtr:SetUpdate(_mpPatch.onUpdate)
+    ContextPtr:SetUpdate(_mpPatch.event.update)
 end
 function _mpPatch.unhookUpdate()
     ContextPtr:ClearUpdate()
-end
-function _mpPatch.addUpdateHook(hook, level)
-    level = level or 0
-    if not hooks[level] then
-        hooks[level] = {}
-        table.insert(hookLevels, level)
-        table.sort(hookLevels)
-    end
-    table.insert(hooks[level], hook)
 end

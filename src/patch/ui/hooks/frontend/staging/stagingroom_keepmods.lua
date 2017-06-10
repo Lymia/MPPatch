@@ -52,7 +52,7 @@ if _mpPatch_activateFrontEnd then
     end
 
     local LaunchGameOld = LaunchGame
-    _mpPatch.addUpdateHook(function(timeDiff)
+    _mpPatch.event.update.registerHandler(function(timeDiff)
         if not ContextPtr:IsHidden() and gameLaunchSet then
             gameLaunchCountdown = gameLaunchCountdown - timeDiff
             if gameLaunchCountdown <= 0 then
