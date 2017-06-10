@@ -27,6 +27,8 @@ if _mpPatch_activateFrontEnd then
     end)
     Events.GameMessageChat.Add(OnChat)
 
+    _mpPatch.net.clientIsPatched(_mpPatch.protocolVersion)
+
     _mpPatch.hookUpdate()
     local countdownRunning = false
     _mpPatch.event.update.registerHandler(function(...)
