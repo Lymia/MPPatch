@@ -99,7 +99,7 @@ if _mpPatch and _mpPatch.loaded then
     end
 
     function _mpPatch.hooks.protocol_kickunpached_onJoin(playerId)
-        if Matchmaking.IsHost() then
+        if Matchmaking.IsHost() and not playerMap[playerId] then
             local header = getHeader(playerId)
 
             _mpPatch.net.skipNextChat(2)
