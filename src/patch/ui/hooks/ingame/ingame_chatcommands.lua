@@ -42,7 +42,6 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     Events.MultiplayerHotJoinStarted.Add(function()
         for player=0,GameDefines.MAX_MAJOR_CIVS-1 do
             if Network.IsPlayerHotJoining(player) then
-                _mpPatch.hooks.protocol_kickunpached_chatActive(player)
                 _mpPatch.hooks.protocol_kickunpached_onJoin(player)
             end
         end

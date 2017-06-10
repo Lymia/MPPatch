@@ -30,16 +30,6 @@ if _mpPatch_activateFrontEnd then
         end
     end)
 
-    Events.MultiplayerGamePlayerUpdated.Add(function()
-        if not ContextPtr:IsHidden() then
-            for playerId=0,GameDefines.MAX_MAJOR_CIVS do
-                if Network.IsPlayerConnected(playerId) then
-                    _mpPatch.hooks.protocol_kickunpached_chatActive(playerId)
-                end
-            end
-        end
-    end)
-
     Events.ConnectedToNetworkHost.Add(function(playerId)
         if not ContextPtr:IsHidden() then
             _mpPatch.hooks.protocol_kickunpached_onJoin(playerId)
