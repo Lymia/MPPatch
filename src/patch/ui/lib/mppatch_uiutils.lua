@@ -77,15 +77,3 @@ function _mpPatch.addUpdateHook(hook, level)
     end
     table.insert(hooks[level], hook)
 end
-
--- Reset UI
-local resetHooks = {}
-function _mpPatch.addResetHook(fn)
-    table.insert(resetHooks, fn)
-end
-function _mpPatch.resetUI()
-    _mpPatch.debugPrint("Resetting UI")
-    for _, fn in ipairs(resetHooks) do
-        fn()
-    end
-end

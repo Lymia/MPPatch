@@ -34,7 +34,7 @@ if _mpPatch_activateFrontEnd then
         gameLaunchSet = true
         gameLaunchCountdown = 3
     end
-    _mpPatch.addResetHook(function()
+    _mpPatch.event.reset.registerHandler(function()
         gameLaunchSet = false
     end)
 
@@ -47,7 +47,7 @@ if _mpPatch_activateFrontEnd then
     local HandleExitRequestOld = HandleExitRequest
     function HandleExitRequest(...)
         if gameLaunchSet then return end
-        _mpPatch.resetUI()
+        _mpPatch.event.reset()
         return HandleExitRequestOld(...)
     end
 
@@ -58,7 +58,7 @@ if _mpPatch_activateFrontEnd then
             if gameLaunchCountdown <= 0 then
                 _mpPatch.event.kickAllUnpatched("Game starting")
                 LaunchGameOld()
-                _mpPatch.resetUI()
+                _mpPatch.event.reset()
             end
             return true
         end
@@ -78,7 +78,7 @@ if _mpPatch_activateFrontEnd then
     _mpPatch.patch.globals.rawset(UIManager, "DequeuePopup", function(this, ...)
         local context = ...
         if context == ContextPtr then
-            _mpPatch.resetUI()
+            _mpPatch.event.reset()
         end
         return DequeuePopup(this, ...)
     end)

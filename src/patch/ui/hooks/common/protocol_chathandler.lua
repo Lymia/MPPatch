@@ -30,7 +30,7 @@ if _mpPatch and _mpPatch.loaded then
                 skipNextLine[fromPlayer] = 1
             end
         end)
-        _mpPatch.addResetHook(function()
+        _mpPatch.event.reset.registerHandler(function()
             skipNextLine = {}
         end)
     end

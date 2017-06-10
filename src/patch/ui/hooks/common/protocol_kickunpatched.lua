@@ -65,7 +65,7 @@ if _mpPatch and _mpPatch.loaded then
     end
 
     function _mpPatch.hooks.protocol_kickunpached_installHooks()
-        _mpPatch.addResetHook(function()
+        _mpPatch.event.reset.registerHandler(function()
             playerMap = {}
             isPatched = {}
             chatActive = {}

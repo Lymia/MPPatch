@@ -98,14 +98,25 @@ end
 local eventTable = {}
 local function newEvent()
     local events = {}
+    local eventLevels = {}
     return setmetatable({
-        registerHandler = function(fn)
-            table.insert(events, fn)
+        registerHandler = function(fn, level)
+            level = level or 0
+            if not events[level] then
+                events[level] = {}
+                table.insert(eventLevels, level)
+                table.sort(eventLevels)
+            end
+            table.insert(events[level], fn)
         end
     }, {
         __call = function(t, ...)
-            for _, fn in ipairs(events) do
-                fn(...)
+            for _, level in ipairs(eventLevels) do
+                for _, fn in ipairs(events[level]) do
+                    if fn(...) then
+                        return true
+                    end
+                end
             end
         end
     })

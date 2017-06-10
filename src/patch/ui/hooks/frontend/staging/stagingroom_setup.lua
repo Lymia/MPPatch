@@ -52,7 +52,7 @@ if _mpPatch_activateFrontEnd then
         countdownRunning = false
     end
 
-    _mpPatch.addResetHook(function()
+    _mpPatch.event.reset.registerHandler(function()
         _mpPatch.patch.NetPatch.reset()
         StopCountdown()
     end)
