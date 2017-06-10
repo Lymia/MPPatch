@@ -27,5 +27,5 @@ pcall(function()
     else
         versionString = "MpPatch v".._mpPatch.versionString
     end
-    Controls.VersionNumber:SetText(Controls.VersionNumber:GetText().." w/ "..versionString)
+    Controls.VersionNumber:SetText(Controls.VersionNumber:GetText().." -- "..versionString)
 end)
