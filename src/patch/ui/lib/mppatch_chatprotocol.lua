@@ -22,20 +22,13 @@ local marker = "mppatch_command:8f671fc2-cd03-11e6-9c65-00e09c101bf5:"
 
 local chatProtocolCommands = {}
 function _mpPatch.registerChatCommand(id)
-    local handlers = {}
-    chatProtocolCommands[id] = function(...)
-        for _, handler in ipairs(handlers) do
-            handler(...)
-        end
-    end
+    local event = _mpPatch.event["command_"..id]
+    chatProtocolCommands[id] = event
     return setmetatable({
         send = function(data)
             _mpPatch.sendChatCommand(id, data)
         end,
-        registerHandler = function(fn)
-            _mpPatch.debugPrint("Registering handler for chat command "..id)
-            table.insert(handlers, fn)
-        end
+        registerHandler = event.registerHandler
     }, {
       __call = function(t, ...) return t.send(...) end
     })
