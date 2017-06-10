@@ -108,7 +108,7 @@ if _mpPatch and _mpPatch.loaded then
             for player, _ in pairs(kickTimer) do
                 kickTimer[player] = kickTimer[player] - timeDiff
 
-                local kickTimerIncrement = math.floor((kickTimer    [player] or 1000) / 5)
+                local kickTimerIncrement = math.floor( kickTimer    [player]          / 5)
                 local lastKickIncrement  = math.floor((lastKickTimer[player] or 1000) / 5)
 
                 if kickTimer[player] <= 0 then

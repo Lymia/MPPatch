@@ -43,14 +43,15 @@ function _mpPatch.interceptChatFunction(fn, condition, chatCondition, noCheckHid
     condition     = condition     or function() return true end
     chatCondition = chatCondition or function() return true end
     local function chatFn(...)
-        local _, _, text = ...
+        local fromPlayer, _, text = ...
         if (noCheckHide or not ContextPtr:IsHidden()) and condition(...) then
             local textHead, textTail = text:sub(1, marker:len()), text:sub(marker:len() + 1)
             if textHead == marker then
                 local split = textTail:find(":")
                 local command, data = textTail:sub(1, split - 1), textTail:sub(split + 1)
                 if data == "" then data = nil end
-                _mpPatch.debugPrint("Got MPPatch chat command: "..command..", data = "..(data or "<no data>"))
+                _mpPatch.debugPrint("Got MPPatch chat command: "..command..", "..
+                                    "player = "..fromPlayer.." data = "..(data or "<no data>"))
                 local fn = chatProtocolCommands[command]
                 if not fn then
                     return
