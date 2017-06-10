@@ -22,6 +22,28 @@ if _mpPatch and _mpPatch.loaded then
     local playerMap = {}
     local isPatched = {}
 
+    local chatActive = {}
+    local chatQueue = {}
+
+    local function sendChat(playerId, fn)
+        if chatActive[playerId] then
+            fn()
+        else
+            if not chatQueue[playerId] then
+                chatQueue[playerId] = {}
+            end
+            table.insert(chatQueue[playerId], fn)
+        end
+    end
+    local function setChatActive(playerId)
+        chatQueue[playerId] = true
+        if chatQueue[playerId] then
+            for _, fn in ipairs(chatQueue[playerId]) do
+                fn()
+            end
+        end
+    end
+
     local getPlayerName, joinWarning1Ending
     function _mpPatch.hooks.protocol_kickunpached_init(pGetPlayerName, pIsInGame)
         getPlayerName = pGetPlayerName
@@ -45,6 +67,8 @@ if _mpPatch and _mpPatch.loaded then
         _mpPatch.addResetHook(function()
             playerMap = {}
             isPatched = {}
+            chatActive = {}
+            chatQueue = {}
         end)
 
         _mpPatch.net.clientIsPatched.registerHandler(function(protocolVersion, playerId)
@@ -55,12 +79,14 @@ if _mpPatch and _mpPatch.loaded then
                 else
                     local header = getHeader(playerId)
 
-                    _mpPatch.skipNextChatIfVersion(_mpPatch.protocolVersion)
-                    Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_OUTDATED").." "..
-                                     joinWarning1Ending)
+                    sendChat(playerId, function()
+                        _mpPatch.skipNextChatIfVersion(_mpPatch.protocolVersion)
+                        Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_OUTDATED").." "..
+                                         joinWarning1Ending)
 
-                    _mpPatch.skipNextChatIfVersion(_mpPatch.protocolVersion)
-                    Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_2")..website)
+                        _mpPatch.skipNextChatIfVersion(_mpPatch.protocolVersion)
+                        Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_2")..website)
+                    end)
                 end
             end
         end)
@@ -101,14 +127,20 @@ if _mpPatch and _mpPatch.loaded then
         end
     end
 
+    function _mpPatch.hooks.protocol_kickunpached_chatActive(playerId)
+        setChatActive(playerId)
+    end
+
     function _mpPatch.hooks.protocol_kickunpached_onJoin(playerId)
         if Matchmaking.IsHost() and not playerMap[playerId] and not isPatched[playerId] then
             local header = getHeader(playerId)
 
-            _mpPatch.net.skipNextChat(2)
-            Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_NOT_INSTALLED").." "..
-                             joinWarning1Ending)
-            Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_2")..website)
+            sendChat(playerId, function()
+                _mpPatch.net.skipNextChat(2)
+                Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_NOT_INSTALLED").." "..
+                                 joinWarning1Ending)
+                Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_2")..website)
+            end)
 
             playerMap[playerId] = 30
         end
@@ -118,6 +150,8 @@ if _mpPatch and _mpPatch.loaded then
         if Matchmaking.IsHost() then
             playerMap[playerId] = nil
             isPatched[playerId] = nil
+            chatActive[playerId] = nil
+            chatQueue[playerId] = nil
         end
     end
 end
