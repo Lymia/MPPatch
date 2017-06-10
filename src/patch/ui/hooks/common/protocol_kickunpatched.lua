@@ -41,6 +41,7 @@ if _mpPatch and _mpPatch.loaded then
             for _, fn in ipairs(chatQueue[playerId]) do
                 fn()
             end
+            chatQueue[playerId] = nil
         end
     end
 
