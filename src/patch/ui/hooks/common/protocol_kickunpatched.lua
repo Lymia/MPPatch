@@ -20,6 +20,7 @@
 
 if _mpPatch and _mpPatch.loaded then
     local playerMap = {}
+    local isPatched = {}
 
     local getPlayerName, joinWarning1Ending
     function _mpPatch.hooks.protocol_kickunpached_init(pGetPlayerName, pIsInGame)
@@ -43,12 +44,14 @@ if _mpPatch and _mpPatch.loaded then
     function _mpPatch.hooks.protocol_kickunpached_installHooks()
         _mpPatch.addResetHook(function()
             playerMap = {}
+            isPatched = {}
         end)
 
-        _mpPatch.net.clientIsPatched.registerHandler(function(protocolVersion, playerID)
+        _mpPatch.net.clientIsPatched.registerHandler(function(protocolVersion, playerId)
             if Matchmaking.IsHost() then
                 if protocolVersion == _mpPatch.protocolVersion then
-                    playerMap[playerID] = nil
+                    playerMap[playerId] = nil
+                    isPatched[playerId] = true
                 else
                     local header = getHeader(playerId)
 
@@ -99,7 +102,7 @@ if _mpPatch and _mpPatch.loaded then
     end
 
     function _mpPatch.hooks.protocol_kickunpached_onJoin(playerId)
-        if Matchmaking.IsHost() and not playerMap[playerId] then
+        if Matchmaking.IsHost() and not playerMap[playerId] and not isPatched[playerId] then
             local header = getHeader(playerId)
 
             _mpPatch.net.skipNextChat(2)
@@ -114,6 +117,7 @@ if _mpPatch and _mpPatch.loaded then
     function _mpPatch.hooks.protocol_kickunpached_onDisconnect(playerId)
         if Matchmaking.IsHost() then
             playerMap[playerId] = nil
+            isPatched[playerId] = nil
         end
     end
 end
