@@ -43,7 +43,7 @@ if _mpPatch and _mpPatch.loaded then
     end
     local function warnPlayer(playerId)
         local header = getHeader(playerId)
-        local timer = math.round(kickTimer[playerId])
+        local timer = math.floor(kickTimer[playerId] + 0.5)
 
         local joinWarning1Ending = Locale.ConvertTextKey(warning1TxtKey, timer)
 

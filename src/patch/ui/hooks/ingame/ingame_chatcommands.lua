@@ -21,7 +21,8 @@
 if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
     _mpPatch.interceptGlobalWrite("OnUpdate", function(OnUpdate)
         _mpPatch.event.update.registerHandler(OnUpdate)
-        return _mpPatch.onUpdate
+        local event = _mpPatch.event.update
+        return function(...) return event(...) end
     end)
 
     _mpPatch.hooks.protocol_resetleaders()
