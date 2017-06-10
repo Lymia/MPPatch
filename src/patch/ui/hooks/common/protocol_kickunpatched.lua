@@ -36,7 +36,7 @@ if _mpPatch and _mpPatch.loaded then
         end
     end
     local function setChatActive(playerId)
-        chatQueue[playerId] = true
+        chatActive[playerId] = true
         if chatQueue[playerId] then
             for _, fn in ipairs(chatQueue[playerId]) do
                 fn()
