@@ -20,22 +20,23 @@
 
 local marker = "mppatch_command:8f671fc2-cd03-11e6-9c65-00e09c101bf5:"
 
+local function sendChatCommand(id, data)
+    _mpPatch.debugPrint("Sending MPPatch chat command: "..id..", data = "..(data or "<no data>"))
+    Network.SendChat(marker..id..":"..(data or ""))
+end
+
 local chatProtocolCommands = {}
-function _mpPatch.registerChatCommand(id)
+local function newChatCommand(id)
     local event = _mpPatch.event["command_"..id]
     chatProtocolCommands[id] = event
     return setmetatable({
         send = function(data)
-            _mpPatch.sendChatCommand(id, data)
+            sendChatCommand(id, data)
         end,
         registerHandler = event.registerHandler
     }, {
       __call = function(t, ...) return t.send(...) end
     })
-end
-function _mpPatch.sendChatCommand(id, data)
-    _mpPatch.debugPrint("Sending MPPatch chat command: "..id..", data = "..(data or "<no data>"))
-    Network.SendChat(marker..id..":"..(data or ""))
 end
 
 function _mpPatch.interceptChatFunction(fn, condition, chatCondition, noCheckHide)
@@ -67,9 +68,12 @@ end
 _mpPatch.protocolVersion = "0"
 
 -- commands
-_mpPatch.net = {}
-_mpPatch.net.skipNextChat          = _mpPatch.registerChatCommand("skipNextChat"         )
-_mpPatch.net.skipNextChatIfVersion = _mpPatch.registerChatCommand("skipNextChatIfVersion")
-_mpPatch.net.sendPlayerData        = _mpPatch.registerChatCommand("sendPlayerData"       )
-_mpPatch.net.startLaunchCountdown  = _mpPatch.registerChatCommand("startLaunchCountdown" )
-_mpPatch.net.clientIsPatched       = _mpPatch.registerChatCommand("clientIsPatched"      )
+local chatCommands = {}
+_mpPatch.net = setmetatable({}, {
+    __index = function(_, k)
+        if not chatCommands[k] then
+            chatCommands[k] = newChatCommand(k)
+        end
+        return chatCommands[k]
+    end
+})
