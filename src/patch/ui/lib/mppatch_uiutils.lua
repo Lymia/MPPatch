@@ -52,7 +52,8 @@ end
 
 -- Update function hooking
 function _mpPatch.hookUpdate()
-    ContextPtr:SetUpdate(_mpPatch.event.update)
+    local onUpdate = _mpPatch.event.update
+    ContextPtr:SetUpdate(function(...) return onUpdate(...) end)
 end
 function _mpPatch.unhookUpdate()
     ContextPtr:ClearUpdate()
