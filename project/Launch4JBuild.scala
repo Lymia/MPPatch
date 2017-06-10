@@ -78,7 +78,6 @@ object Launch4JBuild {
       config.setJar     (jarFile)
       config.setOutfile (outDir / s"$jarFileShortName.exe")
       config.setManifest(launch4jManifest.value)
-      config.setIcon    (baseDirectory.value / "project" / "icon.ico")
 
       config.getVersionInfo.setFileVersion      (versionString)
       config.getVersionInfo.setTxtFileVersion   (version.value)
