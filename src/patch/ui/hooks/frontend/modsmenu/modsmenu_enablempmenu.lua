@@ -47,8 +47,9 @@ if _mpPatch and _mpPatch.loaded then
     _mpPatch.hookGlobalFunction("OnSinglePlayerClick", function()
         showMessage("SupportsSinglePlayer", "TXT_KEY_MPPATCH_NO_SINGLEPLAYER_SUPPORT")
     end)
-    _mpPatch.hookGlobalFunction("OnMultiPlayerClick", function()
+    _mpPatch.replaceGlobalFunction("OnMultiPlayerClick", function()
         showMessage("SupportsMultiplayer" , "TXT_KEY_MPPATCH_NO_MULTIPLAYER_SUPPORT" )
+        UIManager:QueuePopup(Controls.ModMultiplayerSelectScreen, PopupPriority.ModMultiplayerSelectScreen)
     end)
 
     local function onShowHide()

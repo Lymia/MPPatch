@@ -71,7 +71,7 @@ function _mpPatch.interceptGlobalWrite(name, fn)
     interceptGlobalWriteHooks[name] = fn
 end
 function _mpPatch.hookGlobalFunction(name, fn)
-    _mpPatch.interceptGlobalWrite(name,  function(origFn)
+    _mpPatch.interceptGlobalWrite(name, function(origFn)
         return function(...)
             local v = fn(...)
             if not v then
@@ -80,6 +80,9 @@ function _mpPatch.hookGlobalFunction(name, fn)
             return v
         end
     end)
+end
+function _mpPatch.replaceGlobalFunction(name, fn)
+    _mpPatch.interceptGlobalWrite(name, function() return fn end)
 end
 
 -- Version utils
