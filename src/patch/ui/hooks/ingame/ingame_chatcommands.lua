@@ -40,18 +40,17 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.isModding then
         _mpPatch.hooks.protocol_kickunpached_onUpdate(timeDiff)
     end)
 
-    Events.MultiplayerHotJoinStarted.Add(function()
-        for player=0,GameDefines.MAX_MAJOR_CIVS-1 do
-            if Network.IsPlayerHotJoining(player) then
-                _mpPatch.hooks.protocol_kickunpached_onJoin(player)
-            end
-        end
+    Events.ConnectedToNetworkHost.Add(function(player)
+        _mpPatch.hooks.protocol_kickunpached_onJoin(player)
     end)
     Events.MultiplayerGamePlayerDisconnected.Add(function(player)
         _mpPatch.hooks.protocol_kickunpached_onDisconnect(player)
     end)
+
+    Events.MultiplayerHotJoinStarted.Add(function(player)
+        _mpPatch.event.kickAllUnpatched("Hotjoin started")
+    end)
     Events.MultiplayerHotJoinCompleted.Add(function(player)
         _mpPatch.event.kickAllUnpatched("Hotjoin completed")
     end)
-
 end
