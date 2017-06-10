@@ -96,7 +96,7 @@ if _mpPatch and _mpPatch.loaded and _mpPatch.debug then
         }
         local excludeList = { LocalMachineAppUpdate = true, KeyUpEvent = true, SerialEventMouseOverHex = true,
                               WorldMouseOver = true, UnitVisibilityChanged = true, VisibilityUpdated = true,
-                              MultiplayerPingTimesChanged = true, DragCamera }
+                              MultiplayerPingTimesChanged = true, DragCamera = true, }
         local excludePrefixes = { "SerialEventCamera", "Camera", "Show" }
 
         local testEventHandlerPing = "7f176dfe-4d49-11e7-b2f0-62ba1ac45905"
