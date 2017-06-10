@@ -19,6 +19,8 @@
 -- THE SOFTWARE.
 
 -----------------------------------------------------------------------------------------------------------------------
+-- Game option wrapper
+--
 -- There's a bug in CvPreGame.cpp (available in the SDK) where it passes the result of strlen to strncmp, in a way
 -- where it doesn't check for the C string terminator in some cases. This works around it.
 --
