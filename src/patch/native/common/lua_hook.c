@@ -78,7 +78,7 @@ static int luaHook_NetPatch_pushMod(lua_State *L) {
     return 0;
 }
 static int luaHook_NetPatch_overrideReloadMods(lua_State *L) {
-    NetPatch_overrideReloadMods(luaL_checkinteger(L, 1) != 0);
+    NetPatch_overrideReloadMods(lua_toboolean(L, 1));
     return 0;
 }
 static int luaHook_NetPatch_overrideModList(lua_State *L) {
@@ -92,7 +92,7 @@ static int luaHook_NetPatch_pushDLC(lua_State *L) {
     return 0;
 }
 static int luaHook_NetPatch_overrideReloadDLC(lua_State *L) {
-    NetPatch_overrideReloadDLC(luaL_checkinteger(L, 1) != 0);
+    NetPatch_overrideReloadDLC(lua_toboolean(L, 1));
     return 0;
 }
 static int luaHook_NetPatch_overrideDLCList(lua_State *L) {
