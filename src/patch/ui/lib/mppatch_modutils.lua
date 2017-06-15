@@ -20,6 +20,11 @@
 
 local patch = _mpPatch.patch
 
+function _mpPatch.forceReloadMods()
+    patch.NetPatch.reset()
+    patch.NetPatch.overrideReloadMods(true)
+    patch.NetPatch.install()
+end
 function _mpPatch.overrideWithModList(list)
     _mpPatch.debugPrint("Overriding mods...")
     patch.NetPatch.reset()
@@ -31,6 +36,7 @@ function _mpPatch.overrideWithModList(list)
     patch.NetPatch.overrideModList()
     patch.NetPatch.install()
 end
+
 function _mpPatch.overrideModsFromActivatedList()
     local modList = Modding.GetActivatedMods()
     if modList and #modList > 0 then
@@ -43,7 +49,6 @@ function _mpPatch.overrideModsFromPreGame()
         _mpPatch.overrideWithModList(modList)
     end
 end
-
 _mpPatch._mt.registerProperty("areModsEnabled", function()
     return #Modding.GetActivatedMods() > 0
 end)

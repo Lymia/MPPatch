@@ -57,6 +57,10 @@
     </Hook>
 
     <!-- Multiplayer/Mods frontend hooks -->
+    <SoftHook ScreenID="ModsBrowser">
+        <Include Filename="mppatch_runtime.lua"/>
+        <Inject Source="ui/hooks/frontend/modsmenu/modsbrowser_forcereload.lua"/>
+    </SoftHook>
     <SoftHook ScreenID="ModsMenu">
         <Include Filename="mppatch_runtime.lua"/>
         <Inject Source="ui/hooks/frontend/modsmenu/modsmenu_enablempmenu.lua"/>
