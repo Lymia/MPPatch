@@ -108,8 +108,8 @@ if _mpPatch and _mpPatch.loaded then
             for player, _ in pairs(kickTimer) do
                 kickTimer[player] = kickTimer[player] - timeDiff
 
-                local kickTimerIncrement = math.floor( kickTimer    [player]          / 5)
-                local lastKickIncrement  = math.floor((lastKickTimer[player] or 1000) / 5)
+                local kickTimerIncrement = math.floor( kickTimer    [player]          / 10)
+                local lastKickIncrement  = math.floor((lastKickTimer[player] or 1000) / 10)
 
                 if kickTimer[player] <= 0 then
                     _mpPatch.debugPrint("Kicking player "..player.." for (presumably) not having MPPatch.")
@@ -126,7 +126,7 @@ if _mpPatch and _mpPatch.loaded then
     function _mpPatch.hooks.protocol_kickunpached_onJoin(playerId)
         if Matchmaking.IsHost() and not kickTimer[playerId] and not isPatched[playerId] then
             local header = getHeader(playerId)
-            kickTimer[playerId] = 30
+            kickTimer[playerId] = 60
             lastKickTimer[playerId] = 1000
         end
     end
