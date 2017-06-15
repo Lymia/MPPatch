@@ -45,6 +45,31 @@ if _mpPatch and _mpPatch.loaded then
         end
         return false
     end
+
+    local areEventsActive, startTimer = false, nil
+    _mpPatch.hookUpdate()
+    _mpPatch.event.update.registerHandler(function(timeDiff)
+        if areEventsActive and startTimer then
+            startTimer = startTimer - timeDiff
+            if startTimer <= 0 then
+                startTimer = nil
+                enterLobby()
+            end
+        end
+    end)
+
+    local RegisterEventsOld = RegisterEvents
+    function RegisterEvents(...)
+        areEventsActive = true
+        return RegisterEventsOld(...)
+    end
+
+    local UnregisterEventsOld = UnregisterEvents
+    function UnregisterEvents(...)
+        areEventsActive = false
+        return UnregisterEventsOld(...)
+    end
+
     function OnConnectionCompete()
         if not Matchmaking.IsHost() then
             if _mpPatch.isModding then
@@ -81,9 +106,11 @@ if _mpPatch and _mpPatch.loaded then
                                         "is installed = "..tostring(ContentManager.IsInstalled(k)))
                 end
                 if checkTable(missingDlc, "TXT_KEY_MPPATCH_DLC_MISSING") then return end
-            end
 
-            enterLobby()
+                startTimer = 2 -- Delay enterLobby() call to try and give the client time to send clientIsPatched
+            else
+                enterLobby()
+            end
         end
     end
 end
