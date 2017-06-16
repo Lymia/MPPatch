@@ -57,7 +57,7 @@ class VersionInfo(properties: VersionInfoSource) {
   lazy val minorVersion  = properties("mppatch.version.minor", "-1").toInt
   lazy val patchVersion  = properties("mppatch.version.patch", "0").toInt
 
-  lazy val versionSuffix = properties("mppatch.version.suffix", "0")
+  lazy val versionSuffix = properties("mppatch.version.suffix", "")
   lazy val commit        = properties("mppatch.version.commit", "<unknown>")
   lazy val treeStatus    = properties("build.treestatus", "<clean>")
   lazy val versionString = properties("mppatch.version.string", "<unknown>")

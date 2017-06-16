@@ -69,7 +69,7 @@ object InstallerResourceBuild {
         "mppatch.version.major"     -> major,
         "mppatch.version.minor"     -> minor,
         "mppatch.version.patch"     -> patch,
-        "mppatch.version.suffix"    -> suffix,
+        "mppatch.version.suffix"    -> Option(suffix).getOrElse(""),
         "mppatch.version.commit"    -> git.gitHeadCommit.value.getOrElse("<unknown>"),
         "mppatch.version.clean"     -> (!git.gitUncommittedChanges.value).toString,
 
@@ -98,7 +98,10 @@ object InstallerResourceBuild {
       val path = crossTarget.value / "version-resource-cache.properties"
 
       val properties = new java.util.Properties
-      for((k, v) <- versionData.value) properties.put(k, v)
+      for((k, v) <- versionData.value) {
+        println(k, v)
+        properties.put(k, v)
+      }
       IO.write(properties, "MPPatch build information", path)
 
       path
