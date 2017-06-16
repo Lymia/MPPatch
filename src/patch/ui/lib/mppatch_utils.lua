@@ -42,7 +42,6 @@ function _mpPatch.strStarts(str, prefix)
    return str:sub(1, prefix:len()) == prefix
 end
 
-
 -- Soft hook utils
 local globalMetatableSetupComplete = false
 local interceptGlobalWriteHooks = {}
