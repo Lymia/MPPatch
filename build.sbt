@@ -39,7 +39,7 @@ val commonSettings = versionWithGit ++ Seq(
   licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
 
   // Git versioning
-  git.baseVersion := "0.1.0",
+  git.baseVersion := "0.1.1",
   git.uncommittedSignifier := Some("DIRTY"),
   git.formattedShaVersion := {
     val base = git.baseVersion.?.value
