@@ -46,6 +46,11 @@ static int readConfig_handler(void* user, const char* section, const char* name,
     return 1;
 }
 
+static bool exists(const char *fname) {
+    FILE *file = fopen(fname, "r");
+    if (file) fclose(file);
+    return file ? true : false;
+}
 __attribute__((constructor(CONSTRUCTOR_READ_CONFIG))) static void readConfig() {
-    if(access(CONFIG_FILENAME, F_OK) != -1) ini_parse(CONFIG_FILENAME, readConfig_handler, NULL);
+    if(exists(CONFIG_FILENAME)) ini_parse(CONFIG_FILENAME, readConfig_handler, NULL);
 }

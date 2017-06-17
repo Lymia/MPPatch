@@ -58,7 +58,8 @@ object LuaJITBuild {
             case "win32" =>
               (Map("HOST_CC" -> (config_linux_gcc+" -m32"), "CROSS" -> config_mingw_prefix,
                    "TARGET_SYS" -> "Windows"), "src/lua51.dll", ".dll",
-               Seq("-static-libgcc") ++ config_win32_secureFlags)
+               Seq(s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
+                   "-static-libgcc") ++ config_win32_secureFlags)
             case "linux" =>
               (Map("CC" -> (config_linux_gcc+" -m32")), "src/libluajit.so", ".so", config_linux_secureFlags)
           }
