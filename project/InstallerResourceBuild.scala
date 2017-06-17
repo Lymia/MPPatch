@@ -98,10 +98,7 @@ object InstallerResourceBuild {
       val path = crossTarget.value / "version-resource-cache.properties"
 
       val properties = new java.util.Properties
-      for((k, v) <- versionData.value) {
-        println(k, v)
-        properties.put(k, v)
-      }
+      for((k, v) <- versionData.value) properties.put(k, v)
       IO.write(properties, "MPPatch build information", path)
 
       path
