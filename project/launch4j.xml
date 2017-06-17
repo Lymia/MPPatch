@@ -37,7 +37,7 @@
     <trademarks>MPPatch is licenced under the terms of the MIT License.</trademarks>
   </versionInfo>
   <messages>
-    <jreVersionErr>This application requires Java 8 or later to run.
+    <jreVersionErr>This application requires Java 7 or later to run.
 Minimum version:</jreVersionErr>
   </messages>
 </launch4jConfig>
