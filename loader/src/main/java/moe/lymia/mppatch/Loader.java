@@ -33,7 +33,13 @@ import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 
-final class Loader implements Runnable {
+final class LoaderException extends RuntimeException {
+    LoaderException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
+
+public final class Loader implements Runnable {
     private static final Pack200.Unpacker unpacker = Pack200.newUnpacker();
 
     private File tempJarFile;
@@ -102,7 +108,7 @@ final class Loader implements Runnable {
         JOptionPane.showMessageDialog(null, "Could not start MPPatch installer:\n"+error, "MPPatch Installer",
                                       JOptionPane.ERROR_MESSAGE);
         if(e != null) e.printStackTrace();
-        return new RuntimeException(error, e);
+        return new LoaderException(error, e);
     }
 
     // Shutdown hook
@@ -134,21 +140,25 @@ final class Loader implements Runnable {
 
     public static void main(String[] args) {
         try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            System.err.println("Warning: Failed to set system Look and Feel.");
-            e.printStackTrace();
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } catch (Exception e) {
+                System.err.println("Warning: Failed to set system Look and Feel.");
+                e.printStackTrace();
+            }
+
+            boolean isJava8;
+            try {
+                isJava8 = isJava8();
+            } catch (Exception e) {
+                throw error("Could not parse JVM version", e);
+            }
+
+            if(!isJava8) throw error("Java 8 or later is required to run this program.", null);
+
+            new Loader().startPackedProgram(args);
+        } catch(LoaderException e) {
+            // ignored
         }
-
-        boolean isJava8;
-        try {
-            isJava8 = isJava8();
-        } catch (Exception e) {
-            throw error("Could not parse JVM version", e);
-        }
-
-        if(!isJava8) throw error("Java 8 or later is required to run this program.", null);
-
-        new Loader().startPackedProgram(args);
     }
 }

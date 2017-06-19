@@ -39,45 +39,51 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
   protected def locale = Locale.getDefault
   override protected def frame: JFrame = null
 
-  def main(args: Array[String]): Unit = try {
-    System.setProperty("awt.useSystemAAFontSettings","on")
-    System.setProperty("swing.aatext", "true")
+  def main(args: Array[String]): Unit =
+      try {
+      System.setProperty("awt.useSystemAAFontSettings","on")
+      System.setProperty("swing.aatext", "true")
 
-    SimpleLogger.addLogger(new PrintWriter(new OutputStreamWriter(
-      new FileOutputStream(InstallerMain.logFile, true), StandardCharsets.UTF_8)))
+      SimpleLogger.addLogger(new PrintWriter(new OutputStreamWriter(
+        new FileOutputStream(InstallerMain.logFile, true), StandardCharsets.UTF_8)))
 
-    val line = Seq.fill(80)("=").mkString("")
-    log.logRaw("")
-    log.logRaw(line)
-    log.logRaw(s"MPPatch version ${VersionInfo.versionString}")
-    log.logRaw(s"Revision ${VersionInfo.commit.substring(0, 8)}${if(VersionInfo.isDirty) " (dirty)" else ""}, "+
-                   s"built on ${dateFormat.format(VersionInfo.buildDate)} by ${VersionInfo.buildUser}")
-    log.logRaw("")
+      val line = Seq.fill(80)("=").mkString("")
+      log.logRaw("")
+      log.logRaw(line)
+      log.logRaw(s"MPPatch version ${VersionInfo.versionString}")
+      log.logRaw(s"Revision ${VersionInfo.commit.substring(0, 8)}${if(VersionInfo.isDirty) " (dirty)" else ""}, "+
+                     s"built on ${dateFormat.format(VersionInfo.buildDate)} by ${VersionInfo.buildUser}")
+      log.logRaw("")
 
-    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
 
-    val versionData = Seq(
-      "Build ID"    -> VersionInfo.buildID,
-      "Build Date"  -> Logger.dateFormat.format(VersionInfo.buildDate),
-      "Revision"    -> VersionInfo.commit,
-      "Tree Status" -> VersionInfo.treeStatus
-    )
-    val headerLength = versionData.map(_._1.length).max
-    val indent = Seq.fill(headerLength + 2)(" ").mkString("")
-    val formatStr = s"%-${headerLength}s: %s"
-    for((k, v) <- versionData) {
-      val lines = v.split("\n")
-      log.logRaw(formatStr.format(k, lines.head))
-      for(l <- lines.tail) log.logRaw(indent + l)
+      val versionData = Seq(
+        "Build ID"    -> VersionInfo.buildID,
+        "Build Date"  -> Logger.dateFormat.format(VersionInfo.buildDate),
+        "Revision"    -> VersionInfo.commit,
+        "Tree Status" -> VersionInfo.treeStatus
+      )
+      val headerLength = versionData.map(_._1.length).max
+      val indent = Seq.fill(headerLength + 2)(" ").mkString("")
+      val formatStr = s"%-${headerLength}s: %s"
+      for((k, v) <- versionData) {
+        val lines = v.split("\n")
+        log.logRaw(formatStr.format(k, lines.head))
+        for(l <- lines.tail) log.logRaw(indent + l)
+      }
+      log.logRaw(line)
+      log.logRaw("")
+
+
+      new MainFrame(locale, args.length > 0 && args(0) == "--launch-from-exe").showForm()
+    } catch {
+      case _: InstallerException => // ignored
+      case e: Exception => try {
+        dumpException("error.genericerror", e)
+      } catch {
+        case _: InstallerException => // ignored
+      }
     }
-    log.logRaw(line)
-    log.logRaw("")
-
-
-    new MainFrame(locale, args.length > 0 && args(0) == "--launch-from-exe").showForm()
-  } catch {
-    case e: Exception => dumpException("error.genericerror", e)
-  }
 }
 
 object Installer {

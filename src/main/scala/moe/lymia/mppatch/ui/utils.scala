@@ -144,6 +144,7 @@ trait I18NFrameUtils extends FrameUtils with I18NTrait {
   }
 }
 
+final class InstallerException(str: String, ex: Throwable) extends RuntimeException(str, ex)
 trait FrameError[F <: Window] extends HasLogger {
   protected def frame: F
   protected def i18n: I18N
@@ -168,7 +169,7 @@ trait FrameError[F <: Window] extends HasLogger {
       case Some(t) => log.error(string, t)
       case None    => log.error(string)
     }
-    throw new RuntimeException(string, ex.orNull)
+    throw new InstallerException(string, ex.orNull)
   }
   protected def error[T](string: String, data: Any*) = error0(string, None, data)
   protected def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T =
