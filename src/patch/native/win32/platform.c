@@ -89,10 +89,6 @@ __attribute__((constructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void initiali
     if(baseDll == NULL)
         fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08lx)", GetLastError());
 }
-__attribute__((destructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void deinitializeProxy() {
-    debug_print("Unloading original CvGameDatabase");
-    FreeLibrary(baseDll);
-}
 
 // Symbol resolution
 void* resolveSymbol(AddressDomain domain, const char* symbol) {

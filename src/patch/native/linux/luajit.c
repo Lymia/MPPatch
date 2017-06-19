@@ -51,17 +51,14 @@ static const char* luaJITSymbols[] = {
     "lua_setmetatable", "lua_loadx", "lua_isuserdata", "lua_pushinteger", "lua_getstack", "luaL_argerror",
     "lua_atpanic"
 };
-static PatchInformation* luaJITHooks[sizeof(luaJITSymbols) / sizeof(const char*)] = {NULL};
-static void* luaJIT = NULL;
 
 __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installLuaJIT() {
     if(enableLuaJIT) {
         debug_print("Loading LuaJIT...");
-        luaJIT = dlopen("mppatch_luajit.so", RTLD_NOW);
+        void* luaJIT = dlopen("mppatch_luajit.so", RTLD_NOW);
         if(luaJIT == NULL) fatalError("Could not open LuaJIT library: %s", dlerror());
         for(int i=0; i < sizeof(luaJITSymbols) / sizeof(const char*); i++) {
             const char* symbol = luaJITSymbols[i];
-            luaJITHooks[i] = NULL;
 
             void* targetSym = resolveSymbol(CV_GAME_DATABASE, symbol);
             void* patchSym  = dlsym(luaJIT, symbol);
@@ -70,12 +67,7 @@ __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installLuaJIT() 
             if(patchSym  == NULL) debug_print("WARNING: Symbol %s does not exist in LuaJIT binary.", symbol);
             if(targetSym == NULL || patchSym == NULL) continue;
 
-            luaJITHooks[i] = proxyFunction(targetSym, patchSym, 0, symbol);
+            patchJmpInstruction(targetSym, patchSym, symbol);
         }
     }
-}
-__attribute__((destructor(CONSTRUCTOR_HOOK_INIT))) static void uninstallLuaJIT() {
-    for(int i=0; i < sizeof(luaJITSymbols) / sizeof(const char*); i++)
-        if(luaJITHooks[i] != NULL) unpatch(luaJITHooks[i]);
-    if(luaJIT != NULL) dlclose(luaJIT);
 }

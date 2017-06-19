@@ -164,9 +164,3 @@ ENTRY int SetActiveDLCAndMods_attributes SetActiveDLCAndModsProxy(void* this, Cp
     NetPatch_reset();
     return ret;
 }
-
-__attribute__((destructor(CONSTRUCTOR_HOOK_INIT))) static void destroyHooks() {
-    spinLock();
-    if(SetActiveDLCAndMods_patchInfo != 0) unpatch(SetActiveDLCAndMods_patchInfo);
-    spinUnlock();
-}

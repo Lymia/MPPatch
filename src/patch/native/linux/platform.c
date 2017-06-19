@@ -98,10 +98,6 @@ __attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void loadDysymHandl
     struct link_map *lm = (struct link_map*) dlsymHandle;
     base_offset = lm->l_addr;
 }
-__attribute__((destructor(CONSTRUCTOR_BINARY_INIT))) static void closeDysymHandle() {
-    debug_print("Closing handle to main binary");
-    dlclose(dlsymHandle);
-}
 
 // std::list implementation
 #define CppList_length(list) ((int*) list->data)[0]

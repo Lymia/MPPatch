@@ -41,9 +41,6 @@ __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installHooks() {
         lGetMemoryUsage = (lGetMemoryUsage_t) lGetMemoryUsage_patchInfo->functionFragment->data;
     }
 }
-__attribute__((destructor(CONSTRUCTOR_HOOK_INIT))) static void destroyHooks() {
-    if(lGetMemoryUsage_patchInfo != NULL) unpatch(lGetMemoryUsage_patchInfo);
-}
 
 void installNetHook() {
     SetActiveDLCAndMods_patchInfo = proxyFunction(resolveSymbol(CV_MERGED_BINARY, SetActiveDLCAndMods_symbol),
