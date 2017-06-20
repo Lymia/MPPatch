@@ -114,7 +114,7 @@ object NativePatchBuild {
 
       IO.createDirectory(patchDirectory)
 
-      val patches = for(versionDir <- (patchSourceDir.value / "versions").listFiles) yield {
+      val patches = for(versionDir <- (patchSourceDir.value / "versions").listFiles if !versionDir.getName.toString.startsWith("macos")) yield {
         val version = versionDir.getName
         val Array(platform, sha256) = version.split("_")
 
@@ -127,7 +127,7 @@ object NativePatchBuild {
                   s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
                   "-static-libgcc") ++ config_win32_secureFlags)
             case "linux" => (gcc       _, "elf"  , ".so" ,
-              Seq(patchSourceDir.value / "linux", steamrtSDLDev.value),
+              Seq(patchSourceDir.value / "linux", patchSourceDir.value / "posix", steamrtSDLDev.value),
               Seq(steamrtSDL.value),
               Seq("-ldl") ++ config_linux_secureFlags)
           }
