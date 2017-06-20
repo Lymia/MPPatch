@@ -55,10 +55,16 @@ static const char* luaJITSymbols[] = {
 __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installLuaJIT() {
     if(enableLuaJIT) {
         debug_print("Loading LuaJIT...");
-        void* luaJIT = dlopen("mppatch_luajit.so", RTLD_NOW);
+
+        char buffer[PATH_MAX];
+        getSupportFilePath(buffer, LUAJIT_LIBRARY);
+
+        void* luaJIT = dlopen(buffer, RTLD_NOW);
         if(luaJIT == NULL) fatalError("Could not open LuaJIT library: %s", dlerror());
+
+        char symbol[512];
         for(int i=0; i < sizeof(luaJITSymbols) / sizeof(const char*); i++) {
-            const char* symbol = luaJITSymbols[i];
+            snprintf(symbol, sizeof(symbol), LUAJIT_SYMBOL_FORMAT, luaJITSymbols[i]);
 
             void* targetSym = resolveSymbol(CV_GAME_DATABASE, symbol);
             void* patchSym  = dlsym(luaJIT, symbol);

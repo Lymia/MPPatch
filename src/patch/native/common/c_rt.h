@@ -27,13 +27,15 @@
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
+#include <limits.h>
 
 #include "platform.h"
 #include "config.h"
 
-#define CONSTRUCTOR_READ_CONFIG       200
-#define CONSTRUCTOR_LOGGING           210
-#define CONSTRUCTOR_EARLY_INIT        220
+#define CONSTRUCTOR_GET_EXE_PATH      200
+#define CONSTRUCTOR_READ_CONFIG       210
+#define CONSTRUCTOR_LOGGING           220
+#define CONSTRUCTOR_EARLY_INIT        230
 #define CONSTRUCTOR_BINARY_INIT_EARLY 300
 #define CONSTRUCTOR_BINARY_INIT       310
 #define CONSTRUCTOR_PROXY_INIT        320
@@ -57,6 +59,10 @@ extern FILE* debug_log_file;
     debug_print_raw("%s at %s:%u - " format, __PRETTY_FUNCTION__, strrchr(__FILE__, '/') + 1, __LINE__, ##arg)
 
 #define ENTRY __attribute__((force_align_arg_pointer))
+
+const char* executable_directory_path;
+#define getSupportFilePath(buffer, file) \
+    snprintf(buffer, sizeof(buffer), "%s" PATH_SEPARATOR file, executable_directory_path);
 
 bool endsWith(const char* str, const char* ending);
 

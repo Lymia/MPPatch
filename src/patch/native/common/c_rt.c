@@ -31,10 +31,17 @@
 #include "platform.h"
 #include "config.h"
 
+// Get executable path
+__attribute__((constructor(CONSTRUCTOR_GET_EXE_PATH))) static void initExecutablePath() {
+    executable_directory_path = getExecutablePath();
+}
+
 // Debug logging
 FILE* debug_log_file = NULL;
 __attribute__((constructor(CONSTRUCTOR_LOGGING))) static void initDebugLogging() {
-    if(enableLogging) debug_log_file = fopen("mppatch_debug.log", "w");
+    char buffer[PATH_MAX];
+    getSupportFilePath(buffer, "mppatch_debug.log");
+    if(enableLogging) debug_log_file = fopen(buffer, "w");
 }
 
 // String manipulation

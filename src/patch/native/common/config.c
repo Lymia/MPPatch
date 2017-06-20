@@ -52,5 +52,7 @@ static bool exists(const char *fname) {
     return file ? true : false;
 }
 __attribute__((constructor(CONSTRUCTOR_READ_CONFIG))) static void readConfig() {
-    if(exists(CONFIG_FILENAME)) ini_parse(CONFIG_FILENAME, readConfig_handler, NULL);
+    char buffer[PATH_MAX];
+    getSupportFilePath(buffer, CONFIG_FILENAME);
+    if(exists(buffer)) ini_parse(buffer, readConfig_handler, NULL);
 }

@@ -22,6 +22,8 @@
 
 #pragma once
 
+#define PATH_SEPARATOR "\\"
+
 #define lGetMemoryUsage_attributes     __cdecl
 #define SetActiveDLCAndMods_attributes __thiscall
 

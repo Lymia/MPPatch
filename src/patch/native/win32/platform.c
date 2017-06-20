@@ -20,6 +20,7 @@
     SOFTWARE.
 */
 
+#include <string.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <windows.h>
@@ -27,6 +28,16 @@
 #include "c_rt.h"
 #include "c_defines.h"
 #include "platform.h"
+
+const char* getExecutablePath() {
+    char* buffer = malloc(PATH_MAX);
+    GetModuleFileName(NULL, buffer, PATH_MAX);
+
+    char* location = strrchr(buffer, '\\');
+    if(location) *location = '\0';
+
+    return (const char*) buffer;
+}
 
 __attribute__((noreturn)) void fatalError_fn(const char* message) {
     debug_print("%s", message);
@@ -80,12 +91,16 @@ static bool checkFileExists(LPCTSTR szPath) {
   return (attrib != INVALID_FILE_ATTRIBUTES &&
          !(attrib & FILE_ATTRIBUTE_DIRECTORY));
 }
+
 #define TARGET_LIBRARY_NAME "CvGameDatabase_Original.dll"
 __attribute__((constructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void initializeProxy() {
+    char buffer[PATH_MAX];
+    getSupportFilePath(buffer, TARGET_LIBRARY_NAME);
+
     debug_print("Loading original CvGameDatabase");
-    if(!checkFileExists(TARGET_LIBRARY_NAME))
+    if(!checkFileExists(buffer))
         fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.");
-    baseDll = LoadLibrary(TARGET_LIBRARY_NAME);
+    baseDll = LoadLibrary(buffer);
     if(baseDll == NULL)
         fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08lx)", GetLastError());
 }

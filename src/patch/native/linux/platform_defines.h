@@ -24,6 +24,11 @@
 
 #include "c_defines.h"
 
+#define PATH_SEPARATOR "/"
+
+#define LUAJIT_LIBRARY       "mppatch_luajit.so"
+#define LUAJIT_SYMBOL_FORMAT "%s"
+
 #define lGetMemoryUsage_attributes     __attribute__((cdecl))
 #define SetActiveDLCAndMods_attributes __attribute__((cdecl))
 

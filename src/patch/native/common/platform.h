@@ -25,6 +25,8 @@
 #include <stddef.h>
 #include "platform_defines.h"
 
+const char* getExecutablePath();
+
 __attribute__((noreturn)) void fatalError_fn(const char* message);
 #define fatalError(format, arg...) { \
     char buffer[1024]; \
