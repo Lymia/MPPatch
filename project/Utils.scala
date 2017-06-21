@@ -51,12 +51,16 @@ object Utils {
   def cached(cacheDirectory: File, inStyle: FilesInfo.Style = FilesInfo.lastModified, // hack to fix ambigous overload
              outStyle: FilesInfo.Style = FilesInfo.exists)
             (fn: Set[File] => Set[File]) = FileFunction.cached(cacheDirectory, inStyle, outStyle)(fn)
+  def trackDependencySet(cacheDirectory: File, deps: Set[File],
+                         inStyle: FilesInfo.Style = FilesInfo.lastModified,
+                         outStyle: FilesInfo.Style = FilesInfo.exists)(fn: => Set[File]) = {
+    val cache = cached(cacheDirectory, inStyle, outStyle) { _ => fn }
+    cache(deps)
+  }
   def trackDependencies(cacheDirectory: File, deps: Set[File],
                         inStyle: FilesInfo.Style = FilesInfo.lastModified,
                         outStyle: FilesInfo.Style = FilesInfo.exists)(fn: => File) = {
-    val cache = cached(cacheDirectory, inStyle, outStyle) { _ =>
-      Set(fn)
-    }
+    val cache = cached(cacheDirectory, inStyle, outStyle) { _ => Set(fn) }
     cache(deps).head
   }
   def cachedTransform(cacheDirectory: File, input: File, output: File,

@@ -19,4 +19,44 @@
 ; SOFTWARE.
 
 bits 32
-%include "platform.s"
+
+%include "symbols.s"
+
+%macro symbol_toString 2
+    %defstr tmp_str %2
+    segment .rdata
+        %1: dd tmp_str, 0
+    segment .text
+    %undef tmp_str
+%endmacro
+
+segment .rdata_proxy_symbols
+global cif_symbolTable
+cif_symbolTable:
+segment .text
+
+%macro symbol_add 2
+    segment .rdata_proxy_symbols
+        dd 1, %1, %2
+    segment .text
+%endmacro
+%macro symbol_end 0
+    segment .rdata_proxy_symbols
+        dd 0, 0, 0
+    segment .text
+%endmacro
+
+%macro generate_variables 1
+    symbol_toString %1_name, %1
+
+    segment .text_proxy
+        global _%1
+        _%1: dd 0, 0
+        export %1
+    segment .text
+
+    symbol_add _%1, %1_name
+%endmacro
+proxy_symbols generate_variables
+
+symbol_end

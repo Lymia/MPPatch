@@ -119,21 +119,20 @@ object NativePatchBuild {
         val version = versionDir.getName
         val Array(platform, sha256) = version.split("_")
 
-        val (cc, nasmFormat, binaryExtension, sourcePath, extraCDeps, gccFlags) =
+        val (cc, nasmFormat, binaryExtension, sourcePath, extraCDeps, gccFlags, nasmFiles) =
           platform match {
-            case "win32" => (mingw_gcc _, "win32", ".dll",
+            case "win32" => (mingw_gcc _, "win32"  , ".dll",
               Seq(patchSourceDir.value / "win32"),
               allFiles(win32Directory.value, ".dll"),
               Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
                   s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
-                  "-static-libgcc") ++ config_win32_secureFlags)
-            case "macos" => (macos_gcc _, "elf"  , ".dylib" ,
+                  "-static-libgcc") ++ config_win32_secureFlags, Seq(patchSourceDir.value / "win32" / "proxy.s"))
+            case "macos" => (macos_gcc _, "macho32", ".dylib" ,
               Seq(patchSourceDir.value / "macos", patchSourceDir.value / "posix"), Seq(),
-              Seq("-ldl", "-framework", "CoreFoundation", "-undefined", "dynamic_lookup"))
+              Seq("-ldl", "-framework", "CoreFoundation", "-undefined", "dynamic_lookup"), Seq())
             case "linux" => (gcc       _, "elf"  , ".so" ,
-              Seq(patchSourceDir.value / "linux", patchSourceDir.value / "posix", steamrtSDLDev.value),
-              Seq(steamrtSDL.value),
-              Seq("-ldl") ++ config_linux_secureFlags)
+              Seq(patchSourceDir.value / "linux"  , patchSourceDir.value / "posix", steamrtSDLDev.value),
+              Seq(steamrtSDL.value), Seq("-ldl") ++ config_linux_secureFlags, Seq())
           }
         val fullSourcePath = Seq(patchSourceDir.value / "common", patchSourceDir.value / "inih",
                                  commonIncludes.value, versionDir) ++ sourcePath
@@ -148,20 +147,21 @@ object NativePatchBuild {
         val buildTmp = patchBuildDir.value / versionStr
         IO.createDirectory(buildTmp)
 
-        val nasmOut = trackDependencies(patchCacheDir.value / (versionStr + "_nasm_o"), sBuildDependencies.toSet) {
+        val nasmOut = trackDependencySet(patchCacheDir.value / (versionStr + "_nasm_o"), sBuildDependencies.toSet) {
           logger.info("Compiling as_entry.o for version "+version)
 
-          val output = buildTmp / "as_entry.o"
-          nasm(includePaths("-i") ++ Seq("-Ox", "-f", nasmFormat, "-o", output,
-                                         patchSourceDir.value / "common" / "as_entry.s"))
-          output
+          (for(file <- nasmFiles) yield {
+            val output = buildTmp / file.getName.replace(".s", ".o")
+            nasm(includePaths("-i") ++ Seq("-Ox", "-f", nasmFormat, "-o", output, file))
+            output
+          }).toSet
         }
 
         val targetDir = patchDirectory / version
         val targetFile = targetDir / ("mppatch_"+version+binaryExtension)
         val buildIdFile = targetDir / "buildid.txt"
         val outputPath =
-          trackDependencies(patchCacheDir.value / (versionStr + "_c_out"), cBuildDependencies.toSet + nasmOut) {
+          trackDependencies(patchCacheDir.value / (versionStr + "_c_out"), cBuildDependencies.toSet ++ nasmOut) {
             logger.info("Compiling binary patch for version "+version)
             val buildId = UUID.randomUUID()
 
@@ -173,7 +173,7 @@ object NativePatchBuild {
             cc(includePaths("-I") ++ Seq(
               "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-fvisibility=hidden",
               "-s", "-o", targetFile, "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
-              "-DMPPATCH_BUILDID=\""+buildId+"\"", nasmOut) ++ config_common_secureFlags ++
+              "-DMPPATCH_BUILDID=\""+buildId+"\"") ++ nasmOut ++ config_common_secureFlags ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")))
             targetDir
           }
