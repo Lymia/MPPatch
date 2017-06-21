@@ -31,3 +31,4 @@
 #define SetActiveDLCAndMods_attributes __attribute__((cdecl))
 
 void* resolveSymbol(const char* symbol);
+void setupProxyFunction(void* entry, const char* symbol);

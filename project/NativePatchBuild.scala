@@ -45,6 +45,34 @@ object NativePatchBuild {
       target
     }
 
+  // Codegen for the macOS proxy (to deal with unexported symbols in Civ V's binary).
+  def generateProxyDefine(file: File, target: File) {
+    val lines = IO.readLines(file).filter(_.nonEmpty)
+    val proxies = for((symbol, i) <- IO.readLines(file).filter(_.nonEmpty).zipWithIndex
+                      if !symbol.startsWith("#") && !symbol.trim.isEmpty) yield {
+      (s"""static const char* ${symbol}_name = "$symbol";
+          |__attribute__((naked, section("MPPATCH_PROXY,MPPATCH_PROXY"), aligned(8))) void $symbol() {
+          |  asm volatile("jmp _proxyNotYetSetUp");
+          |}
+        """.stripMargin,
+       s"setupProxyFunction($symbol, ${symbol}_name);")
+    }
+
+    IO.write(target,
+      s"""#import "c_rt.h"
+         |#import "platform.h"
+         |
+         |${proxies.map(_._1.trim).mkString("\n\n")}
+         |
+         |__attribute__((used)) static void proxyNotYetSetUp() {
+         |  fatalError("Proxied function accessed before proxy setup.");
+         |}
+         |__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void setupProxyFunctions() {
+         |  ${proxies.map(_._2.trim).mkString("\n  ")}
+         |}
+       """.stripMargin)
+  }
+
   // Codegen for version header
   def tryParse(s: String, default: Int) = try { s.toInt } catch { case _: NumberFormatException => default }
   def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
@@ -66,7 +94,7 @@ object NativePatchBuild {
     val patchSourceDir = SettingKey[File]("native-patch-source-directory")
 
     val win32Directory = TaskKey[File]("native-patch-win32-directory")
-    val linuxDirectory = TaskKey[File]("native-patch-linux-directory")
+    val macosDirectory = TaskKey[File]("native-patch-macos-directory")
 
     val steamrtSDL     = TaskKey[File]("native-patch-download-steam-runtime-sdl")
     val steamrtSDLDev  = TaskKey[File]("native-patch-download-steam-runtime-sdl-dev")
@@ -93,7 +121,11 @@ object NativePatchBuild {
         patchSourceDir.value / "win32" / "stub" / "lua51_Win32.c",
         dir / "lua51_Win32.dll")((in, out) => mingw_gcc(Seq("-shared", "-o", out, in)))
     },
-    linuxDirectory := simplePrepareDirectory(patchBuildDir.value / "linux"),
+    macosDirectory := prepareDirectory(patchBuildDir.value / "macos") { dir =>
+      cachedTransform(patchCacheDir.value / "macos_proxy",
+                      patchSourceDir.value / "macos" / "external_symbols",
+                      dir / "extern_defines.c")(generateProxyDefine)
+    },
 
     // Extract Steam runtime libSDL files.
     steamrtSDL :=
@@ -108,7 +140,6 @@ object NativePatchBuild {
                           streams.value.log.info("Extracting SDL2 headers...")) { (dir, target) =>
         IO.copyDirectory(dir / "usr" / "include" / "SDL2", target)
       },
-
     nativeVersions := {
       val patchDirectory = patchBuildDir.value / "output"
       val logger         = streams.value.log
@@ -128,8 +159,8 @@ object NativePatchBuild {
                   s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
                   "-static-libgcc") ++ config_win32_secureFlags, Seq(patchSourceDir.value / "win32" / "proxy.s"))
             case "macos" => (macos_clang _, "macho32", ".dylib" ,
-              Seq(patchSourceDir.value / "macos", patchSourceDir.value / "posix"), Seq(),
-              Seq("-ldl", "-framework", "CoreFoundation", "-undefined", "dynamic_lookup"), Seq())
+              Seq(patchSourceDir.value / "macos", patchSourceDir.value / "posix", macosDirectory.value), Seq(),
+              Seq("-ldl", "-framework", "CoreFoundation", "-Wl,-segprot,MPPATCH_PROXY,rwx,rx"), Seq())
             case "linux" => (gcc         _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux"  , patchSourceDir.value / "posix", steamrtSDLDev.value),
               Seq(steamrtSDL.value), Seq("-ldl") ++ config_linux_secureFlags, Seq())
@@ -140,7 +171,7 @@ object NativePatchBuild {
         val cBuildDependencies =
           fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ fullIncludePath.flatMap(x => allFiles(x, ".h")) ++
           extraCDeps
-        val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s"))
+        val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s")) ++ nasmFiles
         def includePaths(flag: String) = fullIncludePath.flatMap(x => Seq(flag, dir(x)))
 
         val versionStr = "version_"+version

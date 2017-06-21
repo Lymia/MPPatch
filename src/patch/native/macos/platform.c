@@ -110,7 +110,7 @@ static void loadSymbols(map_t symbolMap, struct mach_header* image) {
 }
 
 static map_t symbolMap;
-__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void loadSymbolsFromBinary() {
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void loadSymbolsFromBinary() {
     debug_print("Loading Civilization V binary symbols...");
     symbolMap = hashmap_new();
     loadSymbols(symbolMap, getBinaryHeader());

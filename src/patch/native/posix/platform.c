@@ -30,6 +30,15 @@
 #include "c_defines.h"
 #include "platform.h"
 
+void setupProxyFunction(void* entry, const char* symbol) {
+    void* ptr = resolveSymbol(symbol);
+    if(!symbol) fatalError("Linking proxy defines symbol %s, which doesn't exist.", symbol);
+
+    char buffer[1024];
+    snprintf(buffer, sizeof(buffer), "proxy for %s", symbol);
+    patchJmpInstruction(entry, ptr, buffer);
+}
+
 // Memory management functions
 static int protectRange(size_t start, size_t length, int flags) {
     int page_size = getpagesize();
