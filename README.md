@@ -26,6 +26,8 @@ On Arch Linux, you will need the following packages: `base-devel jdk8-openjdk sb
 The first time you build a release, you must initialize submodules used by MPPatch. To do this, run
 `git submodule update --init`.
 
+You will also need to install [osxcross](https://github.com/tpoechtrager/osxcross) and put the binaries in your `$PATH`.
+
 To build a release, use `sbt clean dist`. You can also use `sbt run` to test your local version without building a full
 release.
 
