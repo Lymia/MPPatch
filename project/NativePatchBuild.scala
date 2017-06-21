@@ -29,6 +29,7 @@ import Utils._
 
 object NativePatchBuild {
   def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
+  def macos_gcc(p: Seq[Any]) = runProcess(config_macos_gcc +: p)
   def gcc      (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
   def nasm     (p: Seq[Any]) = runProcess(config_nasm +: p)
 
@@ -114,7 +115,7 @@ object NativePatchBuild {
 
       IO.createDirectory(patchDirectory)
 
-      val patches = for(versionDir <- (patchSourceDir.value / "versions").listFiles if !versionDir.getName.toString.startsWith("macos")) yield {
+      val patches = for(versionDir <- (patchSourceDir.value / "versions").listFiles) yield {
         val version = versionDir.getName
         val Array(platform, sha256) = version.split("_")
 
@@ -126,6 +127,9 @@ object NativePatchBuild {
               Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
                   s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
                   "-static-libgcc") ++ config_win32_secureFlags)
+            case "macos" => (macos_gcc _, "elf"  , ".dylib" ,
+              Seq(patchSourceDir.value / "macos", patchSourceDir.value / "posix"), Seq(),
+              Seq("-ldl", "-framework", "CoreFoundation", "-undefined", "dynamic_lookup"))
             case "linux" => (gcc       _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux", patchSourceDir.value / "posix", steamrtSDLDev.value),
               Seq(steamrtSDL.value),

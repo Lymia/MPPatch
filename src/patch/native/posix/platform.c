@@ -25,7 +25,6 @@
 
 #include <sys/mman.h>
 #include <dlfcn.h>
-#include <link.h>
 #include <unistd.h>
 
 #include "c_rt.h"
@@ -85,9 +84,6 @@ __attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void loadDysymHandl
     debug_print("Opening handle to main binary");
     dlsymHandle = dlopen(NULL, RTLD_NOW);
     if(dlsymHandle == NULL) fatalError("Could not open handle to main binary: %s", dlerror());
-    debug_print("Finding l_addr (to deal with ASLR)");
-    struct link_map *lm = (struct link_map*) dlsymHandle;
-    base_offset = lm->l_addr;
 }
 
 // std::list implementation
