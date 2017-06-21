@@ -61,7 +61,7 @@ object LuaJITBuild {
                Seq(s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
                    "-static-libgcc") ++ config_win32_secureFlags)
             case "macos" =>
-              (Map("HOST_CC" -> (config_linux_gcc+" -m32"), "CROSS" -> config_macos_prefix, "CC" -> "clang -m32",
+              (Map("HOST_CC" -> (config_linux_gcc+" -m32"), "CROSS" -> config_macos_prefix, "CC" -> "clang",
                    "TARGET_SYS" -> "Darwin"), "src/libluajit.so", ".dylib", Seq())
             case "linux" =>
               (Map("CC" -> (config_linux_gcc+" -m32")), "src/libluajit.so", ".so", config_linux_secureFlags)
