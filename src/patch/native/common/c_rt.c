@@ -52,7 +52,7 @@ bool endsWith(const char* str, const char* ending) {
     return str_len >= ending_len && !strcmp(str + str_len - ending_len, ending);
 }
 bool fileExists(const char* file) {
-    return access(file, F_OK) ? true : false;
+    return access(file, F_OK) ? false : true;
 }
 
 // std::list implementation
