@@ -31,6 +31,7 @@
 #include "c_defines.h"
 #include "platform.h"
 
+// Memory management functions
 static int protectRange(size_t start, size_t length, int flags) {
   int page_size = getpagesize();
   size_t end = start + length;
@@ -58,28 +59,12 @@ void executable_free(ExecutableMemory* memory) {
     munmap(memory, memory->length);
 }
 
-BinaryType getBinaryType() {
-    return BIN_GENERIC;
-}
 
 // Symbol & address resolution
-static void checkDomain(AddressDomain domain, const char* fn) {
-    if(domain != CV_BINARY && domain != CV_GAME_DATABASE && domain != CV_MERGED_BINARY)
-        fatalError("%s in unknown domain %d", fn, domain);
-}
-
 static void* dlsymHandle;
-void* resolveSymbol(AddressDomain domain, const char* symbol) {
-    checkDomain(domain, "resolveSymbol");
+void* resolveSymbol(const char* symbol) {
     return dlsym(dlsymHandle, symbol);
 }
-
-static unsigned base_offset;
-void* resolveAddress(AddressDomain domain, int address) {
-    checkDomain(domain, "resolveAddress");
-    return (void*) (base_offset + address);
-}
-
 __attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void loadDysymHandle() {
     debug_print("Opening handle to main binary");
     dlsymHandle = dlopen(NULL, RTLD_NOW);

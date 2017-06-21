@@ -29,6 +29,9 @@
 #include "c_defines.h"
 #include "platform.h"
 
+
+
+// Memory management functions
 const char* getExecutablePath() {
     char* buffer = malloc(PATH_MAX);
     GetModuleFileName(NULL, buffer, PATH_MAX);
@@ -63,76 +66,27 @@ void executable_free(ExecutableMemory* memory) {
     VirtualFree(memory, memory->length, MEM_RELEASE);
 }
 
-// Get executable type
-static BinaryType detectedBinaryType;
-BinaryType getBinaryType() {
-    return detectedBinaryType;
-}
-__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void initializeBinaryType() {
-    debug_print("Finding binary type");
-
-    char moduleName[1024];
-    if(!GetModuleFileName(NULL, moduleName, sizeof(moduleName)))
-        fatalError("Could not get main executable binary name. (code: 0x%08lx)", GetLastError());
-    debug_print("Binary name: %s", moduleName);
-
-    if     (endsWith(moduleName, "CivilizationV.exe"       )) detectedBinaryType = BIN_DX9   ;
-    else if(endsWith(moduleName, "CivilizationV_DX11.exe"  )) detectedBinaryType = BIN_DX11  ;
-    else if(endsWith(moduleName, "CivilizationV_Tablet.exe")) detectedBinaryType = BIN_TABLET;
-    else fatalError("Unknown main executable type! (executable path: %s)", moduleName);
-
-    debug_print("Detected binary type: %d", detectedBinaryType)
-}
-
-// Runtime for DLL proxying
+// Symbol resolution
 static HMODULE baseDll;
-static bool checkFileExists(LPCTSTR szPath) {
-  DWORD attrib = GetFileAttributes(szPath);
-  return (attrib != INVALID_FILE_ATTRIBUTES &&
-         !(attrib & FILE_ATTRIBUTE_DIRECTORY));
-}
-
 #define TARGET_LIBRARY_NAME "CvGameDatabase_Original.dll"
 __attribute__((constructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void initializeProxy() {
     char buffer[PATH_MAX];
     getSupportFilePath(buffer, TARGET_LIBRARY_NAME);
 
     debug_print("Loading original CvGameDatabase");
-    if(!checkFileExists(buffer))
+    if(fileExists(buffer))
         fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.");
     baseDll = LoadLibrary(buffer);
     if(baseDll == NULL)
         fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08lx)", GetLastError());
 }
-
-// Symbol resolution
-void* resolveSymbol(AddressDomain domain, const char* symbol) {
-    if(domain != CV_GAME_DATABASE) fatalError("resolveSymbol only supported in CV_GAME_DATABASE on win32");
-
+void* resolveSymbol(const char* symbol) {
     void* procAddress = GetProcAddress(baseDll, symbol);
     if(!procAddress) fatalError("Failed to load symbol %s.", symbol);
 
     debug_print("Resolving symbol - %s = %p", symbol, procAddress);
 
     return procAddress;
-}
-
-// Address resolution
-static void* binary_base_addr;
-static void* database_constant_symbol_addr;
-void* resolveAddress(AddressDomain domain, int address) {
-    if(domain == CV_GAME_DATABASE) return database_constant_symbol_addr + (address - WIN32_REF_SYMBOL_ADDR);
-    if(domain == CV_BINARY       ) return binary_base_addr              + (address - WIN32_BINARY_BASE    );
-    fatalError("resolveAddress in unknown domain");
-}
-
-__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void initializeBinaryBase() {
-    debug_print("Finding Civ V binary base address (to deal with ASLR)");
-    binary_base_addr = GetModuleHandle(NULL);
-}
-__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void initializeConstantSymbol() {
-    debug_print("Loading constant symbol (to deal with ASLR/general .dll rebasing)");
-    database_constant_symbol_addr = resolveSymbol(CV_GAME_DATABASE, WIN32_REF_SYMBOL_NAME);
 }
 
 // std::list implementation

@@ -28,6 +28,7 @@
 #define SetActiveDLCAndMods_attributes __thiscall
 
 void* filterProxySymbol(const char* name, void* target);
+void* resolveSymbol(const char* symbol);
 
 // std::list data structure
 typedef struct CppListLink {

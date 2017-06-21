@@ -65,6 +65,7 @@ const char* executable_directory_path;
     snprintf(buffer, sizeof(buffer), "%s" PATH_SEPARATOR file, executable_directory_path);
 
 bool endsWith(const char* str, const char* ending);
+bool fileExists(const char* file);
 
 CppListLink* CppListLink_alloc(int length);
 void* CppListLink_newLink(CppListLink* list, int length);

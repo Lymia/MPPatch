@@ -1,4 +1,4 @@
-/**
+ /**
     Copyright (C) 2015-2017 Lymia Aluysia <lymiahugs@gmail.com>
 
     Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -20,31 +20,18 @@
     SOFTWARE.
 */
 
-#include <stdlib.h>
+#pragma once
 
-#include "c_rt.h"
-#include "platform.h"
 #include "c_defines.h"
 
-#include "net_hook.h"
-#include "lua_hook.h"
-#include "config.h"
+#define LUAJIT_LIBRARY       "mppatch_luajit.dylib"
+#define LUAJIT_SYMBOL_FORMAT "_%s"
 
-static PatchInformation* lGetMemoryUsage_patchInfo = NULL;
-PatchInformation* SetActiveDLCAndMods_patchInfo = NULL;
+// std::list data structure
+typedef struct CppListLink {
+    struct CppListLink* next;
+    struct CppListLink* prev;
+    char data[];
+} CppListLink;
 
-__attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installHooks() {
-    // Lua hook
-    if(enableMultiplayerPatch) {
-        lGetMemoryUsage_patchInfo = proxyFunction(resolveSymbol(lGetMemoryUsage_symbol),
-                                                 lGetMemoryUsageProxy, lGetMemoryUsage_hook_length, "lGetMemoryUsage");
-        lGetMemoryUsage = (lGetMemoryUsage_t) lGetMemoryUsage_patchInfo->functionFragment->data;
-    }
-}
-
-void installNetHook() {
-    SetActiveDLCAndMods_patchInfo = proxyFunction(resolveSymbol(SetActiveDLCAndMods_symbol),
-                                                  SetActiveDLCAndModsProxy, SetActiveDLCAndMods_hook_length,
-                                                  "SetActiveDLCAndMods");
-    SetActiveDLCAndMods = (SetActiveDLCAndMods_t) SetActiveDLCAndMods_patchInfo->functionFragment->data;
-}
+typedef CppListLink CppList;

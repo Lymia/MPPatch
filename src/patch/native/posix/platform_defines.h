@@ -23,20 +23,11 @@
 #pragma once
 
 #include "c_defines.h"
+#include "posix_defines.h"
 
 #define PATH_SEPARATOR "/"
-
-#define LUAJIT_LIBRARY       "mppatch_luajit.dylib"
-#define LUAJIT_SYMBOL_FORMAT "_%s"
 
 #define lGetMemoryUsage_attributes     __attribute__((cdecl))
 #define SetActiveDLCAndMods_attributes __attribute__((cdecl))
 
-// std::list data structure
-typedef struct CppListLink {
-    struct CppListLink* next;
-    struct CppListLink* prev;
-    char data[];
-} CppListLink;
-
-typedef CppListLink CppList;
+void* resolveSymbol(const char* symbol);

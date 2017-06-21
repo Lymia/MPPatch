@@ -26,6 +26,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "c_rt.h"
 #include "platform.h"
@@ -44,10 +45,13 @@ __attribute__((constructor(CONSTRUCTOR_LOGGING))) static void initDebugLogging()
     if(enableLogging) debug_log_file = fopen(buffer, "w");
 }
 
-// String manipulation
+// Misc utilities
 bool endsWith(const char* str, const char* ending) {
     size_t str_len = strlen(str), ending_len = strlen(ending);
     return str_len >= ending_len && !strcmp(str + str_len - ending_len, ending);
+}
+bool fileExists(const char* file) {
+    return access(file, F_OK) ? true : false;
 }
 
 // std::list implementation

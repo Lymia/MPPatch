@@ -66,7 +66,7 @@ __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installLuaJIT() 
         for(int i=0; i < sizeof(luaJITSymbols) / sizeof(const char*); i++) {
             snprintf(symbol, sizeof(symbol), LUAJIT_SYMBOL_FORMAT, luaJITSymbols[i]);
 
-            void* targetSym = resolveSymbol(CV_GAME_DATABASE, symbol);
+            void* targetSym = resolveSymbol(symbol);
             void* patchSym  = dlsym(luaJIT, symbol);
 
             if(targetSym == NULL) debug_print("WARNING: Symbol %s does not exist in Civ V binary.", symbol);

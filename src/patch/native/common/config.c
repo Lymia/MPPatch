@@ -22,7 +22,6 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include <unistd.h>
 
 #include "config.h"
 #include "c_rt.h"
@@ -46,13 +45,8 @@ static int readConfig_handler(void* user, const char* section, const char* name,
     return 1;
 }
 
-static bool exists(const char *fname) {
-    FILE *file = fopen(fname, "r");
-    if (file) fclose(file);
-    return file ? true : false;
-}
 __attribute__((constructor(CONSTRUCTOR_READ_CONFIG))) static void readConfig() {
     char buffer[PATH_MAX];
     getSupportFilePath(buffer, CONFIG_FILENAME);
-    if(exists(buffer)) ini_parse(buffer, readConfig_handler, NULL);
+    if(fileExists(buffer)) ini_parse(buffer, readConfig_handler, NULL);
 }

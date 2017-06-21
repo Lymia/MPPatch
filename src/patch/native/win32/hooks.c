@@ -21,6 +21,7 @@
 */
 
 #include <stdlib.h>
+#include <windows.h>
 
 #include "c_rt.h"
 #include "platform.h"
@@ -30,11 +31,41 @@
 #include "lua_hook.h"
 #include "config.h"
 
+// Detect binary type
 #define switchOnType(type, name) ((type) == BIN_DX9    ? name##_BIN_DX9    : \
                                   (type) == BIN_DX11   ? name##_BIN_DX11   : \
                                   (type) == BIN_TABLET ? name##_BIN_TABLET : \
                                   0)
+typedef enum BinaryType { BIN_DX9, BIN_DX11, BIN_TABLET } BinaryType;
 
+static BinaryType detectedBinaryType;
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void initializeBinaryType() {
+    debug_print("Finding binary type");
+
+    char moduleName[1024];
+    if(!GetModuleFileName(NULL, moduleName, sizeof(moduleName)))
+        fatalError("Could not get main executable binary name. (code: 0x%08lx)", GetLastError());
+    debug_print("Binary name: %s", moduleName);
+
+    if     (endsWith(moduleName, "CivilizationV.exe"       )) detectedBinaryType = BIN_DX9   ;
+    else if(endsWith(moduleName, "CivilizationV_DX11.exe"  )) detectedBinaryType = BIN_DX11  ;
+    else if(endsWith(moduleName, "CivilizationV_Tablet.exe")) detectedBinaryType = BIN_TABLET;
+    else fatalError("Unknown main executable type! (executable path: %s)", moduleName);
+
+    debug_print("Detected binary type: %d", detectedBinaryType)
+}
+
+// Address resolution
+static void* binary_base_addr;
+static void* resolveAddress(int address) {
+    return binary_base_addr + (address - WIN32_BINARY_BASE);
+}
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void initializeBinaryBase() {
+    debug_print("Finding Civ V binary base address (to deal with ASLR)");
+    binary_base_addr = GetModuleHandle(NULL);
+}
+
+// Hooks
 void* filterProxySymbol(const char* name, void* target) {
     if(enableMultiplayerPatch && !strcmp(name, lGetMemoryUsage_symbol)) {
         debug_print("Intercepting lGetMemoryUsage proxy target.");
@@ -44,14 +75,12 @@ void* filterProxySymbol(const char* name, void* target) {
 PatchInformation* SetActiveDLCAndMods_patchInfo = NULL;
 __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installHooks() {
     // Lua hook
-    lGetMemoryUsage = resolveSymbol(CV_GAME_DATABASE, lGetMemoryUsage_symbol);
+    lGetMemoryUsage = resolveSymbol(lGetMemoryUsage_symbol);
 }
 
 void installNetHook() {
-    BinaryType type = getBinaryType();
-
-    void* offset    = resolveAddress(CV_BINARY, switchOnType(type, SetActiveDLCAndMods_offset));
-    int   patchSize = switchOnType(type, SetActiveDLCAndMods_hook_length);
+    void* offset    = resolveAddress(switchOnType(detectedBinaryType, SetActiveDLCAndMods_offset));
+    int   patchSize = switchOnType(detectedBinaryType, SetActiveDLCAndMods_hook_length);
 
     SetActiveDLCAndMods_patchInfo = proxyFunction(offset, SetActiveDLCAndModsProxy, patchSize, "SetActiveDLCAndMods");
     SetActiveDLCAndMods = (SetActiveDLCAndMods_t) SetActiveDLCAndMods_patchInfo->functionFragment->data;
