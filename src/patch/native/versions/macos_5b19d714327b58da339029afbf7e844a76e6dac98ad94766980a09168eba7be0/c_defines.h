@@ -27,3 +27,5 @@
 
 #define SetActiveDLCAndMods_symbol      "_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKSt4listIN15ModAssociations7ModInfoESaIS5_EEbb"
 #define SetActiveDLCAndMods_hook_length 5
+
+#define KNOWN_PUBLIC_BINARY_SYMBOL      "_ZrsR11FDataStreamRSs"

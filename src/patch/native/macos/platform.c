@@ -22,9 +22,17 @@
 
 #include <stdio.h>
 
+#include <dlfcn.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
+#include <mach-o/dyld.h>
+#include <mach-o/nlist.h>
+
 #include <CoreFoundation/CoreFoundation.h>
 
 #include "c_rt.h"
+#include "c_defines.h"
+#include "hashmap.h"
 #include "platform.h"
 
 // Based on code used by Civ V for locating libCvGameCoreDLL_DLL.dylib, etc
@@ -56,6 +64,61 @@ __attribute__((noreturn)) void fatalError_fn(const char* message) {
     exit(1);
 }
 
+static struct mach_header* getBinaryHeader() {
+    void* knownSymbol = dlsym(RTLD_DEFAULT, KNOWN_PUBLIC_BINARY_SYMBOL);
+    if(!knownSymbol) fatalError("Could not find symbol %s.", KNOWN_PUBLIC_BINARY_SYMBOL);
+
+    Dl_info info;
+    if(!dladdr(knownSymbol, &info)) fatalError("Could not retrieve executable header.");
+
+    debug_print("Target executable: %s", info.dli_fname);
+    return (struct mach_header*) info.dli_fbase;
+}
+
+static void loadSymbols(map_t symbolMap, struct mach_header* image) {
+    struct segment_command* seg_text = NULL;
+    struct segment_command* seg_linkedit = NULL;
+	struct symtab_command* symtab = NULL;
+
+	void* current_cmd = (void*) image + sizeof(struct mach_header);
+	for(int i=0; i < image->ncmds; i++) {
+	    struct load_command* cmd = (struct load_command*) current_cmd;
+	    if(cmd->cmd == LC_SEGMENT) {
+            struct segment_command* segment = (struct segment_command*) current_cmd;
+                 if(!strcmp(segment->segname, SEG_TEXT    )) seg_text = segment;
+            else if(!strcmp(segment->segname, SEG_LINKEDIT)) seg_linkedit = segment;
+	    } else if(cmd->cmd == LC_SYMTAB) symtab = (struct symtab_command*) current_cmd;
+	    current_cmd += cmd->cmdsize;
+    }
+
+	if(seg_text == NULL || seg_linkedit == NULL || symtab == NULL) fatalError("Could not parse executable header.");
+
+    void* imageBase = (void*) image - seg_text->vmaddr;
+    void* linkeditFileBase = imageBase + seg_linkedit->vmaddr - seg_linkedit->fileoff;
+
+	struct nlist *symbase = (struct nlist*) (linkeditFileBase + symtab->symoff);
+	char *strings = (char*) (linkeditFileBase + symtab->stroff);
+
+    struct nlist* sym = symbase;
+	for(int i=0; i < symtab->nsyms; i++, sym++) if(sym->n_un.n_strx != 0) {
+        char* name = strings + sym->n_un.n_strx;
+        void* addr = imageBase + sym->n_value;
+
+        if(*name == '_') hashmap_put(symbolMap, name + 1, addr);
+        else             hashmap_put(symbolMap, name, addr);
+    }
+}
+
+static map_t symbolMap;
+__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void loadSymbolsFromBinary() {
+    debug_print("Loading Civilization V binary symbols...");
+    symbolMap = hashmap_new();
+    loadSymbols(symbolMap, getBinaryHeader());
+    debug_print("Loaded %d symbols.", hashmap_length(symbolMap));
+}
+
 void* resolveSymbol(const char* symbol) {
-    return NULL;
+    any_t out;
+    if(hashmap_get(symbolMap, (char*) symbol, &out) == MAP_MISSING) return NULL;
+    return (void*) out;
 }
