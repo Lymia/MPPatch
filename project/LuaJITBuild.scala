@@ -56,15 +56,15 @@ object LuaJITBuild {
         val (platformEnv, outputFile, extension, flags) =
           platform match {
             case "win32" =>
-              (Map("HOST_CC" -> (config_linux_gcc+" -m32"), "CROSS" -> config_mingw_prefix,
+              (Map("HOST_CC" -> (config_linux_cc+" -m32"), "CROSS" -> config_mingw_prefix,
                    "TARGET_SYS" -> "Windows"), "src/lua51.dll", ".dll",
                Seq(s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
                    "-static-libgcc") ++ config_win32_secureFlags)
             case "macos" =>
-              (Map("HOST_CC" -> (config_linux_gcc+" -m32"), "CROSS" -> config_macos_prefix, "CC" -> "clang",
+              (Map("HOST_CC" -> (config_linux_cc+" -m32"), "CROSS" -> config_macos_prefix, "CC" -> "clang",
                    "TARGET_SYS" -> "Darwin"), "src/libluajit.so", ".dylib", Seq())
             case "linux" =>
-              (Map("CC" -> (config_linux_gcc+" -m32")), "src/libluajit.so", ".so", config_linux_secureFlags)
+              (Map("CC" -> (config_linux_cc+" -m32")), "src/libluajit.so", ".so", Seq())
           }
         val allFlags = ("-O2" +: "-flto" +: (config_common_secureFlags ++ flags)).mkString(" ")
         val env = Map("TARGET_FLAGS" -> allFlags) ++ platformEnv

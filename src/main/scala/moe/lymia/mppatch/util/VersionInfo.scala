@@ -53,20 +53,10 @@ case class PropertiesSource(prop: Properties) extends VersionInfoSource {
 class VersionInfo(properties: VersionInfoSource) {
   def this(resource: String) = this(VersionInfoSource.getPropertySource(resource))
 
-  lazy val majorVersion  = properties("mppatch.version.major", "-1").toInt
-  lazy val minorVersion  = properties("mppatch.version.minor", "-1").toInt
-  lazy val patchVersion  = properties("mppatch.version.patch", "0").toInt
-
-  lazy val versionSuffix = properties("mppatch.version.suffix", "")
   lazy val commit        = properties("mppatch.version.commit", "<unknown>")
   lazy val treeStatus    = properties("build.treestatus", "<clean>")
   lazy val versionString = properties("mppatch.version.string", "<unknown>")
   lazy val isDirty       = properties("mppatch.version.clean", "false") == "false"
-
-  lazy val gccVersion    = properties("build.version.gcc.short", "<unknown>")
-  lazy val nasmVersion   = properties("build.version.nasm", "<unknown>")
-  lazy val mingwVersion  = properties("build.version.mingw.short", "<unknown>")
-  lazy val sbtVersion    = properties("build.version.sbt", "<unknown>")
 
   lazy val buildID       = properties("build.id", "<unknown>")
   lazy val buildDate     = new Date(properties("build.time", "0").toLong)

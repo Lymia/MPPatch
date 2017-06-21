@@ -102,8 +102,8 @@ object Launch4JBuild {
       }
 
       val gotChecksum = sha256_hex(IO.readBytes(launch4jDownloadPath.value))
-      if(gotChecksum != config_launch4j_Checksum)
-        sys.error(s"Launch4J checksum error: got $gotChecksum, expected $config_launch4j_Checksum")
+      if(gotChecksum != config_launch4j_checksum)
+        sys.error(s"Launch4J checksum error: got $gotChecksum, expected $config_launch4j_checksum")
 
       launch4jDownloadPath.value
     },

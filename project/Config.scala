@@ -25,13 +25,12 @@ object Config {
   val config_mingw_prefix = "i686-w64-mingw32-"
   val config_macos_prefix = "i386-apple-darwin15-"
 
-  val config_mingw_gcc    = config_mingw_prefix+"gcc"
-  val config_macos_clang  = config_macos_prefix+"clang"
-  val config_linux_gcc    = "gcc"
+  val config_win32_cc     = config_mingw_prefix+"gcc"
+  val config_macos_cc     = config_macos_prefix+"clang"
+  val config_linux_cc     = "clang"
   val config_nasm         = "nasm"
 
   val config_win32_secureFlags  = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
-  val config_linux_secureFlags  = Seq("-Wl,-z,now", "-Wl,-z,relro")
   val config_common_secureFlags = Seq("-fstack-protector", "-fstack-protector-strong", "-D_FORTIFY_SOURCE=2")
 
   val config_steam_sdlbin_path = "libsdl2_2.0.3+steamrt1+srt4_i386.deb"
@@ -39,5 +38,5 @@ object Config {
   val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
 
   val config_launch4j_url      = "https://downloads.sourceforge.net/project/launch4j/launch4j-3/3.9/launch4j-3.9-linux.tgz"
-  val config_launch4j_Checksum = "e6e9a83927585d16efcb82f41d4ae480f14eccc19ced611a59f31fffb5ca549b"
+  val config_launch4j_checksum = "e6e9a83927585d16efcb82f41d4ae480f14eccc19ced611a59f31fffb5ca549b"
 }

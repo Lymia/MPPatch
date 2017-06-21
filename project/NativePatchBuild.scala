@@ -28,10 +28,10 @@ import Config._
 import Utils._
 
 object NativePatchBuild {
-  def mingw_gcc  (p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
-  def macos_clang(p: Seq[Any]) = runProcess(config_macos_clang +: p)
-  def gcc        (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
-  def nasm       (p: Seq[Any]) = runProcess(config_nasm +: p)
+  def win32_cc(p: Seq[Any]) = runProcess(config_win32_cc +: p)
+  def macos_cc(p: Seq[Any]) = runProcess(config_macos_cc +: p)
+  def linux_cc(p: Seq[Any]) = runProcess(config_linux_cc +: p)
+  def nasm    (p: Seq[Any]) = runProcess(config_nasm +: p)
 
   // Steam runtime
   def extractSteamRuntime[T](source: File, target: File, beforeLog: => T = null)(fn: (File, File) => Unit) =
@@ -119,7 +119,7 @@ object NativePatchBuild {
     win32Directory := prepareDirectory(patchBuildDir.value / "win32") { dir =>
       cachedTransform(patchCacheDir.value / "win23_lua_stub",
         patchSourceDir.value / "win32" / "stub" / "lua51_Win32.c",
-        dir / "lua51_Win32.dll")((in, out) => mingw_gcc(Seq("-shared", "-o", out, in)))
+        dir / "lua51_Win32.dll")((in, out) => win32_cc(Seq("-shared", "-o", out, in)))
     },
     macosDirectory := prepareDirectory(patchBuildDir.value / "macos") { dir =>
       cachedTransform(patchCacheDir.value / "macos_proxy",
@@ -152,18 +152,18 @@ object NativePatchBuild {
 
         val (cc, nasmFormat, binaryExtension, sourcePath, extraCDeps, gccFlags, nasmFiles) =
           platform match {
-            case "win32" => (mingw_gcc   _, "win32"  , ".dll",
+            case "win32" => (win32_cc _, "win32"  , ".dll",
               Seq(patchSourceDir.value / "win32"),
               allFiles(win32Directory.value, ".dll"),
               Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
                   s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
                   "-static-libgcc") ++ config_win32_secureFlags, Seq(patchSourceDir.value / "win32" / "proxy.s"))
-            case "macos" => (macos_clang _, "macho32", ".dylib" ,
+            case "macos" => (macos_cc _, "macho32", ".dylib" ,
               Seq(patchSourceDir.value / "macos", patchSourceDir.value / "posix", macosDirectory.value), Seq(),
               Seq("-ldl", "-framework", "CoreFoundation", "-Wl,-segprot,MPPATCH_PROXY,rwx,rx"), Seq())
-            case "linux" => (gcc         _, "elf"  , ".so" ,
+            case "linux" => (linux_cc _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux"  , patchSourceDir.value / "posix", steamrtSDLDev.value),
-              Seq(steamrtSDL.value), Seq("-ldl") ++ config_linux_secureFlags, Seq())
+              Seq(steamrtSDL.value), Seq("-ldl"), Seq())
           }
         val fullSourcePath = Seq(patchSourceDir.value / "common", patchSourceDir.value / "inih",
                                  commonIncludes.value, versionDir) ++ sourcePath
