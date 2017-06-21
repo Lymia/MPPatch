@@ -55,3 +55,7 @@ __attribute__((noreturn)) void fatalError_fn(const char* message) {
 
     exit(1);
 }
+
+void* resolveSymbol(const char* symbol) {
+    return NULL;
+}

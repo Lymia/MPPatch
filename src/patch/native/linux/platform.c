@@ -20,6 +20,9 @@
     SOFTWARE.
 */
 
+#define _GNU_SOURCE
+
+#include <dlfcn.h>
 #include <unistd.h>
 #include <string.h>
 #include <SDL.h>
@@ -43,4 +46,8 @@ __attribute__((noreturn)) void fatalError_fn(const char* message) {
   debug_print("%s", message);
   SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "MPPatch", message, 0);
   exit(1);
+}
+
+void* resolveSymbol(const char* symbol) {
+    return dlsym(RTLD_DEFAULT, symbol);
 }

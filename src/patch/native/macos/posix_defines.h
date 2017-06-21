@@ -24,8 +24,7 @@
 
 #include "c_defines.h"
 
-#define LUAJIT_LIBRARY       "mppatch_luajit.dylib"
-#define LUAJIT_SYMBOL_FORMAT "_%s"
+#define LUAJIT_LIBRARY "mppatch_luajit.dylib"
 
 // std::list data structure
 typedef struct CppListLink {

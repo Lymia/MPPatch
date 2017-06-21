@@ -22,8 +22,8 @@
 
 #pragma once
 
-#define lGetMemoryUsage_symbol          "__ZN17cvLuaScriptSystem15lGetMemoryUsageEP9lua_State"
+#define lGetMemoryUsage_symbol          "_ZN17cvLuaScriptSystem15lGetMemoryUsageEP9lua_State"
 #define lGetMemoryUsage_hook_length     5
 
-#define SetActiveDLCAndMods_symbol      "__ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKSt4listIN15ModAssociations7ModInfoESaIS5_EEbb"
+#define SetActiveDLCAndMods_symbol      "_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKSt4listIN15ModAssociations7ModInfoESaIS5_EEbb"
 #define SetActiveDLCAndMods_hook_length 5

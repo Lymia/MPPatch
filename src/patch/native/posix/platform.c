@@ -24,7 +24,6 @@
 #include <stdbool.h>
 
 #include <sys/mman.h>
-#include <dlfcn.h>
 #include <unistd.h>
 
 #include "c_rt.h"
@@ -33,11 +32,11 @@
 
 // Memory management functions
 static int protectRange(size_t start, size_t length, int flags) {
-  int page_size = getpagesize();
-  size_t end = start + length;
-  start = (start / page_size) * page_size;
-  end   = ((end + page_size) / page_size) * page_size;
-  return mprotect((void*) start, end - start, flags);
+    int page_size = getpagesize();
+    size_t end = start + length;
+    start = (start / page_size) * page_size;
+    end   = ((end + page_size) / page_size) * page_size;
+    return mprotect((void*) start, end - start, flags);
 }
 void unprotectMemoryRegion(void* start, size_t length, memory_oldProtect* old) {
   protectRange((size_t) start, length, PROT_READ | PROT_WRITE);
@@ -57,18 +56,6 @@ void executable_prepare(ExecutableMemory* memory) {
 }
 void executable_free(ExecutableMemory* memory) {
     munmap(memory, memory->length);
-}
-
-
-// Symbol & address resolution
-static void* dlsymHandle;
-void* resolveSymbol(const char* symbol) {
-    return dlsym(dlsymHandle, symbol);
-}
-__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void loadDysymHandle() {
-    debug_print("Opening handle to main binary");
-    dlsymHandle = dlopen(NULL, RTLD_NOW);
-    if(dlsymHandle == NULL) fatalError("Could not open handle to main binary: %s", dlerror());
 }
 
 // std::list implementation

@@ -59,12 +59,11 @@ __attribute__((constructor(CONSTRUCTOR_HOOK_INIT))) static void installLuaJIT() 
         char buffer[PATH_MAX];
         getSupportFilePath(buffer, LUAJIT_LIBRARY);
 
-        void* luaJIT = dlopen(buffer, RTLD_NOW);
+        void* luaJIT = dlopen(buffer, RTLD_LOCAL | RTLD_NOW);
         if(luaJIT == NULL) fatalError("Could not open LuaJIT library: %s", dlerror());
 
-        char symbol[512];
         for(int i=0; i < sizeof(luaJITSymbols) / sizeof(const char*); i++) {
-            snprintf(symbol, sizeof(symbol), LUAJIT_SYMBOL_FORMAT, luaJITSymbols[i]);
+            const char* symbol = luaJITSymbols[i];
 
             void* targetSym = resolveSymbol(symbol);
             void* patchSym  = dlsym(luaJIT, symbol);

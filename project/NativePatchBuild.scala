@@ -172,7 +172,7 @@ object NativePatchBuild {
 
             cc(includePaths("-I") ++ Seq(
               "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-fvisibility=hidden",
-              "-s", "-o", targetFile, "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
+              "-g", "-o", targetFile, "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
               "-DMPPATCH_BUILDID=\""+buildId+"\"") ++ nasmOut ++ config_common_secureFlags ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")))
             targetDir

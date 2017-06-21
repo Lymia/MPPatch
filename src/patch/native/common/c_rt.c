@@ -105,6 +105,9 @@ void patchJmpInstruction(void* fromAddress, void* toAddress, const char* logReas
 }
 
 PatchInformation* proxyFunction(void* fromAddress, void* toAddress, int patchBytes, const char* logReason) {
+    if(!fromAddress) fatalError("Could not resolve proxy target: %s", logReason)
+    debug_print("Proxying function (%s) - %p => %p (%d bytes)", logReason, fromAddress, toAddress, patchBytes);
+
     PatchInformation* info = malloc(sizeof(PatchInformation));
     info->offset = fromAddress;
     memcpy(info->oldData, fromAddress, 5);
