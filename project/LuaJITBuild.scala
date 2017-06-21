@@ -52,7 +52,7 @@ object LuaJITBuild {
       val logger         = streams.value.log
       IO.createDirectory(patchDirectory)
 
-      for (platform <- Seq("win32", "linux")) yield {
+      for (platform <- Seq("win32", "macos", "linux")) yield {
         val (platformEnv, outputFile, extension, flags) =
           platform match {
             case "win32" =>
@@ -60,6 +60,9 @@ object LuaJITBuild {
                    "TARGET_SYS" -> "Windows"), "src/lua51.dll", ".dll",
                Seq(s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
                    "-static-libgcc") ++ config_win32_secureFlags)
+            case "macos" =>
+              (Map("HOST_CC" -> (config_linux_gcc+" -m32"), "CROSS" -> config_macos_prefix, "CC" -> "clang",
+                   "TARGET_SYS" -> "Darwin"), "src/libluajit.so", ".dylib", Seq())
             case "linux" =>
               (Map("CC" -> (config_linux_gcc+" -m32")), "src/libluajit.so", ".so", config_linux_secureFlags)
           }

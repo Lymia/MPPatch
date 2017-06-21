@@ -17,16 +17,18 @@ Compiling
 MPPatch can only be built on Linux systems. The build scripts have only been tested on the distributions listed below,
 and have only been extensively tested on Arch Linux. You are on your own for other distributions.
 
-On Ubuntu, you will need the following packages: `openjdk-8-jdk sbt mingw-w64 nasm`. In addition, on 64-bit systems you
-will need `libc6-dev-i386`. Note that sbt is not in the default repositories, so, you will need to add the repository
-manually. See [here](http://www.scala-sbt.org/0.13/tutorial/Installing-sbt-on-Linux.html) for details.
+On Ubuntu, you will need the following packages: `openjdk-8-jdk sbt mingw-w64 nasm clang`. In addition, on 64-bit
+systems you will need `libc6-dev-i386`. Note that sbt is not in the default repositories, so, you will need to add
+the repository manually. See [here](http://www.scala-sbt.org/0.13/tutorial/Installing-sbt-on-Linux.html) for details.
 
-On Arch Linux, you will need the following packages: `base-devel jdk8-openjdk sbt mingw-w64-gcc nasm gcc-multilib`.
+On Arch Linux, you will need the following packages: `base-devel jdk8-openjdk sbt mingw-w64-gcc nasm gcc-multilib
+clang`.
 
 The first time you build a release, you must initialize submodules used by MPPatch. To do this, run
 `git submodule update --init`.
 
-You will also need to install [osxcross](https://github.com/tpoechtrager/osxcross) and put the binaries in your `$PATH`.
+You will also need to install [osxcross](https://github.com/tpoechtrager/osxcross). After cloning osxcross into a
+directory and setting up the xcode tarballs, execute `./build.sh`, then add `osxcross/target/bin` to your `PATH`.
 
 To build a release, use `sbt clean dist`. You can also use `sbt run` to test your local version without building a full
 release.

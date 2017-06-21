@@ -28,10 +28,10 @@ import Config._
 import Utils._
 
 object NativePatchBuild {
-  def mingw_gcc(p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
-  def macos_gcc(p: Seq[Any]) = runProcess(config_macos_gcc +: p)
-  def gcc      (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
-  def nasm     (p: Seq[Any]) = runProcess(config_nasm +: p)
+  def mingw_gcc  (p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
+  def macos_clang(p: Seq[Any]) = runProcess(config_macos_clang +: p)
+  def gcc        (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
+  def nasm       (p: Seq[Any]) = runProcess(config_nasm +: p)
 
   // Steam runtime
   def extractSteamRuntime[T](source: File, target: File, beforeLog: => T = null)(fn: (File, File) => Unit) =
@@ -121,16 +121,16 @@ object NativePatchBuild {
 
         val (cc, nasmFormat, binaryExtension, sourcePath, extraCDeps, gccFlags, nasmFiles) =
           platform match {
-            case "win32" => (mingw_gcc _, "win32"  , ".dll",
+            case "win32" => (mingw_gcc   _, "win32"  , ".dll",
               Seq(patchSourceDir.value / "win32"),
               allFiles(win32Directory.value, ".dll"),
               Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
                   s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
                   "-static-libgcc") ++ config_win32_secureFlags, Seq(patchSourceDir.value / "win32" / "proxy.s"))
-            case "macos" => (macos_gcc _, "macho32", ".dylib" ,
+            case "macos" => (macos_clang _, "macho32", ".dylib" ,
               Seq(patchSourceDir.value / "macos", patchSourceDir.value / "posix"), Seq(),
               Seq("-ldl", "-framework", "CoreFoundation", "-undefined", "dynamic_lookup"), Seq())
-            case "linux" => (gcc       _, "elf"  , ".so" ,
+            case "linux" => (gcc         _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux"  , patchSourceDir.value / "posix", steamrtSDLDev.value),
               Seq(steamrtSDL.value), Seq("-ldl") ++ config_linux_secureFlags, Seq())
           }
