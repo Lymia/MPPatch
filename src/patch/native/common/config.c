@@ -49,4 +49,9 @@ __attribute__((constructor(CONSTRUCTOR_READ_CONFIG))) static void readConfig() {
     char buffer[PATH_MAX];
     getSupportFilePath(buffer, CONFIG_FILENAME);
     if(fileExists(buffer)) ini_parse(buffer, readConfig_handler, NULL);
+
+    debug_print("enableLogging          = %s", enableLogging          ? "true" : "false")
+    debug_print("enableDebug            = %s", enableDebug            ? "true" : "false")
+    debug_print("enableMultiplayerPatch = %s", enableMultiplayerPatch ? "true" : "false")
+    debug_print("enableLuaJIT           = %s", enableLuaJIT           ? "true" : "false")
 }

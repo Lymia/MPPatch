@@ -35,6 +35,7 @@
 // Get executable path
 __attribute__((constructor(CONSTRUCTOR_GET_EXE_PATH))) static void initExecutablePath() {
     executable_directory_path = getExecutablePath();
+    debug_print("Executable base directory: %s", executable_directory_path);
 }
 
 // Debug logging
