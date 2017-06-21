@@ -23,11 +23,11 @@ do
     local debugPrint
     if patch.__mppatch_marker then
         function debugPrint(line)
+            patch.debugPrint(line)
             print("[MPPatch] "..line)
         end
     else
         function debugPrint(line)
-            patch.debugPrint(line)
             print("[MPPatch] "..line)
         end
     end
