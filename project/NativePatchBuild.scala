@@ -29,7 +29,7 @@ import Utils._
 
 object NativePatchBuild {
   def mingw_gcc  (p: Seq[Any]) = runProcess(config_mingw_gcc +: p)
-  def macos_clang(p: Seq[Any]) = runProcess(config_macos_clang +: p)
+  def macos_clang(p: Seq[Any]) = runProcess(config_macos_clang +: "-m32" +: p)
   def gcc        (p: Seq[Any]) = runProcess(config_linux_gcc +: p)
   def nasm       (p: Seq[Any]) = runProcess(config_nasm +: p)
 
