@@ -22,27 +22,28 @@
   -->
 <InstallScript>
     <SteamId>8930</SteamId>
-    <AssetsPath Path="steamassets/assets"/>
-    <CheckFor Path="Civ5XP"/>
-    <VersionFrom Path="Civ5XP"/>
+    <AssetsPath Path="Civilization V.app/Contents/Home/Assets"/>
+    <CheckFor Path="Civilization V.app/Contents/MacOS/Civilization Vsub"/>
+    <VersionFrom Path="Civilization V.app/Contents/MacOS/Civilization Vsub"/>
 
     <Package Name="core">
-        <RenameFile Path="Civ5XP" RenameTo="Civ5XP.orig"/>
+        <RenameFile Path="Civilization V.app/Contents/MacOS/Civilization Vsub"
+                    RenameTo="Civilization V.app/Contents/MacOS/Civilization Vsub orig"/>
 
-        <InstallBinary Path="mppatch_core.so"/>
-        <WriteConfig Path="mppatch_config.ini" Section="MPPatch"/>
+        <InstallBinary Path="Civilization V.app/Contents/MacOS/mppatch_core.dylib"/>
+        <WriteConfig Path="Civilization V.app/Contents/MacOS/mppatch_config.ini" Section="MPPatch"/>
 
-        <AdditionalFile Path="Civ5XP" Source="install/Civ5XP.sh" SetExecutable="true"/>
-        <AdditionalFile Path="Civ5XP.launch" Source="install/Civ5XP.launch.sh" SetExecutable="true"/>
-        <AdditionalFile Path="Civ5XP.dbg" Source="install/Civ5XP.dbg.sh" SetExecutable="true"/>
+        <AdditionalFile Path="Civilization V.app/Contents/MacOS/Civilization Vsub"
+                        Source="install/Civilization Vsub.sh" SetExecutable="true"/>
     </Package>
     <Package Name="multiplayer" Depends="core">
         <SetFlag Name="enableMultiplayerPatch"/>
-        <WriteDLC Source="ui/mppatch.xml" DLCData="dlc/mppatch" TextData="gameplay/xml/newtext/mppatch_textdata"/>
+        <WriteDLC Source="ui/mppatch.xml" DLCData="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
     </Package>
     <Package Name="luajit" Depends="core">
         <SetFlag Name="enableLuaJIT"/>
-        <AdditionalFile Path="mppatch_luajit.so" Source="native/luajit_linux.so"/>
+        <AdditionalFile Path="Civilization V.app/Contents/MacOS/mppatch_luajit.dylib"
+                        Source="native/luajit_macos.dylib"/>
     </Package>
     <Package Name="logging">
         <SetFlag Name="enableLogging"/>
@@ -52,14 +53,13 @@
     </Package>
 
     <Cleanup>
-        <RenameIfExists Path="Civ5XP.orig" RenameTo="Civ5XP"/>
-        <CheckFile Path="Civ5XP.launch"/>
-        <CheckFile Path="Civ5XP.orig"/>
-        <CheckFile Path="Civ5XP.dbg"/>
-        <CheckFile Path="mppatch_core.so"/>
-        <CheckFile Path="mppatch_luajit.so"/>
-        <CheckFile Path="mppatch_config.ini"/>
-        <CheckFile Path="steamassets/assets/dlc/mppatch"/>
-        <CheckFile Path="steamassets/assets/gameplay/xml/newtext/mppatch_textdata"/>
+        <RenameIfExists Path="Civilization V.app/Contents/MacOS/Civilization Vsub orig"
+                        RenameTo="Civilization V.app/Contents/MacOS/Civilization Vsub"/>
+        <CheckFile Path="Civilization V.app/Contents/MacOS/Civilization Vsub orig"/>
+        <CheckFile Path="Civilization V.app/Contents/MacOS/mppatch_core.dylib"/>
+        <CheckFile Path="Civilization V.app/Contents/MacOS/mppatch_config.ini"/>
+        <CheckFile Path="Civilization V.app/Contents/MacOS/mppatch_luajit.dylib"/>
+        <CheckFile Path="Civilization V.app/Contents/Home/Assets/DLC/MPPatch"/>
+        <CheckFile Path="Civilization V.app/Contents/Home/Assets/Gameplay/XML/NewText/MPPatch_TextData"/>
     </Cleanup>
 </InstallScript>

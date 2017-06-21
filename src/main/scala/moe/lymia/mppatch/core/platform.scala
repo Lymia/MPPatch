@@ -32,18 +32,18 @@ import scala.annotation.tailrec
 
 sealed trait PlatformType
 object PlatformType {
-  case object Win32  extends PlatformType
-  case object MacOSX extends PlatformType
-  case object Linux  extends PlatformType
-  case object Other  extends PlatformType
+  case object Win32 extends PlatformType
+  case object MacOS extends PlatformType
+  case object Linux extends PlatformType
+  case object Other extends PlatformType
 
   lazy val currentPlatform = {
     val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
          if(os.contains("windows")) Win32
     else if(os.contains("linux"  )) Linux
     else if(os.contains("mac"    ) ||
-            os.contains("darwin" )) MacOSX
-    else                           Other
+            os.contains("darwin" )) MacOS
+    else                            Other
   }
 }
 
@@ -60,6 +60,7 @@ trait Platform {
 object Platform {
   def apply(t: PlatformType) = t match {
     case PlatformType.Win32 => Some(Win32Platform)
+    case PlatformType.MacOS => Some(MacOSPlatform)
     case PlatformType.Linux => Some(LinuxPlatform)
     case _                  => None
   }
@@ -79,6 +80,15 @@ object Win32Platform extends Platform {
       SimpleLogger.error("Could not load default system paths from registery.", e)
       Seq()
   }
+}
+
+object MacOSPlatform extends Platform {
+  override val platformName = "macos"
+
+  private val home = Paths.get(System.getProperty("user.home"))
+  override def defaultSystemPaths: Seq[Path] =
+    Steam.loadLibraryFolders(home.resolve("Library/Application Support/Steam")).map(
+      _.resolve("steamapps/common/Sid Meier's Civilization V"))
 }
 
 object LinuxPlatform extends Platform {

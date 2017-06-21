@@ -91,7 +91,8 @@ object InstallerResourceBuild {
         "build.version.gcc.short"   -> propertyFromProcess(config_linux_gcc, "--version").split("\n").head,
         "build.version.gcc"         -> propertyFromProcess(config_linux_gcc, "-v"),
         "build.version.mingw.short" -> propertyFromProcess(config_mingw_gcc, "--version").split("\n").head,
-        "build.version.mingw"       -> propertyFromProcess(config_mingw_gcc, "-v")
+        "build.version.mingw"       -> propertyFromProcess(config_mingw_gcc, "-v"),
+        "build.version.osxcross"    -> propertyFromProcess(config_macos_clang, "--version")
       )
     },
     versionFile := {
