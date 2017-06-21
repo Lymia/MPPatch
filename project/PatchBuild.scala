@@ -28,6 +28,8 @@ import sbt.Keys._
 
 import scala.xml._
 
+import moe.lymia.mppatch.util.common._
+
 object PatchBuild {
   object PatchFile {
     def apply(name: String, data: Array[Byte]) = (name, data)
@@ -66,9 +68,9 @@ object PatchBuild {
           |_mpPatch.version = {}
           |_mpPatch.version.buildId = {}
         """.stripMargin + versions.map(x =>
-          s"_mpPatch.version.buildId.${x.platform}_${x.version} = [[${x.buildId}]]").mkString("\n") + "\n" +
+          s"_mpPatch.version.buildId.${x.platform}_${x.version} = ${LuaUtils.quote(x.buildId)}").mkString("\n") + "\n" +
         "_mpPatch.version.info = {}\n" + InstallerResourceBuild.Keys.versionData.value.map(x =>
-          s"_mpPatch.version.info[ [[${x._1}]] ] = [[${x._2.replace("]]", "]]..\"]]\"..[[")}]]").mkString("\n"))
+          s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}").mkString("\n"))
       val manifestFile = PatchFile("manifest.xml",
                                    "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"+xmlWriter.format(output))
       val versionFile  = PatchFile("version.properties", IO.readBytes(InstallerResourceBuild.Keys.versionFile.value))
@@ -89,7 +91,6 @@ object PatchBuild {
         IO.write(target, data)
       }
 
-      import moe.lymia.mppatch.util.common._
       IOWrappers.writePatchPackage(new DataOutputStream(new FileOutputStream(packagePath)),
                                    PatchPackage(patchFiles.value))
 

@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
 
+import moe.lymia.mppatch.util.common.LuaUtils
 import moe.lymia.mppatch.util.io._
 import moe.lymia.mppatch.util.io.XMLUtils._
 
@@ -68,8 +69,6 @@ object UIPatch {
 }
 
 class UIPatchLoader(source: DataSource, patch: UIPatch) {
-  private def quoteLua(s: String) = s"[[${s.replace("]]", "]]..\"]]\"..[[")}]]"
-
   private lazy val luaPatchList = patch.luaPatches.map(x => x.filename.toLowerCase(Locale.ENGLISH) -> x).toMap
   private lazy val libraryFiles = patch.libraryFiles.map(x =>
     x.filename -> source.loadResource(x.source)
@@ -89,10 +88,10 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
     x._1 -> s"${patch.softHookInfo.patchPrefix}${x._2}_${x._1.split("/").last}").toMap
 
   private lazy val softHookInfoFragments = patch.luaSoftHooks.map { x =>
-    val subtableName = s"${patch.softHookInfo.namespace}[ ${quoteLua(x.id)} ]"
+    val subtableName = s"${patch.softHookInfo.namespace}[${LuaUtils.quote(x.id)}]"
     s"""$subtableName = {}
-       |$subtableName.include = {${x.includes.map(quoteLua).mkString(", ")}}
-       |$subtableName.inject = {${x.inject.map(patchFileMap).map(quoteLua).mkString(", ")}}
+       |$subtableName.include = {${x.includes.map(LuaUtils.quote).mkString(", ")}}
+       |$subtableName.inject = {${x.inject.map(patchFileMap).map(LuaUtils.quote).mkString(", ")}}
      """.stripMargin
   }
   private lazy val softHookInfo = {
@@ -116,7 +115,7 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
     }
   private def getLuaFragment(inject: LuaOverrideInject) = {
     if(!inject.inline) {
-      s"include ${quoteLua(patchFileMap(inject.source))}\n"
+      s"include ${LuaUtils.quote(patchFileMap(inject.source))}\n"
     } else {
       val code = source.loadResource(inject.source)
       s"-- source file: ${inject.source} --\n\n"+
