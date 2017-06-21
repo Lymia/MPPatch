@@ -23,11 +23,12 @@ local function createTable()
     _mpPatch._mt = {}
     setmetatable(_mpPatch, _mpPatch._mt)
 end
-local function patchCriticalError(error, statusMarker)
+local function patchCriticalError(errorStr, statusMarker)
     createTable()
-    print("[MPPatch] Cannot load due to critical error: "..error)
+    print("[MPPatch] Cannot load due to critical error: "..errorStr)
     _mpPatch.loaded = false
-    if statusMarker then _mpPatch[statusMarker] = true end
+    _mpPatch.status = {}
+    if statusMarker then _mpPatch.status[statusMarker] = true end
     function _mpPatch._mt.__index(_, k)
         error("Access to field "..k.." in MpPatch runtime without patch installed.")
     end
@@ -38,7 +39,7 @@ end
 
 local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70")
 if not patch.__mppatch_marker then
-    patchCriticalError("Could not load binary patch.")
+    patchCriticalError("Could not load binary patch.", "binaryLoadFailed")
     return
 end
 
