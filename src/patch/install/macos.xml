@@ -35,6 +35,8 @@
 
         <AdditionalFile Path="Civilization V.app/Contents/MacOS/Civilization Vsub"
                         Source="install/Civilization Vsub.sh" SetExecutable="true"/>
+        <AdditionalFile Path="Civilization V.app/Contents/MacOS/Launch Civilization V"
+                        Source="install/Launch Civilization V.sh" SetExecutable="true"/>
     </Package>
     <Package Name="multiplayer" Depends="core">
         <SetFlag Name="enableMultiplayerPatch"/>
