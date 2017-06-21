@@ -58,6 +58,7 @@
         <RenameIfExists Path="Civilization V.app/Contents/MacOS/Civilization Vsub orig"
                         RenameTo="Civilization V.app/Contents/MacOS/Civilization Vsub"/>
         <CheckFile Path="Civilization V.app/Contents/MacOS/Civilization Vsub orig"/>
+        <CheckFile Path="Civilization V.app/Contents/MacOS/Launch Civilization V"/>
         <CheckFile Path="Civilization V.app/Contents/MacOS/mppatch_core.dylib"/>
         <CheckFile Path="Civilization V.app/Contents/MacOS/mppatch_config.ini"/>
         <CheckFile Path="Civilization V.app/Contents/MacOS/mppatch_luajit.dylib"/>

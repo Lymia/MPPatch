@@ -34,7 +34,6 @@
 
         <AdditionalFile Path="Civ5XP" Source="install/Civ5XP.sh" SetExecutable="true"/>
         <AdditionalFile Path="Civ5XP.launch" Source="install/Civ5XP.launch.sh" SetExecutable="true"/>
-        <AdditionalFile Path="Civ5XP.dbg" Source="install/Civ5XP.dbg.sh" SetExecutable="true"/>
     </Package>
     <Package Name="multiplayer" Depends="core">
         <SetFlag Name="enableMultiplayerPatch"/>
@@ -55,7 +54,6 @@
         <RenameIfExists Path="Civ5XP.orig" RenameTo="Civ5XP"/>
         <CheckFile Path="Civ5XP.launch"/>
         <CheckFile Path="Civ5XP.orig"/>
-        <CheckFile Path="Civ5XP.dbg"/>
         <CheckFile Path="mppatch_core.so"/>
         <CheckFile Path="mppatch_luajit.so"/>
         <CheckFile Path="mppatch_config.ini"/>
