@@ -51,9 +51,7 @@ object NativePatchBuild {
     val proxies = for((symbol, i) <- IO.readLines(file).filter(_.nonEmpty).zipWithIndex
                       if !symbol.startsWith("#") && !symbol.trim.isEmpty) yield {
       (s"""static const char* ${symbol}_name = "$symbol";
-          |__attribute__((naked, section("MPPATCH_PROXY,MPPATCH_PROXY"), aligned(8))) void $symbol() {
-          |  asm volatile("jmp _proxyNotYetSetUp");
-          |}
+          |__attribute__((section("MPPATCH_PROXY,MPPATCH_PROXY"), aligned(8))) char $symbol[8] asm ("_$symbol");
         """.stripMargin,
        s"setupProxyFunction($symbol, ${symbol}_name);")
     }
@@ -62,11 +60,7 @@ object NativePatchBuild {
       s"""#import "c_rt.h"
          |#import "platform.h"
          |
-         |${proxies.map(_._1.trim).mkString("\n\n")}
-         |
-         |__attribute__((used)) static void proxyNotYetSetUp() {
-         |  fatalError("Proxied function accessed before proxy setup.");
-         |}
+         |${proxies.map(_._1.trim).mkString("\n")}
          |__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void setupProxyFunctions() {
          |  ${proxies.map(_._2.trim).mkString("\n  ")}
          |}
@@ -203,7 +197,7 @@ object NativePatchBuild {
 
             cc(includePaths("-I") ++ Seq(
               "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-fvisibility=hidden",
-              "-s", "-o", targetFile, "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
+              "-o", targetFile, "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
               "-DMPPATCH_BUILDID=\""+buildId+"\"") ++ nasmOut ++ config_common_secureFlags ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")))
             targetDir
