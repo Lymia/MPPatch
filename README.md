@@ -4,7 +4,7 @@ MPPatch
 [![Build Status](https://lymia.moe/jenkins/job/MPPatch/badge/icon)](https://lymia.moe/jenkins/job/MPPatch/)
 
 MPPatch is a patch for Civilization V that allows mods to be used in multiplayer without any special preparation.
-It supports Windows, macOS and Linux.
+It supports Steam versions of Civilization V on Windows, macOS and Linux.
 
 You can download the [latest version of MPPatch here](https://github.com/Lymia/MPPatch/releases).
 
