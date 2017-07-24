@@ -68,7 +68,7 @@ void executable_free(ExecutableMemory* memory) {
 }
 
 // std::list implementation
-#define CppList_length(list) ((int*) list->data)[0]
+#define CppList_length(list) ((__attribute__((may_alias)) int*) list->data)[0]
 CppList* CppList_alloc() {
     CppList* list = CppListLink_alloc(sizeof(int));
     CppList_length(list) = 0;
