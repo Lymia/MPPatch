@@ -29,8 +29,6 @@
 #include "c_defines.h"
 #include "platform.h"
 
-
-
 // Memory management functions
 const char* getExecutablePath() {
     char* buffer = malloc(PATH_MAX);
@@ -75,7 +73,7 @@ __attribute__((constructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void initiali
 
     debug_print("Loading original CvGameDatabase");
     if(fileExists(buffer))
-        fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.");
+        fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.\nExpected path: %s", buffer);
     baseDll = LoadLibrary(buffer);
     if(baseDll == NULL)
         fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08lx)", GetLastError());
