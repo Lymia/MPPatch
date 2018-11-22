@@ -32,7 +32,7 @@ __attribute__((noreturn)) void fatalError_fn(const char* message);
 #define fatalError(format, arg...) { \
     char fatal_error_buffer[1024]; \
     snprintf(fatal_error_buffer, 1024, format, ##arg); \
-    fatalError_fn(buffer); \
+    fatalError_fn(fatal_error_buffer); \
 }
 
 // Memory management functions
