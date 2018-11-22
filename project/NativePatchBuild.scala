@@ -195,8 +195,10 @@ object NativePatchBuild {
 
             IO.write(buildIdFile, buildId.toString)
 
-            cc(includePaths("-I") ++ Seq(
-              "-m32", "-flto", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-fvisibility=hidden",
+            // TODO: Temporary hack for a problem with mingw
+            val lto = if (platform == "win32") Seq() else Seq("-flto")
+            cc(includePaths("-I") ++ lto ++ Seq(
+              "-m32", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-fvisibility=hidden",
               "-o", targetFile, "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
               "-DMPPATCH_BUILDID=\""+buildId+"\"") ++ nasmOut ++ config_common_secureFlags ++
               gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c")))
