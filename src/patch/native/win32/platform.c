@@ -72,10 +72,10 @@ __attribute__((constructor(CONSTRUCTOR_BINARY_INIT_EARLY))) static void initiali
     getSupportFilePath(buffer, TARGET_LIBRARY_NAME);
 
     debug_print("Loading original CvGameDatabase");
-    if(fileExists(buffer))
+    if (!fileExists(buffer))
         fatalError("Cannot proxy CvGameDatabase!\nOriginal .dll file not found.\nExpected path: %s", buffer);
     baseDll = LoadLibrary(buffer);
-    if(baseDll == NULL)
+    if (baseDll == NULL)
         fatalError("Cannot proxy CvGameDatabase!\nCould not load original .dll file. (code: 0x%08lx)", GetLastError());
 }
 void* resolveSymbol(const char* symbol) {
