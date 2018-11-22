@@ -30,8 +30,8 @@ const char* getExecutablePath();
 
 __attribute__((noreturn)) void fatalError_fn(const char* message);
 #define fatalError(format, arg...) { \
-    char buffer[1024]; \
-    snprintf(buffer, 1024, format, ##arg); \
+    char fatal_error_buffer[1024]; \
+    snprintf(fatal_error_buffer, 1024, format, ##arg); \
     fatalError_fn(buffer); \
 }
 
