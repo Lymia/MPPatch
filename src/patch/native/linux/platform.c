@@ -31,12 +31,14 @@
 #include "platform.h"
 
 const char* getExecutablePath() {
-    char* buffer = malloc(PATH_MAX);
-    if(readlink("/proc/self/exe", buffer, PATH_MAX) == -1)
+    char* buffer = malloc(PATH_MAX + 1);
+    ssize_t name_bytes = readlink("/proc/self/exe", buffer, PATH_MAX);
+    if (name_bytes == -1)
         fatalError("Could not find executable location!");
+    buffer[name_bytes] = '\0';
 
     char* location = strrchr(buffer, '/');
-    if(location) *location = '\0';
+    if (location) *location = '\0';
 
     return (const char*) buffer;
 }
