@@ -28,9 +28,9 @@ import Config._
 import Utils._
 
 object NativePatchBuild {
-  def win32_cc(p: Seq[Any]) = runProcess(config_win32_cc +: p)
-  def macos_cc(p: Seq[Any]) = runProcess(config_macos_cc +: p)
-  def linux_cc(p: Seq[Any]) = runProcess(config_linux_cc +: p)
+  def win32_cc(p: Seq[Any]) = runProcess(config_win32_cc +: s"--target=$config_target_win32" +: p)
+  def macos_cc(p: Seq[Any]) = runProcess(config_macos_cc +: s"--target=$config_target_macos" +: p)
+  def linux_cc(p: Seq[Any]) = runProcess(config_linux_cc +: s"--target=$config_target_linux" +: p)
   def nasm    (p: Seq[Any]) = runProcess(config_nasm +: p)
 
   // Steam runtime
@@ -149,15 +149,17 @@ object NativePatchBuild {
             case "win32" => (win32_cc _, "win32"  , ".dll",
               Seq(patchSourceDir.value / "win32"),
               allFiles(win32Directory.value, ".dll"),
-              Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value, "-Wl,--enable-stdcall-fixup",
-                  s"-specs=${baseDirectory.value / "project" / "mingw.specs"}",
-                  "-static-libgcc") ++ config_win32_secureFlags, Seq(patchSourceDir.value / "win32" / "proxy.s"))
+              Seq("-l", "lua51_Win32", "-Wl,-L,"+win32Directory.value,
+                  "-static-libgcc", "-Wl,--start-group", "-lmsvcr90") ++ config_win32_secureFlags,
+              Seq(patchSourceDir.value / "win32" / "proxy.s"))
             case "macos" => (macos_cc _, "macho32", ".dylib" ,
               Seq(patchSourceDir.value / "macos", patchSourceDir.value / "posix", macosDirectory.value), Seq(),
-              Seq("-ldl", "-framework", "CoreFoundation", "-Wl,-segprot,MPPATCH_PROXY,rwx,rx"), Seq())
+              Seq("-ldl", "-framework", "CoreFoundation", "-Wl,-segprot,MPPATCH_PROXY,rwx,rx"),
+              Seq())
             case "linux" => (linux_cc _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux"  , patchSourceDir.value / "posix", steamrtSDLDev.value),
-              Seq(steamrtSDL.value), Seq("-ldl"), Seq())
+              Seq(steamrtSDL.value), Seq("-ldl"),
+              Seq())
           }
         val fullSourcePath = Seq(patchSourceDir.value / "common", patchSourceDir.value / "inih",
                                  commonIncludes.value, versionDir) ++ sourcePath
@@ -195,9 +197,7 @@ object NativePatchBuild {
 
             IO.write(buildIdFile, buildId.toString)
 
-            // TODO: Temporary hack for a problem with mingw
-            val lto = if (platform == "win32") Seq() else Seq("-flto")
-            cc(includePaths("-I") ++ lto ++ Seq(
+            cc(includePaths("-I") ++ Seq(
               "-m32", "-g", "-shared", "-O2", "--std=gnu11", "-Wall", "-fvisibility=hidden",
               "-o", targetFile, "-DMPPATCH_CIV_VERSION=\""+sha256+"\"", "-DMPPATCH_PLATFORM=\""+platform+"\"",
               "-DMPPATCH_BUILDID=\""+buildId+"\"") ++ nasmOut ++ config_common_secureFlags ++

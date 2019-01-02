@@ -25,10 +25,14 @@ object Config {
   val config_mingw_prefix = "i686-w64-mingw32-"
   val config_macos_prefix = "i386-apple-darwin15-"
 
-  val config_win32_cc     = config_mingw_prefix+"gcc"
+  val config_win32_cc     = "clang"
   val config_macos_cc     = config_macos_prefix+"clang"
   val config_linux_cc     = "clang"
   val config_nasm         = "nasm"
+
+  val config_target_win32 = "i686-pc-windows-gnu"
+  val config_target_linux = "i686-unknown-linux-gnu"
+  val config_target_macos = "i386-apple-darwin15"
 
   val config_win32_secureFlags  = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
   val config_common_secureFlags = Seq("-fstack-protector", "-fstack-protector-strong", "-D_FORTIFY_SOURCE=2")
