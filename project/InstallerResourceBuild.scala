@@ -103,16 +103,16 @@ object InstallerResourceBuild {
 
       path
     },
-    resourceGenerators in Compile += Def.task {
+    Compile / resourceGenerators += Def.task {
       val versionPropertiesPath =
-        (resourceManaged in Compile).value / "moe" / "lymia" / "mppatch" / "version.properties"
+        (Compile / resourceManaged).value / "moe" / "lymia" / "mppatch" / "version.properties"
       IO.copyFile(versionFile.value, versionPropertiesPath)
       Seq(versionPropertiesPath)
     }.taskValue,
 
     // Render about information
     resourceGenerators in Compile += Def.task {
-      val outPath = (resourceManaged in Compile).value / "moe" / "lymia" / "mppatch" / "text"
+      val outPath = (Compile / resourceManaged).value / "moe" / "lymia" / "mppatch" / "text"
 
       (for(file <- IO.listFiles(baseDirectory.value / "project" / "about") if file.getName.endsWith(".md")) yield {
         val markdown = IO.read(file)

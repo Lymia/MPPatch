@@ -78,8 +78,8 @@ object PatchBuild {
       // Final generated files list
       (buildIdInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles ++ luajitFiles)).toMap
     },
-    resourceGenerators in Compile += Def.task {
-      val basePath = (resourceManaged in Compile).value
+    Compile / resourceGenerators += Def.task {
+      val basePath = (Compile / resourceManaged).value
       val packagePath = basePath / "moe" / "lymia" / "mppatch" / s"mppatch.mppak"
 
       val debugOut = crossTarget.value / "patch-package-debug"

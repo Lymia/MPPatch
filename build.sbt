@@ -23,41 +23,40 @@
 import sbt._
 import sbt.Keys._
 
-// Additional keys
+// Package metainfo
+organization := "moe.lymia"
+name := "mppatch"
+homepage := Some(url("https://github.com/Lymia/MPPatch"))
+licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
 
-val commonSettings = versionWithGit ++ Seq(
-  // Organization configuration
-  organization := "moe.lymia",
-  homepage := Some(url("https://github.com/Lymia/MPPatch")),
-  licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php")),
+// Resource generators for the project.
+InstallerResourceBuild.settings
 
-  // Git versioning
-  git.baseVersion := "0.1.3",
-  git.uncommittedSignifier := Some("DIRTY"),
-  git.formattedShaVersion := {
-    val base = git.baseVersion.?.value
-    val suffix = git.makeUncommittedSignifierSuffix(git.gitUncommittedChanges.value, git.uncommittedSignifier.value)
-    git.gitHeadCommit.value map { rawSha =>
-      val sha = "dev_"+rawSha.substring(0, 8)
-      git.defaultFormatShaVersion(base, sha, suffix)
-    }
-  },
+// Git versioning
+versionWithGit
+git.baseVersion := "0.1.3"
+git.uncommittedSignifier := Some("DIRTY")
+git.formattedShaVersion := {
+  val base = git.baseVersion.?.value
+  val suffix = git.makeUncommittedSignifierSuffix(git.gitUncommittedChanges.value, git.uncommittedSignifier.value)
+  git.gitHeadCommit.value map { rawSha =>
+    val sha = "dev_"+rawSha.substring(0, 8)
+    git.defaultFormatShaVersion(base, sha, suffix)
+  }
+}
 
-  // Scala configuration
-  scalaVersion := "2.12.13",
-  scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:classpath -deprecation -unchecked".split(" ").toSeq,
-  crossPaths := false
-)
+// Scala configuration
+scalaVersion := "2.12.13"
+scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:classpath -deprecation -unchecked".split(" ").toSeq
+crossPaths := false
 
-lazy val mppatch = project in file(".") settings (commonSettings ++ Seq(
-  name := "mppatch",
+// Dependencies
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
+libraryDependencies += "org.tukaani" % "xz" % "1.6"
 
-  libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
-  libraryDependencies += "org.tukaani" % "xz" % "1.6",
-) ++ InstallerResourceBuild.settings)
-
+// Launch4J configuration
 Launch4JBuild.settings
-Launch4JBuild.Keys.launch4jSourceJar := (assembly in Compile in mppatch).value
+Launch4JBuild.Keys.launch4jSourceJar := (Compile / assembly).value
 
 // Build distribution file
 InputKey[Unit]("dist") := {
@@ -67,6 +66,6 @@ InputKey[Unit]("dist") := {
     IO.copyFile(source, output)
     output
   }
-  streams.value.log.info(s"Output packed to: ${copy((assembly in Compile in mppatch).value)}")
+  streams.value.log.info(s"Output packed to: ${copy((Compile / assembly).value)}")
   streams.value.log.info(s"Launch4J .exe written to: ${copy(Launch4JBuild.Keys.launch4jOutput.value)}")
 }
