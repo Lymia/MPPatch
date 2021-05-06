@@ -22,12 +22,10 @@
 
 import sbt._
 import sbt.Keys._
-import com.lightbend.sbt.SbtProguard._
 
 import Config._
 import Utils._
 
-import ProguardBuild.Keys._
 import LoaderBuild.Keys._
 
 // Additional keys
@@ -51,22 +49,16 @@ val commonSettings = versionWithGit ++ Seq(
   },
 
   // Scala configuration
-  scalaVersion := "2.12.2",
+  scalaVersion := "2.12.13",
   scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:classpath -deprecation -unchecked".split(" ").toSeq,
   crossPaths := false
 )
 
-lazy val mppatch = project in file(".") settings (commonSettings ++ ProguardBuild.settings ++ Seq(
+lazy val mppatch = project in file(".") settings (commonSettings ++ Seq(
   name := "mppatch-nopack",
 
   libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
-  shadeMappings       += "scala.**" -> "moe.lymia.mppatch.lib.scala.@1",
-
   libraryDependencies += "org.tukaani" % "xz" % "1.6",
-  shadeMappings       += "org.tukaani.xz.**" -> "moe.lymia.mppatch.lib.xz.@1",
-
-  excludeFiles   := Set("library.properties", "rootdoc.txt", "scala-xml.properties"),
-  proguardConfig := "installer.pro"
 ) ++ InstallerResourceBuild.settings)
 
 lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBuild.settings ++ Seq(
@@ -75,7 +67,7 @@ lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBu
 
   javacOptions ++= Seq("-source", "1.5", "-target", "1.5"),
 
-  loaderSourceJar := (proguard in Proguard in mppatch).value.head,
+  loaderSourceJar := (assembly in mppatch).value,
   loaderTargetPath := "moe/lymia/mppatch/installer.pack",
   loaderExclude += "moe/lymia/mppatch/mppatch.mppak"
 ))
