@@ -65,7 +65,7 @@ lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBu
   name := "mppatch",
   autoScalaLibrary := false,
 
-  javacOptions ++= Seq("-source", "1.5", "-target", "1.5"),
+  javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
 
   loaderSourceJar := (assembly in mppatch).value,
   loaderTargetPath := "moe/lymia/mppatch/installer.pack",

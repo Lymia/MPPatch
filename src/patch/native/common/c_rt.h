@@ -60,7 +60,7 @@ extern FILE* debug_log_file;
 
 #define ENTRY __attribute__((force_align_arg_pointer))
 
-const char* executable_directory_path;
+extern const char* executable_directory_path;
 #define getSupportFilePath(buffer, file) \
     snprintf(buffer, sizeof(buffer), "%s" PATH_SEPARATOR file, executable_directory_path);
 

@@ -61,8 +61,8 @@ object LuaJITBuild {
                    "-Wno-unused-command-line-argument") ++ config_win32_secureFlags,
                "src/lua51.dll", ".dll", config_win32_cc, config_target_win32)
             case "macos" =>
-              (Map("CROSS" -> config_macos_prefix, "TARGET_SYS" -> "Darwin"),
-               Seq(s"--target=$config_target_macos"),
+              (Map("CROSS" -> config_macos_prefix, "TARGET_SYS" -> "Darwin", "MACOSX_DEPLOYMENT_TARGET" -> "10.6"),
+               Seq(s"--target=$config_target_macos", "-fuse-ld="+config_macos_ld),
                "src/libluajit.so", ".dylib", config_macos_cc, config_target_macos)
             case "linux" =>
               (Map(),

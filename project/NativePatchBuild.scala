@@ -27,8 +27,6 @@ import sbt.Keys._
 import Config._
 import Utils._
 
-import sbt.dsl.LinterLevel.Ignore
-
 object NativePatchBuild {
   def win32_cc(p: Seq[Any]) = runProcess(config_win32_cc +: s"--target=$config_target_win32" +: p)
   def macos_cc(p: Seq[Any]) = runProcess(config_macos_cc +: s"--target=$config_target_macos" +: p)
@@ -156,7 +154,7 @@ object NativePatchBuild {
               Seq(patchSourceDir.value / "win32" / "proxy.s"))
             case "macos" => (macos_cc _, "macho32", ".dylib" ,
               Seq(patchSourceDir.value / "macos", patchSourceDir.value / "posix", macosDirectory.value), Seq(),
-              Seq("-ldl", "-framework", "CoreFoundation", "-Wl,-segprot,MPPATCH_PROXY,rwx,rx"),
+              Seq("-ldl", "-framework", "CoreFoundation", "-Wl,-segprot,MPPATCH_PROXY,rwx,rx", "-fuse-ld="+config_macos_ld),
               Seq())
             case "linux" => (linux_cc _, "elf"  , ".so" ,
               Seq(patchSourceDir.value / "linux"  , patchSourceDir.value / "posix", steamrtSDLDev.value),
