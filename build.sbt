@@ -23,11 +23,6 @@
 import sbt._
 import sbt.Keys._
 
-import Config._
-import Utils._
-
-import LoaderBuild.Keys._
-
 // Additional keys
 
 val commonSettings = versionWithGit ++ Seq(
@@ -55,25 +50,14 @@ val commonSettings = versionWithGit ++ Seq(
 )
 
 lazy val mppatch = project in file(".") settings (commonSettings ++ Seq(
-  name := "mppatch-nopack",
+  name := "mppatch",
 
   libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
   libraryDependencies += "org.tukaani" % "xz" % "1.6",
 ) ++ InstallerResourceBuild.settings)
 
-lazy val loader = project in file("loader") settings (commonSettings ++ LoaderBuild.settings ++ Seq(
-  name := "mppatch",
-  autoScalaLibrary := false,
-
-  javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
-
-  loaderSourceJar := (assembly in mppatch).value,
-  loaderTargetPath := "moe/lymia/mppatch/installer.pack",
-  loaderExclude += "moe/lymia/mppatch/mppatch.mppak"
-))
-
 Launch4JBuild.settings
-Launch4JBuild.Keys.launch4jSourceJar := (Keys.`package` in Compile in loader).value
+Launch4JBuild.Keys.launch4jSourceJar := (assembly in Compile in mppatch).value
 
 // Build distribution file
 InputKey[Unit]("dist") := {
@@ -83,6 +67,6 @@ InputKey[Unit]("dist") := {
     IO.copyFile(source, output)
     output
   }
-  streams.value.log.info(s"Output packed to: ${copy((Keys.`package` in Compile in loader).value)}")
+  streams.value.log.info(s"Output packed to: ${copy((assembly in Compile in mppatch).value)}")
   streams.value.log.info(s"Launch4J .exe written to: ${copy(Launch4JBuild.Keys.launch4jOutput.value)}")
 }
