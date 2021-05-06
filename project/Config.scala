@@ -23,7 +23,7 @@
 object Config {
   val config_make         = "make"
   val config_mingw_prefix = "i686-w64-mingw32-"
-  val config_macos_prefix = "i386-apple-darwin15-"
+  val config_macos_prefix = "i386-apple-darwin17-"
 
   val config_win32_cc     = "clang"
   val config_macos_cc     = config_macos_prefix+"clang"

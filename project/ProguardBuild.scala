@@ -22,10 +22,12 @@
 
 import sbt._
 import sbt.Keys._
-import com.typesafe.sbt.SbtProguard._
+import com.lightbend.sbt.SbtProguard._
+import sbtassembly.AssemblyPlugin.autoImport.ShadeRule
 
 import sbtassembly._
 import AssemblyKeys._
+import autoImport._
 
 object ProguardBuild {
   object Keys {
@@ -36,7 +38,7 @@ object ProguardBuild {
   }
   import Keys._
 
-  val settings = proguardSettings ++ Seq(
+  val settings = baseSettings ++ Seq(
     shadeMappings := Seq(),
     excludeFiles := Set(),
     assemblyShadeRules in assembly := shadeMappings.value.map(x => ShadeRule.rename(x).inAll),
@@ -47,21 +49,20 @@ object ProguardBuild {
         val oldStrategy = (assemblyMergeStrategy in assembly).value
         oldStrategy(x)
     },
-
-    ProguardKeys.proguard in Proguard <<= (ProguardKeys.proguard in Proguard).dependsOn(assembly)
+    proguard in Proguard := (proguard in Proguard).dependsOn(assembly).value
   ) ++ inConfig(Proguard)(Seq(
-    ProguardKeys.proguardVersion := "5.3.1",
-    ProguardKeys.options ++= Seq("-verbose", "-include",
+    proguardVersion := "5.3.1",
+    proguardOptions ++= Seq("-verbose", "-include",
                                  (file(".") / "project" / proguardConfig.value).getCanonicalPath),
-    ProguardKeys.options +=
+    proguardOptions +=
       ProguardOptions.keepMain((mainClass in Compile).value.getOrElse(sys.error("No main class!"))),
 
     // Print mapping to file
-    proguardMapping := ProguardKeys.proguardDirectory.value / ("symbols-"+version.value+".map"),
-    ProguardKeys.options ++= Seq("-printmapping", proguardMapping.value.toString),
+    proguardMapping := proguardDirectory.value / ("symbols-"+version.value+".map"),
+    proguardOptions ++= Seq("-printmapping", proguardMapping.value.toString),
 
     // Proguard filter configuration
-    ProguardKeys.inputs := Seq(),
-    ProguardKeys.filteredInputs ++= ProguardOptions.noFilter((assemblyOutputPath in assembly).value)
+    proguardInputs := Seq(),
+    proguardFilteredInputs ++= ProguardOptions.noFilter((assemblyOutputPath in assembly).value)
   ))
 }

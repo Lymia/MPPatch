@@ -21,11 +21,12 @@
  */
 
 import java.security.MessageDigest
-
 import sbt._
 import sbt.Keys._
 import Config._
 import Utils._
+
+import scala.io.Source
 
 object Launch4JBuild {
   // Launch4J File
@@ -93,7 +94,8 @@ object Launch4JBuild {
     },
     launch4jDownloadPath := launch4jDir.value / "launch4j.tgz",
     launch4jDownloadTgz := {
-      if(!launch4jDownloadPath.value.exists) IO.download(new URL(config_launch4j_url), launch4jDownloadPath.value)
+      if(!launch4jDownloadPath.value.exists)
+        IO.transfer(new URL(config_launch4j_url).openStream(), launch4jDownloadPath.value)
 
       def sha256_hex(data: Array[Byte]) = {
         val md = MessageDigest.getInstance("SHA-256")

@@ -28,6 +28,8 @@ import org.tukaani.xz.{LZMA2Options, XZOutputStream}
 import sbt._
 import sbt.Keys._
 
+import sbt.dsl.LinterLevel.Ignore
+
 object LoaderBuild {
   object Keys {
     val loaderSourceJar  = TaskKey[File]("loader-source-jar")

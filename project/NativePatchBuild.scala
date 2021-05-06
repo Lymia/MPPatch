@@ -27,6 +27,8 @@ import sbt.Keys._
 import Config._
 import Utils._
 
+import sbt.dsl.LinterLevel.Ignore
+
 object NativePatchBuild {
   def win32_cc(p: Seq[Any]) = runProcess(config_win32_cc +: s"--target=$config_target_win32" +: p)
   def macos_cc(p: Seq[Any]) = runProcess(config_macos_cc +: s"--target=$config_target_macos" +: p)

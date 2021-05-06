@@ -33,6 +33,7 @@ import Utils._
 import com.github.rjeschke.txtmark.Processor
 
 import scala.collection.mutable.ArrayBuffer
+import scala.sys.process._
 
 object InstallerResourceBuild {
   private def tryProperty(s: => String) = try {
@@ -47,8 +48,8 @@ object InstallerResourceBuild {
     val output = new ArrayBuffer[String]()
     val logger = new ProcessLogger {
       override def buffer[T](f: => T): T = f
-      override def error(s: => String): Unit = output += s
-      override def info(s: => String): Unit = output += s
+      override def err(s: => String): Unit = output += s
+      override def out(s: => String): Unit = output += s
     }
     assertProcess(proc ! logger)
     output.mkString("\n")
