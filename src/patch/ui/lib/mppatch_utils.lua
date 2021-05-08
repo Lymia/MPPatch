@@ -90,7 +90,7 @@ function _mpPatch.version.get(string)
 end
 
 function _mpPatch.version.getBoolean(string)
-    return get(string) == "true"
+    return _mpPatch.version.get(string) == "true"
 end
 
 -- Event utils
