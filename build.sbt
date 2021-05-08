@@ -62,7 +62,7 @@ Launch4JBuild.Keys.launch4jSourceJar := (Compile / assembly).value
 InputKey[Unit]("dist") := {
   val path = crossTarget.value / "dist"
   def copy(source: File) = {
-    val output = path / source.getName
+    val output = path / source.getName.replace("-assembly", "")
     IO.copyFile(source, output)
     output
   }
