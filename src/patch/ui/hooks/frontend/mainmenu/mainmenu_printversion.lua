@@ -34,6 +34,6 @@ if _mpPatch and _mpPatch.loaded and not _mpPatch.patch.shared.printVersionRan th
         _mpPatch.debugPrint("Running on ".._VERSION..".")
     end
     if not _mpPatch.version.getBoolean("mppatch.version.clean") then
-        _mpPrint.debugPrint("Tree Status: ".._mpPatch.version.get("build.treestatus"))
+        _mpPatch.debugPrint("Tree Status: ".._mpPatch.version.get("build.treestatus"))
     end
 end
