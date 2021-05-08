@@ -46,13 +46,13 @@ git.formattedShaVersion := {
 }
 
 // Scala configuration
-scalaVersion := "2.12.13"
-scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:classpath -deprecation -unchecked".split(" ").toSeq
+scalaVersion := "2.13.5"
+scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:method,inline -deprecation -unchecked".split(" ").toSeq
 crossPaths := false
 
 // Dependencies
-libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.0.6"
-libraryDependencies += "org.tukaani" % "xz" % "1.6"
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.3.0"
+libraryDependencies += "org.tukaani" % "xz" % "1.9"
 
 // Launch4J configuration
 Launch4JBuild.settings

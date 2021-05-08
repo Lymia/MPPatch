@@ -150,7 +150,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     } else false
   }
 
-  protected def buildForm() {
+  protected def buildForm() = {
     frame = new JFrame(titleString)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     frame.setLayout(new GridBagLayout())

@@ -143,7 +143,8 @@ class UIPatchLoader(source: DataSource, patch: UIPatch) {
       if(Files.isDirectory(file)) findPatchTargets(file)
       else patchFile(file).fold(Seq[(String, String)]())(x => Seq(file.getFileName.toString -> x))
     }.toMap
-  private def prepareList(map: Map[String, String]) = map.mapValues(_.getBytes(StandardCharsets.UTF_8))
+  private def prepareList(map: Map[String, String]) =
+    map.view.mapValues(_.getBytes(StandardCharsets.UTF_8)).toMap
   private def findPathTargets(assetsPath: Path, platform: Platform, path: String*) =
     findPatchTargets(platform.resolve(assetsPath, path: _*))
   def generateBaseDLC(assetsPath: Path, platform: Platform) = {

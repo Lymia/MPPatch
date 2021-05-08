@@ -46,7 +46,7 @@ object WindowsRegistry {
 
   sealed trait RegistryKeyType[T] {
     def readKey(hive: Hive, key: String, value: String): Option[T]
-    def writeKey(hive: Hive, key: String, value: String, data: T)
+    def writeKey(hive: Hive, key: String, value: String, data: T): Unit
   }
   implicit case object RegistryStringKey extends RegistryKeyType[String] {
     def readKey(hive: Hive, key: String, value: String) =

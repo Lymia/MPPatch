@@ -71,7 +71,7 @@ trait FrameUtils {
     }
 
     val font = button.getFont
-    button.setFont(symbolFont.deriveFont(Font.PLAIN, font.getSize))
+    button.setFont(symbolFont.deriveFont(Font.PLAIN, font.getSize.toFloat))
 
     button
   }
@@ -180,10 +180,11 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
   protected var frame: F = _
   def getFrame = frame
 
-  protected def buildForm()
-  def update() { }
+  protected def buildForm(): Unit
 
-  def showForm() = {
+  def update(): Unit = { }
+
+  def showForm(): Unit = {
     buildForm()
     update()
     frame.pack()

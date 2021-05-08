@@ -53,7 +53,9 @@ object I18N {
       includes.trim.split(",").map(x => loadI18NData(x.trim)).reduce(_ ++ _)
     } else Map()
 
-    includeData ++ prop.asScala.filter(_._1 != "includes").map(x => x.copy(_1 = x._1.trim, _2 = x._2))
+    (
+      includeData.toSeq ++ prop.asScala.filter(_._1 != "includes").map(x => x.copy(_1 = x._1.trim, _2 = x._2)).toSeq
+    ).toMap
   }
 
   private def defaultLocale = Locale.US

@@ -32,16 +32,16 @@ import scala.collection.JavaConverters._
 object Steam {
   // TODO: Parse this properly instead of this weirdness.
   val lineRegex = "\"[0-9]+\"\\s+\"(.*)\"".r
-  def loadLibraryFolders(p: Path) =
+  def loadLibraryFolders(p: Path): Seq[Path] =
     if(Files.exists(p))
       (for(l <- Files.readAllLines(p.resolve("steamapps").resolve("libraryfolders.vdf"),
                                    StandardCharsets.UTF_8).asScala.map(_.trim);
-           m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)) :+ p
+           m <- lineRegex.unapplySeq(l)) yield Paths.get(m.head)).toSeq :+ p 
     else Seq(p)
 
   private val desktop = Desktop.getDesktop
-  private def loadURI(uri: String) = desktop.browse(new URI(uri))
+  private def loadURI(uri: String): Unit = desktop.browse(new URI(uri))
 
-  def launchGame(gameId: Int) = loadURI("steam://run/"+gameId)
-  def validateGameFiles(gameId: Int) = loadURI("steam://validate/"+gameId)
+  def launchGame(gameId: Int): Unit = loadURI("steam://run/"+gameId)
+  def validateGameFiles(gameId: Int): Unit = loadURI("steam://validate/"+gameId)
 }

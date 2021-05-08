@@ -36,11 +36,11 @@ trait Logger {
   protected def dateFormat = Logger.dateFormat
   protected def formatString = "[%s/%5s] %s"
 
-  def logRaw(s: String)
-  def logException(t: Throwable)
-  def flush()
+  def logRaw(s: String): Unit
+  def logException(t: Throwable): Unit
+  def flush(): Unit
 
-  def log(format: String, level: String, vals: Any*) =
+  def log(format: String, level: String, vals: Any*): Unit =
     logRaw(formatString.format(dateFormat.format(new Date()), level, format.format(vals: _*)))
 
   def info (format: String, vals: Any*): Unit = log(format, "INFO" , vals: _*)

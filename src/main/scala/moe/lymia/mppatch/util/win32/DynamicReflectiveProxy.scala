@@ -124,7 +124,7 @@ class DynamicReflectiveProxy(val obj: AnyRef) extends Dynamic {
     sys.error("DynamicReflectiveProxy does not support named parameter calls")
 
   def length = selectDynamic("length")
-  def update(i: Int, b: Any) { throw new ClassCastException("Array access on non-array class") }
+  def update(i: Int, b: Any): Unit = throw new ClassCastException("Array access on non-array class")
   def apply(i: Int): DynamicReflectiveProxy = throw new ClassCastException("Array access on non-array class")
 
   def get[T] = obj.asInstanceOf[T]
@@ -134,7 +134,7 @@ class DynamicStaticReflectiveProxy(obj: Class[_]) extends DynamicReflectiveProxy
 }
 class DynamicReflectiveArrayProxy(arr: Array[Any]) extends DynamicReflectiveProxy(arr) {
   override def length = DynamicReflectiveProxy(arr.length)
-  override def update(i: Int, b: Any) {
+  override def update(i: Int, b: Any): Unit = {
     arr(i) = b
   }
   override def apply(i: Int) = DynamicReflectiveProxy(arr(i))
