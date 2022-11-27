@@ -25,6 +25,7 @@
   <headerType>gui</headerType>
   <jre>
     <minVersion>1.7.0</minVersion>
+    <maxVersion>1.8.1</maxVersion>
   </jre>
   <singleInstance>
     <mutexName>moe.lymia.mppatch.Launch4JStartupMutex</mutexName>
@@ -37,7 +38,7 @@
     <trademarks>MPPatch is licenced under the terms of the MIT License.</trademarks>
   </versionInfo>
   <messages>
-    <jreVersionErr>This application requires Java 7 or later to run.
+    <jreVersionErr>This application requires Java Runtime Environment 7 or later to run.
 Minimum version:</jreVersionErr>
   </messages>
 </launch4jConfig>
