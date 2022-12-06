@@ -72,9 +72,7 @@ object Win32Platform extends Platform {
   override val platformName = "win32"
 
   override def defaultSystemPaths: Seq[Path] = try {
-    WindowsRegistry.HKCU("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
-      x => Steam.loadLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
-    WindowsRegistry.HKCU("Software\\Firaxis\\Civilization5", "LastKnownPath").toSeq.map(x => Paths.get(x))
+    WindowsRegistry.HKLM("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 8930", "InstallLocation").toSeq.map(x => Paths.get(x))
   } catch {
     case e: Exception =>
       SimpleLogger.error("Could not load default system paths from registery.", e)
