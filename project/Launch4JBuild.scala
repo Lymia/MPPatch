@@ -21,12 +21,10 @@
  */
 
 import java.security.MessageDigest
-import sbt._
-import sbt.Keys._
-import Config._
-import Utils._
-
-import scala.io.Source
+import sbt.*
+import sbt.Keys.*
+import Config.*
+import Utils.*
 
 object Launch4JBuild {
   // Launch4J File
@@ -50,7 +48,7 @@ object Launch4JBuild {
 
     val launch4jOutput       = TaskKey[File]("launch4j-output")
   }
-  import Keys._
+  import Keys.*
 
   // Patch build script
   val settings = Seq(

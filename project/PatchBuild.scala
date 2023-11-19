@@ -23,12 +23,12 @@
 import java.io.{DataOutputStream, FileOutputStream}
 import java.nio.charset.StandardCharsets
 
-import sbt._
-import sbt.Keys._
+import sbt.*
+import sbt.Keys.*
 
-import scala.xml._
+import scala.xml.*
 
-import moe.lymia.mppatch.util.common._
+import moe.lymia.mppatch.util.common.*
 
 object PatchBuild {
   object PatchFile {
@@ -39,7 +39,7 @@ object PatchBuild {
   object Keys {
     val patchFiles = TaskKey[Map[String, Array[Byte]]]("patch-build-files")
   }
-  import Keys._
+  import Keys.*
 
   val settings = Seq(
     patchFiles := {

@@ -25,15 +25,15 @@ import java.text.DateFormat
 import java.util.Locale
 import java.util.UUID
 
-import sbt._
-import sbt.Keys._
-import com.typesafe.sbt.SbtGit._
-import Config._
-import Utils._
+import sbt.*
+import sbt.Keys.*
+import com.typesafe.sbt.SbtGit.*
+import Config.*
+import Utils.*
 import com.github.rjeschke.txtmark.Processor
 
 import scala.collection.mutable.ArrayBuffer
-import scala.sys.process._
+import scala.sys.process.*
 
 object InstallerResourceBuild {
   private def tryProperty(s: => String) = try {
@@ -59,7 +59,7 @@ object InstallerResourceBuild {
     val versionData = TaskKey[Map[String, String]]("resource-version-data")
     val versionFile = TaskKey[File]("resource-version-file")
   }
-  import Keys._
+  import Keys.*
 
   val settings = PatchBuild.settings ++ NativePatchBuild.settings ++ LuaJITBuild.settings ++ Seq(
     versionData := {
@@ -84,7 +84,7 @@ object InstallerResourceBuild {
         "build.timestr"          -> dateFormat.format(new java.util.Date()),
         "build.path"             -> baseDirectory.value.getAbsolutePath,
         "build.treestatus"       -> propertyFromProcess("git", "status", "--porcelain"),
-  
+
         "build.version.uname"    -> propertyFromProcess("uname", "-a"),
         "build.version.distro"   -> tryProperty { IO.read(file("/etc/os-release")) },
         "build.version.sbt"      -> sbtVersion.value,

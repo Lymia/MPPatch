@@ -20,10 +20,10 @@
  * THE SOFTWARE.
  */
 
-import sbt._
-import sbt.Keys._
-import Config._
-import Utils._
+import sbt.*
+import sbt.Keys.*
+import Config.*
+import Utils.*
 
 object LuaJITBuild {
   val coreCount = java.lang.Runtime.getRuntime.availableProcessors
@@ -39,7 +39,7 @@ object LuaJITBuild {
 
     val luajitFiles = TaskKey[Seq[LuaJITPatchFile]]("luajit-files")
   }
-  import Keys._
+  import Keys.*
 
   // Patch build script
   val settings = Seq(

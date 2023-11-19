@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-import sbt.{FileFunction, FileInfo, IO, _}
+import sbt.{FileFunction, FileInfo, IO, *}
 
-import scala.sys.process._
+import scala.sys.process.*
 
 object Utils {
   val VersionRegex = "([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(-(.*))?".r // major.minor.patch-suffix

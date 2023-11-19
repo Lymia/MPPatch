@@ -22,10 +22,10 @@
 
 import java.util.UUID
 
-import sbt._
-import sbt.Keys._
-import Config._
-import Utils._
+import sbt.*
+import sbt.Keys.*
+import Config.*
+import Utils.*
 
 import sbt.dsl.LinterLevel.Ignore
 
@@ -99,7 +99,7 @@ object NativePatchBuild {
 
     val nativeVersions = TaskKey[Seq[PatchFile]]("native-patch-files")
   }
-  import Keys._
+  import Keys.*
 
   // Patch build script
   val settings = Seq(
