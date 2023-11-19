@@ -27,57 +27,65 @@ import scala.sys.process.*
 object Utils {
   val VersionRegex = "([0-9]+)\\.([0-9]+)(\\.([0-9]+))?(-(.*))?".r // major.minor.patch-suffix
 
-  // Process helper functions
-  def assertProcess(i: Int) = if(i != 0) sys.error("Process returned non-zero return value! (ret: "+i+")")
-  def runProcess   (p: Seq[Any]) = {
-    println("Running process: "+p.map(_.toString).mkString(" "))
+  def runProcess(p: Seq[Any]) = {
+    println("Running process: " + p.map(_.toString).mkString(" "))
     assertProcess(Process(p.map(_.toString)) !)
   }
-  def runProcess   (p: Seq[Any], cd: File) = {
-    println("Running process in "+cd+": "+p.map(_.toString).mkString(" "))
+
+  def runProcess(p: Seq[Any], cd: File) = {
+    println("Running process in " + cd + ": " + p.map(_.toString).mkString(" "))
     assertProcess(Process(p.map(_.toString), cd) !)
   }
 
+  // Process helper functions
+  def assertProcess(i: Int) = if (i != 0) sys.error("Process returned non-zero return value! (ret: " + i + ")")
+
   // Directory helpers
-  def dir     (path: File) = path.toString + "/"
+  def dir(path: File) = path.toString + "/"
+
   def allFiles(path: File, extension: String) = path.listFiles.filter(_.getName.endsWith(extension)).toSeq
+
+  def simplePrepareDirectory(path: File) = prepareDirectory(path) { dir => }
 
   def prepareDirectory(path: File)(fn: File => Unit) = {
     IO.createDirectory(path)
     fn(path)
     path
   }
-  def simplePrepareDirectory(path: File) = prepareDirectory(path){ dir => }
 
-  // Code generation helpers
-  def cached(cacheDirectory: File, inStyle: FileInfo.Style = FileInfo.lastModified, // hack to fix ambigous overload
-             outStyle: FileInfo.Style = FileInfo.exists)
-            (fn: Set[File] => Set[File]) = FileFunction.cached(cacheDirectory, inStyle, outStyle)(fn)
   def trackDependencySet(cacheDirectory: File, deps: Set[File],
                          inStyle: FileInfo.Style = FileInfo.lastModified,
                          outStyle: FileInfo.Style = FileInfo.exists)(fn: => Set[File]) = {
     val cache = cached(cacheDirectory, inStyle, outStyle) { _ => fn }
     cache(deps)
   }
+
   def trackDependencies(cacheDirectory: File, deps: Set[File],
                         inStyle: FileInfo.Style = FileInfo.lastModified,
                         outStyle: FileInfo.Style = FileInfo.exists)(fn: => File) = {
     val cache = cached(cacheDirectory, inStyle, outStyle) { _ => Set(fn) }
     cache(deps).head
   }
+
+  def cachedGeneration(cacheDirectory: File, tempTarget: File, finalTarget: File, data: String) = {
+    IO.write(tempTarget, data)
+    cachedTransform(cacheDirectory, tempTarget, finalTarget, inStyle = FileInfo.hash)((in, out) =>
+      IO.copyFile(in, out))
+  }
+
   def cachedTransform(cacheDirectory: File, input: File, output: File,
                       inStyle: FileInfo.Style = FileInfo.lastModified,
                       outStyle: FileInfo.Style = FileInfo.exists)(fn: (File, File) => Unit) = {
-    val cache = cached(cacheDirectory, inStyle, outStyle){ in =>
+    val cache = cached(cacheDirectory, inStyle, outStyle) { in =>
       fn(in.head, output)
       Set(output)
     }
     cache(Set(input))
     output
   }
-  def cachedGeneration(cacheDirectory: File, tempTarget: File, finalTarget: File, data: String) = {
-    IO.write(tempTarget, data)
-    cachedTransform(cacheDirectory, tempTarget, finalTarget, inStyle = FileInfo.hash)((in, out) =>
-      IO.copyFile(in, out))
-  }
+
+  // Code generation helpers
+  def cached(cacheDirectory: File, inStyle: FileInfo.Style = FileInfo.lastModified, // hack to fix ambigous overload
+             outStyle: FileInfo.Style = FileInfo.exists)
+            (fn: Set[File] => Set[File]) = FileFunction.cached(cacheDirectory, inStyle, outStyle)(fn)
 }

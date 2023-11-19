@@ -6,7 +6,6 @@ resolvers += "SpringSource" at "https://repository.springsource.com/maven/bundle
 
 libraryDependencies += "org.tukaani" % "xz" % "1.5"
 libraryDependencies += "com.github.rjeschke" % "txtmark" % "0.13"
-libraryDependencies += "net.sf.launch4j" % "launch4j" % "3.9"
 
 // Include common source files
 unmanagedSourceDirectories in Compile +=

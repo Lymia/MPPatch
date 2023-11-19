@@ -54,10 +54,6 @@ crossPaths := false
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.3.0"
 libraryDependencies += "org.tukaani" % "xz" % "1.9"
 
-// Launch4J configuration
-Launch4JBuild.settings
-Launch4JBuild.Keys.launch4jSourceJar := (Compile / assembly).value
-
 // Build distribution file
 InputKey[Unit]("dist") := {
   val path = crossTarget.value / "dist"
@@ -67,5 +63,4 @@ InputKey[Unit]("dist") := {
     output
   }
   streams.value.log.info(s"Output packed to: ${copy((Compile / assembly).value)}")
-  streams.value.log.info(s"Launch4J .exe written to: ${copy(Launch4JBuild.Keys.launch4jOutput.value)}")
 }

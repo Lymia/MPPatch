@@ -21,28 +21,27 @@
  */
 
 object Config {
-  val config_make         = "make"
+  val config_make = "make"
   val config_mingw_prefix = "i686-w64-mingw32-"
   val config_macos_prefix = "i386-apple-darwin17-"
 
-  val config_win32_cc     = "clang"
-  val config_macos_cc     = "o32-clang"
-  val config_linux_cc     = "clang"
-  val config_nasm         = "nasm"
+  val config_win32_cc = "clang"
+  val config_macos_cc = "o32-clang"
+  val config_linux_cc = "clang"
+  val config_nasm = "nasm"
 
   val config_target_win32 = "i686-pc-windows-gnu"
   val config_target_linux = "i686-unknown-linux-gnu"
   val config_target_macos = "i386-apple-darwin15"
 
-  val config_win32_secureFlags  = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
+  val config_win32_secureFlags = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
   val config_common_secureFlags = Seq("-fstack-protector", "-fstack-protector-strong", "-D_FORTIFY_SOURCE=2")
 
   val config_steam_sdlbin_path = "libsdl2_2.0.3+steamrt1+srt4_i386.deb"
   val config_steam_sdldev_path = "libsdl2-dev_2.0.3+steamrt1+srt4_i386.deb"
   val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
 
-  val config_launch4j_url      = "https://sourceforge.net/projects/launch4j/files/launch4j-3/3.14/launch4j-3.14-linux.tgz/download"
-  val config_launch4j_checksum = "f8137859f1ce61d6a009ee949acd8056f003a710494210648f69080f06d4bf6d"
+  val config_macos_ld = "" // findExecutableOnPath(config_macos_prefix + "ld")
 
   private def findExecutableOnPath(name: String): String = {
     for (dirname <- System.getenv("PATH").split(java.io.File.pathSeparator)) {
@@ -51,5 +50,4 @@ object Config {
     }
     throw new AssertionError("should have found the executable")
   }
-  val config_macos_ld = "" // findExecutableOnPath(config_macos_prefix + "ld")
 }

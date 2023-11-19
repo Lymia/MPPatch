@@ -12,7 +12,6 @@ Source code for this program can be found [here](https://github.com/Lymia/MPPatc
 * [inih](https://github.com/benhoyt/inih), for configuring the patch  
 * [Symbola font](http://users.teilar.gr/~g1951d/), used for button icons  
 * [LuaJIT](http://luajit.org/), for speeding up Lua code.  
-* [Launch4J](http://launch4j.sourceforge.net/), for creating the Windows .exe installer.  
 
 **Special Thanks**
 

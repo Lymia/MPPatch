@@ -20,36 +20,22 @@
  * THE SOFTWARE.
  */
 
-import sbt.*
-import sbt.Keys.*
 import Config.*
 import Utils.*
+import sbt.*
+import sbt.Keys.*
 
 object LuaJITBuild {
   val coreCount = java.lang.Runtime.getRuntime.availableProcessors
-  def make(dir: File, actions: Seq[String], env: Map[String, String]) =
-    runProcess(config_make +: "--trace" +: "-C" +: dir.toString +: "-j" +: coreCount.toString +:
-               (actions ++ env.map(x => s"${x._1}=${x._2}")))
-
-  case class LuaJITPatchFile(platform: String, file: File)
-  object Keys {
-    val luajitCacheDir  = SettingKey[File]("luajit-cache-dir")
-    val luajitSourceDir = SettingKey[File]("luajit-source-dir")
-    val luajitIncludes  = SettingKey[File]("luajit-includes")
-
-    val luajitFiles = TaskKey[Seq[LuaJITPatchFile]]("luajit-files")
-  }
-  import Keys.*
-
   // Patch build script
   val settings = Seq(
-    luajitCacheDir  := crossTarget.value / "luajit-cache",
-    luajitSourceDir := baseDirectory.value / "src" / "patch" / "native" / "luajit",
-    luajitIncludes  := luajitSourceDir.value / "src",
+    Keys.luajitCacheDir := crossTarget.value / "luajit-cache",
+    Keys.luajitSourceDir := baseDirectory.value / "src" / "patch" / "native" / "luajit",
+    Keys.luajitIncludes := Keys.luajitSourceDir.value / "src",
 
-    luajitFiles := {
-      val patchDirectory = luajitCacheDir.value / "output"
-      val logger         = streams.value.log
+    Keys.luajitFiles := {
+      val patchDirectory = Keys.luajitCacheDir.value / "output"
+      val logger = streams.value.log
       IO.createDirectory(patchDirectory)
 
       for (platform <- Seq(/*"win32", "macos",*/ "linux")) yield {
@@ -57,17 +43,17 @@ object LuaJITBuild {
           platform match {
             case "win32" =>
               (Map("CROSS" -> config_mingw_prefix, "TARGET_SYS" -> "Windows"),
-               Seq("-static-libgcc", "-Wl,--start-group", "-lmsvcr90",
-                   "-Wno-unused-command-line-argument") ++ config_win32_secureFlags,
-               "src/lua51.dll", ".dll", config_win32_cc, config_target_win32)
+                Seq("-static-libgcc", "-Wl,--start-group", "-lmsvcr90",
+                  "-Wno-unused-command-line-argument") ++ config_win32_secureFlags,
+                "src/lua51.dll", ".dll", config_win32_cc, config_target_win32)
             case "macos" =>
               (Map("CROSS" -> config_macos_prefix, "TARGET_SYS" -> "Darwin", "MACOSX_DEPLOYMENT_TARGET" -> "10.6"),
-               Seq(s"--target=$config_target_macos", "-fuse-ld="+config_macos_ld),
-               "src/libluajit.so", ".dylib", config_macos_cc, config_target_macos)
+                Seq(s"--target=$config_target_macos", "-fuse-ld=" + config_macos_ld),
+                "src/libluajit.so", ".dylib", config_macos_cc, config_target_macos)
             case "linux" =>
               (Map(),
-               Seq(s"--target=$config_target_linux"),
-               "src/libluajit.so", ".so", config_linux_cc, config_target_linux)
+                Seq(s"--target=$config_target_linux"),
+                "src/libluajit.so", ".so", config_linux_cc, config_target_linux)
           }
         val env = Map(
           "HOST_CC" -> s"$config_linux_cc -m32",
@@ -79,18 +65,18 @@ object LuaJITBuild {
         val excludeDeps = Set(
           "lj_bcdef.h", "lj_ffdef.h", "lj_libdef.h", "lj_recdef.h", "lj_folddef.h", "buildvm_arch.h", "vmdef.lua"
         )
-        val dependencies = Path.allSubpaths(luajitSourceDir.value).filter { case (_, x) =>
+        val dependencies = Path.allSubpaths(Keys.luajitSourceDir.value).filter { case (_, x) =>
           (x.endsWith(".c") || x.endsWith(".h") || x.endsWith("Makefile") || x.endsWith(".lua")) &&
-          !excludeDeps.contains(x.split("/").last)
+            !excludeDeps.contains(x.split("/").last)
         }.map(_._1)
 
         val outTarget = patchDirectory / s"luajit_$platform$extension"
         val outputPath =
-          trackDependencies(luajitCacheDir.value / (platform + "_c_out"), dependencies.toSet) {
-            logger.info("Compiling Luajit for "+platform)
-            make(luajitSourceDir.value, Seq("clean"), env)
-            make(luajitSourceDir.value, Seq("default"), env)
-            IO.copyFile(luajitSourceDir.value / outputFile, outTarget)
+          trackDependencies(Keys.luajitCacheDir.value / (platform + "_c_out"), dependencies.toSet) {
+            logger.info("Compiling Luajit for " + platform)
+            make(Keys.luajitSourceDir.value, Seq("clean"), env)
+            make(Keys.luajitSourceDir.value, Seq("default"), env)
+            IO.copyFile(Keys.luajitSourceDir.value / outputFile, outTarget)
             outTarget
           }
 
@@ -98,4 +84,18 @@ object LuaJITBuild {
       }
     }
   )
+
+  def make(dir: File, actions: Seq[String], env: Map[String, String]) =
+    runProcess(config_make +: "--trace" +: "-C" +: dir.toString +: "-j" +: coreCount.toString +:
+      (actions ++ env.map(x => s"${x._1}=${x._2}")))
+
+  case class LuaJITPatchFile(platform: String, file: File)
+
+  object Keys {
+    val luajitCacheDir = SettingKey[File]("luajit-cache-dir")
+    val luajitSourceDir = SettingKey[File]("luajit-source-dir")
+    val luajitIncludes = SettingKey[File]("luajit-includes")
+
+    val luajitFiles = TaskKey[Seq[LuaJITPatchFile]]("luajit-files")
+  }
 }
