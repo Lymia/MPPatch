@@ -52,7 +52,7 @@ object LuaJITBuild {
       val logger         = streams.value.log
       IO.createDirectory(patchDirectory)
 
-      for (platform <- Seq("win32", "macos", "linux")) yield {
+      for (platform <- Seq(/*"win32", "macos",*/ "linux")) yield {
         val (platformEnv, flags, outputFile, extension, target_cc, target) =
           platform match {
             case "win32" =>

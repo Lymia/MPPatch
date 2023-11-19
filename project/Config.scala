@@ -51,5 +51,5 @@ object Config {
     }
     throw new AssertionError("should have found the executable")
   }
-  val config_macos_ld = findExecutableOnPath(config_macos_prefix + "ld")
+  val config_macos_ld = "" // findExecutableOnPath(config_macos_prefix + "ld")
 }

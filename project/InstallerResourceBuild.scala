@@ -89,8 +89,8 @@ object InstallerResourceBuild {
         "build.version.distro"   -> tryProperty { IO.read(file("/etc/os-release")) },
         "build.version.sbt"      -> sbtVersion.value,
         "build.version.nasm"     -> propertyFromProcess(config_nasm, "-v"),
-        "build.version.cc.win32" -> propertyFromProcess(config_win32_cc, "-v"),
-        "build.version.cc.macos" -> propertyFromProcess(config_macos_cc, "-v"),
+        "build.version.cc.win32" -> "n/a", //propertyFromProcess(config_win32_cc, "-v"),
+        "build.version.cc.macos" -> "n/a", //propertyFromProcess(config_macos_cc, "-v"),
         "build.version.cc.linux" -> propertyFromProcess(config_linux_cc, "-v")
       )
     },

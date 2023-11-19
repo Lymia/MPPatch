@@ -190,6 +190,7 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
     frame.pack()
     frame.setLocationRelativeTo(null)
     frame.setVisible(true)
+    while (frame.isVisible) Thread.sleep(100) // wait for frame to exit
   }
 
   protected class ActionButton(showCompleteMessage: Boolean = true) extends JButton {

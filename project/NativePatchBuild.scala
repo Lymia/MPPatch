@@ -142,7 +142,8 @@ object NativePatchBuild {
 
       IO.createDirectory(patchDirectory)
 
-      val patches = for(versionDir <- (patchSourceDir.value / "versions").listFiles) yield {
+      val patches = for(versionDir <- (patchSourceDir.value / "versions").listFiles
+                        if !versionDir.getName.startsWith("disabled_")) yield {
         val version = versionDir.getName
         val Array(platform, sha256) = version.split("_")
 
