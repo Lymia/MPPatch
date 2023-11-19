@@ -46,7 +46,7 @@ git.formattedShaVersion := {
 }
 
 // Scala configuration
-scalaVersion := "2.13.5"
+scalaVersion := "2.13.12"
 scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:method,inline -deprecation -unchecked".split(" ").toSeq
 crossPaths := false
 
