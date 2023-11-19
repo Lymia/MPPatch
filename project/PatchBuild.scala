@@ -33,41 +33,52 @@ object PatchBuild {
   val settings = Seq(
     Keys.patchFiles := {
       def loadFromDir(dir: File) =
-        Path.allSubpaths(dir).filter(_._1.isFile).map(x => PatchFile(dir.getName + "/" + x._2, IO.readBytes(x._1))).toSeq
+        Path
+          .allSubpaths(dir)
+          .filter(_._1.isFile)
+          .map(x => PatchFile(dir.getName + "/" + x._2, IO.readBytes(x._1)))
+          .toSeq
 
-      val patchPath = baseDirectory.value / "src" / "patch"
+      val patchPath   = baseDirectory.value / "src" / "patch"
       val copiedFiles = loadFromDir(patchPath / "install") ++ loadFromDir(patchPath / "ui")
 
       val versions = NativePatchBuild.Keys.nativeVersions.value
-      val patchFiles = for (version <- versions)
-        yield PatchFile("native/" + version.file.getName, IO.readBytes(version.file))
+      val patchFiles =
+        for (version <- versions)
+          yield PatchFile("native/" + version.file.getName, IO.readBytes(version.file))
       val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
       val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
                                   Timestamp={System.currentTimeMillis().toString}>
-        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}{versions.map(x => <NativePatch Platform={x.platform} Version={x.version}
-                                                                                                   Source={s"native/${x.file.getName}"}/>)}
+        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}{
+        versions.map(x => <NativePatch Platform={x.platform} Version={x.version} Source={s"native/${x.file.getName}"}/>)
+      }
       </PatchManifest>
 
-      val luajitFiles = for (platform <- LuaJITBuild.Keys.luajitFiles.value)
-        yield PatchFile("native/" + platform.file.getName, IO.readBytes(platform.file))
+      val luajitFiles =
+        for (platform <- LuaJITBuild.Keys.luajitFiles.value)
+          yield PatchFile("native/" + platform.file.getName, IO.readBytes(platform.file))
 
-      val buildIdInfo = PatchFile("ui/lib/mppatch_version.lua",
+      val buildIdInfo = PatchFile(
+        "ui/lib/mppatch_version.lua",
         """-- Generated from PatchBuild.scala
           |_mpPatch.version = {}
           |_mpPatch.version.buildId = {}
-        """.stripMargin + versions.map(x =>
-          s"_mpPatch.version.buildId.${x.platform}_${x.version} = ${LuaUtils.quote(x.buildId)}").mkString("\n") + "\n" +
-          "_mpPatch.version.info = {}\n" + InstallerResourceBuild.Keys.versionData.value.map(x =>
-          s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}").mkString("\n"))
-      val manifestFile = PatchFile("manifest.xml",
-        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
+        """.stripMargin + versions
+          .map(x => s"_mpPatch.version.buildId.${x.platform}_${x.version} = ${LuaUtils.quote(x.buildId)}")
+          .mkString("\n") + "\n" +
+          "_mpPatch.version.info = {}\n" + InstallerResourceBuild.Keys.versionData.value
+            .map(x => s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}")
+            .mkString("\n")
+      )
+      val manifestFile =
+        PatchFile("manifest.xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
       val versionFile = PatchFile("version.properties", IO.readBytes(InstallerResourceBuild.Keys.versionFile.value))
 
       // Final generated files list
       (buildIdInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles ++ luajitFiles)).toMap
     },
     Compile / resourceGenerators += Def.task {
-      val basePath = (Compile / resourceManaged).value
+      val basePath    = (Compile / resourceManaged).value
       val packagePath = basePath / "moe" / "lymia" / "mppatch" / s"mppatch.mppak"
 
       val debugOut = crossTarget.value / "patch-package-debug"
@@ -79,8 +90,10 @@ object PatchBuild {
         IO.write(target, data)
       }
 
-      IOWrappers.writePatchPackage(new DataOutputStream(new FileOutputStream(packagePath)),
-        PatchPackage(Keys.patchFiles.value))
+      IOWrappers.writePatchPackage(
+        new DataOutputStream(new FileOutputStream(packagePath)),
+        PatchPackage(Keys.patchFiles.value)
+      )
 
       // Final generated files list
       Seq(packagePath)

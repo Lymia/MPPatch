@@ -53,29 +53,38 @@ object Utils {
     path
   }
 
-  def trackDependencySet(cacheDirectory: File, deps: Set[File],
-                         inStyle: FileInfo.Style = FileInfo.lastModified,
-                         outStyle: FileInfo.Style = FileInfo.exists)(fn: => Set[File]) = {
-    val cache = cached(cacheDirectory, inStyle, outStyle) { _ => fn }
+  def trackDependencySet(
+      cacheDirectory: File,
+      deps: Set[File],
+      inStyle: FileInfo.Style = FileInfo.lastModified,
+      outStyle: FileInfo.Style = FileInfo.exists
+  )(fn: => Set[File]) = {
+    val cache = cached(cacheDirectory, inStyle, outStyle)(_ => fn)
     cache(deps)
   }
 
-  def trackDependencies(cacheDirectory: File, deps: Set[File],
-                        inStyle: FileInfo.Style = FileInfo.lastModified,
-                        outStyle: FileInfo.Style = FileInfo.exists)(fn: => File) = {
-    val cache = cached(cacheDirectory, inStyle, outStyle) { _ => Set(fn) }
+  def trackDependencies(
+      cacheDirectory: File,
+      deps: Set[File],
+      inStyle: FileInfo.Style = FileInfo.lastModified,
+      outStyle: FileInfo.Style = FileInfo.exists
+  )(fn: => File) = {
+    val cache = cached(cacheDirectory, inStyle, outStyle)(_ => Set(fn))
     cache(deps).head
   }
 
   def cachedGeneration(cacheDirectory: File, tempTarget: File, finalTarget: File, data: String) = {
     IO.write(tempTarget, data)
-    cachedTransform(cacheDirectory, tempTarget, finalTarget, inStyle = FileInfo.hash)((in, out) =>
-      IO.copyFile(in, out))
+    cachedTransform(cacheDirectory, tempTarget, finalTarget, inStyle = FileInfo.hash)((in, out) => IO.copyFile(in, out))
   }
 
-  def cachedTransform(cacheDirectory: File, input: File, output: File,
-                      inStyle: FileInfo.Style = FileInfo.lastModified,
-                      outStyle: FileInfo.Style = FileInfo.exists)(fn: (File, File) => Unit) = {
+  def cachedTransform(
+      cacheDirectory: File,
+      input: File,
+      output: File,
+      inStyle: FileInfo.Style = FileInfo.lastModified,
+      outStyle: FileInfo.Style = FileInfo.exists
+  )(fn: (File, File) => Unit) = {
     val cache = cached(cacheDirectory, inStyle, outStyle) { in =>
       fn(in.head, output)
       Set(output)
@@ -85,7 +94,9 @@ object Utils {
   }
 
   // Code generation helpers
-  def cached(cacheDirectory: File, inStyle: FileInfo.Style = FileInfo.lastModified, // hack to fix ambigous overload
-             outStyle: FileInfo.Style = FileInfo.exists)
-            (fn: Set[File] => Set[File]) = FileFunction.cached(cacheDirectory, inStyle, outStyle)(fn)
+  def cached(
+      cacheDirectory: File,
+      inStyle: FileInfo.Style = FileInfo.lastModified, // hack to fix ambigous overload
+      outStyle: FileInfo.Style = FileInfo.exists
+  )(fn: Set[File] => Set[File]) = FileFunction.cached(cacheDirectory, inStyle, outStyle)(fn)
 }

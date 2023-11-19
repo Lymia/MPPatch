@@ -37,19 +37,17 @@ object InstallerResourceBuild {
   val settings = PatchBuild.settings ++ NativePatchBuild.settings ++ LuaJITBuild.settings ++ Seq(
     Keys.versionData := {
       val VersionRegex(major, minor, _, patch, _, suffix) = version.value
-      val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)
+      val dateFormat                                      = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)
       Map(
         "mppatch.version.string" -> version.value,
-        "mppatch.version.major" -> major,
-        "mppatch.version.minor" -> minor,
-        "mppatch.version.patch" -> patch,
+        "mppatch.version.major"  -> major,
+        "mppatch.version.minor"  -> minor,
+        "mppatch.version.patch"  -> patch,
         "mppatch.version.suffix" -> Option(suffix).getOrElse(""),
         "mppatch.version.commit" -> git.gitHeadCommit.value.getOrElse("<unknown>"),
-        "mppatch.version.clean" -> (!git.gitUncommittedChanges.value).toString,
-
-        "mppatch.website" -> homepage.value.fold("<unknown>")(_.toString),
-
-        "build.id" -> UUID.randomUUID().toString,
+        "mppatch.version.clean"  -> (!git.gitUncommittedChanges.value).toString,
+        "mppatch.website"        -> homepage.value.fold("<unknown>")(_.toString),
+        "build.id"               -> UUID.randomUUID().toString,
         "build.os" -> tryProperty {
           System.getProperty("os.name")
         },
@@ -57,17 +55,16 @@ object InstallerResourceBuild {
           System.getProperty("user.name") + "@" +
             InetAddress.getLocalHost.getHostName
         },
-        "build.time" -> new java.util.Date().getTime.toString,
-        "build.timestr" -> dateFormat.format(new java.util.Date()),
-        "build.path" -> baseDirectory.value.getAbsolutePath,
-        "build.treestatus" -> propertyFromProcess("git", "status", "--porcelain"),
-
+        "build.time"          -> new java.util.Date().getTime.toString,
+        "build.timestr"       -> dateFormat.format(new java.util.Date()),
+        "build.path"          -> baseDirectory.value.getAbsolutePath,
+        "build.treestatus"    -> propertyFromProcess("git", "status", "--porcelain"),
         "build.version.uname" -> propertyFromProcess("uname", "-a"),
         "build.version.distro" -> tryProperty {
           IO.read(file("/etc/os-release"))
         },
-        "build.version.sbt" -> sbtVersion.value,
-        "build.version.nasm" -> propertyFromProcess(config_nasm, "-v"),
+        "build.version.sbt"      -> sbtVersion.value,
+        "build.version.nasm"     -> propertyFromProcess(config_nasm, "-v"),
         "build.version.cc.win32" -> "n/a", //propertyFromProcess(config_win32_cc, "-v"),
         "build.version.cc.macos" -> "n/a", //propertyFromProcess(config_macos_cc, "-v"),
         "build.version.cc.linux" -> propertyFromProcess(config_linux_cc, "-v")
@@ -88,7 +85,6 @@ object InstallerResourceBuild {
       IO.copyFile(Keys.versionFile.value, versionPropertiesPath)
       Seq(versionPropertiesPath)
     }.taskValue,
-
     // Render about information
     resourceGenerators in Compile += Def.task {
       val outPath = (Compile / resourceManaged).value / "moe" / "lymia" / "mppatch" / "text"

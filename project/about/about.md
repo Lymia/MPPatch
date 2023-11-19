@@ -7,11 +7,11 @@ Source code for this program can be found [here](https://github.com/Lymia/MPPatc
 
 **Libraries and resources used**
 
-* [Scala](http://www.scala-lang.org/), the programming language used for this installer  
-* [XZ for Java](http://tukaani.org/xz/java.html), for compressing patch files  
-* [inih](https://github.com/benhoyt/inih), for configuring the patch  
-* [Symbola font](http://users.teilar.gr/~g1951d/), used for button icons  
-* [LuaJIT](http://luajit.org/), for speeding up Lua code.  
+* [Scala](http://www.scala-lang.org/), the programming language used for this installer
+* [XZ for Java](http://tukaani.org/xz/java.html), for compressing patch files
+* [inih](https://github.com/benhoyt/inih), for configuring the patch
+* [Symbola font](http://users.teilar.gr/~g1951d/), used for button icons
+* [LuaJIT](http://luajit.org/), for speeding up Lua code.
 
 **Special Thanks**
 
