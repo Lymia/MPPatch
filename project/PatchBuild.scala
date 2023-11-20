@@ -23,11 +23,8 @@
 import sbt.*
 import sbt.Keys.*
 
-import java.io.{DataOutputStream, FileOutputStream}
 import java.nio.charset.StandardCharsets
 import scala.xml.*
-
-import moe.lymia.mppatch.util.common.*
 
 object PatchBuild {
   val settings = Seq(
@@ -65,8 +62,10 @@ object PatchBuild {
       val patchPath   = baseDirectory.value / "src" / "patch"
       val copiedFiles = loadFromDir(patchPath / "install") ++ loadFromDir(patchPath / "ui")
 
+      val nativeDirFiles = Keys.nativesDir.value.listFiles()
+      if (nativeDirFiles == null) sys.error("native-bin does not exist!")
       val patchFiles =
-        for (binary <- Keys.nativesDir.value.listFiles() if !binary.getName.endsWith(".build-id")) yield {
+        for (binary <- nativeDirFiles if !binary.getName.endsWith(".build-id")) yield {
           log.info(s"Found native binary file: $binary")
           PatchFile(s"native/${binary.getName}", IO.readBytes(binary))
         }
@@ -81,25 +80,28 @@ object PatchBuild {
         {nativePatchEntries}
       </PatchManifest>
 
-      val versionDataInfo = InstallerResourceBuild.Keys.versionData.value
+      val versionDataInfo = InstallerResourceBuild.Keys.versionData.value.toSeq.sorted
         .map(x => s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}")
         .mkString("\n")
-      val buildIdInfo = Keys.nativesDir.value
-        .listFiles()
+      val buildIdInfo = nativeDirFiles
         .filter(x => x.getName.endsWith(".build-id"))
-        .map{x =>
-          s"_mppatch.version.buildId[${LuaUtils.quote(x.getName.split("\\.").head)}] = ${LuaUtils.quote(IO.read(x))}"
+        .sorted
+        .map { x =>
+          val hash = x.getName.split("\\.").head.split("_").last
+          s"_mppatch.version.buildId[${LuaUtils.quote(hash)}] = ${LuaUtils.quote(IO.read(x))}"
         }
         .mkString("\n")
       val versionInfo = PatchFile(
         "ui/lib/mppatch_version.lua",
         s"""-- Generated from PatchBuild.scala
            |_mpPatch.version = {}
+           |
            |_mpPatch.version.buildId = {}
-           |_mpPatch.version.info = {}
            |$buildIdInfo
+           |
+           |_mpPatch.version.info = {}
            |$versionDataInfo
-        """.stripMargin
+        """.stripMargin.trim
       )
       val manifestFile =
         PatchFile("manifest.xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
@@ -110,30 +112,26 @@ object PatchBuild {
     },
     Compile / resourceGenerators += Def.task {
       val basePath    = (Compile / resourceManaged).value
-      val packagePath = basePath / "moe" / "lymia" / "mppatch" / s"mppatch.mppak"
+      val packagePath = basePath / "moe" / "lymia" / "mppatch" / s"builtin_patch"
 
-      val debugOut = crossTarget.value / "patch-package-debug"
-      streams.value.log.info(s"Writing patch package files to $debugOut")
-      if (debugOut.exists) IO.delete(debugOut)
-      for ((name, data) <- Keys.patchFiles.value) {
-        val target = debugOut / name
+      streams.value.log.info(s"Writing patch package files to $packagePath")
+      if (packagePath.exists) IO.delete(packagePath)
+
+      for ((name, data) <- Keys.patchFiles.value.toSeq) yield {
+        val target = packagePath / name
         IO.createDirectory(target.getParentFile)
         IO.write(target, data)
+        target
       }
-
-      IOWrappers.writePatchPackage(
-        new DataOutputStream(new FileOutputStream(packagePath)),
-        PatchPackage(Keys.patchFiles.value)
-      )
-
-      // Final generated files list
-      Seq(packagePath)
     }.taskValue
   )
 
   object PatchFile {
     def apply(name: String, data: Array[Byte]) = (name, data)
-    def apply(name: String, data: String)      = (name, data.getBytes(StandardCharsets.UTF_8))
+    def apply(name: String, data: String) = {
+      val fullData = s"${data.trim}\n"
+      (name, fullData.getBytes(StandardCharsets.UTF_8))
+    }
   }
 
   object Keys {

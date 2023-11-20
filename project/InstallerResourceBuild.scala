@@ -40,10 +40,6 @@ object InstallerResourceBuild {
       val dateFormat                                      = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)
       Map(
         "mppatch.version.string" -> version.value,
-        "mppatch.version.major"  -> major,
-        "mppatch.version.minor"  -> minor,
-        "mppatch.version.patch"  -> patch,
-        "mppatch.version.suffix" -> Option(suffix).getOrElse(""),
         "mppatch.version.commit" -> git.gitHeadCommit.value.getOrElse("<unknown>"),
         "mppatch.version.clean"  -> (!git.gitUncommittedChanges.value).toString,
         "mppatch.website"        -> homepage.value.fold("<unknown>")(_.toString),
@@ -73,7 +69,7 @@ object InstallerResourceBuild {
       Seq(versionPropertiesPath)
     }.taskValue,
     // Render about information
-    resourceGenerators in Compile += Def.task {
+    Compile / resourceGenerators += Def.task {
       val outPath = (Compile / resourceManaged).value / "moe" / "lymia" / "mppatch" / "text"
 
       (for (file <- IO.listFiles(baseDirectory.value / "project" / "about") if file.getName.endsWith(".md")) yield {
@@ -83,8 +79,7 @@ object InstallerResourceBuild {
              |  <body>
              |    ${Processor.process(markdown)}
              |  </body>
-             |</html>
-                    """.stripMargin
+             |</html>""".stripMargin
 
         val outFile = outPath / file.getName.replaceAll("\\.md$", ".html")
         IO.write(outFile, html)

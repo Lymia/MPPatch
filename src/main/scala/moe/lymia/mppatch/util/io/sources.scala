@@ -22,10 +22,6 @@
 
 package moe.lymia.mppatch.util.io
 
-import java.io.{DataInputStream, InputStream}
-
-import moe.lymia.mppatch.util.common.{IOWrappers, PatchPackage}
-
 import scala.xml.XML
 
 trait DataSource {
@@ -33,19 +29,7 @@ trait DataSource {
   def loadXML(name: String) = XML.loadString(loadResource(name))
   def loadBinaryResource(name: String): Array[Byte]
 }
-case class ResourceDataSource(data: PatchPackage) extends DataSource {
-  override def loadResource(name: String): String = IOUtils.loadResource(name)
-  override def loadBinaryResource(name: String): Array[Byte] = IOUtils.loadBinaryResource(name)
-}
-case class MppakDataSource(data: PatchPackage) extends DataSource {
-  override def loadResource(name: String): String = data.loadResource(name)
-  override def loadBinaryResource(name: String): Array[Byte] = data.loadBinaryResource(name)
-}
-object MppakDataSource {
-  def apply(in: InputStream): DataSource =
-    MppakDataSource(IOWrappers.readPatchPackage(in match {
-      case in: DataInputStream => in
-      case _ => new DataInputStream(in)
-    }))
-  def apply(resource: String): DataSource = MppakDataSource(IOUtils.getResource(resource))
+case class ResourceDataSource(path: String) extends DataSource {
+  override def loadResource(name: String): String = IOUtils.loadResource(s"$path/$name")
+  override def loadBinaryResource(name: String): Array[Byte] = IOUtils.loadBinaryResource(s"$path/$name")
 }

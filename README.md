@@ -13,6 +13,8 @@ For usage instructions, [read the user guide](https://github.com/Lymia/MPPatch/w
 Compiling
 ---------
 
+TODO: These instructions are heavily outdated.
+
 MPPatch can only be built on Linux systems. The build scripts has only been extensively tested on Arch Linux. You are
 on your own for other distributions.
 

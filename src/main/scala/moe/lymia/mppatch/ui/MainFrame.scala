@@ -26,10 +26,9 @@ import java.awt.{GridBagConstraints, GridBagLayout}
 import java.nio.file.{Files, Path, Paths}
 import java.util.Locale
 import javax.swing._
-
 import moe.lymia.mppatch.core._
 import moe.lymia.mppatch.util.Steam
-import moe.lymia.mppatch.util.io.{DataSource, MppakDataSource}
+import moe.lymia.mppatch.util.io.{DataSource, ResourceDataSource}
 
 class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var installButton  : ActionButton = _
@@ -86,7 +85,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     reloadInstaller()
   }
 
-  changePatchPackage(MppakDataSource("mppatch.mppak"))
+  changePatchPackage(ResourceDataSource("builtin_patch"))
 
   private def pathFromRegistry() = resolvePaths(platform.defaultSystemPaths) match {
     case Some(x) => changeInstaller(x, false)

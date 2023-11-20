@@ -52,7 +52,6 @@ crossPaths := false
 
 // Dependencies
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.3.0"
-libraryDependencies += "org.tukaani"             % "xz"        % "1.9"
 
 // custom tasks
 val buildNativeTask = TaskKey[Unit]("buildNativeTask")

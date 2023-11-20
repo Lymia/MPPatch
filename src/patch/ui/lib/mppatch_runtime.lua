@@ -52,8 +52,7 @@ do
         patchCriticalError("Could not load version information.")
         return
     end
-    local platformString = patch.version.platform.."_"..patch.version.sha256
-    local expectedBuildId = _mpPatch.version.buildId[platformString]
+    local expectedBuildId = _mpPatch.version.buildId[patch.version.sha256]
     if not expectedBuildId or expectedBuildId ~= patch.version.buildId then
         patchCriticalError("BuildID mismatch.")
         return
