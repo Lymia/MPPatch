@@ -37,10 +37,13 @@ object LuaJITBuild {
       val logger         = streams.value.log
       IO.createDirectory(patchDirectory)
 
-      for (platform <- Seq( /*"win32", "macos",*/ "linux")) yield {
+      for (
+        platform <- Seq(PlatformType.Win32, PlatformType.MacOS, PlatformType.Linux)
+        if PlatformType.currentPlatform.shouldBuildNative(platform)
+      ) yield {
         val (platformEnv, flags, outputFile, extension, target_cc, target) =
           platform match {
-            case "win32" =>
+            case PlatformType.Win32 =>
               (
                 Map("CROSS" -> config_mingw_prefix, "TARGET_SYS" -> "Windows"),
                 Seq(
@@ -54,16 +57,16 @@ object LuaJITBuild {
                 config_win32_cc,
                 config_target_win32
               )
-            case "macos" =>
+            case PlatformType.MacOS =>
               (
-                Map("CROSS" -> config_macos_prefix, "TARGET_SYS" -> "Darwin", "MACOSX_DEPLOYMENT_TARGET" -> "10.6"),
+                Map("TARGET_SYS" -> "Darwin", "MACOSX_DEPLOYMENT_TARGET" -> "10.6"),
                 Seq(s"--target=$config_target_macos", "-fuse-ld=" + config_macos_ld),
                 "src/libluajit.so",
                 ".dylib",
                 config_macos_cc,
                 config_target_macos
               )
-            case "linux" =>
+            case PlatformType.Linux =>
               (
                 Map(),
                 Seq(s"--target=$config_target_linux"),
@@ -97,7 +100,7 @@ object LuaJITBuild {
           }
           .map(_._1)
 
-        val outTarget = patchDirectory / s"luajit_$platform$extension"
+        val outTarget = patchDirectory / s"luajit_${platform.name}$extension"
         val outputPath =
           trackDependencies(Keys.luajitCacheDir.value / (platform + "_c_out"), dependencies.toSet) {
             logger.info("Compiling Luajit for " + platform)
@@ -118,7 +121,7 @@ object LuaJITBuild {
         (actions ++ env.map(x => s"${x._1}=${x._2}"))
     )
 
-  case class LuaJITPatchFile(platform: String, file: File)
+  case class LuaJITPatchFile(platform: PlatformType, file: File)
 
   object Keys {
     val luajitCacheDir  = SettingKey[File]("luajit-cache-dir")

@@ -82,14 +82,15 @@ object NativePatchBuild {
       val patches =
         for (
           versionDir <- (Keys.patchSourceDir.value / "versions").listFiles
-          if !versionDir.getName.startsWith("disabled_")
+          if PlatformType.currentPlatform.shouldBuildNative(PlatformType.forString(versionDir.getName.split("_").head))
         ) yield {
-          val version                 = versionDir.getName
-          val Array(platform, sha256) = version.split("_")
+          val version                    = versionDir.getName
+          val Array(platformStr, sha256) = version.split("_")
+          val platform                   = PlatformType.forString(platformStr)
 
           val (cc, nasmFormat, binaryExtension, sourcePath, extraCDeps, gccFlags, nasmFiles) =
             platform match {
-              case "win32" =>
+              case PlatformType.Win32 =>
                 (
                   win32_cc _,
                   "win32",
@@ -106,7 +107,7 @@ object NativePatchBuild {
                   ) ++ config_win32_secureFlags,
                   Seq(Keys.patchSourceDir.value / "win32" / "proxy.s")
                 )
-              case "macos" =>
+              case PlatformType.MacOS =>
                 (
                   macos_cc _,
                   "macho32",
@@ -126,7 +127,7 @@ object NativePatchBuild {
                   ),
                   Seq()
                 )
-              case "linux" =>
+              case PlatformType.Linux =>
                 (
                   linux_cc _,
                   "elf",
@@ -279,7 +280,7 @@ object NativePatchBuild {
     case _: NumberFormatException => default
   }
 
-  case class PatchFile(platform: String, version: String, file: File, buildId: String)
+  case class PatchFile(platform: PlatformType, version: String, file: File, buildId: String)
 
   object Keys {
     val patchBuildDir  = SettingKey[File]("native-patch-build-directory")

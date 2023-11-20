@@ -50,7 +50,9 @@ object PatchBuild {
       val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
                                   Timestamp={System.currentTimeMillis().toString}>
         {XML.loadString(IO.read(patchPath / "manifest.xml")).child}{
-        versions.map(x => <NativePatch Platform={x.platform} Version={x.version} Source={s"native/${x.file.getName}"}/>)
+        versions.map(x =>
+          <NativePatch Platform={x.platform.name} Version={x.version} Source={s"native/${x.file.getName}"}/>
+        )
       }
       </PatchManifest>
 
@@ -64,7 +66,7 @@ object PatchBuild {
           |_mpPatch.version = {}
           |_mpPatch.version.buildId = {}
         """.stripMargin + versions
-          .map(x => s"_mpPatch.version.buildId.${x.platform}_${x.version} = ${LuaUtils.quote(x.buildId)}")
+          .map(x => s"_mpPatch.version.buildId.${x.platform.name}_${x.version} = ${LuaUtils.quote(x.buildId)}")
           .mkString("\n") + "\n" +
           "_mpPatch.version.info = {}\n" + InstallerResourceBuild.Keys.versionData.value
             .map(x => s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}")

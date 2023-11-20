@@ -20,13 +20,53 @@
  * THE SOFTWARE.
  */
 
+import java.util.Locale
+
+sealed trait PlatformType {
+  def shouldBuildNative(other: PlatformType) = (this, other) match {
+    case (PlatformType.Win32, PlatformType.Win32) => true
+    case (PlatformType.MacOS, PlatformType.MacOS) => true
+    case (PlatformType.Linux, PlatformType.Linux) => true
+    case _                                        => false
+  }
+
+  def name = this match {
+    case PlatformType.Win32 => "win32"
+    case PlatformType.MacOS => "macos"
+    case PlatformType.Linux => "linux"
+  }
+}
+object PlatformType {
+  case object Win32 extends PlatformType
+  case object MacOS extends PlatformType
+  case object Linux extends PlatformType
+  case object Other extends PlatformType
+
+  def forString(name: String): PlatformType = name match {
+    case "win32" => Win32
+    case "macos" => MacOS
+    case "linux" => Linux
+  }
+
+  lazy val currentPlatform = {
+    val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
+    if (os.contains("windows")) Win32
+    else if (os.contains("linux")) Linux
+    else if (
+      os.contains("mac") ||
+      os.contains("darwin")
+    ) MacOS
+    else Other
+  }
+}
+
 object Config {
   val config_make         = "make"
   val config_mingw_prefix = "i686-w64-mingw32-"
   val config_macos_prefix = "i386-apple-darwin17-"
 
   val config_win32_cc = "clang"
-  val config_macos_cc = "o32-clang"
+  val config_macos_cc = "clang"
   val config_linux_cc = "clang"
   val config_nasm     = "nasm"
 
@@ -42,12 +82,4 @@ object Config {
   val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
 
   val config_macos_ld = "" // findExecutableOnPath(config_macos_prefix + "ld")
-
-  private def findExecutableOnPath(name: String): String = {
-    for (dirname <- System.getenv("PATH").split(java.io.File.pathSeparator)) {
-      val file = new java.io.File(dirname, name)
-      if (file.isFile && file.canExecute) return file.getAbsolutePath
-    }
-    throw new AssertionError("should have found the executable")
-  }
 }

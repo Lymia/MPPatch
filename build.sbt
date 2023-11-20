@@ -37,10 +37,10 @@ versionWithGit
 git.baseVersion := "0.1.3"
 git.uncommittedSignifier := Some("DIRTY")
 git.formattedShaVersion := {
-  val base = git.baseVersion.?.value
+  val base   = git.baseVersion.?.value
   val suffix = git.makeUncommittedSignifierSuffix(git.gitUncommittedChanges.value, git.uncommittedSignifier.value)
   git.gitHeadCommit.value map { rawSha =>
-    val sha = "dev_"+rawSha.substring(0, 8)
+    val sha = "dev_" + rawSha.substring(0, 8)
     git.defaultFormatShaVersion(base, sha, suffix)
   }
 }
@@ -52,7 +52,13 @@ crossPaths := false
 
 // Dependencies
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.3.0"
-libraryDependencies += "org.tukaani" % "xz" % "1.9"
+libraryDependencies += "org.tukaani"             % "xz"        % "1.9"
+
+// custom tasks
+val buildNativeTask = TaskKey[Unit]("buildNativeTask")
+
+// buildNative before run
+(Compile / run) := (Compile / run).dependsOn(buildNativeTask).evaluated
 
 // Build distribution file
 InputKey[Unit]("dist") := {
@@ -64,3 +70,24 @@ InputKey[Unit]("dist") := {
   }
   streams.value.log.info(s"Output packed to: ${copy((Compile / assembly).value)}")
 }
+
+// Build native binaries
+buildNativeTask := {
+  // delete and recreate the native-patch directory
+  val dir = crossTarget.value / "native-patch"
+  IO.delete(dir)
+  IO.createDirectory(dir)
+
+  // copy native-patch files to the directory
+  val log = streams.value.log;
+  for (luajitBin <- LuaJITBuild.Keys.luajitFiles.value) {
+    log.log(Level.Info, s"Copying $luajitBin to output directory.")
+    IO.copyFile(luajitBin.file, dir / luajitBin.file.getName)
+  }
+  for (nativeBin <- NativePatchBuild.Keys.nativeVersions.value) {
+    log.log(Level.Info, s"Copying $nativeBin to output directory.")
+    IO.copyFile(nativeBin.file, dir / nativeBin.file.getName)
+    IO.write(dir / s"${nativeBin.file.getName}.build-id", nativeBin.buildId)
+  }
+}
+InputKey[Unit]("buildNative") := buildNativeTask.value
