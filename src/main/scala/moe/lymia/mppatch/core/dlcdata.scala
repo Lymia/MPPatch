@@ -22,11 +22,10 @@
 
 package moe.lymia.mppatch.core
 
+import moe.lymia.mppatch.util.LuaUtils
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
-
-import moe.lymia.mppatch.util.common.LuaUtils
 import moe.lymia.mppatch.util.io._
 import moe.lymia.mppatch.util.io.XMLUtils._
 

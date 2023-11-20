@@ -57,8 +57,8 @@ libraryDependencies += "org.tukaani"             % "xz"        % "1.9"
 // custom tasks
 val buildNativeTask = TaskKey[Unit]("buildNativeTask")
 
-// buildNative before run
-(Compile / run) := (Compile / run).dependsOn(buildNativeTask).evaluated
+// New dependencies for tasks
+(Compile / run) := (Compile / run).dependsOn(PatchBuild.Keys.buildDylibDir).evaluated
 
 // Build distribution file
 InputKey[Unit]("dist") := {
@@ -72,22 +72,4 @@ InputKey[Unit]("dist") := {
 }
 
 // Build native binaries
-buildNativeTask := {
-  // delete and recreate the native-patch directory
-  val dir = crossTarget.value / "native-patch"
-  IO.delete(dir)
-  IO.createDirectory(dir)
-
-  // copy native-patch files to the directory
-  val log = streams.value.log;
-  for (luajitBin <- LuaJITBuild.Keys.luajitFiles.value) {
-    log.log(Level.Info, s"Copying $luajitBin to output directory.")
-    IO.copyFile(luajitBin.file, dir / luajitBin.file.getName)
-  }
-  for (nativeBin <- NativePatchBuild.Keys.nativeVersions.value) {
-    log.log(Level.Info, s"Copying $nativeBin to output directory.")
-    IO.copyFile(nativeBin.file, dir / nativeBin.file.getName)
-    IO.write(dir / s"${nativeBin.file.getName}.build-id", nativeBin.buildId)
-  }
-}
-InputKey[Unit]("buildNative") := buildNativeTask.value
+InputKey[Unit]("buildNative") := PatchBuild.Keys.buildDylibDir.value

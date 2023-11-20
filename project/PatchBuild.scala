@@ -31,7 +31,30 @@ import moe.lymia.mppatch.util.common.*
 
 object PatchBuild {
   val settings = Seq(
+    Keys.nativesDir := crossTarget.value / "native-bin",
+    Keys.buildDylibDir := {
+      // create the native-patch directory
+      val dir = Keys.nativesDir.value
+      IO.createDirectory(dir)
+
+      // copy native-patch files to the directory
+      val log = streams.value.log
+      for (luajitBin <- LuaJITBuild.Keys.luajitFiles.value) {
+        log.log(Level.Info, s"Copying $luajitBin to output directory.")
+        IO.copyFile(luajitBin.file, dir / luajitBin.file.getName)
+      }
+      for (nativeBin <- NativePatchBuild.Keys.nativeVersions.value) {
+        log.log(Level.Info, s"Copying $nativeBin to output directory.")
+        IO.copyFile(nativeBin.file, dir / nativeBin.file.getName)
+        IO.write(dir / s"${nativeBin.file.getName}.build-id", nativeBin.buildId)
+      }
+
+      // return directory
+      dir
+    },
     Keys.patchFiles := {
+      val log = streams.value.log
+
       def loadFromDir(dir: File) =
         Path
           .allSubpaths(dir)
@@ -42,42 +65,48 @@ object PatchBuild {
       val patchPath   = baseDirectory.value / "src" / "patch"
       val copiedFiles = loadFromDir(patchPath / "install") ++ loadFromDir(patchPath / "ui")
 
-      val versions = NativePatchBuild.Keys.nativeVersions.value
       val patchFiles =
-        for (version <- versions)
-          yield PatchFile("native/" + version.file.getName, IO.readBytes(version.file))
+        for (binary <- Keys.nativesDir.value.listFiles() if !binary.getName.endsWith(".build-id")) yield {
+          log.info(s"Found native binary file: $binary")
+          PatchFile(s"native/${binary.getName}", IO.readBytes(binary))
+        }
       val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
+      val nativePatchEntries = NativePatchBuild.Keys.nativeVersionInfo.value.map { x =>
+        val source = s"native/mppatch_${x.platform.name}_${x.version}${x.platform.extension}"
+        <NativePatch Platform={x.platform.name} Version={x.version} Source={source}/>
+      }
       val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
                                   Timestamp={System.currentTimeMillis().toString}>
-        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}{
-        versions.map(x =>
-          <NativePatch Platform={x.platform.name} Version={x.version} Source={s"native/${x.file.getName}"}/>
-        )
-      }
+        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
+        {nativePatchEntries}
       </PatchManifest>
 
-      val luajitFiles =
-        for (platform <- LuaJITBuild.Keys.luajitFiles.value)
-          yield PatchFile("native/" + platform.file.getName, IO.readBytes(platform.file))
-
-      val buildIdInfo = PatchFile(
+      val versionDataInfo = InstallerResourceBuild.Keys.versionData.value
+        .map(x => s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}")
+        .mkString("\n")
+      val buildIdInfo = Keys.nativesDir.value
+        .listFiles()
+        .filter(x => x.getName.endsWith(".build-id"))
+        .map{x =>
+          s"_mppatch.version.buildId[${LuaUtils.quote(x.getName.split("\\.").head)}] = ${LuaUtils.quote(IO.read(x))}"
+        }
+        .mkString("\n")
+      val versionInfo = PatchFile(
         "ui/lib/mppatch_version.lua",
-        """-- Generated from PatchBuild.scala
-          |_mpPatch.version = {}
-          |_mpPatch.version.buildId = {}
-        """.stripMargin + versions
-          .map(x => s"_mpPatch.version.buildId.${x.platform.name}_${x.version} = ${LuaUtils.quote(x.buildId)}")
-          .mkString("\n") + "\n" +
-          "_mpPatch.version.info = {}\n" + InstallerResourceBuild.Keys.versionData.value
-            .map(x => s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}")
-            .mkString("\n")
+        s"""-- Generated from PatchBuild.scala
+           |_mpPatch.version = {}
+           |_mpPatch.version.buildId = {}
+           |_mpPatch.version.info = {}
+           |$buildIdInfo
+           |$versionDataInfo
+        """.stripMargin
       )
       val manifestFile =
         PatchFile("manifest.xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
       val versionFile = PatchFile("version.properties", IO.readBytes(InstallerResourceBuild.Keys.versionFile.value))
 
       // Final generated files list
-      (buildIdInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles ++ luajitFiles)).toMap
+      (versionInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles)).toMap
     },
     Compile / resourceGenerators += Def.task {
       val basePath    = (Compile / resourceManaged).value
@@ -104,11 +133,12 @@ object PatchBuild {
 
   object PatchFile {
     def apply(name: String, data: Array[Byte]) = (name, data)
-
-    def apply(name: String, data: String) = (name, data.getBytes(StandardCharsets.UTF_8))
+    def apply(name: String, data: String)      = (name, data.getBytes(StandardCharsets.UTF_8))
   }
 
   object Keys {
-    val patchFiles = TaskKey[Map[String, Array[Byte]]]("patch-build-files")
+    val nativesDir    = TaskKey[File]("patch-natives-dir")
+    val patchFiles    = TaskKey[Map[String, Array[Byte]]]("patch-build-files")
+    val buildDylibDir = TaskKey[File]("build-dylib-dir")
   }
 }

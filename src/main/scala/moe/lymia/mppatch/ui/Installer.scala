@@ -52,7 +52,8 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
       log.logRaw(line)
       log.logRaw(s"MPPatch version ${VersionInfo.versionString}")
       log.logRaw(s"Revision ${VersionInfo.commit.substring(0, 8)}${if(VersionInfo.isDirty) " (dirty)" else ""}, "+
-                     s"built on ${dateFormat.format(VersionInfo.buildDate)} by ${VersionInfo.buildUser}")
+                     s"built on ${dateFormat.format(VersionInfo.buildDate)} " +
+                     s"by ${VersionInfo.buildUser}@${VersionInfo.buildHostname}")
       log.logRaw("")
 
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)

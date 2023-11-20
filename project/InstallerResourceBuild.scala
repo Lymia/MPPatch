@@ -48,26 +48,13 @@ object InstallerResourceBuild {
         "mppatch.version.clean"  -> (!git.gitUncommittedChanges.value).toString,
         "mppatch.website"        -> homepage.value.fold("<unknown>")(_.toString),
         "build.id"               -> UUID.randomUUID().toString,
-        "build.os" -> tryProperty {
-          System.getProperty("os.name")
-        },
-        "build.user" -> tryProperty {
-          System.getProperty("user.name") + "@" +
-            InetAddress.getLocalHost.getHostName
-        },
-        "build.time"          -> new java.util.Date().getTime.toString,
-        "build.timestr"       -> dateFormat.format(new java.util.Date()),
-        "build.path"          -> baseDirectory.value.getAbsolutePath,
-        "build.treestatus"    -> propertyFromProcess("git", "status", "--porcelain"),
-        "build.version.uname" -> propertyFromProcess("uname", "-a"),
-        "build.version.distro" -> tryProperty {
-          IO.read(file("/etc/os-release"))
-        },
-        "build.version.sbt"      -> sbtVersion.value,
-        "build.version.nasm"     -> propertyFromProcess(config_nasm, "-v"),
-        "build.version.cc.win32" -> "n/a", //propertyFromProcess(config_win32_cc, "-v"),
-        "build.version.cc.macos" -> "n/a", //propertyFromProcess(config_macos_cc, "-v"),
-        "build.version.cc.linux" -> propertyFromProcess(config_linux_cc, "-v")
+        "build.os"               -> tryProperty(System.getProperty("os.name")),
+        "build.user"             -> tryProperty(System.getProperty("user.name")),
+        "build.hostname"         -> tryProperty(InetAddress.getLocalHost.getHostName),
+        "build.time"             -> new java.util.Date().getTime.toString,
+        "build.timestr"          -> dateFormat.format(new java.util.Date()),
+        "build.path"             -> baseDirectory.value.getAbsolutePath,
+        "build.treestatus"       -> propertyFromProcess("git", "status", "--porcelain")
       )
     },
     Keys.versionFile := {

@@ -87,7 +87,8 @@ class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog
     frame.add(new FontLabel(Font.PLAIN,
                             i18n("about.1", VersionInfo.commit.substring(0, 8),
                                             if(VersionInfo.isDirty) i18n("about.dirty") else "",
-                                            dateFormat.format(VersionInfo.buildDate), VersionInfo.buildUser)),
+                                            dateFormat.format(VersionInfo.buildDate),
+                                            VersionInfo.buildUser, VersionInfo.buildHostname)),
               constraints(gridy = 1, anchor = GridBagConstraints.LINE_START,
                           insets = insets(left = 3, right = 3, bottom = 3)))
     frame.add(scroll, constraints(gridy = 2, weightx = 1, weighty = 1,

@@ -100,3 +100,17 @@ object Utils {
       outStyle: FileInfo.Style = FileInfo.exists
   )(fn: Set[File] => Set[File]) = FileFunction.cached(cacheDirectory, inStyle, outStyle)(fn)
 }
+
+object LuaUtils {
+  def quote(s: String) = {
+    val buffer = new StringBuilder
+    for(c <- s) c match {
+      case '\n'             => buffer.append("\\n")
+      case '\r'             => buffer.append("\\r")
+      case '"'              => buffer.append("\\\"")
+      case _ if c.isControl => buffer.append("\\%03d".format(c.toInt))
+      case _                => buffer.append(c)
+    }
+    '"' + buffer.toString() + '"'
+  }
+}

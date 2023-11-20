@@ -73,6 +73,14 @@ object NativePatchBuild {
       ) { (dir, target) =>
         IO.copyDirectory(dir / "usr" / "include" / "SDL2", target)
       },
+    Keys.nativeVersionInfo := {
+      for (versionDir <- (Keys.patchSourceDir.value / "versions").listFiles) yield {
+        val version                    = versionDir.getName
+        val Array(platformStr, sha256) = version.split("_")
+        val platform                   = PlatformType.forString(platformStr)
+        PatchFileInfo(platform, sha256, versionDir)
+      }
+    },
     Keys.nativeVersions := {
       val patchDirectory = Keys.patchBuildDir.value / "output"
       val logger         = streams.value.log
@@ -81,8 +89,8 @@ object NativePatchBuild {
 
       val patches =
         for (
-          versionDir <- (Keys.patchSourceDir.value / "versions").listFiles
-          if PlatformType.currentPlatform.shouldBuildNative(PlatformType.forString(versionDir.getName.split("_").head))
+          PatchFileInfo(platform, version, versionDir) <- Keys.nativeVersionInfo.value
+          if PlatformType.currentPlatform.shouldBuildNative(platform)
         ) yield {
           val version                    = versionDir.getName
           val Array(platformStr, sha256) = version.split("_")
@@ -161,7 +169,7 @@ object NativePatchBuild {
           IO.createDirectory(buildTmp)
 
           val nasmOut =
-            trackDependencySet(Keys.patchCacheDir.value / (versionStr + "_nasm_o"), sBuildDependencies.toSet) {
+            trackDependencySet(Keys.patchCacheDir.value / s"${versionStr}_nasm_o", sBuildDependencies.toSet) {
               logger.info("Compiling as_entry.o for version " + version)
 
               (for (file <- nasmFiles) yield {
@@ -172,11 +180,11 @@ object NativePatchBuild {
             }
 
           val targetDir   = patchDirectory / version
-          val targetFile  = targetDir / ("mppatch_" + version + binaryExtension)
+          val targetFile  = targetDir / s"mppatch_$version$binaryExtension"
           val buildIdFile = targetDir / "buildid.txt"
           val outputPath =
-            trackDependencies(Keys.patchCacheDir.value / (versionStr + "_c_out"), cBuildDependencies.toSet ++ nasmOut) {
-              logger.info("Compiling binary patch for version " + version)
+            trackDependencies(Keys.patchCacheDir.value / s"${versionStr}_c_out", cBuildDependencies.toSet ++ nasmOut) {
+              logger.info(s"Compiling binary patch for version $version")
               val buildId = UUID.randomUUID()
 
               if (targetDir.exists) IO.delete(targetDir)
@@ -195,9 +203,9 @@ object NativePatchBuild {
                   "-fvisibility=hidden",
                   "-o",
                   targetFile,
-                  "-DMPPATCH_CIV_VERSION=\"" + sha256 + "\"",
-                  "-DMPPATCH_PLATFORM=\"" + platform + "\"",
-                  "-DMPPATCH_BUILDID=\"" + buildId + "\""
+                  s"""-DMPPATCH_CIV_VERSION="$version"""",
+                  s"""-DMPPATCH_PLATFORM="${platform.name}"""",
+                  s"""-DMPPATCH_BUILDID="$buildId""""
                 ) ++ nasmOut ++ config_common_secureFlags ++
                   gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c"))
               )
@@ -206,7 +214,7 @@ object NativePatchBuild {
 
           PatchFile(platform, sha256, targetFile, IO.read(buildIdFile))
         }
-      patches.toSeq
+      patches
     }
   )
 
@@ -281,6 +289,7 @@ object NativePatchBuild {
   }
 
   case class PatchFile(platform: PlatformType, version: String, file: File, buildId: String)
+  case class PatchFileInfo(platform: PlatformType, version: String, versionDir: File)
 
   object Keys {
     val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
@@ -295,6 +304,7 @@ object NativePatchBuild {
 
     val commonIncludes = TaskKey[File]("native-patch-common-includes")
 
-    val nativeVersions = TaskKey[Seq[PatchFile]]("native-patch-files")
+    val nativeVersions    = TaskKey[Seq[PatchFile]]("native-patch-files")
+    val nativeVersionInfo = TaskKey[Seq[PatchFileInfo]]("native-patch-info")
   }
 }

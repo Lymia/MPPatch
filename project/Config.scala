@@ -35,6 +35,12 @@ sealed trait PlatformType {
     case PlatformType.MacOS => "macos"
     case PlatformType.Linux => "linux"
   }
+
+  def extension = this match {
+    case PlatformType.Win32 => ".dll"
+    case PlatformType.MacOS => ".dylib"
+    case PlatformType.Linux => ".so"
+  }
 }
 object PlatformType {
   case object Win32 extends PlatformType

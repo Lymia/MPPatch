@@ -24,7 +24,7 @@
 -- There's a bug in CvPreGame.cpp (available in the SDK) where it passes the result of strlen to strncmp, in a way
 -- where it doesn't check for the C string terminator in some cases. This works around it.
 --
--- In particlar, if you already have an option "_foo", the option "_foooooooooo" will match it, as it will only check
+-- In particular, if you already have an option "_foo", the option "_foooooooooo" will match it, as it will only check
 -- the first four characters, and not the terminator.
 --
 -- We use nonprinting characters to try and try and ensure this bug doesn't cause us any trouble. The choice of two

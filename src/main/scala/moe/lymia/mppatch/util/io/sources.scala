@@ -42,10 +42,10 @@ case class MppakDataSource(data: PatchPackage) extends DataSource {
   override def loadBinaryResource(name: String): Array[Byte] = data.loadBinaryResource(name)
 }
 object MppakDataSource {
-  def apply(in: InputStream): MppakDataSource =
+  def apply(in: InputStream): DataSource =
     MppakDataSource(IOWrappers.readPatchPackage(in match {
       case in: DataInputStream => in
       case _ => new DataInputStream(in)
     }))
-  def apply(resource: String): MppakDataSource = MppakDataSource(IOUtils.getResource(resource))
+  def apply(resource: String): DataSource = MppakDataSource(IOUtils.getResource(resource))
 }

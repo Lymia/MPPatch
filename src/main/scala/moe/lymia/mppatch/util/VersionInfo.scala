@@ -61,6 +61,7 @@ class VersionInfo(properties: VersionInfoSource) {
   lazy val buildID       = properties("build.id", "<unknown>")
   lazy val buildDate     = new Date(properties("build.time", "0").toLong)
   lazy val buildUser     = properties("build.user", "<unknown>")
+  lazy val buildHostname = properties("build.hostname", "<unknown>")
 }
 object VersionInfo extends VersionInfo("version.properties") {
   def loadFromResource(resource: String) = new VersionInfo(VersionInfoSource.getPropertySource(resource))

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.util.common
+package moe.lymia.mppatch.util
 
 object LuaUtils {
   def quote(s: String) = {
@@ -32,6 +32,6 @@ object LuaUtils {
       case _ if c.isControl => buffer.append("\\%03d".format(c.toInt))
       case _                => buffer.append(c)
     }
-    '"' + buffer.toString() + '"'
+    s"'${buffer.toString()}'"
   }
 }
