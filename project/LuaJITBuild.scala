@@ -60,7 +60,7 @@ object LuaJITBuild {
             case PlatformType.MacOS =>
               (
                 Map("TARGET_SYS" -> "Darwin", "MACOSX_DEPLOYMENT_TARGET" -> "10.6"),
-                Seq(s"--target=$config_target_macos", "-fuse-ld=" + config_macos_ld),
+                Seq(s"--target=$config_target_macos"),
                 "src/libluajit.so",
                 ".dylib",
                 config_macos_cc,

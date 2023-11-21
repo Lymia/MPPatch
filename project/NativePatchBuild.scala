@@ -130,8 +130,7 @@ object NativePatchBuild {
                     "-ldl",
                     "-framework",
                     "CoreFoundation",
-                    "-Wl,-segprot,MPPATCH_PROXY,rwx,rx",
-                    "-fuse-ld=" + config_macos_ld
+                    "-Wl,-segprot,MPPATCH_PROXY,rwx,rx"
                   ),
                   Seq()
                 )

@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-import sbt._
-import sbt.Keys._
+import sbt.*
+import sbt.Keys.*
+import scala.sys.process.*
 
 // Package metainfo
 organization := "moe.lymia"
@@ -29,8 +30,9 @@ name := "mppatch"
 homepage := Some(url("https://github.com/Lymia/MPPatch"))
 licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
 
-// Resource generators for the project.
+// Plugins for the project.
 InstallerResourceBuild.settings
+NativeImagePlugin.projectSettings
 
 // Git versioning
 versionWithGit
@@ -50,8 +52,42 @@ scalaVersion := "2.13.12"
 scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:method,inline -deprecation -unchecked".split(" ").toSeq
 crossPaths := false
 
+// Native Image configuration
+nativeImageInstalled := true
+nativeImageGraalHome := {
+  val platform   = PlatformType.currentPlatform
+  val graalvmDir = target.value / s"graalvm_${platform.name}"
+  val (dl_url, dl_dir) = platform match {
+    case PlatformType.Linux => (Config.config_linux_graalvm_url, Config.config_linux_graalvm_dir)
+    case _                  => sys.error("platform not supported for graalvm")
+  }
+
+  val log = streams.value.log;
+  if (!(graalvmDir / dl_dir / "jmods" / "java.base.jmod").exists) {
+    // recreate directory
+    log.info("Preparing directories for GraalVM installation...")
+    IO.delete(graalvmDir)
+    IO.createDirectory(graalvmDir)
+
+    // download graalvm
+    log.info("Downloading GraalVM...")
+    url(dl_url) #> (graalvmDir / "graalvm.tar.gz") !!;
+    Utils.runProcess(Seq("tar", "-xv", "-f", "graalvm.tar.gz"), graalvmDir)
+  }
+
+  (graalvmDir / dl_dir).toPath
+}
+
+nativeImageOptions += "--no-fallback"
+nativeImageOptions += "-H:+UnlockExperimentalVMOptions"
+nativeImageOptions += "-Djava.awt.headless=false"
+
+nativeImageOptions += s"-H:ReflectionConfigurationFiles=${target.value / "native-image-configs" / "reflect-config.json"}"
+nativeImageOptions += s"-H:ConfigurationFileDirectories=${target.value / "native-image-configs"}"
+
 // Dependencies
-libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.3.0"
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
+libraryDependencies += "com.formdev"             % "flatlaf"   % "3.2.5"
 
 // custom tasks
 val buildNativeTask = TaskKey[Unit]("buildNativeTask")

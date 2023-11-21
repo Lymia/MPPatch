@@ -22,13 +22,13 @@
 
 package moe.lymia.mppatch.ui
 
+import moe.lymia.mppatch.util.{Logger, SimpleLogger, VersionInfo}
+
 import java.io.{File, FileOutputStream, OutputStreamWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
 import java.text.DateFormat
 import java.util.Locale
-import javax.swing.{JFrame, UIManager}
-
-import moe.lymia.mppatch.util.{Logger, SimpleLogger, VersionInfo}
+import javax.swing.JFrame
 
 object InstallerMain {
   val logFile = new File("mppatch_installer.log")
@@ -56,7 +56,7 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
                      s"by ${VersionInfo.buildUser}@${VersionInfo.buildHostname}")
       log.logRaw("")
 
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+      com.formdev.flatlaf.FlatIntelliJLaf.setup()
 
       val versionData = Seq(
         "Build ID"    -> VersionInfo.buildID,

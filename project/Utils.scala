@@ -22,6 +22,7 @@
 
 import sbt.{FileFunction, FileInfo, IO, *}
 
+import java.util.Locale
 import scala.sys.process.*
 
 object Utils {
@@ -114,3 +115,48 @@ object LuaUtils {
     '"' + buffer.toString() + '"'
   }
 }
+
+sealed trait PlatformType {
+  def shouldBuildNative(other: PlatformType) = (this, other) match {
+    case (PlatformType.Win32, PlatformType.Win32) => true
+    case (PlatformType.MacOS, PlatformType.MacOS) => true
+    case (PlatformType.Linux, PlatformType.Linux) => true
+    case _                                        => false
+  }
+
+  def name = this match {
+    case PlatformType.Win32 => "win32"
+    case PlatformType.MacOS => "macos"
+    case PlatformType.Linux => "linux"
+  }
+
+  def extension = this match {
+    case PlatformType.Win32 => ".dll"
+    case PlatformType.MacOS => ".dylib"
+    case PlatformType.Linux => ".so"
+  }
+}
+object PlatformType {
+  case object Win32 extends PlatformType
+  case object MacOS extends PlatformType
+  case object Linux extends PlatformType
+  case object Other extends PlatformType
+
+  def forString(name: String): PlatformType = name match {
+    case "win32" => Win32
+    case "macos" => MacOS
+    case "linux" => Linux
+  }
+
+  lazy val currentPlatform = {
+    val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
+    if (os.contains("windows")) Win32
+    else if (os.contains("linux")) Linux
+    else if (
+      os.contains("mac") ||
+      os.contains("darwin")
+    ) MacOS
+    else Other
+  }
+}
+
