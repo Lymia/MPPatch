@@ -39,11 +39,13 @@ object PlatformType {
 
   lazy val currentPlatform = {
     val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
-         if(os.contains("windows")) Win32
-    else if(os.contains("linux"  )) Linux
-    else if(os.contains("mac"    ) ||
-            os.contains("darwin" )) MacOS
-    else                            Other
+    if (os.contains("windows")) Win32
+    else if (os.contains("linux")) Linux
+    else if (
+      os.contains("mac") ||
+      os.contains("darwin")
+    ) MacOS
+    else Other
   }
 }
 
@@ -54,7 +56,7 @@ trait Platform {
   def mapPath(name: String): String = name
 
   @tailrec final def resolve(path: Path, name: String*): Path =
-    if(name.length == 1) path.resolve(mapPath(name.head))
+    if (name.length == 1) path.resolve(mapPath(name.head))
     else resolve(path.resolve(mapPath(name.head)), name.tail: _*)
 }
 object Platform {
@@ -71,11 +73,13 @@ object Platform {
 object Win32Platform extends Platform {
   override val platformName = "win32"
 
-  override def defaultSystemPaths: Seq[Path] = try {
-    WindowsRegistry.HKCU("Software\\Valve\\Steam", "SteamPath").toSeq.flatMap(
-      x => Steam.loadLibraryFolders(Paths.get(x))).map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
+  override def defaultSystemPaths: Seq[Path] = try WindowsRegistry
+    .HKCU("Software\\Valve\\Steam", "SteamPath")
+    .toSeq
+    .flatMap(x => Steam.loadLibraryFolders(Paths.get(x)))
+    .map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
     WindowsRegistry.HKCU("Software\\Firaxis\\Civilization5", "LastKnownPath").toSeq.map(x => Paths.get(x))
-  } catch {
+  catch {
     case e: Exception =>
       SimpleLogger.error("Could not load default system paths from registery.", e)
       Seq()
@@ -87,8 +91,9 @@ object MacOSPlatform extends Platform {
 
   private val home = Paths.get(System.getProperty("user.home"))
   override def defaultSystemPaths: Seq[Path] =
-    Steam.loadLibraryFolders(home.resolve("Library/Application Support/Steam")).map(
-      _.resolve("steamapps/common/Sid Meier's Civilization V"))
+    Steam
+      .loadLibraryFolders(home.resolve("Library/Application Support/Steam"))
+      .map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
 }
 
 object LinuxPlatform extends Platform {
@@ -99,4 +104,3 @@ object LinuxPlatform extends Platform {
     Steam.loadLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
   override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
 }
-

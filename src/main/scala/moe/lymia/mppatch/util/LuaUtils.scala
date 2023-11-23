@@ -25,7 +25,7 @@ package moe.lymia.mppatch.util
 object LuaUtils {
   def quote(s: String) = {
     val buffer = new StringBuilder
-    for(c <- s) c match {
+    for (c <- s) c match {
       case '\n'             => buffer.append("\\n")
       case '\r'             => buffer.append("\\r")
       case '"'              => buffer.append("\\\"")

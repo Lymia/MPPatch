@@ -26,20 +26,20 @@ import java.security.MessageDigest
 
 object Crypto {
   def digest(algorithm: String, data: Array[Byte]) = {
-    val md = MessageDigest.getInstance(algorithm)
+    val md   = MessageDigest.getInstance(algorithm)
     val hash = md.digest(data)
     hash
   }
   def hexdigest(algorithm: String, data: Array[Byte]) =
     digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
 
-  def md5_hex   (data: Array[Byte]) = hexdigest("MD5"    , data)
-  def sha1_hex  (data: Array[Byte]) = hexdigest("SHA-1"  , data)
+  def md5_hex(data: Array[Byte])    = hexdigest("MD5", data)
+  def sha1_hex(data: Array[Byte])   = hexdigest("SHA-1", data)
   def sha256_hex(data: Array[Byte]) = hexdigest("SHA-256", data)
   def sha512_hex(data: Array[Byte]) = hexdigest("SHA-512", data)
 
-  def md5   (data: Array[Byte]) = digest("MD5"    , data)
-  def sha1  (data: Array[Byte]) = digest("SHA-1"  , data)
+  def md5(data: Array[Byte])    = digest("MD5", data)
+  def sha1(data: Array[Byte])   = digest("SHA-1", data)
   def sha256(data: Array[Byte]) = digest("SHA-256", data)
   def sha512(data: Array[Byte]) = digest("SHA-512", data)
 }

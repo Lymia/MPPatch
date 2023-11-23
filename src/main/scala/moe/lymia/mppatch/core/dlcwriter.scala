@@ -30,12 +30,16 @@ import scala.xml.Node
 
 case class DLCUISkin(name: String, set: String, platform: String)
 case class DLCManifest(uuid: UUID, version: Int, priority: Int, shortName: String, name: String)
-case class DLCGameplay(textData: Map[String, Node] = Map(),
-                       uiFiles: Map[String, Map[String, Array[Byte]]] = Map(), uiSkins: Seq[DLCUISkin] = Nil)
+case class DLCGameplay(
+    textData: Map[String, Node] = Map(),
+    uiFiles: Map[String, Map[String, Array[Byte]]] = Map(),
+    uiSkins: Seq[DLCUISkin] = Nil
+)
 case class DLCData(manifest: DLCManifest, data: DLCGameplay)
 
 object DLCDataWriter {
-  private val languageList = Seq("en_US","fr_FR","de_DE","es_ES","it_IT","ru_RU","ja_JP","pl_PL","ko_KR","zh_Hant_HK")
+  private val languageList =
+    Seq("en_US", "fr_FR", "de_DE", "es_ES", "it_IT", "ru_RU", "ja_JP", "pl_PL", "ko_KR", "zh_Hant_HK")
   private def languageValues(string: String) = languageList.map { x =>
     <Value language={x}>{string}</Value>
   }
@@ -43,10 +47,12 @@ object DLCDataWriter {
   def writeDLC(dlcBasePath: String, languageDirPath: Option[String], dlcData: DLCData, platform: Platform) = {
     val nameString = s"${dlcData.manifest.uuid.toString.replace("-", "")}_v${dlcData.manifest.version}"
 
-    val uiFiles = dlcData.data.uiFiles.map(y => y._2.map(x =>
-      s"$dlcBasePath/${platform.mapPath(y._1)}/${platform.mapPath(x._1)}" -> x._2)).reduce(_ ++ _)
-    val newFiles = Map(s"$dlcBasePath/${platform.mapPath(s"$nameString.Civ5Pkg")}" -> IOUtils.writeXMLBytes(
-      <Civ5Package>
+    val uiFiles = dlcData.data.uiFiles
+      .map(y => y._2.map(x => s"$dlcBasePath/${platform.mapPath(y._1)}/${platform.mapPath(x._1)}" -> x._2))
+      .reduce(_ ++ _)
+    val newFiles = Map(
+      s"$dlcBasePath/${platform.mapPath(s"$nameString.Civ5Pkg")}" -> IOUtils.writeXMLBytes(
+        <Civ5Package>
         <GUID>{s"{${dlcData.manifest.uuid}}"}</GUID>
         <Version>{dlcData.manifest.version.toString}</Version>
         <Name>{languageValues(nameString)}</Name>
@@ -60,20 +66,22 @@ object DLCDataWriter {
           <Tag>Ownership</Tag>
         </PTags>
         {
-          for(DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins) yield
-            <UISkin name={name} set={set} platform={skinPlatform}>
+          for (DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins)
+            yield <UISkin name={name} set={set} platform={skinPlatform}>
               <Skin>
-                { dlcData.data.uiFiles.filter(_._2.nonEmpty).map(x => <Directory>{x._1}</Directory>) }
+                {dlcData.data.uiFiles.filter(_._2.nonEmpty).map(x => <Directory>{x._1}</Directory>)}
               </Skin>
             </UISkin>
         }
       </Civ5Package>
-    ))
+      )
+    )
     val languageFiles = languageDirPath.fold(Map[String, Array[Byte]]()) { languagePath =>
       dlcData.data.textData.map(x =>
-        s"$languagePath/${platform.mapPath(s"${nameString}_TextData_${x._1}")}" -> IOUtils.writeXMLBytes(x._2))
+        s"$languagePath/${platform.mapPath(s"${nameString}_TextData_${x._1}")}" -> IOUtils.writeXMLBytes(x._2)
+      )
     }
 
-    languageFiles ++ newFiles ++ uiFiles : Map[String, Array[Byte]]
+    languageFiles ++ newFiles ++ uiFiles: Map[String, Array[Byte]]
   }
 }

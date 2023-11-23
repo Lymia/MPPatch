@@ -35,7 +35,7 @@ object DynamicReflectiveProxy {
     case x                => new DynamicReflectiveProxy(x.asInstanceOf[AnyRef])
   }
 
-  def static[T : ClassTag]: DynamicReflectiveProxy =
+  def static[T: ClassTag]: DynamicReflectiveProxy =
     new DynamicStaticReflectiveProxy(implicitly[ClassTag[T]].runtimeClass)
   def static(name: String): DynamicReflectiveProxy =
     new DynamicStaticReflectiveProxy(getClass.getClassLoader.loadClass(name))
@@ -45,27 +45,27 @@ object DynamicReflectiveProxy {
 
 class DynamicReflectiveProxy(val obj: AnyRef) extends Dynamic {
   private lazy val _clazz: Class[_] = obj.getClass
-  protected def clazz = _clazz
+  protected def clazz               = _clazz
 
   @tailrec
   private def resolveDeclaredField(name: String, current: Class[_] = clazz): Option[Field] =
     current.getDeclaredField(name) match {
       case null =>
-        if(current != classOf[AnyRef]) resolveDeclaredField(name, current.getSuperclass)
+        if (current != classOf[AnyRef]) resolveDeclaredField(name, current.getSuperclass)
         else None
-      case x    => Some(x)
+      case x => Some(x)
     }
 
   private def wraps(clazz: Class[_]) = clazz match {
-    case m if m == classOf[java.lang.Boolean  ] => java.lang.Boolean  .TYPE
-    case m if m == classOf[java.lang.Byte     ] => java.lang.Byte     .TYPE
+    case m if m == classOf[java.lang.Boolean]   => java.lang.Boolean.TYPE
+    case m if m == classOf[java.lang.Byte]      => java.lang.Byte.TYPE
     case m if m == classOf[java.lang.Character] => java.lang.Character.TYPE
-    case m if m == classOf[java.lang.Short    ] => java.lang.Short    .TYPE
-    case m if m == classOf[java.lang.Integer  ] => java.lang.Integer  .TYPE
-    case m if m == classOf[java.lang.Long     ] => java.lang.Long     .TYPE
-    case m if m == classOf[java.lang.Float    ] => java.lang.Float    .TYPE
-    case m if m == classOf[java.lang.Double   ] => java.lang.Double   .TYPE
-    case _ => null
+    case m if m == classOf[java.lang.Short]     => java.lang.Short.TYPE
+    case m if m == classOf[java.lang.Integer]   => java.lang.Integer.TYPE
+    case m if m == classOf[java.lang.Long]      => java.lang.Long.TYPE
+    case m if m == classOf[java.lang.Float]     => java.lang.Float.TYPE
+    case m if m == classOf[java.lang.Double]    => java.lang.Double.TYPE
+    case _                                      => null
   }
   @tailrec
   private def resolveDeclaredMethod(name: String, types: Seq[Class[_]], current: Class[_] = clazz): Option[Method] =
@@ -73,12 +73,11 @@ class DynamicReflectiveProxy(val obj: AnyRef) extends Dynamic {
       method.getName == name &&
       (method.getParameterTypes.length == types.length) && (
         types.isEmpty ||
-        (method.getParameterTypes zip types).map(x =>
-          x._1.isAssignableFrom(x._2) || x._1 == wraps(x._2)).reduce(_ && _)
+        (method.getParameterTypes zip types).map(x => x._1.isAssignableFrom(x._2) || x._1 == wraps(x._2)).reduce(_ && _)
       )
     ) match {
       case None =>
-        if(current != classOf[AnyRef]) resolveDeclaredMethod(name, types, current.getSuperclass)
+        if (current != classOf[AnyRef]) resolveDeclaredMethod(name, types, current.getSuperclass)
         else None
       case Some(x) => Some(x)
     }
@@ -87,9 +86,9 @@ class DynamicReflectiveProxy(val obj: AnyRef) extends Dynamic {
     resolveDeclaredMethod(name, params.map(_.getClass)) match {
       case Some(x) =>
         x.setAccessible(true)
-        DynamicReflectiveProxy(x.invoke(obj, params.map(_.asInstanceOf[AnyRef]) : _*))
+        DynamicReflectiveProxy(x.invoke(obj, params.map(_.asInstanceOf[AnyRef]): _*))
       case None =>
-        if(params.length == 1) {
+        if (params.length == 1) {
           resolveDeclaredField(name) match {
             case Some(x) =>
               x.setAccessible(true)
@@ -104,13 +103,14 @@ class DynamicReflectiveProxy(val obj: AnyRef) extends Dynamic {
       case Some(x) =>
         x.setAccessible(true)
         DynamicReflectiveProxy(x.get(obj))
-      case None => resolveDeclaredMethod(name, Seq()) match {
-        case Some(x) =>
-          x.setAccessible(true)
-          DynamicReflectiveProxy(x.invoke(obj))
-        case None =>
-          throw new NoSuchFieldError(s"Non-existent field $name in ${clazz.getName} was accessed.")
-      }
+      case None =>
+        resolveDeclaredMethod(name, Seq()) match {
+          case Some(x) =>
+            x.setAccessible(true)
+            DynamicReflectiveProxy(x.invoke(obj))
+          case None =>
+            throw new NoSuchFieldError(s"Non-existent field $name in ${clazz.getName} was accessed.")
+        }
     }
   def updateDynamic(name: String)(v: Any) =
     resolveDeclaredField(name) match {
@@ -123,8 +123,8 @@ class DynamicReflectiveProxy(val obj: AnyRef) extends Dynamic {
   def applyDynamicNamed(name: String)(params: (String, Any)*) =
     sys.error("DynamicReflectiveProxy does not support named parameter calls")
 
-  def length = selectDynamic("length")
-  def update(i: Int, b: Any): Unit = throw new ClassCastException("Array access on non-array class")
+  def length                                = selectDynamic("length")
+  def update(i: Int, b: Any): Unit          = throw new ClassCastException("Array access on non-array class")
   def apply(i: Int): DynamicReflectiveProxy = throw new ClassCastException("Array access on non-array class")
 
   def get[T] = obj.asInstanceOf[T]
@@ -134,8 +134,7 @@ class DynamicStaticReflectiveProxy(obj: Class[_]) extends DynamicReflectiveProxy
 }
 class DynamicReflectiveArrayProxy(arr: Array[Any]) extends DynamicReflectiveProxy(arr) {
   override def length = DynamicReflectiveProxy(arr.length)
-  override def update(i: Int, b: Any): Unit = {
+  override def update(i: Int, b: Any): Unit =
     arr(i) = b
-  }
   override def apply(i: Int) = DynamicReflectiveProxy(arr(i))
 }

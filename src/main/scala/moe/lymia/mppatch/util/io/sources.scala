@@ -30,6 +30,6 @@ trait DataSource {
   def loadBinaryResource(name: String): Array[Byte]
 }
 case class ResourceDataSource(path: String) extends DataSource {
-  override def loadResource(name: String): String = IOUtils.loadResource(s"$path/$name")
+  override def loadResource(name: String): String            = IOUtils.loadResource(s"$path/$name")
   override def loadBinaryResource(name: String): Array[Byte] = IOUtils.loadBinaryResource(s"$path/$name")
 }

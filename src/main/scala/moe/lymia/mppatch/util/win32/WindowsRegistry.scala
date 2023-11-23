@@ -31,17 +31,16 @@ object WindowsRegistry {
   private val KEY_READ       = 0x20019
 
   private type Dynamic = DynamicReflectiveProxy
-  private def toCString(s: String) = s.getBytes(StandardCharsets.UTF_8) :+ 0.toByte
+  private def toCString(s: String)        = s.getBytes(StandardCharsets.UTF_8) :+ 0.toByte
   private def fromCString(s: Array[Byte]) = new String(s, StandardCharsets.UTF_8).replaceAll("\u0000.*", "")
   private def withKey[A](hive: Hive, key: String, access: Int)(f: Int => A) = {
     val Array(handle, success) = hive.h.WindowsRegOpenKey(hive.hiveId, toCString(key), access).get[Array[Int]]
-    if(success == 0) try {
-      Some(f(handle))
-    } catch {
-      case t: Exception => None
-    } finally {
-      hive.h.WindowsRegCloseKey(handle)
-    } else None
+    if (success == 0)
+      try Some(f(handle))
+      catch {
+        case t: Exception => None
+      } finally hive.h.WindowsRegCloseKey(handle)
+    else None
   }
 
   sealed trait RegistryKeyType[T] {
@@ -59,14 +58,20 @@ object WindowsRegistry {
       }
   }
 
-  case class Hive private[WindowsRegistry](private[WindowsRegistry] val hiveId: Int,
-                                           private[WindowsRegistry] val hrName: String,
-                                           private[WindowsRegistry] val h: Dynamic) {
+  case class Hive private[WindowsRegistry] (
+      private[WindowsRegistry] val hiveId: Int,
+      private[WindowsRegistry] val hrName: String,
+      private[WindowsRegistry] val h: Dynamic
+  ) {
 
-    require(h.obj.getClass.getName == "java.util.prefs.WindowsPreferences",
-            "Preferences object must be instance of java.util.prefs.WindowsPreferences")
-    require(System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"),
-            "Windows registry not available.")
+    require(
+      h.obj.getClass.getName == "java.util.prefs.WindowsPreferences",
+      "Preferences object must be instance of java.util.prefs.WindowsPreferences"
+    )
+    require(
+      System.getProperty("os.name").toLowerCase(Locale.ENGLISH).contains("windows"),
+      "Windows registry not available."
+    )
 
     def readKey[T: RegistryKeyType](key: String, value: String) =
       implicitly[RegistryKeyType[T]].readKey(this, key, value)
@@ -76,6 +81,6 @@ object WindowsRegistry {
       implicitly[RegistryKeyType[T]].writeKey(this, key, value, data)
     def update[T: RegistryKeyType](key: String, value: String, data: T) = writeKey[T](key, value, data)
   }
-  lazy val HKCU = Hive(0x80000001, "HKEY_CURRENT_USER" , DynamicReflectiveProxy(Preferences.systemRoot()))
-  lazy val HKLM = Hive(0x80000002, "HKEY_LOCAL_MACHINE", DynamicReflectiveProxy(Preferences.userRoot  ()))
+  lazy val HKCU = Hive(0x80000001, "HKEY_CURRENT_USER", DynamicReflectiveProxy(Preferences.systemRoot()))
+  lazy val HKLM = Hive(0x80000002, "HKEY_LOCAL_MACHINE", DynamicReflectiveProxy(Preferences.userRoot()))
 }

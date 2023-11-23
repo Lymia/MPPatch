@@ -32,7 +32,8 @@ trait VersionInfoSource {
 object VersionInfoSource {
   def getPropertySource(resource: String) = {
     val stream = IOUtils.getResource(resource)
-    if(stream == null) NullSource else {
+    if (stream == null) NullSource
+    else {
       val prop = new Properties()
       prop.load(stream)
       PropertiesSource(prop)
@@ -46,7 +47,7 @@ object NullSource extends VersionInfoSource {
 case class PropertiesSource(prop: Properties) extends VersionInfoSource {
   def apply(key: String, default: String) = {
     val p = prop.getProperty(key)
-    if(p == null || p.trim.isEmpty) default else p
+    if (p == null || p.trim.isEmpty) default else p
   }
 }
 
