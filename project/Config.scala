@@ -28,7 +28,7 @@ object Config {
   val config_linux_cc = "clang"
   val config_nasm     = "nasm"
 
-  val config_target_win32 = "i686-pc-windows-gnu"
+  val config_target_win32 = "i686-w64-mingw32"
   val config_target_linux = "i686-unknown-linux-gnu"
 
   val config_win32_secureFlags  = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
