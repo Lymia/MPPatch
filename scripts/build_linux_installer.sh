@@ -40,11 +40,10 @@ cd ../.. || exit 1
 echo "Building Linux installer...."
 rm -rfv target/native-image || exit 1
 sbt nativeImage || exit 1
+chmod +x target/native-image/*.so || exit 1
 
-echo "Compressing installer image..."
-cd target/native-image || exit 1
-  chmod +x *.so || exit 1
-cd ../.. || exit 1
+echo "Building assembly jar..."
+cp "$(sbt "print assembly" --error || exit 1)" target/native-image/assembly.jar || exit 1
 
 echo "Creating Linux installer tarball..."
 cd target/native-image || exit 1

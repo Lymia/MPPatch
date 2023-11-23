@@ -41,6 +41,7 @@ mkdir -pv target/dist-build/linux/AppDir || exit 1
 # Build basic directory structure
 cd target/dist-build/linux/AppDir || exit 1
   tar -xv -f ../../../../mppatch_linux_installer.tar.gz || exit 1
+  mv -v assembly.jar ../.. || exit 1
   mkdir -pv usr/bin usr/lib usr/share/applications usr/share/icons/hicolor/scalable/apps || exit 1
   mv -v mppatch-installer usr/bin/ || exit 1
   mv -v *.so usr/lib/ || exit 1
@@ -57,4 +58,7 @@ echo "Building AppImage..."
 cd target/dist-build/linux || exit 1
   LDAI_COMP=xz ../linuxdeploy --appdir AppDir/ --output appimage || exit 1
 cd ../../.. || exit 1
+
+# Copy to dist directory
 cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/dist/MPPatch_Installer-linux-$VERSION.AppImage || exit 1
+cp -v target/dist-build/assembly.jar target/dist/MPPatch_Installer-universal-$VERSION.jar || exit 1
