@@ -43,6 +43,10 @@ jobs:
         with:
           name: mppatch_linux_natives.tar.gz
           path: mppatch_linux_natives.tar.gz
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'liberica'
+          java-version: '21'
       - name: Build Linux installer
         run: scripts/build_linux_installer.sh
       - uses: actions/upload-artifact@v2
