@@ -49,7 +49,7 @@ object NativeImageGenConfig {
 
     // about dialog
     val aboutDialog = new AboutDialog(locale, mainFrame)
-    new Thread(() => aboutDialog.showForm())
+    new Thread(() => aboutDialog.showForm()).start()
     Thread.sleep(sleepDur)
     aboutDialog.forceClose()
 
