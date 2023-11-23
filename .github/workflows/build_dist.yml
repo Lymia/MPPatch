@@ -20,6 +20,10 @@ jobs:
       - uses: ConorMacBride/install-package@v1
         with:
           apt: gcc-multilib
+      - name: Set up MinGW
+        uses: egor-tensin/setup-mingw@v2
+        with:
+          platform: x64
       - name: Build native binaries
         run: scripts/build_linux_natives.sh
       - uses: actions/upload-artifact@v2
