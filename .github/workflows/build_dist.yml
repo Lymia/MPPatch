@@ -11,15 +11,17 @@ env:
 jobs:
   buildNative:
     runs-on: ubuntu-latest
+    container: archlinux:base-devel
     steps:
+      - name: Install packages
+        run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang multilib-devel
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
+      - name: Fix dubious permissions error
+        run: git config --global --add safe.directory /__w/MPPatch/MPPatch
       - name: Fetch git tags.
         run: git fetch --prune --unshallow --tags
-      - uses: ConorMacBride/install-package@v1
-        with:
-          apt: gcc-multilib gcc-mingw-w64-i686
       - name: Build native binaries
         run: scripts/build_linux_natives.sh
       - uses: actions/upload-artifact@v2
