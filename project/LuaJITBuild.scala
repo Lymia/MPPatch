@@ -38,7 +38,7 @@ object LuaJITBuild {
       IO.createDirectory(patchDirectory)
 
       for (
-        platform <- Seq(PlatformType.Win32, PlatformType.MacOS, PlatformType.Linux)
+        platform <- Seq(PlatformType.Win32, PlatformType.Linux)
         if PlatformType.currentPlatform.shouldBuildNative(platform)
       ) yield {
         val (platformEnv, flags, outputFile, extension, target_cc, target) =
@@ -56,15 +56,6 @@ object LuaJITBuild {
                 ".dll",
                 config_win32_cc,
                 config_target_win32
-              )
-            case PlatformType.MacOS =>
-              (
-                Map("TARGET_SYS" -> "Darwin", "MACOSX_DEPLOYMENT_TARGET" -> "10.6"),
-                Seq(s"--target=$config_target_macos"),
-                "src/libluajit.so",
-                ".dylib",
-                config_macos_cc,
-                config_target_macos
               )
             case PlatformType.Linux =>
               (

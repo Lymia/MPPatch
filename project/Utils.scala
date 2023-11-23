@@ -105,7 +105,7 @@ object Utils {
 object LuaUtils {
   def quote(s: String) = {
     val buffer = new StringBuilder
-    for(c <- s) c match {
+    for (c <- s) c match {
       case '\n'             => buffer.append("\\n")
       case '\r'             => buffer.append("\\r")
       case '"'              => buffer.append("\\\"")
@@ -118,10 +118,9 @@ object LuaUtils {
 
 sealed trait PlatformType {
   def shouldBuildNative(other: PlatformType) = (this, other) match {
-    case (PlatformType.Win32, PlatformType.Win32) => true
-    case (PlatformType.MacOS, PlatformType.MacOS) => true
-    case (PlatformType.Linux, PlatformType.Linux) => true
-    case _                                        => false
+    case (PlatformType.Win32, PlatformType.Win32)                      => true
+    case (PlatformType.Linux, PlatformType.Win32 | PlatformType.Linux) => true
+    case _                                                             => false
   }
 
   def name = this match {
@@ -159,4 +158,3 @@ object PlatformType {
     else Other
   }
 }
-

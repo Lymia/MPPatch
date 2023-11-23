@@ -49,13 +49,6 @@ object NativePatchBuild {
         dir / "lua51_Win32.dll"
       )((in, out) => win32_cc(Seq("-shared", "-o", out, in)))
     },
-    Keys.macosDirectory := prepareDirectory(Keys.patchBuildDir.value / "macos") { dir =>
-      cachedTransform(
-        Keys.patchCacheDir.value / "macos_proxy",
-        Keys.patchSourceDir.value / "macos" / "external_symbols",
-        dir / "extern_defines.c"
-      )(generateProxyDefine)
-    },
     // Extract Steam runtime libSDL files.
     Keys.steamrtSDL :=
       extractSteamRuntime(
@@ -114,25 +107,6 @@ object NativePatchBuild {
                     "-lmsvcr90"
                   ) ++ config_win32_secureFlags,
                   Seq(Keys.patchSourceDir.value / "win32" / "proxy.s")
-                )
-              case PlatformType.MacOS =>
-                (
-                  macos_cc _,
-                  "macho32",
-                  ".dylib",
-                  Seq(
-                    Keys.patchSourceDir.value / "macos",
-                    Keys.patchSourceDir.value / "posix",
-                    Keys.macosDirectory.value
-                  ),
-                  Seq(),
-                  Seq(
-                    "-ldl",
-                    "-framework",
-                    "CoreFoundation",
-                    "-Wl,-segprot,MPPATCH_PROXY,rwx,rx"
-                  ),
-                  Seq()
                 )
               case PlatformType.Linux =>
                 (
@@ -219,8 +193,6 @@ object NativePatchBuild {
 
   def win32_cc(p: Seq[Any]) = runProcess(config_win32_cc +: s"--target=$config_target_win32" +: p)
 
-  def macos_cc(p: Seq[Any]) = runProcess(config_macos_cc +: s"--target=$config_target_macos" +: p)
-
   def linux_cc(p: Seq[Any]) = runProcess(config_linux_cc +: s"--target=$config_target_linux" +: p)
 
   def nasm(p: Seq[Any]) = runProcess(config_nasm +: p)
@@ -237,34 +209,6 @@ object NativePatchBuild {
       }
       target
     }
-
-  // Codegen for the macOS proxy (to deal with unexported symbols in Civ V's binary).
-  def generateProxyDefine(file: File, target: File): Unit = {
-    val lines = IO.readLines(file).filter(_.nonEmpty)
-    val proxies =
-      for (
-        (symbol, i) <- IO.readLines(file).filter(_.nonEmpty).zipWithIndex
-        if !symbol.startsWith("#") && symbol.trim.nonEmpty
-      )
-        yield (
-          s"""static const char* ${symbol}_name = "$symbol";
-           |__attribute__((section("MPPATCH_PROXY,MPPATCH_PROXY"), aligned(8))) char $symbol[8] asm ("_$symbol");
-        """.stripMargin,
-          s"setupProxyFunction($symbol, ${symbol}_name);"
-        )
-
-    IO.write(
-      target,
-      s"""#import "c_rt.h"
-         |#import "platform.h"
-         |
-         |${proxies.map(_._1.trim).mkString("\n")}
-         |__attribute__((constructor(CONSTRUCTOR_BINARY_INIT))) static void setupProxyFunctions() {
-         |  ${proxies.map(_._2.trim).mkString("\n  ")}
-         |}
-       """.stripMargin
-    )
-  }
 
   def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
     val VersionRegex(major, minor, _, _, _, _) = version
@@ -296,7 +240,6 @@ object NativePatchBuild {
     val patchSourceDir = SettingKey[File]("native-patch-source-directory")
 
     val win32Directory = TaskKey[File]("native-patch-win32-directory")
-    val macosDirectory = TaskKey[File]("native-patch-macos-directory")
 
     val steamrtSDL    = TaskKey[File]("native-patch-download-steam-runtime-sdl")
     val steamrtSDLDev = TaskKey[File]("native-patch-download-steam-runtime-sdl-dev")
