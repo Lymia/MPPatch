@@ -27,14 +27,14 @@ import java.text.DateFormat
 import java.util.Locale
 import javax.swing.text.html.HTMLEditorKit
 import javax.swing._
-import javax.swing.event.{HyperlinkEvent, HyperlinkListener}
+import javax.swing.event.HyperlinkEvent
 
 import moe.lymia.mppatch.util.VersionInfo
 import moe.lymia.mppatch.util.io.IOUtils
 
 class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
   private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
-  private val desktop = Desktop.getDesktop
+  private val desktop    = Desktop.getDesktop
   override protected def buildForm(): Unit = {
     frame = new JDialog(main.getFrame, i18n("title.about"), true)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
@@ -52,8 +52,8 @@ class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog
     val systemFont = new JLabel().getFont
     val stylesheet = htmlEditor.getStyleSheet
     stylesheet.addRule(IOUtils.loadResource("text/style.css"))
-    stylesheet.addRule(
-      s"""p, li, h1, h2, h3, h4, h5, h6 {
+    stylesheet.addRule(s"""
+         |p, li, h1, h2, h3, h4, h5, h6 {
          |  font-family: ${systemFont.getFontName},sans-serif;
          |  font-size: ${systemFont.getSize};
          |}
@@ -69,29 +69,33 @@ class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog
     }
     setPage("text/about.html")
 
-    editor.addHyperlinkListener(new HyperlinkListener {
-      override def hyperlinkUpdate(e: HyperlinkEvent): Unit = {
-        if(e.getEventType == HyperlinkEvent.EventType.ACTIVATED) {
-          val url = e.getURL
-          if(url.getProtocol == "http" && url.getHost == "fromres") setPage(url.getPath)
-          else if(url.getProtocol == "http" || url.getProtocol == "https") desktop.browse(e.getURL.toURI)
-          else warn("Unknown protocol "+url.getProtocol)
-        }
+    editor.addHyperlinkListener((e: HyperlinkEvent) =>
+      if (e.getEventType == HyperlinkEvent.EventType.ACTIVATED) {
+        val url = e.getURL
+        if (url.getProtocol == "http" && url.getHost == "fromres") setPage(url.getPath)
+        else if (url.getProtocol == "http" || url.getProtocol == "https") desktop.browse(e.getURL.toURI)
+        else warn("Unknown protocol " + url.getProtocol)
       }
-    })
+    )
 
-    frame.add(new FontLabel(Font.BOLD,
-                            i18n("about.0", VersionInfo.versionString)),
-              constraints(gridy = 0, anchor = GridBagConstraints.LINE_START,
-                          insets = insets(left = 3, right = 3, top = 3)))
-    frame.add(new FontLabel(Font.PLAIN,
-                            i18n("about.1", VersionInfo.commit.substring(0, 8),
-                                            if(VersionInfo.isDirty) i18n("about.dirty") else "",
-                                            dateFormat.format(VersionInfo.buildDate),
-                                            VersionInfo.buildUser, VersionInfo.buildHostname)),
-              constraints(gridy = 1, anchor = GridBagConstraints.LINE_START,
-                          insets = insets(left = 3, right = 3, bottom = 3)))
-    frame.add(scroll, constraints(gridy = 2, weightx = 1, weighty = 1,
-                                  fill = GridBagConstraints.BOTH))
+    frame.add(
+      new FontLabel(Font.BOLD, i18n("about.0", VersionInfo.versionString)),
+      constraints(gridy = 0, anchor = GridBagConstraints.LINE_START, insets = insets(left = 3, right = 3, top = 3))
+    )
+    frame.add(
+      new FontLabel(
+        Font.PLAIN,
+        i18n(
+          "about.1",
+          VersionInfo.commit.substring(0, 8),
+          if (VersionInfo.isDirty) i18n("about.dirty") else "",
+          dateFormat.format(VersionInfo.buildDate),
+          VersionInfo.buildUser,
+          VersionInfo.buildHostname
+        )
+      ),
+      constraints(gridy = 1, anchor = GridBagConstraints.LINE_START, insets = insets(left = 3, right = 3, bottom = 3))
+    )
+    frame.add(scroll, constraints(gridy = 2, weightx = 1, weighty = 1, fill = GridBagConstraints.BOTH))
   }
 }

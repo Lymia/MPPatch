@@ -49,7 +49,7 @@ git.formattedShaVersion := {
 
 // Scala configuration
 scalaVersion := "2.13.12"
-scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:method,inline -deprecation -unchecked".split(" ").toSeq
+scalacOptions ++= "-Xlint -release:21 -opt:l:method,inline -deprecation -unchecked".split(" ").toSeq
 crossPaths := false
 
 // Dependencies
@@ -62,6 +62,7 @@ libraryDependencies += "com.formdev"             % "flatlaf-fonts-roboto" % "2.1
 
 // Build assembled jar
 ThisBuild / assemblyMergeStrategy := {
+  case x if x.startsWith("moe/lymia") => MergeStrategy.first
   case "module-info.class" => MergeStrategy.discard
   case x =>
     val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
@@ -98,5 +99,9 @@ nativeImageOptions += "--no-fallback"
 nativeImageOptions += "-Djava.awt.headless=false"
 nativeImageOptions += "--strict-image-heap"
 nativeImageOptions += s"-H:ConfigurationFileDirectories=${baseDirectory.value / "src" / "native-image-config" / PlatformType.currentPlatform.name}"
+
+Global / excludeLintKeys += nativeImageJvm
+Global / excludeLintKeys += nativeImageJvmIndex
+Global / excludeLintKeys += nativeImageVersion
 
 InputKey[Unit]("buildNative") := PatchBuild.Keys.buildDylibDir.value

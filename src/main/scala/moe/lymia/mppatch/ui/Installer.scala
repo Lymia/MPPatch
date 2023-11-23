@@ -115,8 +115,15 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
       FlatLaf.setPreferredSemiboldFontFamily(FlatRobotoFont.FAMILY_SEMIBOLD)
       FlatIntelliJLaf.setup()
 
-      // start main frame
-      new MainFrame(locale).showForm()
+      if (args.length > 0 && args.head == "@nativeImageGenerateConfig") {
+        // generate native image configs
+        log.warn("Generating native image configs...")
+        log.warn("If you did not intend this, I don't know what to say.")
+        NativeImageGenConfig.run()
+      } else {
+        // start main frame
+        new MainFrame(locale).showForm()
+      }
     } catch {
       case _: InstallerException => // ignored
       case e: Exception =>

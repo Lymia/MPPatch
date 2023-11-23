@@ -31,26 +31,25 @@ import javax.swing._
 class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
   private var installPath: JTextField = _
 
-  private var enableDebug           : JCheckBox = _
-  private var enableLogging         : JCheckBox = _
+  private var enableDebug: JCheckBox            = _
+  private var enableLogging: JCheckBox          = _
   private var enableMultiplayerPatch: JCheckBox = _
-  private var enableLuaJIT          : JCheckBox = _
+  private var enableLuaJIT: JCheckBox           = _
 
   private val desktop = Desktop.getDesktop
 
-  private def validateSettings() = {
-    if(!enableMultiplayerPatch.isSelected && !enableLuaJIT.isSelected) {
+  private def validateSettings() =
+    if (!enableMultiplayerPatch.isSelected && !enableLuaJIT.isSelected) {
       warn("error.nothingenabled")
       false
     } else true
-  }
   private def applySettings(): Unit = {
     main.changeInstaller(Paths.get(installPath.getText))
 
-    Preferences.enableDebug           .value = enableDebug           .isSelected
-    Preferences.enableLogging         .value = enableLogging         .isSelected
+    Preferences.enableDebug.value = enableDebug.isSelected
+    Preferences.enableLogging.value = enableLogging.isSelected
     Preferences.enableMultiplayerPatch.value = enableMultiplayerPatch.isSelected
-    Preferences.enableLuaJIT          .value = enableLuaJIT          .isSelected
+    Preferences.enableLuaJIT.value = enableLuaJIT.isSelected
 
     main.update()
   }
@@ -66,16 +65,16 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
 
     frame.subFrame(constraints(fill = GridBagConstraints.BOTH)) { options =>
       installPath = options.gridButtonTextRow(0, "path", "browse") {
-        val chooser = new JFileChooser()
+        val chooser         = new JFileChooser()
         val installPathFile = new File(installPath.getText)
-        if(installPath.getText.trim.nonEmpty && installPathFile.exists) chooser.setCurrentDirectory(installPathFile)
+        if (installPath.getText.trim.nonEmpty && installPathFile.exists) chooser.setCurrentDirectory(installPathFile)
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-        if(chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
+        if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION)
           installPath.setText(chooser.getSelectedFile.toString)
       }
       installPath.setEditable(true)
       main.getInstaller match {
-        case None => installPath.setText("")
+        case None            => installPath.setText("")
         case Some(installer) => installPath.setText(installer.basePath.toString)
       }
 
@@ -92,8 +91,10 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       enableDebug.setSelected(Preferences.enableDebug.value)
     }
 
-    frame.add(new JSeparator(), constraints(gridy = 1, weighty = 1, fill = GridBagConstraints.BOTH,
-                                            insets = insets(top = 2, bottom = 2)))
+    frame.add(
+      new JSeparator(),
+      constraints(gridy = 1, weighty = 1, fill = GridBagConstraints.BOTH, insets = insets(top = 2, bottom = 2))
+    )
 
     frame.subFrame(constraints(gridy = 2, fill = GridBagConstraints.BOTH)) { frameButtons =>
       val viewLog = new ActionButton(false)
@@ -103,7 +104,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       frameButtons.add(new JPanel, constraints(gridx = 1, weightx = 1))
 
       val apply = new ActionButton(false)
-      apply.setAction("action.apply", () => if(validateSettings()) applySettings())
+      apply.setAction("action.apply", () => if (validateSettings()) applySettings())
       frameButtons.add(apply, constraints(gridx = 2))
 
       val cancel = new ActionButton(false)
@@ -111,10 +112,14 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       frameButtons.add(cancel, constraints(gridx = 3))
 
       val ok = new ActionButton(false)
-      ok.setAction("action.ok", () => if(validateSettings()) {
-        applySettings()
-        closeWindow()
-      })
+      ok.setAction(
+        "action.ok",
+        () =>
+          if (validateSettings()) {
+            applySettings()
+            closeWindow()
+          }
+      )
       frameButtons.add(ok, constraints(gridx = 4))
 
       sizeButtons(viewLog)

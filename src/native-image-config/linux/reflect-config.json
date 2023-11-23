@@ -1,298 +1,1540 @@
 [
-{
-  "name":"[B"
-},
-{
-  "name":"[C"
-},
-{
-  "name":"[Ljava.awt.event.MouseMotionListener;"
-},
-{
-  "name":"[Ljava.lang.String;"
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatCheckBoxIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileChooserDetailsViewIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileChooserHomeFolderIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileChooserListViewIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileChooserNewFolderIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileChooserUpFolderIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileViewComputerIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileViewDirectoryIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileViewFileIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileViewFloppyDriveIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatFileViewHardDriveIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatHelpButtonIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatArrowButton",
-  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatBorder",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatButtonBorder",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatButtonUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatCheckBoxUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatComboBoxUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatComboBoxUI$FlatComboBoxButton",
-  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatComboBoxUI$FlatComboPopup",
-  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatEditorPaneUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatFileChooserUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatFileChooserUI$FlatShortcutsPanel",
-  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatLabelUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatListCellBorder$Default",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatListUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatMarginBorder",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatOptionPaneUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatPanelUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatPopupMenuBorder",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatPopupMenuUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatRootPaneUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatRoundBorder",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatScrollBarUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatScrollBarUI$FlatScrollBarButton",
-  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatScrollPaneUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatSeparatorUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatTextBorder",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatTextFieldUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatToggleButtonUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatToolBarBorder",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatToolBarUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.formdev.flatlaf.ui.FlatViewportUI",
-  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
-},
-{
-  "name":"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"java.awt.Image"
-},
-{
-  "name":"java.awt.SequencedEvent"
-},
-{
-  "name":"java.awt.event.KeyEvent",
-  "fields":[{"name":"VK_A"}, {"name":"VK_BACK_SLASH"}, {"name":"VK_BACK_SPACE"}, {"name":"VK_C"}, {"name":"VK_CONTEXT_MENU"}, {"name":"VK_COPY"}, {"name":"VK_CUT"}, {"name":"VK_DELETE"}, {"name":"VK_DOWN"}, {"name":"VK_END"}, {"name":"VK_ENTER"}, {"name":"VK_ESCAPE"}, {"name":"VK_F10"}, {"name":"VK_F2"}, {"name":"VK_F5"}, {"name":"VK_H"}, {"name":"VK_HOME"}, {"name":"VK_INSERT"}, {"name":"VK_KP_DOWN"}, {"name":"VK_KP_LEFT"}, {"name":"VK_KP_RIGHT"}, {"name":"VK_KP_UP"}, {"name":"VK_LEFT"}, {"name":"VK_O"}, {"name":"VK_PAGE_DOWN"}, {"name":"VK_PAGE_UP"}, {"name":"VK_PASTE"}, {"name":"VK_RIGHT"}, {"name":"VK_SLASH"}, {"name":"VK_SPACE"}, {"name":"VK_T"}, {"name":"VK_TAB"}, {"name":"VK_UP"}, {"name":"VK_V"}, {"name":"VK_X"}]
-},
-{
-  "name":"java.io.InputStream"
-},
-{
-  "name":"java.io.Reader"
-},
-{
-  "name":"java.lang.ClassValue"
-},
-{
-  "name":"java.lang.String"
-},
-{
-  "name":"java.lang.Thread",
-  "fields":[{"name":"threadLocalRandomProbe"}]
-},
-{
-  "name":"java.lang.invoke.VarHandle",
-  "methods":[{"name":"releaseFence","parameterTypes":[] }]
-},
-{
-  "name":"java.nio.ByteBuffer"
-},
-{
-  "name":"java.nio.CharBuffer"
-},
-{
-  "name":"java.security.SecureRandomParameters"
-},
-{
-  "name":"java.util.List"
-},
-{
-  "name":"java.util.concurrent.atomic.AtomicBoolean",
-  "fields":[{"name":"value"}]
-},
-{
-  "name":"java.util.concurrent.atomic.Striped64",
-  "fields":[{"name":"base"}, {"name":"cellsBusy"}]
-},
-{
-  "name":"javax.swing.filechooser.FileSystemView",
-  "methods":[{"name":"getChooserShortcutPanelFiles","parameterTypes":[] }]
-},
-{
-  "name":"javax.swing.filechooser.UnixFileSystemView"
-},
-{
-  "name":"javax.swing.plaf.basic.BasicGraphicsUtils",
-  "methods":[{"name":"drawStringUnderlineCharAt","parameterTypes":["javax.swing.JComponent","java.awt.Graphics2D","java.lang.String","int","float","float"] }]
-},
-{
-  "name":"javax.swing.plaf.basic.BasicOptionPaneUI",
-  "methods":[{"name":"loadActionMap","parameterTypes":["javax.swing.plaf.basic.LazyActionMap"] }]
-},
-{
-  "name":"moe.lymia.mppatch.ui.FrameBase$ActionButton",
-  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
-},
-{
-  "name":"moe.lymia.mppatch.ui.FrameUtils$FontLabel",
-  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
-},
-{
-  "name":"net.miginfocom.swing.MigLayout"
-},
-{
-  "name":"sun.awt.shell.ShellFolderManager",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"sun.java2d.marlin.DMarlinRenderingEngine",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"sun.security.provider.NativePRNG",
-  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"<init>","parameterTypes":["java.security.SecureRandomParameters"] }]
-},
-{
-  "name":"sun.security.provider.SHA",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-},
-{
-  "name":"sun.security.provider.SHA2$SHA256",
-  "methods":[{"name":"<init>","parameterTypes":[] }]
-}
+  {
+    "name": "[B"
+  },
+  {
+    "name": "[C"
+  },
+  {
+    "name": "[Ljava.awt.event.MouseMotionListener;"
+  },
+  {
+    "name": "[Ljava.awt.event.MouseWheelListener;"
+  },
+  {
+    "name": "[Ljava.awt.event.WindowFocusListener;"
+  },
+  {
+    "name": "[Ljava.lang.String;"
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatDarculaLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatDarkLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatIntelliJLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatLightLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.BasicComponentsPanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.ControlBar",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.DataComponentsPanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.DemoFrame",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.HintManager$HintPanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.HintManager$HintPanel$2",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.LookAndFeelsComboBox",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.LookAndFeelsComboBox$1",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.MoreComponentsPanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.OptionPanePanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.OptionPanePanel$ShowDialogLinkLabel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.ScrollablePanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.TabsPanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.extras.ExtrasPanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.intellijthemes.IJThemesPanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.intellijthemes.IJThemesPanel$2",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.FlatAnimatedLafChange$1",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.FlatUIDefaultsInspector$KeyRenderer",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.FlatUIDefaultsInspector$Renderer",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.FlatUIDefaultsInspector$ValueRenderer",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.components.FlatButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.components.FlatTextField",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.components.FlatTriStateCheckBox",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatAscendingSortIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatCapsLockIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatCheckBoxIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatCheckBoxMenuItemIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatClearIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatDescendingSortIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserDetailsViewIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserHomeFolderIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserListViewIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserNewFolderIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserUpFolderIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewComputerIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewDirectoryIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewFileIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewFloppyDriveIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewHardDriveIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatHelpButtonIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatInternalFrameCloseIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatInternalFrameIconifyIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatInternalFrameMaximizeIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatInternalFrameRestoreIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatMenuArrowIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatMenuItemArrowIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatOptionPaneQuestionIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatRadioButtonIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatRadioButtonMenuItemIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatRevealIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTabbedPaneCloseIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeClosedIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeCollapsedIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeExpandedIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeLeafIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeOpenIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatWindowCloseIcon",
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatWindowIconifyIcon",
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatWindowMaximizeIcon",
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatWindowRestoreIcon",
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.themes.FlatMacDarkLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.themes.FlatMacLightLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatArrowButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatBorder",
+    "fields": [
+      {
+        "name": "focusable"
+      },
+      {
+        "name": "font"
+      },
+      {
+        "name": "icon"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatButtonBorder",
+    "fields": [
+      {
+        "name": "focusable"
+      },
+      {
+        "name": "font"
+      },
+      {
+        "name": "icon"
+      },
+      {
+        "name": "toolbarMargin"
+      },
+      {
+        "name": "toolbarSpacingInsets"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatButtonUI",
+    "fields": [
+      {
+        "name": "focusable"
+      },
+      {
+        "name": "font"
+      },
+      {
+        "name": "icon"
+      },
+      {
+        "name": "toolbarHoverBackground"
+      },
+      {
+        "name": "toolbarMargin"
+      },
+      {
+        "name": "toolbarPressedBackground"
+      },
+      {
+        "name": "toolbarSelectedBackground"
+      },
+      {
+        "name": "toolbarSpacingInsets"
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatCheckBoxMenuItemUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatCheckBoxUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatComboBoxUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatComboBoxUI$FlatComboBoxButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatComboBoxUI$FlatComboPopup",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatEditorPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatEmptyBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatFileChooserUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatFileChooserUI$FlatShortcutsPanel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatFormattedTextFieldUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatInternalFrameUI$FlatInternalFrameBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatLabelUI",
+    "fields": [
+      {
+        "name": "font"
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatListCellBorder$Default",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatListCellBorder$Focused",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatListCellBorder$Selected",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatListUI",
+    "fields": [
+      {
+        "name": "selectionArc"
+      },
+      {
+        "name": "selectionInsets"
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMarginBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuBarBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuBarUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuItemBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuItemUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatOptionPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPanelUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPasswordFieldUI",
+    "fields": [
+      {
+        "name": "showRevealButton"
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPopupMenuBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPopupMenuSeparatorUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPopupMenuUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPopupMenuUI$FlatPopupScroller",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPopupMenuUI$FlatPopupScroller$ArrowButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatProgressBarUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRadioButtonMenuItemUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRadioButtonUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRootPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRootPaneUI$FlatWindowBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRoundBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatScrollBarUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatScrollBarUI$FlatScrollBarButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatScrollPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSeparatorUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSliderUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSpinnerUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSpinnerUI$1",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSplitPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSplitPaneUI$FlatSplitPaneDivider",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$ContainerUIResource",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$FlatMoreTabsButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$FlatScrollableTabButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$FlatTabAreaButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$TabCloseButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableCellBorder$Default",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableCellBorder$Focused",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableCellBorder$Selected",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableHeaderBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableHeaderUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTextAreaUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTextBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTextFieldUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTextPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane$1",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane$2",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane$4",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane$5",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToggleButtonUI",
+    "fields": [
+      {
+        "name": "focusable"
+      },
+      {
+        "name": "font"
+      },
+      {
+        "name": "toolbarHoverBackground"
+      },
+      {
+        "name": "toolbarMargin"
+      },
+      {
+        "name": "toolbarPressedBackground"
+      },
+      {
+        "name": "toolbarSelectedBackground"
+      },
+      {
+        "name": "toolbarSpacingInsets"
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToolBarBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToolBarSeparatorUI",
+    "fields": [
+      {
+        "name": "separatorWidth"
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToolBarUI",
+    "fields": [
+      {
+        "name": "borderMargins"
+      },
+      {
+        "name": "floatable"
+      },
+      {
+        "name": "opaque"
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToolTipUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTreeUI",
+    "fields": [
+      {
+        "name": "selectionArc"
+      },
+      {
+        "name": "selectionInsets"
+      }
+    ],
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatViewportUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatWindowResizer$DragBorderComponent",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.xml.internal.stream.XMLInputFactoryImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.awt.Component",
+    "methods": [
+      {
+        "name": "getFont",
+        "parameterTypes": []
+      },
+      {
+        "name": "isFocusable",
+        "parameterTypes": []
+      },
+      {
+        "name": "setFocusable",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.awt.Image"
+  },
+  {
+    "name": "java.awt.SequencedEvent"
+  },
+  {
+    "name": "java.awt.event.KeyEvent",
+    "allPublicFields": true
+  },
+  {
+    "name": "java.awt.geom.Path2D",
+    "methods": [
+      {
+        "name": "trimToSize",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.beans.Beans"
+  },
+  {
+    "name": "java.beans.PropertyVetoException"
+  },
+  {
+    "name": "java.io.InputStream"
+  },
+  {
+    "name": "java.io.Reader"
+  },
+  {
+    "name": "java.lang.ClassValue"
+  },
+  {
+    "name": "java.lang.Object",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "java.lang.ObjectCustomizer"
+  },
+  {
+    "name": "java.lang.String"
+  },
+  {
+    "name": "java.lang.Thread",
+    "fields": [
+      {
+        "name": "threadLocalRandomProbe"
+      }
+    ]
+  },
+  {
+    "name": "java.lang.invoke.VarHandle",
+    "methods": [
+      {
+        "name": "releaseFence",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.nio.ByteBuffer"
+  },
+  {
+    "name": "java.nio.CharBuffer"
+  },
+  {
+    "name": "java.security.SecureRandomParameters"
+  },
+  {
+    "name": "java.util.List"
+  },
+  {
+    "name": "java.util.concurrent.atomic.AtomicBoolean",
+    "fields": [
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "name": "java.util.concurrent.atomic.Striped64",
+    "fields": [
+      {
+        "name": "base"
+      },
+      {
+        "name": "cellsBusy"
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.AbstractButton",
+    "methods": [
+      {
+        "name": "getIcon",
+        "parameterTypes": []
+      },
+      {
+        "name": "setIcon",
+        "parameterTypes": [
+          "javax.swing.Icon"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JButton",
+    "methods": [
+      {
+        "name": "getFocusable",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JComponent",
+    "methods": [
+      {
+        "name": "isOpaque",
+        "parameterTypes": []
+      },
+      {
+        "name": "setFont",
+        "parameterTypes": [
+          "java.awt.Font"
+        ]
+      },
+      {
+        "name": "setOpaque",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JLabel"
+  },
+  {
+    "name": "javax.swing.JPanel",
+    "methods": [
+      {
+        "name": "getUI",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JTable",
+    "methods": [
+      {
+        "name": "getUI",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JTextField",
+    "methods": [
+      {
+        "name": "processInputMethodEvent",
+        "parameterTypes": [
+          "java.awt.event.InputMethodEvent"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JToggleButton",
+    "methods": [
+      {
+        "name": "getFocusable",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JToolBar",
+    "methods": [
+      {
+        "name": "getFloatable",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOpaque",
+        "parameterTypes": []
+      },
+      {
+        "name": "isFloatable",
+        "parameterTypes": []
+      },
+      {
+        "name": "setFloatable",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.PopupFactory",
+    "methods": [
+      {
+        "name": "getPopup",
+        "parameterTypes": [
+          "java.awt.Component",
+          "java.awt.Component",
+          "int",
+          "int",
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.filechooser.FileSystemView",
+    "methods": [
+      {
+        "name": "getChooserShortcutPanelFiles",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.filechooser.UnixFileSystemView"
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicButtonListener",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicComboBoxUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicGraphicsUtils",
+    "methods": [
+      {
+        "name": "drawStringUnderlineCharAt",
+        "parameterTypes": [
+          "javax.swing.JComponent",
+          "java.awt.Graphics2D",
+          "java.lang.String",
+          "int",
+          "float",
+          "float"
+        ]
+      },
+      {
+        "name": "getClippedString",
+        "parameterTypes": [
+          "javax.swing.JComponent",
+          "java.awt.FontMetrics",
+          "java.lang.String",
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicLabelUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicListUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicMenuBarUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicMenuItemUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicMenuUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicOptionPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicOptionPaneUI$MultiplexingTextField",
+    "methods": [
+      {
+        "name": "processInputMethodEvent",
+        "parameterTypes": [
+          "java.awt.event.InputMethodEvent"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicPopupMenuUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicRootPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicTabbedPaneUI",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicTabbedPaneUI$ScrollableTabPanel"
+  },
+  {
+    "name": "javax.swing.text.html.HTMLEditorKit",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.FrameBase$ActionButton",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.FrameUtils$FontLabel",
+    "allDeclaredMethods": true
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.NativeImageGenConfig$$anon$1",
+    "methods": [
+      {
+        "name": "doInstallUninstall",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "net.miginfocom.layout.BoundSize",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "net.miginfocom.layout.BoundSizeCustomizer"
+  },
+  {
+    "name": "net.miginfocom.layout.UnitValue",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "net.miginfocom.layout.UnitValueCustomizer"
+  },
+  {
+    "name": "net.miginfocom.swing.MigLayout"
+  },
+  {
+    "name": "sun.awt.shell.ShellFolderManager",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.marlin.DMarlinRenderingEngine",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.NativePRNG",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.security.SecureRandomParameters"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA2$SHA256",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  }
 ]

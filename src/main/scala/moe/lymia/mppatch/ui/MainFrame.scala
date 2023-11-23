@@ -31,44 +31,46 @@ import moe.lymia.mppatch.util.Steam
 import moe.lymia.mppatch.util.io.{DataSource, ResourceDataSource}
 
 class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
-  private var installButton  : ActionButton = _
-  private var uninstallButton: ActionButton = _
-  private var currentVersion : JTextField   = _
-  private var targetVersion  : JTextField   = _
-  private var currentStatus  : JTextField   = _
+  protected var installButton: ActionButton   = _
+  protected var uninstallButton: ActionButton = _
+  protected var currentVersion: JTextField    = _
+  protected var targetVersion: JTextField     = _
+  protected var currentStatus: JTextField     = _
 
   private def packages = {
-    val logging     = if(Preferences.enableLogging.value         ) Set("logging")     else Set[String]()
-    val multiplayer = if(Preferences.enableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
-    val luajit      = if(Preferences.enableLuaJIT.value          ) Set("luajit")      else Set[String]()
-    val debug       = if(Preferences.enableDebug.value           ) Set("debug")       else Set[String]()
+    val logging     = if (Preferences.enableLogging.value) Set("logging") else Set[String]()
+    val multiplayer = if (Preferences.enableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
+    val luajit      = if (Preferences.enableLuaJIT.value) Set("luajit") else Set[String]()
+    val debug       = if (Preferences.enableDebug.value) Set("debug") else Set[String]()
     debug ++ multiplayer ++ luajit ++ logging
   }
 
-  private val platform  = Platform.currentPlatform.getOrElse(error("error.unknownplatform"))
+  private val platform = Platform.currentPlatform.getOrElse(error("error.unknownplatform"))
   private def checkPath(path: Path) =
     Files.exists(path) && Files.isDirectory(path) &&
-      patchPackage.script.checkFor.forall(x => Files.exists(path.resolve(x)))
+    patchPackage.script.checkFor.forall(x => Files.exists(path.resolve(x)))
   private def resolvePaths(paths: Seq[Path]) = paths.find(checkPath)
 
-  private val syncLock = new Object
-  private var patchPackage: PatchLoader = _
-  private var isUserChange = false
-  private var isValid = false
+  private val syncLock                          = new Object
+  private var patchPackage: PatchLoader         = _
+  private var isUserChange                      = false
+  private var isValid                           = false
   private var installer: Option[PatchInstaller] = None
+
   private def getInstallerUnsafe = installer.getOrElse(sys.error("installer does not exist"))
-  def getPatch = patchPackage
+
+  def getPatch     = patchPackage
   def getInstaller = installer
   def changeInstaller(path: Path, changeByUser: Boolean = true): Unit = syncLock synchronized {
     log.info(s"Changing installer path to ${path.toString}")
     val instance = new PatchInstaller(path, patchPackage, platform)
     isUserChange = changeByUser
-    if(Files.exists(path)) {
+    if (Files.exists(path)) {
       isValid = checkPath(path)
       installer.foreach(_.releaseLock())
-      if(isValid) {
+      if (isValid) {
         instance.acquireLock()
-        if(changeByUser) Preferences.installationDirectory.value = path.toFile.toString
+        if (changeByUser) Preferences.installationDirectory.value = path.toFile.toString
       }
       installer = Some(instance)
     } else {
@@ -89,11 +91,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
   private def pathFromRegistry() = resolvePaths(platform.defaultSystemPaths) match {
     case Some(x) => changeInstaller(x, false)
-    case None =>
+    case None    =>
   }
-  if(Preferences.installationDirectory.hasValue) {
+  if (Preferences.installationDirectory.hasValue) {
     val configPath = Paths.get(Preferences.installationDirectory.value)
-    if(checkPath(configPath)) changeInstaller(configPath, false)
+    if (checkPath(configPath)) changeInstaller(configPath, false)
     else {
       Preferences.installationDirectory.clear()
       pathFromRegistry()
@@ -106,24 +108,24 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
       case Some(x) => installer.fold(false)(_.checkPatchStatus(packages) == x)
       case None    => false
     }
-    if(!flag) warn("error.statuschanged")
+    if (!flag) warn("error.statuschanged")
     flag
   }
   private val actionUpdate = () => {
-    if(checkPatchStatus()) {
+    if (checkPatchStatus()) {
       getInstallerUnsafe.safeUpdate(packages)
       true
     } else false
   }
   private val actionUninstall = () => {
-    if(checkPatchStatus()) {
+    if (checkPatchStatus()) {
       getInstallerUnsafe.safeUninstall()
       true
     } else false
   }
   private def actionValidate0() = {
     val ret = JOptionPane.showConfirmDialog(frame, i18n("validate.confirm"), titleString, JOptionPane.YES_NO_OPTION)
-    if(ret == JOptionPane.OK_OPTION) {
+    if (ret == JOptionPane.OK_OPTION) {
       getInstallerUnsafe.cleanupPatch()
       Steam.validateGameFiles(patchPackage.script.steamId)
       JOptionPane.showMessageDialog(frame, i18n("validate.wait"), titleString, JOptionPane.INFORMATION_MESSAGE)
@@ -131,19 +133,19 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     }
   }
   private val actionValidate = () => {
-    if(checkPatchStatus()) {
+    if (checkPatchStatus()) {
       actionValidate0()
       true
     } else false
   }
   private val actionCleanup = () => {
-    if(checkPatchStatus()) {
+    if (checkPatchStatus()) {
       getInstallerUnsafe.cleanupPatch()
       getInstallerUnsafe.checkPatchStatus(packages) match {
         case PatchStatus.NeedsValidation | PatchStatus.NotInstalled(false) =>
           actionValidate0()
         case _ =>
-          // ignored
+        // ignored
       }
       true
     } else false
@@ -162,14 +164,14 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     }
 
     // Button section
-    installButton   = new ActionButton()
-    frame.add(installButton  , constraints(gridx = 0, gridy = 1, weightx = 0.5, fill = GridBagConstraints.BOTH))
+    installButton = new ActionButton()
+    frame.add(installButton, constraints(gridx = 0, gridy = 1, weightx = 0.5, fill = GridBagConstraints.BOTH))
 
     uninstallButton = new ActionButton()
     frame.add(uninstallButton, constraints(gridx = 1, gridy = 1, weightx = 0.5, fill = GridBagConstraints.BOTH))
 
-    frame.iconButton(2, 1, "settings") { new SettingsDialog(locale, this).showForm() }
-    frame.iconButton(3, 1, "about"   ) { new AboutDialog   (locale, this).showForm() }
+    frame.iconButton(2, 1, "settings")(new SettingsDialog(locale, this).showForm())
+    frame.iconButton(3, 1, "about")(new AboutDialog(locale, this).showForm())
   }
 
   private def setStatus(text: String) = currentStatus.setText(i18n(text))
@@ -187,15 +189,15 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     installer match {
       case None =>
         currentVersion.setText(i18n("status.dir.noversion"))
-        setStatus(if(isUserChange) "status.doesnotexist" else "status.cannotfind")
+        setStatus(if (isUserChange) "status.doesnotexist" else "status.cannotfind")
       case Some(installer) =>
         currentVersion.setText(installer.installedVersion.fold(i18n("status.dir.noversion"))(identity))
 
-        if(!isValid) {
+        if (!isValid) {
           setStatus("status.noprogram")
           uninstallButton.setAction("action.validate", () => actionValidate0())
           uninstallButton.setEnabled(true)
-        } else if(!installer.isLockAcquired) setStatus("status.inuse")
+        } else if (!installer.isLockAcquired) setStatus("status.inuse")
         else {
           val status = installer.checkPatchStatus(packages)
           lastPatchStatus = Some(status)
@@ -211,8 +213,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
               installButton.setEnabled(true)
               uninstallButton.setEnabled(true)
             case PatchStatus.NeedsUpdate =>
-              setStatus(if(installer.isDowngrade) "status.candowngrade" else "status.needsupdate")
-              installButton.setActionText(if(installer.isDowngrade) "action.downgrade" else "action.update")
+              setStatus(if (installer.isDowngrade) "status.candowngrade" else "status.needsupdate")
+              installButton.setActionText(if (installer.isDowngrade) "action.downgrade" else "action.update")
               installButton.setEnabled(true)
               uninstallButton.setEnabled(true)
             case PatchStatus.FilesCorrupted =>
@@ -245,7 +247,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
               setStatus("status.needsvalidation")
               uninstallButton.setStatusAction("action.validate", actionValidate)
               uninstallButton.setEnabled(true)
-            case x => setStatus("unknown state: "+x)
+            case x => setStatus("unknown state: " + x)
           }
         }
     }

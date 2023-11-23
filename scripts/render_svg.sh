@@ -1,5 +1,3 @@
-#!/bin/sh
-
 #
 # Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>
 #
@@ -22,5 +20,18 @@
 # THE SOFTWARE.
 #
 
-wget https://download.formdev.com/files/flatlaf/flatlaf-demo-3.2.5.jar -O target/flatlaf-demo-3.2.5.jar || exit 1
-java -agentlib:native-image-agent=config-output-dir=src/native-image-config/common -jar target/flatlaf-demo-3.2.5.jar || exit 1
+rm -vf scripts/mppatch-installer-*.png scripts/mppatch-installer.ico || exit 1
+
+for i in {16,20,24,30,32,36,40,48,60,64,72,80,96,256}; do
+  resvg -w $i -h $i scripts/mppatch-installer.svg scripts/mppatch-installer-$i.png || exit 1
+done
+
+convert scripts/mppatch-installer-{16,20,24,30,32,36,40,48,60,64,72,80,96,256}.png scripts/mppatch-installer.ico || exit 1
+
+for i in {8,22}; do
+  resvg -w $i -h $i scripts/mppatch-installer.svg scripts/mppatch-installer-$i.png || exit 1
+done
+
+for i in {20,30,36,40,60,72,80,96}; do
+  rm -v scripts/mppatch-installer-$i.png
+done

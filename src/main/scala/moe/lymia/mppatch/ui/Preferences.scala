@@ -27,35 +27,33 @@ object Preferences {
     def encode(t: T): String
     def decode(s: String): T
   }
-  case class SimplePreferenceSerializer[T](encodeF: T => String, decodeF: String => T)
-    extends PreferenceSerializer[T] {
-
+  case class SimplePreferenceSerializer[T](encodeF: T => String, decodeF: String => T) extends PreferenceSerializer[T] {
     def encode(t: T): String = encodeF(t)
     def decode(s: String): T = decodeF(s)
   }
 
-  implicit val StringPreference  = SimplePreferenceSerializer[String ](identity, identity)
+  implicit val StringPreference  = SimplePreferenceSerializer[String](identity, identity)
   implicit val BooleanPreference = SimplePreferenceSerializer[Boolean](_.toString, _.toBoolean)
 
   val prefs = java.util.prefs.Preferences.userNodeForPackage(getClass)
-  class PreferenceKey[T : PreferenceSerializer](val name: String, default: => T) {
-    def this(name: String) = this(name, sys.error("preference "+name+" not set"))
+  class PreferenceKey[T: PreferenceSerializer](val name: String, default: => T) {
+    def this(name: String) = this(name, sys.error("preference " + name + " not set"))
 
     private val encoder = implicitly[PreferenceSerializer[T]]
 
     def hasValue = prefs.get(name, null) != null
-    def clear() = prefs.remove(name)
+    def clear()  = prefs.remove(name)
     def valueOption = try {
       val pref = prefs.get(name, null)
-      if(pref == null) None else Some(encoder.decode(pref))
+      if (pref == null) None else Some(encoder.decode(pref))
     } catch {
       case _: Exception => None
     }
-    def value = valueOption.fold(default)(identity)
+    def value         = valueOption.fold(default)(identity)
     def value_=(t: T) = prefs.put(name, encoder.encode(t))
   }
 
-  val installationDirectory  = new PreferenceKey[String ]("installationDirectory")
+  val installationDirectory  = new PreferenceKey[String]("installationDirectory")
   val enableDebug            = new PreferenceKey[Boolean]("enableDebug", false)
   val enableLogging          = new PreferenceKey[Boolean]("enableLogging", true)
   val enableMultiplayerPatch = new PreferenceKey[Boolean]("enableMultiplayerPatch", true)
