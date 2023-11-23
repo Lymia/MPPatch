@@ -82,7 +82,7 @@ object NativePatchBuild {
 
       val patches =
         for (
-          PatchFileInfo(platform, version, versionDir) <- Keys.nativeVersionInfo.value
+          PatchFileInfo(platform, _, versionDir) <- Keys.nativeVersionInfo.value
           if PlatformType.currentPlatform.shouldBuildNative(platform)
         ) yield {
           val version                    = versionDir.getName
@@ -176,7 +176,7 @@ object NativePatchBuild {
                   "-fvisibility=hidden",
                   "-o",
                   targetFile,
-                  s"""-DMPPATCH_CIV_VERSION="$version"""",
+                  s"""-DMPPATCH_CIV_SHA256="$sha256"""",
                   s"""-DMPPATCH_PLATFORM="${platform.name}"""",
                   s"""-DMPPATCH_BUILDID="$buildId""""
                 ) ++ nasmOut ++ config_common_secureFlags ++
@@ -231,8 +231,8 @@ object NativePatchBuild {
     case _: NumberFormatException => default
   }
 
-  case class PatchFile(platform: PlatformType, version: String, file: File, buildId: String)
-  case class PatchFileInfo(platform: PlatformType, version: String, versionDir: File)
+  case class PatchFile(platform: PlatformType, sha256: String, file: File, buildId: String)
+  case class PatchFileInfo(platform: PlatformType, sha256: String, versionDir: File)
 
   object Keys {
     val patchBuildDir  = SettingKey[File]("native-patch-build-directory")

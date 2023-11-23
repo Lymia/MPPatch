@@ -104,7 +104,7 @@ object InstallScript {
     )
 }
 
-case class NativePatch(platform: String, version: String, source: String)
+case class NativePatch(platform: String, sha256: String, source: String)
 case class PatchManifest(
     patchVersion: String,
     timestamp: Long,
@@ -113,7 +113,7 @@ case class PatchManifest(
 )
 object PatchManifest {
   def loadNativePatch(xml: Node) =
-    NativePatch(getAttribute(xml, "Platform"), getAttribute(xml, "Version"), loadSource(xml))
+    NativePatch(getAttribute(xml, "Platform"), getAttribute(xml, "Sha256"), loadSource(xml))
   def loadFromXML(xml: Node) = {
     val manifestVersion = getAttribute(xml, "ManifestVersion")
     if (manifestVersion != "0") sys.error("Unknown ManifestVersion: " + manifestVersion)
@@ -172,7 +172,7 @@ class PatchLoader(val source: DataSource, val platform: Platform) {
   def loadUIPatch(x: String)            = UIPatch.loadFromXML(source.loadXML(x))
   def loadPackages(toLoad: Set[String]) = PackageSetLoader(this, script.loadPackages(toLoad).toSeq)
 
-  private val versionMap = data.nativePatches.map(x => (x.platform, x.version) -> x).toMap
+  private val versionMap = data.nativePatches.map(x => (x.platform, x.sha256) -> x).toMap
   def getNativePatch(versionName: String) =
     versionMap.get((platform.platformName, versionName))
   def nativePatchExists(versionName: String) =

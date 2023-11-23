@@ -72,8 +72,8 @@ object PatchBuild {
         }
       val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
       val nativePatchEntries = NativePatchBuild.Keys.nativeVersionInfo.value.map { x =>
-        val source = s"native/mppatch_${x.platform.name}_${x.version}${x.platform.extension}"
-        <NativePatch Platform={x.platform.name} Version={x.version} Source={source}/>
+        val source = s"native/mppatch_${x.platform.name}_${x.sha256}${x.platform.extension}"
+        <NativePatch Platform={x.platform.name} Sha256={x.sha256} Source={source}/>
       }
       val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
                                   Timestamp={System.currentTimeMillis().toString}>
@@ -89,7 +89,7 @@ object PatchBuild {
         .sorted
         .map { x =>
           val hash = x.getName.split("\\.").head.split("_").last
-          s"_mppatch.version.buildId[${LuaUtils.quote(hash)}] = ${LuaUtils.quote(IO.read(x))}"
+          s"_mpPatch.version.buildId[${LuaUtils.quote(hash)}] = ${LuaUtils.quote(IO.read(x))}"
         }
         .mkString("\n")
       val versionInfo = PatchFile(
@@ -101,6 +101,8 @@ object PatchBuild {
            |$buildIdInfo
            |
            |_mpPatch.version.info = {}
+           |
+           |_mpPatch.version.loaded = true
            |$versionDataInfo
         """.stripMargin.trim
       )
