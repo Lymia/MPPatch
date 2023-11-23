@@ -22,6 +22,10 @@
 
 package moe.lymia.mppatch.ui
 
+import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont
+import com.formdev.flatlaf.{FlatIntelliJLaf, FlatLaf}
+import moe.lymia.mppatch.core.PlatformType
+import moe.lymia.mppatch.ui.InstallerMain.{appImageContents, isAppImage}
 import moe.lymia.mppatch.util.{Logger, SimpleLogger, VersionInfo}
 
 import java.io.{File, FileOutputStream, OutputStreamWriter, PrintWriter}
@@ -31,32 +35,61 @@ import java.util.Locale
 import javax.swing.JFrame
 
 object InstallerMain {
-  val logFile = new File("mppatch_installer.log")
+  val isAppImage = PlatformType.currentPlatform == PlatformType.Linux && System.getenv("APPIMAGE") != null
+
+  val appImageFileLocation = if (isAppImage) {
+    Some(new File(System.getenv("APPIMAGE")).getCanonicalFile)
+  } else {
+    None
+  }
+  val appImageContents = if (isAppImage) {
+    Some(new File(System.getenv("APPDIR")).getCanonicalFile)
+  } else {
+    None
+  }
+
+  val baseDirectory = if (isAppImage) {
+    appImageFileLocation.get.getParentFile
+  } else {
+    new File(".").getCanonicalFile
+  }
+  val logFile = baseDirectory.toPath.resolve("mppatch_installer.log").toFile
 }
 class InstallerMain extends FrameError[JFrame] with I18NTrait {
   private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)
 
-  protected def locale = Locale.getDefault
+  protected def locale                 = Locale.getDefault
   override protected def frame: JFrame = null
 
   def main(args: Array[String]): Unit =
-      try {
-      System.setProperty("awt.useSystemAAFontSettings","on")
+    try {
+      // enable anti-aliasing
+      System.setProperty("awt.useSystemAAFontSettings", "on")
       System.setProperty("swing.aatext", "true")
 
-      SimpleLogger.addLogger(new PrintWriter(new OutputStreamWriter(
-        new FileOutputStream(InstallerMain.logFile, true), StandardCharsets.UTF_8)))
+      // set properties for appimage
+      if (isAppImage) {
+        System.setProperty("java.library.path", s"${appImageContents.get.toString}/usr/lib/")
+      }
 
+      // enable logging
+      SimpleLogger.addLogger(
+        new PrintWriter(
+          new OutputStreamWriter(new FileOutputStream(InstallerMain.logFile, true), StandardCharsets.UTF_8)
+        )
+      )
+
+      // print version information to console
       val line = Seq.fill(80)("=").mkString("")
       log.logRaw("")
       log.logRaw(line)
       log.logRaw(s"MPPatch version ${VersionInfo.versionString}")
-      log.logRaw(s"Revision ${VersionInfo.commit.substring(0, 8)}${if(VersionInfo.isDirty) " (dirty)" else ""}, "+
-                     s"built on ${dateFormat.format(VersionInfo.buildDate)} " +
-                     s"by ${VersionInfo.buildUser}@${VersionInfo.buildHostname}")
+      log.logRaw(
+        s"Revision ${VersionInfo.commit.substring(0, 8)}${if (VersionInfo.isDirty) " (dirty)" else ""}, " +
+          s"built on ${dateFormat.format(VersionInfo.buildDate)} " +
+          s"by ${VersionInfo.buildUser}@${VersionInfo.buildHostname}"
+      )
       log.logRaw("")
-
-      com.formdev.flatlaf.FlatIntelliJLaf.setup()
 
       val versionData = Seq(
         "Build ID"    -> VersionInfo.buildID,
@@ -65,24 +98,32 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
         "Tree Status" -> VersionInfo.treeStatus
       )
       val headerLength = versionData.map(_._1.length).max
-      val indent = Seq.fill(headerLength + 2)(" ").mkString("")
-      val formatStr = s"%-${headerLength}s: %s"
-      for((k, v) <- versionData) {
+      val indent       = Seq.fill(headerLength + 2)(" ").mkString("")
+      val formatStr    = s"%-${headerLength}s: %s"
+      for ((k, v) <- versionData) {
         val lines = v.split("\n")
         log.logRaw(formatStr.format(k, lines.head))
-        for(l <- lines.tail) log.logRaw(indent + l)
+        for (l <- lines.tail) log.logRaw(indent + l)
       }
       log.logRaw(line)
       log.logRaw("")
 
+      // install look-and-feel
+      FlatRobotoFont.install()
+      FlatLaf.setPreferredFontFamily(FlatRobotoFont.FAMILY)
+      FlatLaf.setPreferredLightFontFamily(FlatRobotoFont.FAMILY_LIGHT)
+      FlatLaf.setPreferredSemiboldFontFamily(FlatRobotoFont.FAMILY_SEMIBOLD)
+      FlatIntelliJLaf.setup()
+
+      // start main frame
       new MainFrame(locale).showForm()
     } catch {
       case _: InstallerException => // ignored
-      case e: Exception => try {
-        dumpException("error.genericerror", e)
-      } catch {
-        case _: InstallerException => // ignored
-      }
+      case e: Exception =>
+        try dumpException("error.genericerror", e)
+        catch {
+          case _: InstallerException => // ignored
+        }
     }
 }
 

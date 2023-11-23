@@ -12,6 +12,8 @@ Source code for this program can be found [here](https://github.com/Lymia/MPPatc
 * [inih](https://github.com/benhoyt/inih), for configuring the patch
 * [Symbola font](http://users.teilar.gr/~g1951d/), used for button icons
 * [LuaJIT](http://luajit.org/), for speeding up Lua code.
+* [Papirus Icon Theme](https://github.com/PapirusDevelopmentTeam/papirus-icon-theme) and
+  [OpenClipArt](https://openclipart.org/), used for the clipart used for the icon.
 
 **Special Thanks**
 

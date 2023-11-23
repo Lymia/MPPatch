@@ -26,7 +26,7 @@ import scala.sys.process.*
 
 // Package metainfo
 organization := "moe.lymia"
-name := "mppatch"
+name := "mppatch-installer"
 homepage := Some(url("https://github.com/Lymia/MPPatch"))
 licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
 
@@ -52,7 +52,23 @@ scalaVersion := "2.13.12"
 scalacOptions ++= "-Xlint -target:jvm-1.8 -opt:l:method,inline -deprecation -unchecked".split(" ").toSeq
 crossPaths := false
 
-// Native Image configuration
+// Dependencies
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml"            % "2.1.0"
+libraryDependencies += "com.formdev"             % "flatlaf"              % "3.2.5"
+libraryDependencies += "com.formdev"             % "flatlaf-fonts-roboto" % "2.137"
+
+// New dependencies for tasks
+(Compile / run) := (Compile / run).dependsOn(PatchBuild.Keys.buildDylibDir).evaluated
+
+// Build assembled jar
+ThisBuild / assemblyMergeStrategy := {
+  case "module-info.class" => MergeStrategy.discard
+  case x =>
+    val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
+    oldStrategy(x)
+}
+
+// Build native binaries
 nativeImageInstalled := true
 nativeImageGraalHome := {
   val platform   = PlatformType.currentPlatform
@@ -79,32 +95,8 @@ nativeImageGraalHome := {
 }
 
 nativeImageOptions += "--no-fallback"
-nativeImageOptions += "-H:+UnlockExperimentalVMOptions"
 nativeImageOptions += "-Djava.awt.headless=false"
+nativeImageOptions += "--strict-image-heap"
+nativeImageOptions += s"-H:ConfigurationFileDirectories=${baseDirectory.value / "src" / "native-image-config" / PlatformType.currentPlatform.name}"
 
-nativeImageOptions += s"-H:ReflectionConfigurationFiles=${target.value / "native-image-configs" / "reflect-config.json"}"
-nativeImageOptions += s"-H:ConfigurationFileDirectories=${target.value / "native-image-configs"}"
-
-// Dependencies
-libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"
-libraryDependencies += "com.formdev"             % "flatlaf"   % "3.2.5"
-
-// custom tasks
-val buildNativeTask = TaskKey[Unit]("buildNativeTask")
-
-// New dependencies for tasks
-(Compile / run) := (Compile / run).dependsOn(PatchBuild.Keys.buildDylibDir).evaluated
-
-// Build distribution file
-InputKey[Unit]("dist") := {
-  val path = crossTarget.value / "dist"
-  def copy(source: File) = {
-    val output = path / source.getName.replace("-assembly", "")
-    IO.copyFile(source, output)
-    output
-  }
-  streams.value.log.info(s"Output packed to: ${copy((Compile / assembly).value)}")
-}
-
-// Build native binaries
 InputKey[Unit]("buildNative") := PatchBuild.Keys.buildDylibDir.value

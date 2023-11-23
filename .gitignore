@@ -1,6 +1,8 @@
 /.idea
-/out
-/*.iml
-/target
-/mppatch_installer*.log
 /.bsp
+/*.iml
+
+/out
+/target
+
+/mppatch_*

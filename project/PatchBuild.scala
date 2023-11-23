@@ -32,6 +32,7 @@ object PatchBuild {
     Keys.buildDylibDir := {
       // create the native-patch directory
       val dir = Keys.nativesDir.value
+      IO.delete(dir)
       IO.createDirectory(dir)
 
       // copy native-patch files to the directory

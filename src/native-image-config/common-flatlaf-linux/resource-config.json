@@ -1,0 +1,335 @@
+{
+  "resources":{
+  "includes":[{
+    "pattern":"\\QMETA-INF/services/com.formdev.flatlaf.FlatDefaultsAddon\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.awt.im.spi.InputMethodDescriptor\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.lang.System$LoggerFinder\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.net.spi.InetAddressResolverProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.nio.charset.spi.CharsetProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.time.zone.ZoneRulesProvider\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/java.util.prefs.PreferencesFactory\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.xml.parsers.DocumentBuilderFactory\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.xml.stream.XMLInputFactory\\E"
+  }, {
+    "pattern":"\\QMETA-INF/services/javax.xml.transform.TransformerFactory\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/FlatDarculaLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/FlatDarkLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/FlatIntelliJLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/FlatLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/FlatLightLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/IntelliJTheme$ThemeLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/FlatDarculaLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/FlatDarkLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/FlatIntelliJLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/FlatLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/FlatLaf.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/FlatLightLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/FlatMacDarkLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/FlatMacLightLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/ThemeLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/colors.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/colors_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/copy.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/copy_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/execute.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/execute_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/intentionBulb.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/intentionBulb_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/quickfixOffBulb.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/quickfixOffBulb_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/suspend.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/suspend_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/errorDialog.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/errorDialog_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/informationDialog.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/informationDialog_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/abstractClass.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/abstractClass_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/abstractMethod.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/abstractMethod_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/annotationtype.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/annotationtype_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/css.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/css_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/javaScript.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/javaScript_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/xhtml.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/objects/xhtml_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/warningDialog.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/warningDialog_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/DataTables.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/DataTables_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/RecentlyUsed.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/RecentlyUsed_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/back.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/back_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/bookmarkGroup.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/bookmarkGroup_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/buildLoadChanges.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/buildLoadChanges_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/commit.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/commit_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/copy.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/copy_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/diff.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/diff_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/download.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/download_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/favorite.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/favorite_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/forward.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/forward_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/github.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/github_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/intellij-showWriteAccess.png\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/listFiles.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/listFiles_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/matchCase.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/matchCase_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/menu-cut.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/menu-cut_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/menu-paste.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/menu-paste_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/project.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/project_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/redo.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/refresh.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/refresh_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/regex.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/regex_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/search.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/search_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/show.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/show_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/undo.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/user.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/user_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/users.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/users_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/words.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/words_dark.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/intellijthemes/themes.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/extras/resources/DerivedColorKeys.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/icons/JavaCup16.png\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/icons/image-delayed.png\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/icons/image-failed.png\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Carbon.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Cobalt_2.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Cyan.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/DarkFlatTheme.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/DarkPurple.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Dracula.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gradianto_Nature_Green.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gradianto_dark_fuchsia.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gradianto_deep_ocean.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gradianto_midnight_blue.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gray.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/HiberbeeDark.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/HighContrast.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/LightFlatTheme.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/MaterialTheme.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Monocai.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/SolarizedLight.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/arc-theme-orange.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/arc-theme.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/arc_theme_dark.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/arc_theme_dark_orange.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/gruvbox_dark_hard.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/gruvbox_dark_medium.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/gruvbox_dark_soft.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/Atom One Light.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/GitHub.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/Light Owl.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/Material Lighter.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/Solarized Light.theme.json\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/themes/FlatMacDarkLaf.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/themes/FlatMacLightLaf.properties\\E"
+  }, {
+    "pattern":"java.base:\\Qjava/util/currency.data\\E"
+  }, {
+    "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt72b/nfc.nrm\\E"
+  }, {
+    "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt72b/ubidi.icu\\E"
+  }, {
+    "pattern":"java.base:\\Qsun/text/resources/LineBreakIteratorData\\E"
+  }, {
+    "pattern":"java.datatransfer:\\Qsun/datatransfer/resources/flavormap.properties\\E"
+  }, {
+    "pattern":"java.desktop:\\Qcom/formdev/flatlaf/resources/Bundle.properties\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/basic/icons/JavaCup16.png\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/basic/icons/image-delayed.png\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/plaf/basic/icons/image-failed.png\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/text/html/default.css\\E"
+  }, {
+    "pattern":"java.desktop:\\Qjavax/swing/text/html/parser/html32.bdtd\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/CopyDrop32x32.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/LinkDrop32x32.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/MoveDrop32x32.gif\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/cursors.properties\\E"
+  }, {
+    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/invalid32x32.gif\\E"
+  }, {
+    "pattern":"java.xml:\\Qcom/sun/org/apache/xml/internal/serializer/Encodings.properties\\E"
+  }]},
+  "bundles":[{
+    "name":"com.formdev.flatlaf.resources.Bundle",
+    "locales":[""]
+  }, {
+    "name":"com.sun.org.apache.xml.internal.serializer.XMLEntities",
+    "locales":[""]
+  }, {
+    "name":"com.sun.swing.internal.plaf.basic.resources.basic",
+    "classNames":["com.sun.swing.internal.plaf.basic.resources.basic"]
+  }, {
+    "name":"sun.awt.resources.awt",
+    "classNames":["sun.awt.resources.awt"]
+  }]
+}
