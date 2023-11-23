@@ -51,7 +51,9 @@ object LuaJITBuild {
                   "-Wl,--start-group",
                   "-lmsvcr90",
                   "-Wno-unused-command-line-argument"
-                ) ++ config_win32_secureFlags,
+                ) ++ config_win32_secureFlags ++ (if (System.getenv("GITHUB_ACTION") != null)
+                                                    Seq("-L/usr/lib/gcc/i686-w64-mingw32/9.3-win32/")
+                                                  else Seq()),
                 "src/lua51.dll",
                 ".dll",
                 config_win32_cc,
