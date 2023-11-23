@@ -36,20 +36,18 @@ private object PathNames {
   val patchLockFilename  = ".mppatch_installer_lock"
 }
 
-sealed trait PatchStatus
-object PatchStatus {
-  case class NotInstalled(isKnownVersion: Boolean) extends PatchStatus
-
-  case object Installed       extends PatchStatus
-  case object CanUninstall    extends PatchStatus
-  case object PackageChange   extends PatchStatus
-  case object NeedsUpdate     extends PatchStatus
-  case object FilesValidated  extends PatchStatus
-  case object TargetUpdated   extends PatchStatus
-  case object UnknownUpdate   extends PatchStatus
-  case object FilesCorrupted  extends PatchStatus
-  case object NeedsCleanup    extends PatchStatus
-  case object NeedsValidation extends PatchStatus
+enum PatchStatus {
+  case NotInstalled(isKnownVersion: Boolean)
+  case Installed
+  case CanUninstall
+  case PackageChange
+  case NeedsUpdate
+  case FilesValidated
+  case TargetUpdated
+  case UnknownUpdate
+  case FilesCorrupted
+  case NeedsCleanup
+  case NeedsValidation
 }
 
 private case class PatchFile(path: String, expectedSha256: String)

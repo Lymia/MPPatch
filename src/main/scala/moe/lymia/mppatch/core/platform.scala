@@ -30,13 +30,10 @@ import moe.lymia.mppatch.util.win32.WindowsRegistry
 
 import scala.annotation.tailrec
 
-sealed trait PlatformType
+enum PlatformType {
+  case Win32, MacOS, Linux, Other
+}
 object PlatformType {
-  case object Win32 extends PlatformType
-  case object MacOS extends PlatformType
-  case object Linux extends PlatformType
-  case object Other extends PlatformType
-
   lazy val currentPlatform = {
     val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
     if (os.contains("windows")) Win32
