@@ -26,15 +26,7 @@ echo "Extracting native tarballs..."
 rm -rfv target/native-bin || exit 1
 mkdir -vp target/native-bin || exit 1
 cd target/native-bin || exit 1
-  if [ -e ../../mppatch_win32_natives.tar.gz ]; then
-    tar -xv -f ../../mppatch_linux_natives.tar.gz
-  fi
-  if [ -e ../../mppatch_macos_natives.tar.gz ]; then
-    tar -xv -f ../../mppatch_linux_natives.tar.gz
-  fi
-  if [ -e ../../mppatch_linux_natives.tar.gz ]; then
-    tar -xv -f ../../mppatch_linux_natives.tar.gz
-  fi
+  tar -xv -f ../../mppatch_linux_natives.tar.gz
 cd ../.. || exit 1
 
 echo "Building Linux installer...."

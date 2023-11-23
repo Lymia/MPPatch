@@ -13,17 +13,20 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux/archlinux:multilib-devel
     steps:
-      - name: Install packages
-        run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang nasm
+      # Install packages
+      - run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang nasm
+
+      # Initialize git
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - name: Fix dubious permissions error
-        run: git config --global --add safe.directory /__w/MPPatch/MPPatch
-      - name: Fetch git tags.
-        run: git fetch --prune --unshallow --tags
-      - name: Build native binaries
-        run: scripts/build_linux_natives.sh
+      - run: git config --global --add safe.directory /__w/MPPatch/MPPatch
+      - run: git fetch --prune --unshallow --tags
+
+      # Do the actual build
+      - run: scripts/build_linux_natives.sh
+
+      # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
           name: mppatch_linux_natives.tar.gz
@@ -34,21 +37,30 @@ jobs:
     needs:
       - buildNative
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: 'recursive'
-      - name: Fetch git tags.
-        run: git fetch --prune --unshallow --tags
-      - uses: actions/download-artifact@v3
-        with:
-          name: mppatch_linux_natives.tar.gz
-          path: mppatch_linux_natives.tar.gz
+      # Install packages
       - uses: actions/setup-java@v3
         with:
           distribution: 'liberica'
           java-version: '21'
-      - name: Build Linux installer
-        run: scripts/build_linux_installer.sh
+
+      # Initialize git
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: git fetch --prune --unshallow --tags
+
+      # Download artifacts
+      - uses: actions/download-artifact@v3
+        with:
+          name: mppatch_linux_natives.tar.gz
+          path: mppatch_linux_natives
+      - run: mv mppatch_linux_natives/* .
+      - run: rm -rf mppatch_linux_natives
+
+      # Do the actual build
+      - run: scripts/build_linux_installer.sh
+
+      # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
           name: mppatch_linux_installer.tar.gz
@@ -59,19 +71,24 @@ jobs:
     needs:
       - buildInstallerLinux
     steps:
+      # Initialize git
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
-      - name: Fetch git tags.
-        run: git fetch --prune --unshallow --tags
+      - run: git fetch --prune --unshallow --tags
+
+      # Download artifacts
       - uses: actions/download-artifact@v3
         with:
           name: mppatch_linux_installer.tar.gz
           path: mppatch_linux_installer
       - run: mv mppatch_linux_installer/* .
       - run: rm -rf mppatch_linux_installer
-      - name: Build distribution
-        run: scripts/build_dist.sh
+
+      # Do the actual build
+      - run: scripts/build_dist.sh
+
+      # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
           name: mppatch_dist.tar.gz
