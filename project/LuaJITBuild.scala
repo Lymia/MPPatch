@@ -72,7 +72,7 @@ object LuaJITBuild {
           "STATIC_CC"    -> target_cc,
           "DYNAMIC_CC"   -> s"$target_cc -fPIC",
           "TARGET_LD"    -> target_cc,
-          "TARGET_FLAGS" -> ("-O2" +: s"--target=$target" +: (config_common_secureFlags ++ flags)).mkString(" ")
+          "TARGET_FLAGS" -> (s"--target=$target" +: "-O2" +: (config_common_secureFlags ++ flags)).mkString(" ")
         ) ++ platformEnv
         val excludeDeps = Set(
           "lj_bcdef.h",
@@ -96,7 +96,7 @@ object LuaJITBuild {
           trackDependencies(Keys.luajitCacheDir.value / (platform + "_c_out"), dependencies.toSet) {
             logger.info("Compiling Luajit for " + platform)
             make(Keys.luajitSourceDir.value, Seq("clean"), env)
-            make(Keys.luajitSourceDir.value, Seq("default"), env)
+            make(Keys.luajitSourceDir.value, Seq(), env)
             IO.copyFile(Keys.luajitSourceDir.value / outputFile, outTarget)
             outTarget
           }

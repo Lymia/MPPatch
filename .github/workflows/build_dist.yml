@@ -1,0 +1,28 @@
+name: Build distribution
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ '*' ]
+
+env:
+  SHELL: /bin/bash
+
+jobs:
+  buildNative:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Fetch git tags.
+        run: git fetch --prune --unshallow --tags
+      - uses: ConorMacBride/install-package@v1
+        with:
+          apt: gcc-multilib
+      - name: Build native binaries
+        run: scripts/build_linux_natives.sh
+      - uses: actions/upload-artifact@v2
+        with:
+          name: mppatch_linux_natives.tar.gz
+          path: mppatch_linux_natives.tar.gz
