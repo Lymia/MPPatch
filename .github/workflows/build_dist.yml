@@ -11,10 +11,10 @@ env:
 jobs:
   buildNative:
     runs-on: ubuntu-latest
-    container: archlinux:base-devel
+    container: archlinux/archlinux:multilib-devel
     steps:
       - name: Install packages
-        run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang multilib-devel
+        run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
