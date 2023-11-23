@@ -43,8 +43,10 @@ sbt nativeImage || exit 1
 chmod +x target/native-image/*.so || exit 1
 
 echo "Building assembly jar..."
+sbt "print scalaVersion" || exit 1 # get results cached, required to wrangle CI
 ASSEMBLY_JAR="$(sbt "print assembly" --error || exit 1)"
-cp "$(echo "$ASSEMBLY_JAR" | head -n 1)" target/native-image/assembly.jar || exit 1
+echo "ASSEMBLY_JAR=$ASSEMBLY_JAR"
+cp "$(echo "$ASSEMBLY_JAR" | head -n 1 | tr -d '\n')" target/native-image/assembly.jar || exit 1
 
 echo "Creating Linux installer tarball..."
 cd target/native-image || exit 1

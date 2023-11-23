@@ -33,7 +33,10 @@ wget -O target/dist-build/linuxdeploy "$LINUXDEPLOY_DL" || exit 1
 chmod +x target/dist-build/linuxdeploy || exit 1
 
 echo "Gathering facts from SBT..."
-VERSION=$(sbt "print version" --error || exit 1)
+sbt "print scalaVersion" || exit 1 # get results cached, required to wrangle CI
+VERSION="$(sbt "print version" --error || exit 1)"
+VERSION="$(echo "$VERSION" | head -n 1 | tr -d '\n')"
+echo "VERSION=$VERSION"
 
 echo "Building AppDir for Linux installer..."
 mkdir -pv target/dist-build/linux/AppDir || exit 1
@@ -62,3 +65,9 @@ cd ../../.. || exit 1
 # Copy to dist directory
 cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/dist/MPPatch_Installer-linux-$VERSION.AppImage || exit 1
 cp -v target/dist-build/assembly.jar target/dist/MPPatch_Installer-universal-$VERSION.jar || exit 1
+
+# Building tarball
+cd target/dist || exit 1
+  tar --gzip -cv -f mppatch_dist.tar.gz * || exit 1
+cd ../.. || exit 1
+cp target/dist/mppatch_dist.tar.gz . || exit 1
