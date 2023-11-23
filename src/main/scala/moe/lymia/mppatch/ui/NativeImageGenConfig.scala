@@ -29,7 +29,7 @@ object NativeImageGenConfig {
   private val sleepDur = 1000
 
   private def forLocale(locale: Locale): Unit = {
-    val mainFrame = new MainFrame(locale) {
+    class MainFrameExt(locale: Locale) extends MainFrame(locale) {
       override protected val neverShowMessage: Boolean = true
       def doInstallUninstall(): Unit = {
         if (uninstallButton.isEnabled) uninstallButton.doClick()
@@ -42,13 +42,16 @@ object NativeImageGenConfig {
         Thread.sleep(sleepDur)
       }
     }
+
+    val mainFrame = new MainFrameExt(locale)
     new Thread(() => mainFrame.showForm()).start()
     Thread.sleep(sleepDur)
 
     // about dialog
-    JOptionPane.showMessageDialog(null, "Please click the link then close the dialog.")
     val aboutDialog = new AboutDialog(locale, mainFrame)
-    aboutDialog.showForm()
+    new Thread(() => aboutDialog.showForm())
+    Thread.sleep(sleepDur)
+    aboutDialog.forceClose()
 
     // settings dialog
     val settingsDialog = new SettingsDialog(locale, mainFrame)

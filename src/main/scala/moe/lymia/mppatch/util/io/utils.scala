@@ -29,7 +29,7 @@ import java.nio.file._
 import java.nio.file.attribute.BasicFileAttributes
 
 import scala.annotation.tailrec
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.io.Codec
 import scala.xml.{Node, PrettyPrinter, XML}
 
@@ -54,7 +54,7 @@ object IOUtils {
   def getResource(s: String) = getClass.getResourceAsStream(resPath + s)
   def resourceExists(s: String) = getResource(s) != null
   def loadFromStream(s: InputStream) = scala.io.Source.fromInputStream(s)(Codec.UTF8).mkString
-  def loadBinaryFromStream(s: InputStream) = Stream.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
+  def loadBinaryFromStream(s: InputStream) = LazyList.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
   def loadResource(s: String) = loadFromStream(getResource(s))
   def loadBinaryResource(s: String) = loadBinaryFromStream(getResource(s))
 

@@ -48,8 +48,8 @@ git.formattedShaVersion := {
 }
 
 // Scala configuration
-scalaVersion := "2.13.12"
-scalacOptions ++= "-Xlint -release:21 -opt:l:method,inline -deprecation -unchecked".split(" ").toSeq
+scalaVersion := "3.3.1"
+scalacOptions ++= "-release:21 -deprecation -unchecked".split(" ").toSeq
 crossPaths := false
 
 // Dependencies

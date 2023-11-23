@@ -28,7 +28,7 @@ import java.nio.file.{Files, Path}
 import moe.lymia.mppatch.util.io._
 import moe.lymia.mppatch.util.{Crypto, Logger, SimpleLogger}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.xml.Node
 
 private object PathNames {
@@ -247,7 +247,7 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
       log.info(s"- Installing $name (size: ${data.length}, executable: $executable)")
       Files.write(path, data)
       if(executable) Files.setPosixFilePermissions(path,
-        (Files.getPosixFilePermissions(path).asScala + OWNER_EXECUTE + GROUP_EXECUTE + OTHERS_EXECUTE).asJava)
+        (Files.getPosixFilePermissions(path).asScala.toSet + OWNER_EXECUTE + GROUP_EXECUTE + OTHERS_EXECUTE).asJava)
       (PatchFile(name, Crypto.sha256_hex(data)), newDirs.flatten)
     }
 

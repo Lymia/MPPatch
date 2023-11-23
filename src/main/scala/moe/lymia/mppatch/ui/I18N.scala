@@ -29,7 +29,7 @@ import java.util.{Locale, Properties}
 
 import moe.lymia.mppatch.util.io.IOUtils
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 case class I18N(locale: Locale, map: Map[String, String]) {
   private val messageFormatCache = new collection.mutable.HashMap[String, Option[MessageFormat]]

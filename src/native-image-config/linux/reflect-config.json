@@ -1453,19 +1453,172 @@
     ]
   },
   {
+    "name": "moe.lymia.mppatch.core.PackageSetLoader",
+    "fields": [
+      {
+        "name": "renames$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.PatchLoader",
+    "fields": [
+      {
+        "name": "cleanup$lzy1"
+      },
+      {
+        "name": "data$lzy1"
+      },
+      {
+        "name": "script$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.PatchState",
+    "fields": [
+      {
+        "name": "expectedPaths$lzy1"
+      },
+      {
+        "name": "nonreplacementFiles$lzy1"
+      },
+      {
+        "name": "replacementTargets$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.Platform$",
+    "fields": [
+      {
+        "name": "currentPlatform$lzy2"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.PlatformType$",
+    "fields": [
+      {
+        "name": "currentPlatform$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.UIPatchLoader",
+    "fields": [
+      {
+        "name": "libraryFiles$lzy1"
+      },
+      {
+        "name": "luaPatchList$lzy1"
+      },
+      {
+        "name": "newScreenFiles$lzy1"
+      },
+      {
+        "name": "patchFileList$lzy1"
+      },
+      {
+        "name": "patchFileMap$lzy1"
+      },
+      {
+        "name": "softHookFiles$lzy1"
+      },
+      {
+        "name": "softHookInfo$lzy1"
+      },
+      {
+        "name": "softHookInfoFragments$lzy1"
+      },
+      {
+        "name": "textFiles$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.AboutDialog",
+    "fields": [
+      {
+        "name": "ActionButton$lzy1"
+      },
+      {
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
     "name": "moe.lymia.mppatch.ui.FrameBase$ActionButton",
     "allDeclaredMethods": true
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.FrameUtils$",
+    "fields": [
+      {
+        "name": "symbolFont$lzy1"
+      }
+    ]
   },
   {
     "name": "moe.lymia.mppatch.ui.FrameUtils$FontLabel",
     "allDeclaredMethods": true
   },
   {
-    "name": "moe.lymia.mppatch.ui.NativeImageGenConfig$$anon$1",
-    "methods": [
+    "name": "moe.lymia.mppatch.ui.InstallerMain",
+    "fields": [
       {
-        "name": "doInstallUninstall",
-        "parameterTypes": []
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.MainFrame",
+    "fields": [
+      {
+        "name": "ActionButton$lzy1"
+      },
+      {
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.SettingsDialog",
+    "fields": [
+      {
+        "name": "ActionButton$lzy1"
+      },
+      {
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.util.VersionInfo",
+    "fields": [
+      {
+        "name": "buildDate$lzy1"
+      },
+      {
+        "name": "buildHostname$lzy1"
+      },
+      {
+        "name": "buildID$lzy1"
+      },
+      {
+        "name": "buildUser$lzy1"
+      },
+      {
+        "name": "commit$lzy1"
+      },
+      {
+        "name": "isDirty$lzy1"
+      },
+      {
+        "name": "treeStatus$lzy1"
+      },
+      {
+        "name": "versionString$lzy1"
       }
     ]
   },
@@ -1487,6 +1640,30 @@
     "name": "net.miginfocom.swing.MigLayout"
   },
   {
+    "name": "scala.xml.PrettyPrinter",
+    "fields": [
+      {
+        "name": "0bitmap$1"
+      }
+    ]
+  },
+  {
+    "name": "scala.xml.XML$",
+    "fields": [
+      {
+        "name": "0bitmap$2"
+      }
+    ]
+  },
+  {
+    "name": "scala.xml.parsing.FactoryAdapter",
+    "fields": [
+      {
+        "name": "0bitmap$1"
+      }
+    ]
+  },
+  {
     "name": "sun.awt.shell.ShellFolderManager",
     "methods": [
       {
@@ -1501,6 +1678,14 @@
       {
         "name": "<init>",
         "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.misc.Unsafe",
+    "fields": [
+      {
+        "name": "theUnsafe"
       }
     ]
   },

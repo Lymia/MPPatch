@@ -32,8 +32,10 @@ object Preferences {
     def decode(s: String): T = decodeF(s)
   }
 
-  implicit val StringPreference  = SimplePreferenceSerializer[String](identity, identity)
-  implicit val BooleanPreference = SimplePreferenceSerializer[Boolean](_.toString, _.toBoolean)
+  implicit val StringPreference: SimplePreferenceSerializer[String] =
+    SimplePreferenceSerializer[String](identity, identity)
+  implicit val BooleanPreference: SimplePreferenceSerializer[Boolean] =
+    SimplePreferenceSerializer[Boolean](_.toString, _.toBoolean)
 
   val prefs = java.util.prefs.Preferences.userNodeForPackage(getClass)
   class PreferenceKey[T: PreferenceSerializer](val name: String, default: => T) {
