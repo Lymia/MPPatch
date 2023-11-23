@@ -53,10 +53,10 @@ class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog
     val stylesheet = htmlEditor.getStyleSheet
     stylesheet.addRule(IOUtils.loadResource("text/style.css"))
     stylesheet.addRule(s"""
-         |p, li, h1, h2, h3, h4, h5, h6 {
-         |  font-family: ${systemFont.getFontName},sans-serif;
-         |  font-size: ${systemFont.getSize};
-         |}
+                          |p, li, h1, h2, h3, h4, h5, h6 {
+                          |  font-family: ${systemFont.getFontName},sans-serif;
+                          |  font-size: ${systemFont.getSize};
+                          |}
        """.stripMargin)
 
     val document = htmlEditor.createDefaultDocument()

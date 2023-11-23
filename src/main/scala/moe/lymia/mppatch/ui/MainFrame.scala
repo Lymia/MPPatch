@@ -48,7 +48,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private val platform = Platform.currentPlatform.getOrElse(error("error.unknownplatform"))
   private def checkPath(path: Path) =
     Files.exists(path) && Files.isDirectory(path) &&
-    patchPackage.script.checkFor.forall(x => Files.exists(path.resolve(x)))
+      patchPackage.script.checkFor.forall(x => Files.exists(path.resolve(x)))
   private def resolvePaths(paths: Seq[Path]) = paths.find(checkPath)
 
   private val syncLock                          = new Object
@@ -111,18 +111,16 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     if (!flag) warn("error.statuschanged")
     flag
   }
-  private val actionUpdate = () => {
+  private val actionUpdate = () =>
     if (checkPatchStatus()) {
       getInstallerUnsafe.safeUpdate(packages)
       true
     } else false
-  }
-  private val actionUninstall = () => {
+  private val actionUninstall = () =>
     if (checkPatchStatus()) {
       getInstallerUnsafe.safeUninstall()
       true
     } else false
-  }
   private def actionValidate0() = {
     val ret = JOptionPane.showConfirmDialog(frame, i18n("validate.confirm"), titleString, JOptionPane.YES_NO_OPTION)
     if (ret == JOptionPane.OK_OPTION) {
@@ -132,13 +130,12 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
       reloadInstaller()
     }
   }
-  private val actionValidate = () => {
+  private val actionValidate = () =>
     if (checkPatchStatus()) {
       actionValidate0()
       true
     } else false
-  }
-  private val actionCleanup = () => {
+  private val actionCleanup = () =>
     if (checkPatchStatus()) {
       getInstallerUnsafe.cleanupPatch()
       getInstallerUnsafe.checkPatchStatus(packages) match {
@@ -149,7 +146,6 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
       }
       true
     } else false
-  }
 
   protected def buildForm() = {
     frame = new JFrame(titleString)

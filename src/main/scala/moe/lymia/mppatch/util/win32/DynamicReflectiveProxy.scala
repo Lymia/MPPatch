@@ -71,10 +71,12 @@ class DynamicReflectiveProxy(val obj: AnyRef) extends Dynamic {
   private def resolveDeclaredMethod(name: String, types: Seq[Class[_]], current: Class[_] = clazz): Option[Method] =
     current.getDeclaredMethods.find(method =>
       method.getName == name &&
-      (method.getParameterTypes.length == types.length) && (
-        types.isEmpty ||
-        (method.getParameterTypes zip types).map(x => x._1.isAssignableFrom(x._2) || x._1 == wraps(x._2)).reduce(_ && _)
-      )
+        (method.getParameterTypes.length == types.length) && (
+          types.isEmpty ||
+            (method.getParameterTypes zip types)
+              .map(x => x._1.isAssignableFrom(x._2) || x._1 == wraps(x._2))
+              .reduce(_ && _)
+        )
     ) match {
       case None =>
         if (current != classOf[AnyRef]) resolveDeclaredMethod(name, types, current.getSuperclass)

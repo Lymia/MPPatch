@@ -29,9 +29,9 @@ object LuaJITBuild {
   val coreCount = java.lang.Runtime.getRuntime.availableProcessors
   // Patch build script
   val settings = Seq(
-    Keys.luajitCacheDir := crossTarget.value / "luajit-cache",
+    Keys.luajitCacheDir  := crossTarget.value / "luajit-cache",
     Keys.luajitSourceDir := baseDirectory.value / "src" / "patch" / "native" / "luajit",
-    Keys.luajitIncludes := Keys.luajitSourceDir.value / "src",
+    Keys.luajitIncludes  := Keys.luajitSourceDir.value / "src",
     Keys.luajitFiles := {
       val patchDirectory = Keys.luajitCacheDir.value / "output"
       val logger         = streams.value.log
@@ -87,7 +87,7 @@ object LuaJITBuild {
           .allSubpaths(Keys.luajitSourceDir.value)
           .filter { case (_, x) =>
             (x.endsWith(".c") || x.endsWith(".h") || x.endsWith("Makefile") || x.endsWith(".lua")) &&
-              !excludeDeps.contains(x.split("/").last)
+            !excludeDeps.contains(x.split("/").last)
           }
           .map(_._1)
 

@@ -30,8 +30,8 @@ import java.util.UUID
 object NativePatchBuild {
   // Patch build script
   val settings = Seq(
-    Keys.patchBuildDir := crossTarget.value / "native-patch-build",
-    Keys.patchCacheDir := Keys.patchBuildDir.value / "cache",
+    Keys.patchBuildDir  := crossTarget.value / "native-patch-build",
+    Keys.patchCacheDir  := Keys.patchBuildDir.value / "cache",
     Keys.patchSourceDir := baseDirectory.value / "src" / "patch" / "native",
     // prepare common directories
     Keys.commonIncludes := prepareDirectory(Keys.patchBuildDir.value / "common") { dir =>

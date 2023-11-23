@@ -26,9 +26,9 @@ import scala.sys.process.*
 
 // Package metainfo
 organization := "moe.lymia"
-name := "mppatch-installer"
-homepage := Some(url("https://github.com/Lymia/MPPatch"))
-licenses := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
+name         := "mppatch-installer"
+homepage     := Some(url("https://github.com/Lymia/MPPatch"))
+licenses     := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit-license.php"))
 
 // Plugins for the project.
 InstallerResourceBuild.settings
@@ -36,7 +36,7 @@ NativeImagePlugin.projectSettings
 
 // Git versioning
 versionWithGit
-git.baseVersion := "0.1.3"
+git.baseVersion          := "0.1.3"
 git.uncommittedSignifier := Some("DIRTY")
 git.formattedShaVersion := {
   val base   = git.baseVersion.?.value
@@ -63,7 +63,7 @@ libraryDependencies += "com.formdev"             % "flatlaf-fonts-roboto" % "2.1
 // Build assembled jar
 ThisBuild / assemblyMergeStrategy := {
   case x if x.startsWith("moe/lymia") => MergeStrategy.first
-  case "module-info.class" => MergeStrategy.discard
+  case "module-info.class"            => MergeStrategy.discard
   case x =>
     val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
     oldStrategy(x)

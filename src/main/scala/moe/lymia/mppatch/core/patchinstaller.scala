@@ -179,9 +179,10 @@ class PatchInstaller(val basePath: Path, val loader: PatchLoader, platform: Plat
 
   private def isVersionKnown(path: String) =
     loader.nativePatchExists(Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
-  private def loadPatchState() = try if (Files.exists(patchStatePath))
-    PatchState.unserialize(IOUtils.readXML(patchStatePath))
-  else None
+  private def loadPatchState() = try
+    if (Files.exists(patchStatePath))
+      PatchState.unserialize(IOUtils.readXML(patchStatePath))
+    else None
   catch {
     case e: Exception =>
       log.error("Error encountered while deserializing patch state.", e)
