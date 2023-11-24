@@ -17,9 +17,9 @@ jobs:
       - run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang nasm rustup
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable
+          toolchain: nightly
           default: true
-          target: i686-pc-windows-gnu i686-unknown-linux-gnu
+          target: i686-pc-windows-gnu, i686-unknown-linux-gnu
 
       # Initialize git
       - uses: actions/checkout@v2
