@@ -34,6 +34,13 @@ enum PlatformType {
   case Win32, MacOS, Linux, Other
 }
 object PlatformType {
+  def forName(name: String) = name match {
+    case "win32" => PlatformType.Win32
+    case "macos" => PlatformType.MacOS
+    case "linux" => PlatformType.Linux
+    case _       => PlatformType.Other
+  }
+
   lazy val currentPlatform = {
     val os = System.getProperty("os.name", "-").toLowerCase(Locale.ENGLISH)
     if (os.contains("windows")) Win32
@@ -57,6 +64,8 @@ trait Platform {
     else resolve(path.resolve(mapPath(name.head)), name.tail: _*)
 }
 object Platform {
+  def forName(name: String) = Platform(PlatformType.forName(name))
+
   def apply(t: PlatformType) = t match {
     case PlatformType.Win32 => Some(Win32Platform)
     case PlatformType.MacOS => Some(MacOSPlatform)

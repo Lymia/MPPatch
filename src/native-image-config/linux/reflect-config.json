@@ -1453,7 +1453,7 @@
     ]
   },
   {
-    "name": "moe.lymia.mppatch.core.PackageSetLoader",
+    "name": "moe.lymia.mppatch.core.InstallFileSet",
     "fields": [
       {
         "name": "renames$lzy1"
@@ -1461,16 +1461,27 @@
     ]
   },
   {
-    "name": "moe.lymia.mppatch.core.PatchLoader",
+    "name": "moe.lymia.mppatch.core.InstallScript",
     "fields": [
       {
         "name": "cleanup$lzy1"
       },
       {
-        "name": "data$lzy1"
+        "name": "patchManifest$lzy2"
       },
       {
-        "name": "script$lzy1"
+        "name": "source$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.PatchPackage",
+    "fields": [
+      {
+        "name": "patchManifest$lzy1"
+      },
+      {
+        "name": "scripts$lzy1"
       }
     ]
   },

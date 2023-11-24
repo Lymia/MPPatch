@@ -25,8 +25,8 @@ package moe.lymia.mppatch.ui
 import java.awt.{GridBagConstraints, GridBagLayout}
 import java.nio.file.{Files, Path, Paths}
 import java.util.Locale
-import javax.swing._
-import moe.lymia.mppatch.core._
+import javax.swing.*
+import moe.lymia.mppatch.core.*
 import moe.lymia.mppatch.util.Steam
 import moe.lymia.mppatch.util.io.{DataSource, ResourceDataSource}
 
@@ -48,11 +48,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private val platform = Platform.currentPlatform.getOrElse(error("error.unknownplatform"))
   private def checkPath(path: Path) =
     Files.exists(path) && Files.isDirectory(path) &&
-      patchPackage.script.checkFor.forall(x => Files.exists(path.resolve(x)))
+      patchPackage.detectInstallationPlatform(path).isDefined
   private def resolvePaths(paths: Seq[Path]) = paths.find(checkPath)
 
   private val syncLock                          = new Object
-  private var patchPackage: PatchLoader         = _
+  private var patchPackage: PatchPackage         = _
   private var isUserChange                      = false
   private var isValid                           = false
   private var installer: Option[PatchInstaller] = None
@@ -63,7 +63,8 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   def getInstaller = installer
   def changeInstaller(path: Path, changeByUser: Boolean = true): Unit = syncLock synchronized {
     log.info(s"Changing installer path to ${path.toString}")
-    val instance = new PatchInstaller(path, patchPackage, platform)
+    val installPlatform = patchPackage.detectInstallationPlatform(path).get
+    val instance = new PatchInstaller(path, installPlatform, platform)
     isUserChange = changeByUser
     if (Files.exists(path)) {
       isValid = checkPath(path)
@@ -83,7 +84,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   }
   def changePatchPackage(pack: DataSource) = syncLock synchronized {
     log.info("Changing patch package...")
-    patchPackage = new PatchLoader(pack, platform)
+    patchPackage = new PatchPackage(pack)
     reloadInstaller()
   }
 
@@ -125,7 +126,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     val ret = JOptionPane.showConfirmDialog(frame, i18n("validate.confirm"), titleString, JOptionPane.YES_NO_OPTION)
     if (ret == JOptionPane.OK_OPTION) {
       getInstallerUnsafe.cleanupPatch()
-      Steam.validateGameFiles(patchPackage.script.steamId)
+      Steam.validateGameFiles(getInstallerUnsafe.install.script.steamId)
       JOptionPane.showMessageDialog(frame, i18n("validate.wait"), titleString, JOptionPane.INFORMATION_MESSAGE)
       reloadInstaller()
     }
@@ -178,7 +179,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     uninstallButton.setEnabled(false)
     uninstallButton.setStatusAction("action.uninstall", actionUninstall)
 
-    targetVersion.setText(patchPackage.data.patchVersion)
+    targetVersion.setText(patchPackage.patchManifest.patchVersion)
 
     lastPatchStatus = None
 
