@@ -21,6 +21,6 @@
   ~ THE SOFTWARE.
   -->
 <PatchManifest>
-    <InstallScript Platform="win32" Source="install/win32.xml"/>
-    <InstallScript Platform="linux" Source="install/linux.xml"/>
+    <InstallScript Source="install/win32_civ5.xml"/>
+    <InstallScript Source="install/linux_civ5.xml"/>
 </PatchManifest>

@@ -22,24 +22,74 @@
 
 package moe.lymia.mppatch.core
 
-import java.nio.charset.StandardCharsets
-import java.nio.file.Path
-import java.nio.file.Files
 import moe.lymia.mppatch.util.io.*
 import moe.lymia.mppatch.util.io.XMLUtils.*
 
-import java.io.File
+import java.nio.charset.StandardCharsets
+import java.nio.file.{Files, Path}
 import scala.xml.{Node, XML}
+
+case class XmlPatchManifest(
+    patchVersion: String,
+    timestamp: Long,
+    installScripts: Seq[String]
+)
+object XmlPatchManifest {
+  def loadFromXML(xml: Node) = {
+    val manifestVersion = getAttribute(xml, "ManifestVersion")
+    if (manifestVersion != "1") sys.error("Unknown ManifestVersion: " + manifestVersion)
+    XmlPatchManifest(
+      getAttribute(xml, "PatchVersion"),
+      getAttribute(xml, "Timestamp").toLong,
+      (xml \ "InstallScript").map(loadSource)
+    )
+  }
+}
+
+case class XmlInstallScript(
+    platform: String,
+    steamId: Int,
+    assetsPath: String,
+    checkFor: Set[String],
+    hashFrom: String,
+    supportedHashes: Set[String],
+    packages: Map[String, XmlPackage],
+    cleanupData: XmlCleanupData
+) {
+  def loadPackage(name: String) = packages.getOrElse(name, sys.error("no such package " + name))
+
+  @annotation.tailrec
+  final def loadPackages(toLoad: Set[String], packages: Set[XmlPackage] = Set()): Set[XmlPackage] = {
+    val loaded = packages.map(_.name)
+    if (loaded == toLoad) packages
+    else {
+      val newPackages = (toLoad -- loaded).map(loadPackage)
+      loadPackages(toLoad ++ newPackages.flatMap(_.dependencies), packages ++ newPackages)
+    }
+  }
+}
+object XmlInstallScript {
+  def loadFromXML(xml: Node) =
+    XmlInstallScript(
+      getAttribute(xml, "Platform"),
+      getNodeText(xml, "SteamId").toInt,
+      (xml \ "AssetsPath").map(loadPath).head,
+      (xml \ "CheckFor").map(loadPath).toSet,
+      (xml \ "HashFrom").map(loadPath).head,
+      (xml \ "SupportedHash").map(loadHash).toSet,
+      (xml \ "Package").map(XmlPackage.loadFromXML).map(x => x.name -> x).toMap,
+      (xml \ "Cleanup").map(XmlCleanupData.loadFromXML).head
+    )
+}
 
 case class XmlPackage(
     name: String,
     dependencies: Set[String],
     renames: Seq[XmlRenameFile],
-    installBinary: Seq[String],
-    writeConfig: Seq[XmlWriteConfig],
+    writeConfig: Seq[String],
     additionalFile: Seq[XmlAdditionalFile],
     writeDLC: Seq[XmlWriteDLC],
-    setFlags: Set[String]
+    enableFeature: Set[String]
 )
 object XmlPackage {
   def loadAdditionalFile(xml: Node) =
@@ -51,11 +101,10 @@ object XmlPackage {
       getAttribute(xml, "Name"),
       getOptionalAttribute(xml, "Depends").fold(Set[String]())(_.split(",").toSet),
       (xml \ "RenameFile").map(XmlRenameFile.loadFromXML),
-      (xml \ "InstallBinary").map(loadPath),
-      (xml \ "WriteConfig").map(x => XmlWriteConfig(loadPath(x), getAttribute(x, "Section"))),
+      (xml \ "WriteConfig").map(loadPath),
       (xml \ "AdditionalFile").map(loadAdditionalFile),
       (xml \ "WriteDLC").map(loadWriteDLC),
-      (xml \ "SetFlag").map(x => getAttribute(x, "Name")).toSet
+      (xml \ "EnableFeature").map(x => getAttribute(x, "Name")).toSet
     )
 }
 
@@ -74,61 +123,6 @@ object XmlCleanupData {
     XmlCleanupData((xml \ "RenameIfExists").map(XmlRenameFile.loadFromXML), (xml \ "CheckFile").map(loadPath))
 }
 
-case class XmlInstallScript(
-    steamId: Int,
-    assetsPath: String,
-    checkFor: Set[String],
-    packages: Map[String, XmlPackage],
-    cleanupData: XmlCleanupData,
-    versionFrom: String
-) {
-  def loadPackage(name: String) = packages.getOrElse(name, sys.error("no such package " + name))
-
-  @annotation.tailrec
-  final def loadPackages(toLoad: Set[String], packages: Set[XmlPackage] = Set()): Set[XmlPackage] = {
-    val loaded = packages.map(_.name)
-    if (loaded == toLoad) packages
-    else {
-      val newPackages = (toLoad -- loaded).map(loadPackage)
-      loadPackages(toLoad ++ newPackages.flatMap(_.dependencies), packages ++ newPackages)
-    }
-  }
-}
-object XmlInstallScript {
-  def loadFromXML(xml: Node) =
-    XmlInstallScript(
-      getNodeText(xml, "SteamId").toInt,
-      (xml \ "AssetsPath").map(loadPath).head,
-      (xml \ "CheckFor").map(loadPath).toSet,
-      (xml \ "Package").map(XmlPackage.loadFromXML).map(x => x.name -> x).toMap,
-      (xml \ "Cleanup").map(XmlCleanupData.loadFromXML).head,
-      (xml \ "VersionFrom").map(loadPath).head
-    )
-}
-
-case class XmlPatchManifest(
-    patchVersion: String,
-    timestamp: Long,
-    nativePatches: Seq[XmlNativePatch],
-    installScripts: Map[String, String]
-)
-object XmlPatchManifest {
-  def loadNativePatch(xml: Node) =
-    XmlNativePatch(getAttribute(xml, "Platform"), getAttribute(xml, "Sha256"), loadSource(xml))
-  def loadFromXML(xml: Node) = {
-    val manifestVersion = getAttribute(xml, "ManifestVersion")
-    if (manifestVersion != "0") sys.error("Unknown ManifestVersion: " + manifestVersion)
-    XmlPatchManifest(
-      getAttribute(xml, "PatchVersion"),
-      getAttribute(xml, "Timestamp").toLong,
-      (xml \ "NativePatch").map(loadNativePatch),
-      (xml \ "InstallScript").map(x => getAttribute(x, "Platform") -> loadSource(x)).toMap
-    )
-  }
-}
-
-case class XmlNativePatch(platform: String, sha256: String, source: String)
-
 /** Main loader for the game's patch packages.
   *
   * @param source
@@ -140,63 +134,58 @@ class PatchPackage(val source: DataSource) {
   lazy val patchManifest = XmlPatchManifest.loadFromXML(XML.loadString(source.loadResource("manifest.xml")))
 
   /** The list of install scripts available in this package. */
-  lazy val scripts =
-    patchManifest.installScripts.view.mapValues(x => XmlInstallScript.loadFromXML(source.loadXML(x))).toMap
+  lazy val scripts = patchManifest.installScripts.map(x => XmlInstallScript.loadFromXML(source.loadXML(x)))
 
   /** Detects the platform a Civilization installation directory is for. */
   def detectInstallationPlatform(root: Path): Option[InstallScript] = {
     val possible = for (
-      (platformStr, script) <- scripts;
-      platform              <- Platform.forName(platformStr)
+      script <- scripts;
       if script.checkFor.forall(x => Files.exists(root.resolve(x)))
-    ) yield new InstallScript(this, platform, script)
+    ) yield new InstallScript(this, script)
     possible.headOption
   }
 
   /** Loads a UI patch from the package. */
   def loadUIPatch(x: String) = UIPatch.loadFromXML(source.loadXML(x))
-
-  private[core] val versionMap         = patchManifest.nativePatches.map(x => (x.platform, x.sha256) -> x).toMap
-  def loadPatch(patch: XmlNativePatch) = source.loadBinaryResource(patch.source)
 }
 
 /** A specific installation script for a specific version of Civilization. */
-class InstallScript private[core] (val pkg: PatchPackage, val platform: Platform, val script: XmlInstallScript) {
+class InstallScript private[core] (val pkg: PatchPackage, val script: XmlInstallScript) {
+  val platform = Platform.forName(script.platform).get
+
   lazy val source        = pkg.source
   lazy val patchManifest = pkg.patchManifest
   lazy val cleanup       = script.cleanupData
 
-  def nativePatchForHash(versionName: String) =
-    pkg.versionMap.get((platform.platformName, versionName))
+  def makeFileSet(packages: Set[String], sha256: String) =
+    InstallFileSet(this, sha256, script.loadPackages(packages).toSeq)
 
-  def nativePatchExists(versionName: String) = nativePatchForHash(versionName).isDefined
-
-  def makeFileSet(packages: Set[String]) = InstallFileSet(this, script.loadPackages(packages).toSeq)
+  def supportedHash(hash: String) =
+    script.supportedHashes.contains(hash)
 }
 
 /** A set of files which to be added to a Civilization directory. */
-case class InstallFileSet private[core] (script: InstallScript, packages: Seq[XmlPackage]) {
+case class InstallFileSet private[core] (script: InstallScript, sha256: String, packages: Seq[XmlPackage]) {
   lazy val renames = packages.flatMap(_.renames)
   def getFiles(basePath: Path, versionName: String): Seq[OutputFile] = {
     val configFileBody =
-      "; This file was automatically generated by the MPPatch installer. Do not edit it manually.\n" +
-        packages.flatMap(_.setFlags).toSet.map((x: String) => s"$x=true").mkString("\n")
-    lazy val nativePatch =
-      script.pkg.loadPatch(script.nativePatchForHash(versionName).getOrElse(sys.error("Unknown version.")))
+      f"""# Generated by MPPatch. Do not edit manually.
+         |bin_sha256 = "$sha256"
+         |features = [${packages.flatMap(_.enableFeature).map(x => "\"" + x + "\"").distinct.sorted.mkString(",")}]
+         |""".stripMargin
 
     val configFiles = packages
       .flatMap(_.writeConfig)
-      .map(x => OutputFile(x.filename, s"[${x.section}]\n$configFileBody".getBytes(StandardCharsets.UTF_8)))
+      .map(x => OutputFile(x, configFileBody.getBytes(StandardCharsets.UTF_8)))
     val additionalFiles = packages
       .flatMap(_.additionalFile)
       .map(x => OutputFile(x.filename, script.source.loadBinaryResource(x.source), x.isExecutable))
-    val binaryFiles = packages.flatMap(_.installBinary).map(x => OutputFile(x, nativePatch))
 
     val assetPath = script.script.assetsPath
     val assets    = script.platform.resolve(basePath, assetPath)
     val dlcFiles = packages.flatMap(_.writeDLC).flatMap { x =>
       val uiPatch = script.pkg.loadUIPatch(x.source)
-      val dlc     = new UIPatchLoader(script.source, uiPatch).generateBaseDLC(assets, script.platform)
+      val dlc     = new CivDlcBuilder(script.source, uiPatch).generateBaseDLC(assets, script.platform)
       val dlcMap = DLCDataWriter.writeDLC(
         s"$assetPath/${script.platform.mapPath(x.target)}",
         Some(s"$assetPath/${script.platform.mapPath(x.textData)}"),
@@ -206,7 +195,7 @@ case class InstallFileSet private[core] (script: InstallScript, packages: Seq[Xm
       dlcMap.map(x => OutputFile(x._1, x._2))
     }
 
-    dlcFiles ++ binaryFiles ++ additionalFiles ++ configFiles
+    dlcFiles ++ additionalFiles ++ configFiles
   }
 }
 case class OutputFile(filename: String, data: Array[Byte], isExecutable: Boolean = false)

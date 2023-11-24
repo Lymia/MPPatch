@@ -20,31 +20,31 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-<InstallScript>
+<InstallScript Platform="win32">
     <SteamId>8930</SteamId>
     <AssetsPath Path="Assets"/>
     <CheckFor Path="CvGameDatabaseWin32Final Release.dll"/>
-    <VersionFrom Path="CvGameDatabaseWin32Final Release.dll"/>
+
+    <HashFrom Path="CvGameDatabaseWin32Final Release.dll"/>
+    <SupportedHash Hash="f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563"/>
 
     <Package Name="multiplayer">
         <RenameFile Path="CvGameDatabaseWin32Final Release.dll" RenameTo="CvGameDatabase_Original.dll"/>
-
-        <InstallBinary Path="CvGameDatabaseWin32Final Release.dll"/>
-        <WriteConfig Path="mppatch_config.ini" Section="MPPatch"/>
+        <AdditionalFile Path="CvGameDatabaseWin32Final Release.dll" Source="native/mppatch_core.dll"/>
+        <WriteConfig Path="mppatch_config.toml"/>
         <WriteDLC Source="ui/mppatch.xml" DLCData="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
-
-        <SetFlag Name="enableMultiplayerPatch"/>
+        <EnableFeature Name="Multiplayer"/>
     </Package>
     <Package Name="luajit">
-        <SetFlag Name="enableLuaJIT"/>
         <RenameFile Path="lua51_Win32.dll" RenameTo="lua51_Win32.dll.bak"/>
         <AdditionalFile Path="lua51_Win32.dll" Source="native/luajit_win32.dll"/>
+        <EnableFeature Name="LuaJit"/>
     </Package>
     <Package Name="logging">
-        <SetFlag Name="enableLogging"/>
+        <EnableFeature Name="Logging"/>
     </Package>
     <Package Name="debug">
-        <SetFlag Name="enableDebug"/>
+        <EnableFeature Name="Debug"/>
     </Package>
 
     <Cleanup>

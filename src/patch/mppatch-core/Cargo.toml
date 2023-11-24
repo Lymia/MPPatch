@@ -1,6 +1,6 @@
 [package]
 name = "mppatch-core"
-version = "0.3.0"
+version = "0.0.0"
 authors = ["Lymia Kanokawa <lymia@lymia.moe>"]
 edition = "2021"
 
@@ -12,6 +12,7 @@ anyhow = { version = "1.0", features = ["backtrace"] }
 ctor = "0.2"
 enumset = { version = "1.1", features = ["serde"] }
 log = { version = "0.4", features = ["std"] }
+native-dialog = "0.7.0"
 serde = { version = "1.0", features = ["derive"] }
 simplelog = { version = "0.12", features = ["paris"] }
 toml = "0.8"

@@ -23,12 +23,12 @@
 package moe.lymia.mppatch.core
 
 import moe.lymia.mppatch.util.LuaUtils
+import moe.lymia.mppatch.util.io.*
+import moe.lymia.mppatch.util.io.XMLUtils.*
+
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import java.util.{Locale, UUID}
-import moe.lymia.mppatch.util.io._
-import moe.lymia.mppatch.util.io.XMLUtils._
-
 import scala.xml.{Node, XML}
 
 case class LuaSoftHook(id: String, includes: Seq[String], inject: Seq[String])
@@ -86,7 +86,7 @@ object UIPatch {
     )
 }
 
-class UIPatchLoader(source: DataSource, patch: UIPatch) {
+class CivDlcBuilder(source: DataSource, patch: UIPatch) {
   private lazy val luaPatchList = patch.luaPatches.map(x => x.filename.toLowerCase(Locale.ENGLISH) -> x).toMap
   private lazy val libraryFiles = patch.libraryFiles.map(x => x.filename -> source.loadResource(x.source)).toMap
   private lazy val newScreenFiles = patch.newScreenFileNames

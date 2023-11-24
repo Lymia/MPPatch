@@ -43,8 +43,8 @@ object PatchBuild {
       }
       for (nativeBin <- NativePatchBuild.Keys.nativeVersions.value) {
         log.log(Level.Info, s"Copying $nativeBin to output directory.")
-        IO.copyFile(nativeBin.file, dir / nativeBin.file.getName)
-        IO.write(dir / s"${nativeBin.file.getName}.build-id", nativeBin.buildId)
+        IO.copyFile(nativeBin.file, dir / nativeBin.name)
+        IO.write(dir / s"${nativeBin.name}.build-id", nativeBin.buildId)
       }
 
       // return directory
@@ -70,16 +70,6 @@ object PatchBuild {
           log.info(s"Found native binary file: $binary")
           PatchFile(s"native/${binary.getName}", IO.readBytes(binary))
         }
-      val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
-      val nativePatchEntries = NativePatchBuild.Keys.nativeVersionInfo.value.map { x =>
-        val source = s"native/mppatch_${x.platform.name}_${x.sha256}${x.platform.extension}"
-        <NativePatch Platform={x.platform.name} Sha256={x.sha256} Source={source}/>
-      }
-      val output = <PatchManifest ManifestVersion="0" PatchVersion={version.value}
-                                  Timestamp={System.currentTimeMillis().toString}>
-        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
-        {nativePatchEntries}
-      </PatchManifest>
 
       val versionDataInfo = InstallerResourceBuild.Keys.versionData.value.toSeq.sorted
         .map(x => s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}")
@@ -88,8 +78,7 @@ object PatchBuild {
         .filter(x => x.getName.endsWith(".build-id"))
         .sorted
         .map { x =>
-          val hash = x.getName.split("\\.").head.split("_").last
-          s"_mpPatch.version.buildId[${LuaUtils.quote(hash)}] = ${LuaUtils.quote(IO.read(x))}"
+          s"_mpPatch.version.buildId[${LuaUtils.quote(x.getName)}] = ${LuaUtils.quote(IO.read(x))}"
         }
         .mkString("\n")
       val versionInfo = PatchFile(
@@ -101,14 +90,21 @@ object PatchBuild {
            |$buildIdInfo
            |
            |_mpPatch.version.info = {}
+           |$versionDataInfo
            |
            |_mpPatch.version.loaded = true
-           |$versionDataInfo
         """.stripMargin.trim
       )
+
+      val versionFile = PatchFile("version.properties", IO.readBytes(InstallerResourceBuild.Keys.versionFile.value))
+
+      val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
+      val output = <PatchManifest ManifestVersion="1" PatchVersion={version.value}
+                                  Timestamp={System.currentTimeMillis().toString}>
+        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
+      </PatchManifest>
       val manifestFile =
         PatchFile("manifest.xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
-      val versionFile = PatchFile("version.properties", IO.readBytes(InstallerResourceBuild.Keys.versionFile.value))
 
       // Final generated files list
       (versionInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles)).toMap

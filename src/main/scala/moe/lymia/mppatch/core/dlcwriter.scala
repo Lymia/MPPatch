@@ -22,10 +22,9 @@
 
 package moe.lymia.mppatch.core
 
+import moe.lymia.mppatch.util.io.*
+
 import java.util.UUID
-
-import moe.lymia.mppatch.util.io._
-
 import scala.xml.Node
 
 case class DLCUISkin(name: String, set: String, platform: String)

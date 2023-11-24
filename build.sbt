@@ -36,7 +36,7 @@ NativeImagePlugin.projectSettings
 
 // Git versioning
 versionWithGit
-git.baseVersion          := "0.1.3"
+git.baseVersion          := "0.2.0"
 git.uncommittedSignifier := Some("DIRTY")
 git.formattedShaVersion := {
   val base   = git.baseVersion.?.value
@@ -56,9 +56,6 @@ crossPaths := false
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml"            % "2.1.0"
 libraryDependencies += "com.formdev"             % "flatlaf"              % "3.2.5"
 libraryDependencies += "com.formdev"             % "flatlaf-fonts-roboto" % "2.137"
-
-// New dependencies for tasks
-(Compile / run) := (Compile / run).dependsOn(PatchBuild.Keys.buildDylibDir).evaluated
 
 // Build assembled jar
 ThisBuild / assemblyMergeStrategy := {

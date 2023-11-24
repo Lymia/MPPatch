@@ -22,13 +22,12 @@
 
 package moe.lymia.mppatch.core
 
-import java.nio.file.attribute.PosixFilePermission._
-import java.nio.file.{Files, Path}
-
-import moe.lymia.mppatch.util.io._
+import moe.lymia.mppatch.util.io.*
 import moe.lymia.mppatch.util.{Crypto, Logger, SimpleLogger}
 
-import scala.jdk.CollectionConverters._
+import java.nio.file.attribute.PosixFilePermission.*
+import java.nio.file.{Files, Path}
+import scala.jdk.CollectionConverters.*
 import scala.xml.Node
 
 private object PathNames {
@@ -114,7 +113,7 @@ private object PatchState {
 }
 
 class PatchInstaller(val basePath: Path, val install: InstallScript, platform: Platform, log: Logger = SimpleLogger) {
-  import PathNames._
+  import PathNames.*
 
   private val patchStatePath = basePath.resolve(patchStateFilename)
   private val patchLockPath  = basePath.resolve(patchLockFilename)
@@ -176,7 +175,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   private def validatePatchFile(file: PatchFile): Boolean = validatePatchFile(file.path, file.expectedSha256)
 
   private def isVersionKnown(path: String) =
-    install.nativePatchExists(Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
+    install.supportedHash(Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
   private def loadPatchState() = try
     if (Files.exists(patchStatePath))
       PatchState.unserialize(IOUtils.readXML(patchStatePath))
@@ -197,9 +196,9 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
       val leftoverFiles = install.cleanup.checkFile.filter(x => Files.exists(basePath.resolve(x)))
 
       if (!Files.exists(patchStatePath)) {
-        if (!Files.exists(basePath.resolve(install.script.versionFrom))) PatchStatus.NeedsValidation
+        if (!Files.exists(basePath.resolve(install.script.hashFrom))) PatchStatus.NeedsValidation
         else if (leftoverFiles.nonEmpty) PatchStatus.NeedsCleanup
-        else PatchStatus.NotInstalled(isVersionKnown(install.script.versionFrom))
+        else PatchStatus.NotInstalled(isVersionKnown(install.script.hashFrom))
       } else
         loadPatchState() match {
           case Some(patchState) =>
@@ -219,18 +218,16 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
                 if (validatePatchFile(patchState.versionFrom, patchState.sha256)) PatchStatus.FilesValidated
                 else if (isVersionKnown(patchState.versionFrom)) PatchStatus.TargetUpdated
                 else PatchStatus.UnknownUpdate
-              } else
-                install.nativePatchForHash(patchState.sha256) match {
-                  case Some(version) =>
-                    if (
-                      patchState.installedTimestamp != install.patchManifest.timestamp ||
-                      patchState.installedVersion != install.patchManifest.patchVersion
-                    )
-                      PatchStatus.NeedsUpdate
-                    else if (patchState.packages != packages) PatchStatus.PackageChange
-                    else PatchStatus.Installed
-                  case None => PatchStatus.CanUninstall
-                }
+              } else if (install.supportedHash(patchState.sha256)) {
+                if (
+                  patchState.installedTimestamp != install.patchManifest.timestamp ||
+                  patchState.installedVersion != install.patchManifest.patchVersion
+                ) PatchStatus.NeedsUpdate
+                else if (patchState.packages != packages) PatchStatus.PackageChange
+                else PatchStatus.Installed
+              } else {
+                PatchStatus.CanUninstall
+              }
             }
           case None => PatchStatus.NeedsCleanup
         }
@@ -244,10 +241,10 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   private def installPatch(packages: Set[String]) = {
     log.info("Installing patch...")
 
-    val targetVersion = Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(install.script.versionFrom)))
+    val targetVersion = Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(install.script.hashFrom)))
     log.info(s"- Target version: $targetVersion")
 
-    val newFileSet = install.makeFileSet(packages)
+    val newFileSet = install.makeFileSet(packages, targetVersion)
     val newFiles   = newFileSet.getFiles(basePath, targetVersion)
 
     for (rename <- newFileSet.renames) {
@@ -282,7 +279,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
 
     log.info("- Writing patch state")
     val state = PatchState(
-      install.script.versionFrom,
+      install.script.hashFrom,
       targetVersion,
       packages,
       renameData,

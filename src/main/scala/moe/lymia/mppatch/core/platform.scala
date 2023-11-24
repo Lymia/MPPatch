@@ -22,12 +22,11 @@
 
 package moe.lymia.mppatch.core
 
+import moe.lymia.mppatch.util.win32.WindowsRegistry
+import moe.lymia.mppatch.util.{SimpleLogger, Steam}
+
 import java.nio.file.{Path, Paths}
 import java.util.Locale
-
-import moe.lymia.mppatch.util.{SimpleLogger, Steam}
-import moe.lymia.mppatch.util.win32.WindowsRegistry
-
 import scala.annotation.tailrec
 
 enum PlatformType {
@@ -66,7 +65,7 @@ trait Platform {
 object Platform {
   def forName(name: String) = Platform(PlatformType.forName(name))
 
-  def apply(t: PlatformType) = t match {
+  def apply(t: PlatformType): Option[Platform] = t match {
     case PlatformType.Win32 => Some(Win32Platform)
     case PlatformType.MacOS => Some(MacOSPlatform)
     case PlatformType.Linux => Some(LinuxPlatform)

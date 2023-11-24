@@ -30,223 +30,42 @@ import java.util.UUID
 object NativePatchBuild {
   // Patch build script
   val settings = Seq(
-    Keys.patchBuildDir  := crossTarget.value / "native-patch-build",
-    Keys.patchCacheDir  := Keys.patchBuildDir.value / "cache",
-    Keys.patchSourceDir := baseDirectory.value / "src" / "patch" / "native",
-    // prepare common directories
-    Keys.commonIncludes := prepareDirectory(Keys.patchBuildDir.value / "common") { dir =>
-      cacheVersionHeader(
-        Keys.patchCacheDir.value / "version_h",
-        Keys.patchBuildDir.value / "tmp_version.h",
-        dir / "version.h",
-        version.value
-      )
-    },
-    Keys.win32Directory := prepareDirectory(Keys.patchBuildDir.value / "win32") { dir =>
-      cachedTransform(
-        Keys.patchCacheDir.value / "win23_lua_stub",
-        Keys.patchSourceDir.value / "win32" / "stub" / "lua51_Win32.c",
-        dir / "lua51_Win32.dll"
-      )((in, out) => win32_cc(Seq("-shared", "-o", out, in)))
-    },
-    // Extract Steam runtime libSDL files.
-    Keys.steamrtSDL :=
-      extractSteamRuntime(
-        baseDirectory.value / "project" / "contrib_bin" / config_steam_sdlbin_path,
-        Keys.patchBuildDir.value / config_steam_sdlbin_name,
-        streams.value.log.info("Extracting " + config_steam_sdlbin_name + "...")
-      ) { (dir, target) =>
-        IO.copyFile(dir / "usr" / "lib" / "i386-linux-gnu" / config_steam_sdlbin_name, target)
-      },
-    Keys.steamrtSDLDev :=
-      extractSteamRuntime(
-        baseDirectory.value / "project" / "contrib_bin" / config_steam_sdldev_path,
-        Keys.patchBuildDir.value / "SDL2_include",
-        streams.value.log.info("Extracting SDL2 headers...")
-      ) { (dir, target) =>
-        IO.copyDirectory(dir / "usr" / "include" / "SDL2", target)
-      },
-    Keys.nativeVersionInfo := {
-      for (versionDir <- (Keys.patchSourceDir.value / "versions").listFiles) yield {
-        val version                    = versionDir.getName
-        val Array(platformStr, sha256) = version.split("_")
-        val platform                   = PlatformType.forString(platformStr)
-        PatchFileInfo(platform, sha256, versionDir)
-      }
-    },
     Keys.nativeVersions := {
-      val patchDirectory = Keys.patchBuildDir.value / "output"
-      val logger         = streams.value.log
+      val crateDir = baseDirectory.value / "src" / "patch" / "mppatch-core"
+      val logger   = streams.value.log
 
-      IO.createDirectory(patchDirectory)
-
-      val patches =
-        for (
-          PatchFileInfo(platform, _, versionDir) <- Keys.nativeVersionInfo.value
-          if PlatformType.currentPlatform.shouldBuildNative(platform)
-        ) yield {
-          val version                    = versionDir.getName
-          val Array(platformStr, sha256) = version.split("_")
-          val platform                   = PlatformType.forString(platformStr)
-
-          val (cc, nasmFormat, binaryExtension, sourcePath, extraCDeps, gccFlags, nasmFiles) =
-            platform match {
-              case PlatformType.Win32 =>
-                (
-                  win32_cc _,
-                  "win32",
-                  ".dll",
-                  Seq(Keys.patchSourceDir.value / "win32"),
-                  allFiles(Keys.win32Directory.value, ".dll"),
-                  Seq(
-                    "-l",
-                    "lua51_Win32",
-                    "-Wl,-L," + Keys.win32Directory.value,
-                    "-static-libgcc",
-                    "-Wl,--start-group",
-                    "-lmsvcr90"
-                  ) ++ config_win32_secureFlags,
-                  Seq(Keys.patchSourceDir.value / "win32" / "proxy.s")
-                )
-              case PlatformType.Linux =>
-                (
-                  linux_cc _,
-                  "elf",
-                  ".so",
-                  Seq(
-                    Keys.patchSourceDir.value / "linux",
-                    Keys.patchSourceDir.value / "posix",
-                    Keys.steamrtSDLDev.value
-                  ),
-                  Seq(Keys.steamrtSDL.value),
-                  Seq("-ldl"),
-                  Seq()
-                )
-            }
-          val fullSourcePath = Seq(
-            Keys.patchSourceDir.value / "common",
-            Keys.patchSourceDir.value / "inih",
-            Keys.commonIncludes.value,
-            versionDir
-          ) ++ sourcePath
-          val fullIncludePath = fullSourcePath :+ LuaJITBuild.Keys.luajitIncludes.value
-          val cBuildDependencies =
-            fullSourcePath.flatMap(x => allFiles(x, ".c")) ++ fullIncludePath.flatMap(x => allFiles(x, ".h")) ++
-              extraCDeps
-          val sBuildDependencies = fullSourcePath.flatMap(x => allFiles(x, ".s")) ++ nasmFiles
-
-          def includePaths(flag: String) = fullIncludePath.flatMap(x => Seq(flag, dir(x)))
-
-          val versionStr = "version_" + version
-          val buildTmp   = Keys.patchBuildDir.value / versionStr
-          IO.createDirectory(buildTmp)
-
-          val nasmOut =
-            trackDependencySet(Keys.patchCacheDir.value / s"${versionStr}_nasm_o", sBuildDependencies.toSet) {
-              logger.info("Compiling as_entry.o for version " + version)
-
-              (for (file <- nasmFiles) yield {
-                val output = buildTmp / file.getName.replace(".s", ".o")
-                nasm(includePaths("-i") ++ Seq("-Ox", "-f", nasmFormat, "-o", output, file))
-                output
-              }).toSet
-            }
-
-          val targetDir   = patchDirectory / version
-          val targetFile  = targetDir / s"mppatch_$version$binaryExtension"
-          val buildIdFile = targetDir / "buildid.txt"
-          val outputPath =
-            trackDependencies(Keys.patchCacheDir.value / s"${versionStr}_c_out", cBuildDependencies.toSet ++ nasmOut) {
-              logger.info(s"Compiling binary patch for version $version")
-              val buildId = UUID.randomUUID()
-
-              if (targetDir.exists) IO.delete(targetDir)
-              targetDir.mkdirs()
-
-              IO.write(buildIdFile, buildId.toString)
-
-              cc(
-                includePaths("-I") ++ Seq(
-                  "-m32",
-                  "-g",
-                  "-shared",
-                  "-O2",
-                  "--std=gnu11",
-                  "-Wall",
-                  "-fvisibility=hidden",
-                  "-o",
-                  targetFile,
-                  s"""-DMPPATCH_CIV_SHA256="$sha256"""",
-                  s"""-DMPPATCH_PLATFORM="${platform.name}"""",
-                  s"""-DMPPATCH_BUILDID="$buildId""""
-                ) ++ nasmOut ++ config_common_secureFlags ++
-                  gccFlags ++ fullSourcePath.flatMap(x => allFiles(x, ".c"))
-              )
-              targetDir
-            }
-
-          PatchFile(platform, sha256, targetFile, IO.read(buildIdFile))
+      for (
+        platform <- Seq(PlatformType.Win32, PlatformType.Linux)
+        if PlatformType.currentPlatform.shouldBuildNative(platform)
+      ) yield {
+        val (rustTarget, outName, targetName) = platform match {
+          case PlatformType.Win32 => ("i686-pc-windows-gnu", "mppatch_core.dll", "mppatch_core.dll")
+          case PlatformType.Linux => ("i686-unknown-linux-gnu", "mppatch_core.so", "libmppatch_core.so")
+          case _                  => sys.error("unreachable")
         }
-      patches
+
+        // clean build the package
+        IO.delete(crateDir / "target" / rustTarget)
+
+        // run Cargo
+        val buildId = UUID.randomUUID()
+        runProcess(
+          Seq("cargo", "build", "--target", rustTarget, "--release"),
+          crateDir,
+          Map(
+            "MPPATCH_VERSION" -> version.value,
+            "MPPATCH_BUILDID" -> buildId.toString
+          )
+        )
+
+        // make the patches list
+        PatchFile(outName, crateDir / "target" / rustTarget / "release" / targetName, buildId.toString)
+      }
     }
   )
 
-  def win32_cc(p: Seq[Any]) = runProcess(config_win32_cc +: s"--target=$config_target_win32" +: p)
-
-  def linux_cc(p: Seq[Any]) = runProcess(config_linux_cc +: s"--target=$config_target_linux" +: p)
-
-  def nasm(p: Seq[Any]) = runProcess(config_nasm +: p)
-
-  // Steam runtime
-  def extractSteamRuntime[T](source: File, target: File, beforeLog: => T = null)(fn: (File, File) => Unit) =
-    if (target.exists) target
-    else {
-      beforeLog
-      IO.withTemporaryDirectory { temp =>
-        runProcess(Seq("ar", "xv", source), temp)
-        runProcess(Seq("tar", "xvf", temp / "data.tar.gz"), temp)
-        fn(temp, target)
-      }
-      target
-    }
-
-  def cacheVersionHeader(cacheDirectory: File, tempTarget: File, finalTarget: File, version: String) = {
-    val VersionRegex(major, minor, _, _, _, _) = version
-    cachedGeneration(
-      cacheDirectory,
-      tempTarget,
-      finalTarget,
-      "#ifndef VERSION_H\n" +
-        "#define VERSION_H\n" +
-        "#define patchVersionMajor " + tryParse(major, -1) + "\n" +
-        "#define patchVersionMinor " + tryParse(minor, -1) + "\n" +
-        "#define patchFullVersion \"" + version + "\"\n" +
-        "#endif /* VERSION_H */"
-    )
-  }
-
-  // Codegen for version header
-  def tryParse(s: String, default: Int) = try s.toInt
-  catch {
-    case _: NumberFormatException => default
-  }
-
-  case class PatchFile(platform: PlatformType, sha256: String, file: File, buildId: String)
-  case class PatchFileInfo(platform: PlatformType, sha256: String, versionDir: File)
-
+  case class PatchFile(name: String, file: File, buildId: String)
   object Keys {
-    val patchBuildDir  = SettingKey[File]("native-patch-build-directory")
-    val patchCacheDir  = SettingKey[File]("native-patch-cache-directory")
-    val patchSourceDir = SettingKey[File]("native-patch-source-directory")
-
-    val win32Directory = TaskKey[File]("native-patch-win32-directory")
-
-    val steamrtSDL    = TaskKey[File]("native-patch-download-steam-runtime-sdl")
-    val steamrtSDLDev = TaskKey[File]("native-patch-download-steam-runtime-sdl-dev")
-
-    val commonIncludes = TaskKey[File]("native-patch-common-includes")
-
-    val nativeVersions    = TaskKey[Seq[PatchFile]]("native-patch-files")
-    val nativeVersionInfo = TaskKey[Seq[PatchFileInfo]]("native-patch-info")
+    val nativeVersions = TaskKey[Seq[PatchFile]]("native-patch-files")
   }
 }

@@ -38,6 +38,12 @@ object Utils {
     assertProcess(Process(p.map(_.toString), cd) !)
   }
 
+  def runProcess(p: Seq[Any], cd: File, env: Map[String, String]) = {
+    println("Running process in " + cd + ": " + p.map(_.toString).mkString(" "))
+    for ((k, v) <- env) println(s"  - $k = $v")
+    assertProcess(Process(p.map(_.toString), cd, env.toSeq*) !)
+  }
+
   // Process helper functions
   def assertProcess(i: Int) = if (i != 0) sys.error("Process returned non-zero return value! (ret: " + i + ")")
 

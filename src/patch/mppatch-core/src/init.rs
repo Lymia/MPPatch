@@ -22,7 +22,7 @@
 
 use anyhow::*;
 use enumset::*;
-use log::{info, LevelFilter, trace};
+use log::{info, trace, LevelFilter};
 use serde::*;
 use simplelog::{
     ColorChoice, CombinedLogger, ConfigBuilder, SharedLogger, TermLogger, TerminalMode,
@@ -37,9 +37,16 @@ pub struct MppatchCtx {
     exe_dir: PathBuf,
     config: MppatchConfig,
 }
+
 impl MppatchCtx {
     pub fn exe_dir(&self) -> &Path {
         &self.exe_dir
+    }
+    pub fn build_id(&self) -> &'static str {
+        match option_env!("MPPATCH_BUILDID") {
+            Some(x) => x,
+            None => "00000000-0000-0000-0000-000000000000",
+        }
     }
     pub fn bin_sha256(&self) -> &str {
         &self.config.bin_sha256
@@ -59,7 +66,6 @@ struct MppatchConfig {
 #[derive(EnumSetType, Serialize, Deserialize, Debug)]
 #[enumset(serialize_repr = "list")]
 pub enum MppatchFeature {
-    Core,
     Multiplayer,
     LuaJit,
     Logging,
@@ -114,6 +120,8 @@ fn setup_logging(ctx: &MppatchCtx) {
                 .build(),
             File::create(log_file).expect("Cannot open log file."),
         ));
+    } else {
+        log::set_max_level(LevelFilter::Info)
     }
     CombinedLogger::init(loggers).unwrap();
 }
@@ -123,7 +131,11 @@ pub fn run() -> Result<MppatchCtx> {
     let ctx = create_ctx()?;
     setup_logging(&ctx);
 
-    info!("mppatch-core v{} loaded", env!("CARGO_PKG_VERSION"));
+    info!("mppatch-core v{} loaded", match option_env!("MPPATCH_VERSION") {
+        Some(x) => x,
+        None => "<unknown>",
+    });
+    trace!("build-id: {}", ctx.build_id());
     trace!("ctx: {ctx:#?}");
 
     Ok(ctx)

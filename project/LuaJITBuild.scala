@@ -31,7 +31,6 @@ object LuaJITBuild {
   val settings = Seq(
     Keys.luajitCacheDir  := crossTarget.value / "luajit-cache",
     Keys.luajitSourceDir := baseDirectory.value / "src" / "patch" / "native" / "luajit",
-    Keys.luajitIncludes  := Keys.luajitSourceDir.value / "src",
     Keys.luajitFiles := {
       val patchDirectory = Keys.luajitCacheDir.value / "output"
       val logger         = streams.value.log
@@ -119,8 +118,6 @@ object LuaJITBuild {
   object Keys {
     val luajitCacheDir  = SettingKey[File]("luajit-cache-dir")
     val luajitSourceDir = SettingKey[File]("luajit-source-dir")
-    val luajitIncludes  = SettingKey[File]("luajit-includes")
-
     val luajitFiles = TaskKey[Seq[LuaJITPatchFile]]("luajit-files")
   }
 }

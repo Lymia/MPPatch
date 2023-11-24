@@ -38,5 +38,6 @@ object XMLUtils {
   def getOptionalNodeText(node: Node, tag: String) = getOptional(node \ tag).map(_.trim)
 
   def loadPath(node: Node)   = getAttribute(node, "Path")
+  def loadHash(node: Node)   = getAttribute(node, "Hash")
   def loadSource(node: Node) = getAttribute(node, "Source")
 }

@@ -20,34 +20,34 @@
   ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   ~ THE SOFTWARE.
   -->
-<InstallScript>
+<InstallScript Platform="linux">
     <SteamId>8930</SteamId>
     <AssetsPath Path="steamassets/assets"/>
     <CheckFor Path="Civ5XP"/>
-    <VersionFrom Path="Civ5XP"/>
+
+    <HashFrom Path="Civ5XP"/>
+    <SupportedHash Hash="cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca"/>
 
     <Package Name="core">
         <RenameFile Path="Civ5XP" RenameTo="Civ5XP.orig"/>
-
-        <InstallBinary Path="mppatch_core.so"/>
-        <WriteConfig Path="mppatch_config.ini" Section="MPPatch"/>
-
         <AdditionalFile Path="Civ5XP" Source="install/Civ5XP.sh" SetExecutable="true"/>
         <AdditionalFile Path="Civ5XP.launch" Source="install/Civ5XP.launch.sh" SetExecutable="true"/>
+        <AdditionalFile Path="mppatch_core.so" Source="native/mppatch_core.so" SetExecutable="true"/>
+        <WriteConfig Path="mppatch_config.toml"/>
     </Package>
     <Package Name="multiplayer" Depends="core">
-        <SetFlag Name="enableMultiplayerPatch"/>
         <WriteDLC Source="ui/mppatch.xml" DLCData="dlc/mppatch" TextData="gameplay/xml/newtext/mppatch_textdata"/>
+        <EnableFeature Name="Multiplayer"/>
     </Package>
     <Package Name="luajit" Depends="core">
-        <SetFlag Name="enableLuaJIT"/>
         <AdditionalFile Path="mppatch_luajit.so" Source="native/luajit_linux.so"/>
+        <EnableFeature Name="LuaJit"/>
     </Package>
     <Package Name="logging">
-        <SetFlag Name="enableLogging"/>
+        <EnableFeature Name="Logging"/>
     </Package>
     <Package Name="debug">
-        <SetFlag Name="enableDebug"/>
+        <EnableFeature Name="Debug"/>
     </Package>
 
     <Cleanup>

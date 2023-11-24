@@ -50,9 +50,11 @@ class FileLock(lockFile: Path) {
 object IOUtils {
   private val resPath = "/moe/lymia/mppatch/"
 
-  def getResourceURL(s: String)            = getClass.getResource(resPath + s)
-  def getResource(s: String)               = getClass.getResourceAsStream(resPath + s)
-  def resourceExists(s: String)            = getResource(s) != null
+  private def checkNull[T](in: Any, t: T): T = if (t == null) sys.error(f"Could not find '$in'") else t
+
+  def getResourceURL(s: String)            = checkNull(s, getClass.getResource(resPath + s))
+  def getResource(s: String)               = checkNull(s, getClass.getResourceAsStream(resPath + s))
+  def resourceExists(s: String)            = getClass.getResource(resPath + s) != null
   def loadFromStream(s: InputStream)       = scala.io.Source.fromInputStream(s)(Codec.UTF8).mkString
   def loadBinaryFromStream(s: InputStream) = LazyList.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
   def loadResource(s: String)              = loadFromStream(getResource(s))
