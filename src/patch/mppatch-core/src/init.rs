@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-use anyhow::*;
+use anyhow::{ensure, Result};
 use enumset::*;
 use log::{info, trace, LevelFilter};
 use serde::*;

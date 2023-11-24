@@ -20,11 +20,23 @@
  * THE SOFTWARE.
  */
 
+use crate::init::MppatchFeature;
 use ctor::ctor;
 
+mod hook_luajit;
 mod init;
+mod patch_rt;
+mod platform;
+
+fn ctor_impl() -> anyhow::Result<()> {
+    let ctx = init::run()?;
+    if ctx.has_feature(MppatchFeature::LuaJit) {
+        hook_luajit::apply_luajit_hook(&ctx)?;
+    }
+    Ok(())
+}
 
 #[ctor]
 fn ctor() {
-    let ctx = init::run().unwrap();
+    ctor_impl().unwrap();
 }

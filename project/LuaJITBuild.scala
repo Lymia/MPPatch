@@ -30,7 +30,7 @@ object LuaJITBuild {
   // Patch build script
   val settings = Seq(
     Keys.luajitCacheDir  := crossTarget.value / "luajit-cache",
-    Keys.luajitSourceDir := baseDirectory.value / "src" / "patch" / "native" / "luajit",
+    Keys.luajitSourceDir := baseDirectory.value / "src" / "patch" / "luajit",
     Keys.luajitFiles := {
       val patchDirectory = Keys.luajitCacheDir.value / "output"
       val logger         = streams.value.log

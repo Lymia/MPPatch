@@ -35,7 +35,7 @@ object NativePatchBuild {
       val logger   = streams.value.log
 
       for (
-        platform <- Seq(PlatformType.Win32, PlatformType.Linux)
+        platform <- Seq[PlatformType](PlatformType.Linux)
         if PlatformType.currentPlatform.shouldBuildNative(platform)
       ) yield {
         val (rustTarget, outName, targetName) = platform match {

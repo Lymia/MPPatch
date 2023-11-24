@@ -1,6 +1,3 @@
-[submodule "src/patch/native/inih"]
-	path = src/patch/native/inih
-	url = https://github.com/benhoyt/inih.git
 [submodule "src/patch/native/luajit"]
-	path = src/patch/native/luajit
+	path = src/patch/luajit
 	url = https://github.com/openresty/luajit2.git
