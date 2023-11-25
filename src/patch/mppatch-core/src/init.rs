@@ -20,7 +20,8 @@
  * THE SOFTWARE.
  */
 
-use anyhow::{ensure, Result};
+use crate::versions::{find_info, VersionInfo, VersionInfoLinux};
+use anyhow::{bail, ensure, Result};
 use enumset::*;
 use log::{info, trace, LevelFilter};
 use serde::*;
@@ -28,19 +29,30 @@ use simplelog::{
     ColorChoice, CombinedLogger, ConfigBuilder, SharedLogger, TermLogger, TerminalMode,
     ThreadLogMode, WriteLogger,
 };
-use std::fs::File;
-use std::path::{Path, PathBuf};
+use std::{
+    fs::File,
+    path::{Path, PathBuf},
+};
 
 /// The context for a particular load of the binary.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct MppatchCtx {
     exe_dir: PathBuf,
     config: MppatchConfig,
+    version_info: VersionInfo,
 }
-
 impl MppatchCtx {
     pub fn exe_dir(&self) -> &Path {
         &self.exe_dir
+    }
+    pub fn sha256(&self) -> &str {
+        &self.config.bin_sha256
+    }
+    pub fn version(&self) -> &'static str {
+        match option_env!("MPPATCH_VERSION") {
+            Some(x) => x,
+            None => "<unknown>",
+        }
     }
     pub fn build_id(&self) -> &'static str {
         match option_env!("MPPATCH_BUILDID") {
@@ -48,16 +60,19 @@ impl MppatchCtx {
             None => "00000000-0000-0000-0000-000000000000",
         }
     }
-    pub fn bin_sha256(&self) -> &str {
-        &self.config.bin_sha256
-    }
     pub fn has_feature(&self, feature: MppatchFeature) -> bool {
         self.config.features.contains(feature)
+    }
+    pub fn info_linux(&self) -> Result<VersionInfoLinux> {
+        match self.version_info {
+            VersionInfo::Linux(info) => Ok(info),
+            _ => bail!("Version is not Linux-based."),
+        }
     }
 }
 
 /// The configuration file for MPPatch
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Clone, Debug)]
 struct MppatchConfig {
     bin_sha256: String,
     features: EnumSet<MppatchFeature>,
@@ -89,7 +104,9 @@ fn create_ctx() -> Result<MppatchCtx> {
     let config = std::io::read_to_string(File::open(config_file)?)?;
     let config = toml::from_str::<MppatchConfig>(&config)?;
 
-    Ok(MppatchCtx { exe_dir, config })
+    let version_info = find_info(&config.bin_sha256)?;
+
+    Ok(MppatchCtx { exe_dir, config, version_info })
 }
 
 fn setup_logging(ctx: &MppatchCtx) {
@@ -98,7 +115,7 @@ fn setup_logging(ctx: &MppatchCtx) {
 
     let mut loggers: Vec<Box<dyn SharedLogger>> = Vec::new();
     loggers.push(TermLogger::new(
-        LevelFilter::Info,
+        LevelFilter::Trace,
         ConfigBuilder::default()
             .set_thread_level(LevelFilter::Error)
             .set_thread_mode(ThreadLogMode::Both)
@@ -120,8 +137,6 @@ fn setup_logging(ctx: &MppatchCtx) {
                 .build(),
             File::create(log_file).expect("Cannot open log file."),
         ));
-    } else {
-        log::set_max_level(LevelFilter::Info)
     }
     CombinedLogger::init(loggers).unwrap();
 }
@@ -131,10 +146,7 @@ pub fn run() -> Result<MppatchCtx> {
     let ctx = create_ctx()?;
     setup_logging(&ctx);
 
-    info!("mppatch-core v{} loaded", match option_env!("MPPATCH_VERSION") {
-        Some(x) => x,
-        None => "<unknown>",
-    });
+    info!("mppatch-core v{} loaded", ctx.version());
     trace!("build-id: {}", ctx.build_id());
     trace!("ctx: {ctx:#?}");
 

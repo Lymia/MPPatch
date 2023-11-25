@@ -20,30 +20,31 @@
  * THE SOFTWARE.
  */
 
-#![feature(c_unwind)]
+#![allow(non_snake_case)]
 
-use crate::init::MppatchFeature;
-use ctor::ctor;
+use anyhow::*;
 
-mod hook_lua;
-mod hook_luajit;
-mod init;
-mod rt_patch;
-mod rt_platform;
-mod versions;
-
-fn ctor_impl() -> anyhow::Result<()> {
-    let ctx = init::run()?;
-    if ctx.has_feature(MppatchFeature::LuaJit) {
-        hook_luajit::apply_luajit_hook(&ctx)?;
-    }
-    if ctx.has_feature(MppatchFeature::Multiplayer) {
-        hook_lua::init(&ctx)?;
-    }
-    Ok(())
+#[derive(Copy, Clone, Debug)]
+pub enum VersionInfo {
+    Linux(VersionInfoLinux),
 }
 
-#[ctor]
-fn ctor() {
-    ctor_impl().unwrap();
+#[derive(Copy, Clone, Debug)]
+pub struct VersionInfoLinux {
+    pub sym_lGetMemoryUsage: &'static str,
+    pub sym_lGetMemoryUsage_len: usize,
+    pub sym_SetActiveDLCAndMods: &'static str,
+    pub sym_SetActiveDLCAndMods_len: usize,
+}
+
+pub fn find_info(sha256: &str) -> Result<VersionInfo> {
+    Ok(match sha256 {
+        "cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca" => VersionInfo::Linux(VersionInfoLinux {
+            sym_lGetMemoryUsage: "_ZN8Database9Scripting3Lua15lGetMemoryUsageEP9lua_State",
+            sym_lGetMemoryUsage_len: 7,
+            sym_SetActiveDLCAndMods: "_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb",
+            sym_SetActiveDLCAndMods_len: 10,
+        }),
+        _ => bail!("Unknown version: {sha256}"),
+    })
 }

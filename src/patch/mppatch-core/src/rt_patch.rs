@@ -20,14 +20,13 @@
  * THE SOFTWARE.
  */
 
-use crate::platform::{reprotect_region, unprotect_region, ExecutableMemory};
-use log::trace;
-use std::ffi::c_void;
-use std::ptr;
+use crate::rt_platform::{reprotect_region, unprotect_region, ExecutableMemory};
+use log::debug;
+use std::{ffi::c_void, ptr};
 
 unsafe fn write_jmp(patch_addr: *mut c_void, to_addr: *const c_void, reason: &str) {
     let offset_diff = (to_addr as i32) - (patch_addr as i32) - 5;
-    trace!("Writing JMP ({reason}) - {patch_addr:?} => {to_addr:?} (diff: 0x{offset_diff:08x})");
+    debug!("Writing JMP ({reason}) - {patch_addr:?} => {to_addr:?} (diff: 0x{offset_diff:08x})");
     (patch_addr as *mut u8).write_unaligned(0xe9);
     (patch_addr.offset(1) as *mut i32).write_unaligned(offset_diff);
 }
@@ -50,7 +49,7 @@ impl PatchedFunction {
         patch_bytes: usize,
         reason: &str,
     ) -> Self {
-        trace!(
+        debug!(
             "Proxying function ({reason}) - {patch_addr:?} => {to_addr:?} ({patch_bytes} bytes)"
         );
 
@@ -74,7 +73,7 @@ impl PatchedFunction {
 }
 impl Drop for PatchedFunction {
     fn drop(&mut self) {
-        trace!("Unpatching proxied function at {:?}", self.patch_addr);
+        debug!("Unpatching proxied function at {:?}", self.patch_addr);
 
         unsafe {
             let old_prot = unprotect_region(self.patch_addr, self.patch_bytes);
@@ -83,3 +82,5 @@ impl Drop for PatchedFunction {
         }
     }
 }
+unsafe impl Send for PatchedFunction {}
+unsafe impl Sync for PatchedFunction {}

@@ -24,10 +24,10 @@ use crate::init::MppatchCtx;
 
 #[cfg(unix)]
 mod unix_impl {
-    use crate::init::MppatchCtx;
-    use crate::patch_rt::patch_jmp_instruction;
+    use crate::{init::MppatchCtx, rt_patch::patch_jmp_instruction};
     use anyhow::{bail, Result};
     use dlopen::raw::Library;
+    use log::info;
     use std::ffi::c_void;
 
     const LUAJIT_SYMBOLS: &[&str] = &[
@@ -188,6 +188,8 @@ mod unix_impl {
     ];
 
     pub fn patch(ctx: &MppatchCtx) -> Result<()> {
+        info!("Applying LuaJIT patch...");
+
         let dylib_civ = Library::open_self()?;
 
         let mut luajit_path = ctx.exe_dir().to_owned();

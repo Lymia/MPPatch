@@ -9,6 +9,7 @@ chain_width = 60
 single_line_if_else_max_width = 60
 
 # Other options
+imports_granularity = "Crate"
 merge_derives = false
 overflow_delimited_expr = true
 struct_lit_single_line = true

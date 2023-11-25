@@ -78,7 +78,12 @@ object PatchBuild {
         .filter(x => x.getName.endsWith(".build-id"))
         .sorted
         .map { x =>
-          s"_mpPatch.version.buildId[${LuaUtils.quote(x.getName)}] = ${LuaUtils.quote(IO.read(x))}"
+          val platform = x.getName match {
+            case "mppatch_core.dll.build-id"   => "win32"
+            case "mppatch_core.dylib.build-id" => "macos"
+            case "mppatch_core.so.build-id"    => "linux"
+          }
+          s"_mpPatch.version.buildId[${LuaUtils.quote(platform)}] = ${LuaUtils.quote(IO.read(x))}"
         }
         .mkString("\n")
       val versionInfo = PatchFile(

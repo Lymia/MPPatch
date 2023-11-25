@@ -66,11 +66,11 @@ do
         loadFailed("Could not load version information.")
         return
     end
-    local expectedBuildId = _mpPatch.version.buildId[patch.version.sha256]
+    local expectedBuildId = _mpPatch.version.buildId[patch.version.platform]
     if not expectedBuildId or expectedBuildId ~= patch.version.buildId then
         expectedBuildId = tostring(expectedBuildId)
-        local format = "BuildID mismatch. (version: %s, got: %s, expected: %s)"
-        loadFailed(format:format(patch.version.sha256, patch.version.buildId, expectedBuildId))
+        local format = "BuildID mismatch. (platform: %s, got: %s, expected: %s)"
+        loadFailed(format:format(patch.version.platform, patch.version.buildId, expectedBuildId))
         return
     end
 end
