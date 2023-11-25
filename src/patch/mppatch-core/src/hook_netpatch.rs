@@ -74,8 +74,7 @@ mod platform_impl {
 
         let linux_info: VersionInfoLinux = ctx.info_linux()?;
 
-        let sym = linux_info.sym_SetActiveDLCAndMods;
-        let sym_size = linux_info.sym_SetActiveDLCAndMods_len;
+        let (sym, sym_size) = linux_info.sym_SetActiveDLCAndMods;
 
         unsafe {
             let dylib_civ = Library::open_self()?;

@@ -67,8 +67,7 @@ mod platform_impl {
 
         let linux_info: VersionInfoLinux = ctx.info_linux()?;
 
-        let sym = linux_info.sym_lGetMemoryUsage;
-        let sym_size = linux_info.sym_lGetMemoryUsage_len;
+        let (sym, sym_size) = linux_info.sym_lGetMemoryUsage;
 
         unsafe {
             let dylib_civ = Library::open_self()?;

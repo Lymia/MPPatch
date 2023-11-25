@@ -26,24 +26,37 @@ use anyhow::*;
 
 #[derive(Copy, Clone, Debug)]
 pub enum VersionInfo {
+    Windows(VersionInfoWindows),
     Linux(VersionInfoLinux),
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct VersionInfoLinux {
+pub struct VersionInfoWindows {
     pub sym_lGetMemoryUsage: &'static str,
-    pub sym_lGetMemoryUsage_len: usize,
-    pub sym_SetActiveDLCAndMods: &'static str,
-    pub sym_SetActiveDLCAndMods_len: usize,
+    pub sym_SetActiveDLCAndMods_dx9: (usize, usize),
+    pub sym_SetActiveDLCAndMods_dx11: (usize, usize),
+    pub sym_SetActiveDLCAndMods_tablet: (usize, usize),
+    pub binary_base: usize,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct VersionInfoLinux {
+    pub sym_lGetMemoryUsage: (&'static str, usize),
+    pub sym_SetActiveDLCAndMods: (&'static str, usize),
 }
 
 pub fn find_info(sha256: &str) -> Result<VersionInfo> {
     Ok(match sha256 {
         "cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca" => VersionInfo::Linux(VersionInfoLinux {
-            sym_lGetMemoryUsage: "_ZN8Database9Scripting3Lua15lGetMemoryUsageEP9lua_State",
-            sym_lGetMemoryUsage_len: 7,
-            sym_SetActiveDLCAndMods: "_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb",
-            sym_SetActiveDLCAndMods_len: 10,
+            sym_lGetMemoryUsage: ("_ZN8Database9Scripting3Lua15lGetMemoryUsageEP9lua_State", 7),
+            sym_SetActiveDLCAndMods: ("_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb", 10),
+        }),
+        "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563" => VersionInfo::Windows(VersionInfoWindows {
+            sym_lGetMemoryUsage: "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z",
+            sym_SetActiveDLCAndMods_dx9: (0x006CD160, 6),
+            sym_SetActiveDLCAndMods_dx11: (0x006B8E50, 6),
+            sym_SetActiveDLCAndMods_tablet: (0x0065DC10, 6),
+            binary_base: 0x00400000,
         }),
         _ => bail!("Unknown version: {sha256}"),
     })
