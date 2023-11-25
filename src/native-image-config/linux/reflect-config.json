@@ -1453,6 +1453,38 @@
     ]
   },
   {
+    "name": "moe.lymia.mppatch.core.CivDlcBuilder",
+    "fields": [
+      {
+        "name": "libraryFiles$lzy1"
+      },
+      {
+        "name": "luaPatchList$lzy1"
+      },
+      {
+        "name": "newScreenFiles$lzy1"
+      },
+      {
+        "name": "patchFileList$lzy1"
+      },
+      {
+        "name": "patchFileMap$lzy1"
+      },
+      {
+        "name": "softHookFiles$lzy1"
+      },
+      {
+        "name": "softHookInfo$lzy1"
+      },
+      {
+        "name": "softHookInfoFragments$lzy1"
+      },
+      {
+        "name": "textFiles$lzy1"
+      }
+    ]
+  },
+  {
     "name": "moe.lymia.mppatch.core.InstallFileSet",
     "fields": [
       {
@@ -1512,38 +1544,6 @@
     "fields": [
       {
         "name": "currentPlatform$lzy1"
-      }
-    ]
-  },
-  {
-    "name": "moe.lymia.mppatch.core.UIPatchLoader",
-    "fields": [
-      {
-        "name": "libraryFiles$lzy1"
-      },
-      {
-        "name": "luaPatchList$lzy1"
-      },
-      {
-        "name": "newScreenFiles$lzy1"
-      },
-      {
-        "name": "patchFileList$lzy1"
-      },
-      {
-        "name": "patchFileMap$lzy1"
-      },
-      {
-        "name": "softHookFiles$lzy1"
-      },
-      {
-        "name": "softHookInfo$lzy1"
-      },
-      {
-        "name": "softHookInfoFragments$lzy1"
-      },
-      {
-        "name": "textFiles$lzy1"
       }
     ]
   },
