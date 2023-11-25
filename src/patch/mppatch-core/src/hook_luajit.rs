@@ -20,11 +20,11 @@
  * THE SOFTWARE.
  */
 
-use crate::init::MppatchCtx;
+use crate::rt_init::MppatchCtx;
 
 #[cfg(unix)]
 mod unix_impl {
-    use crate::{init::MppatchCtx, rt_patch::patch_jmp_instruction};
+    use crate::{rt_init::MppatchCtx, rt_patch::patch_jmp_instruction};
     use anyhow::{bail, Result};
     use dlopen::raw::Library;
     use log::info;
@@ -218,12 +218,9 @@ mod unix_impl {
     }
 }
 
-pub fn apply_luajit_hook(_ctx: &MppatchCtx) -> anyhow::Result<()> {
+pub fn init(_ctx: &MppatchCtx) -> anyhow::Result<()> {
     #[cfg(unix)]
     unix_impl::patch(_ctx)?;
-
-    #[cfg(not(unix))]
-    log::trace!("apply_luajit_hook doing nothing: not on Unix");
 
     Ok(())
 }

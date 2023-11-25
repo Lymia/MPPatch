@@ -22,7 +22,11 @@
 
 #![allow(non_snake_case)]
 
-use crate::init::{MppatchCtx, MppatchFeature};
+use crate::{
+    hook_netpatch,
+    hook_netpatch::OverrideType,
+    rt_init::{MppatchCtx, MppatchFeature},
+};
 use anyhow::Result;
 use libc::c_int;
 use log::{debug, trace};
@@ -32,7 +36,7 @@ use mlua::{
         lua_pushcfunction, lua_pushstring, lua_settable, lua_type, LUA_REGISTRYINDEX, LUA_TSTRING,
     },
     lua_State,
-    prelude::{LuaFunction, LuaResult, LuaString},
+    prelude::{LuaFunction, LuaString},
     Lua, Table,
 };
 use std::{ffi::CStr, sync::Mutex};
@@ -92,7 +96,6 @@ mod platform_impl {
     pub const PLATFORM: &str = "linux";
 }
 
-const LUA_REG_INDEX: &str = "2c11892f-7ad1-4ea1-bc4e-770a86c387e6";
 const LUA_SENTINEL: &str = "216f0090-85dd-4061-8371-3d8ba2099a70";
 
 const LUA_TABLE_INDEX: &str = "4f9ef697-7746-45d3-9c2d-f2121464a359";
@@ -119,8 +122,18 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
 
     let patch_table = lua.create_table()?;
     patch_table.set("__mppatch_marker", 1)?;
-    patch_table.set("debugPrint", lua.create_function(l_debug_print)?)?;
-    patch_table.set("getGlobals", lua.create_function(l_get_globals)?)?;
+
+    // misc functions
+    patch_table.set(
+        "debugPrint",
+        lua.create_function(|_, value: LuaString| {
+            debug!(target: "<lua>", "{}", value.to_string_lossy());
+            Ok(())
+        })?,
+    )?;
+    patch_table.set("getGlobals", lua.create_function(|lua, _: ()| Ok(lua.globals()))?)?;
+
+    // shared table
     patch_table.set("shared", lua.create_table()?)?;
 
     // version table
@@ -167,26 +180,71 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
     // NetPatch table
     {
         let net_patch_table = lua.create_table()?;
-        // TODO: NetPatch.pushMod
-        // TODO: NetPatch.overrideReloadMods
-        // TODO: NetPatch.overrideModList
-        // TODO: NetPatch.pushDLC
-        // TODO: NetPatch.overrideReloadDLC
-        // TODO: NetPatch.overrideDLCList
-        // TODO: NetPatch.install
-        // TODO: NetPatch.reset
+
+        net_patch_table.set(
+            "pushMod",
+            lua.create_function(|_, (name, ver): (String, i32)| {
+                hook_netpatch::add_mod(&name, ver);
+                Ok(())
+            })?,
+        )?;
+        net_patch_table.set(
+            "pushDLC",
+            lua.create_function(|_, guid: String| {
+                hook_netpatch::add_dlc(&guid);
+                Ok(())
+            })?,
+        )?;
+
+        net_patch_table.set(
+            "overrideReloadMods",
+            lua.create_function(|_, _: ()| {
+                hook_netpatch::add_override(OverrideType::ForceReloadMods);
+                Ok(())
+            })?,
+        )?;
+        net_patch_table.set(
+            "overrideReloadDLC",
+            lua.create_function(|_, _: ()| {
+                hook_netpatch::add_override(OverrideType::ForceReloadDlcs);
+                Ok(())
+            })?,
+        )?;
+        net_patch_table.set(
+            "overrideModList",
+            lua.create_function(|_, _: ()| {
+                hook_netpatch::add_override(OverrideType::OverrideMods);
+                Ok(())
+            })?,
+        )?;
+        net_patch_table.set(
+            "overrideDLCList",
+            lua.create_function(|_, _: ()| {
+                hook_netpatch::add_override(OverrideType::OverrideDlcs);
+                Ok(())
+            })?,
+        )?;
+
+        net_patch_table.set(
+            "install",
+            lua.create_function(|_, _: ()| {
+                hook_netpatch::install();
+                Ok(())
+            })?,
+        )?;
+        net_patch_table.set(
+            "reset",
+            lua.create_function(|_, _: ()| {
+                hook_netpatch::reset();
+                Ok(())
+            })?,
+        )?;
+
         patch_table.set("NetPatch", net_patch_table)?;
     }
 
     lua.set_named_registry_value(LUA_TABLE_INDEX, patch_table)?;
     Ok(())
-}
-fn l_debug_print(_: &Lua, value: LuaString) -> LuaResult<()> {
-    debug!("{}", value.to_string_lossy());
-    Ok(())
-}
-fn l_get_globals(lua: &Lua, _: ()) -> LuaResult<Table> {
-    Ok(lua.globals())
 }
 
 /// this can't be done entire in mlua, unfortunately

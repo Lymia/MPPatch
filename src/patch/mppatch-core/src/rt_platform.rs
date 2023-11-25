@@ -88,10 +88,6 @@ impl ExecutableMemory {
     pub fn ptr(&self) -> *mut u8 {
         self.data
     }
-
-    pub fn leak(self) {
-        std::mem::forget(self);
-    }
 }
 impl Drop for ExecutableMemory {
     fn drop(&mut self) {
@@ -99,4 +95,4 @@ impl Drop for ExecutableMemory {
     }
 }
 
-pub use platform_impl::{reprotect_region, unprotect_region, ProtectionInfo};
+pub use platform_impl::{reprotect_region, unprotect_region};

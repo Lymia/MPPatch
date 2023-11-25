@@ -22,23 +22,26 @@
 
 #![feature(c_unwind)]
 
-use crate::init::MppatchFeature;
+use crate::rt_init::MppatchFeature;
 use ctor::ctor;
 
 mod hook_lua;
 mod hook_luajit;
-mod init;
+mod hook_netpatch;
+mod rt_cpplist;
+mod rt_init;
 mod rt_patch;
 mod rt_platform;
 mod versions;
 
 fn ctor_impl() -> anyhow::Result<()> {
-    let ctx = init::run()?;
+    let ctx = rt_init::run()?;
     if ctx.has_feature(MppatchFeature::LuaJit) {
-        hook_luajit::apply_luajit_hook(&ctx)?;
+        hook_luajit::init(&ctx)?;
     }
     if ctx.has_feature(MppatchFeature::Multiplayer) {
         hook_lua::init(&ctx)?;
+        hook_netpatch::init(&ctx)?;
     }
     Ok(())
 }
