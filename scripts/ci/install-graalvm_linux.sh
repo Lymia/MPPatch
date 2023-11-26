@@ -22,14 +22,30 @@
 # THE SOFTWARE.
 #
 
-. scripts/ci/install-graalvm_linux.sh
-install_for_linux || exit 1
+GRAALVM_WIN32="https://download.bell-sw.com/vm/23.1.1/bellsoft-liberica-vm-openjdk21.0.1+12-23.1.1+1-windows-amd64.zip"
+GRAALVM_WIN32_DIR="bellsoft-liberica-vm-openjdk21-23.1.1"
 
-JAR_NAME="$(sbt "print assembly" --error || exit 1)"
+GRAALVM_LINUX="https://download.bell-sw.com/vm/23.1.1/bellsoft-liberica-vm-openjdk21.0.1+12-23.1.1+1-linux-amd64.tar.gz"
+GRAALVM_LINUX_DIR="bellsoft-liberica-vm-openjdk21-23.1.1"
 
-rm -rfv target/native-image-config-temp scripts/native-image-config/linux || exit 1
-mkdir -p scripts/native-image-config/linux || exit 1
-target/graalvm-linux/bin/java \
-  -agentlib:native-image-agent=config-output-dir=target/native-image-config-temp \
-  -jar "$JAR_NAME" @nativeImageGenerateConfig 9e3c6db9-2a2f-4a22-9eb5-fba1a710449c || exit 1
-scripts/python/merge-configs.py linux || exit 1
+install_for_win32() {
+  if [ ! -d target/graalvm-win32 ]; then
+    wget $GRAALVM_WIN32 -O target/graalvm-win32.zip || exit 1
+    cd target/ || exit 1
+      unzip graalvm-win32.zip || exit 1
+      mv -v $GRAALVM_WIN32_DIR graalvm-win32 || exit 1
+      rm -rf graalvm-win32.tar.gz || exit 1
+    cd .. || exit 1
+  fi
+}
+
+install_for_linux() {
+  if [ ! -d target/graalvm-linux ]; then
+    wget $GRAALVM_LINUX -O target/graalvm-linux.tar.gz || exit 1
+    cd target/ || exit 1
+      tar -xv -f graalvm-linux.tar.gz || exit 1
+      mv -v $GRAALVM_LINUX_DIR graalvm-linux || exit 1
+      rm -rf graalvm-linux.tar.gz || exit 1
+    cd .. || exit 1
+  fi
+}

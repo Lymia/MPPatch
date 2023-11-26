@@ -90,6 +90,10 @@
     "allDeclaredMethods": true
   },
   {
+    "name": "com.formdev.flatlaf.demo.NewDialog",
+    "allDeclaredMethods": true
+  },
+  {
     "name": "com.formdev.flatlaf.demo.OptionPanePanel",
     "allDeclaredMethods": true
   },
@@ -1078,6 +1082,12 @@
     "allDeclaredMethods": true
   },
   {
+    "name": "com.intellij.codeInsight.editorActions.FoldingData"
+  },
+  {
+    "name": "com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl$CopyPasteOptionsTransferableData"
+  },
+  {
     "name": "com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
     "methods": [
       {
@@ -1198,6 +1208,24 @@
   },
   {
     "name": "java.nio.CharBuffer"
+  },
+  {
+    "name": "java.rmi.MarshalledObject",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "get",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.rmi.Remote"
   },
   {
     "name": "java.security.SecureRandomParameters"

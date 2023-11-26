@@ -68,34 +68,12 @@ ThisBuild / assemblyMergeStrategy := {
 
 // Build native binaries
 nativeImageInstalled := true
-nativeImageGraalHome := {
-  val platform   = PlatformType.currentPlatform
-  val graalvmDir = target.value / s"graalvm_${platform.name}"
-  val (dl_url, dl_dir) = platform match {
-    case PlatformType.Linux => (Config.config_linux_graalvm_url, Config.config_linux_graalvm_dir)
-    case _                  => sys.error("platform not supported for graalvm")
-  }
-
-  val log = streams.value.log;
-  if (!(graalvmDir / dl_dir / "jmods" / "java.base.jmod").exists) {
-    // recreate directory
-    log.info("Preparing directories for GraalVM installation...")
-    IO.delete(graalvmDir)
-    IO.createDirectory(graalvmDir)
-
-    // download graalvm
-    log.info("Downloading GraalVM...")
-    url(dl_url) #> (graalvmDir / "graalvm.tar.gz") !!;
-    Utils.runProcess(Seq("tar", "-xv", "-f", "graalvm.tar.gz"), graalvmDir)
-  }
-
-  (graalvmDir / dl_dir).toPath
-}
+nativeImageGraalHome := (target.value / f"graalvm_${PlatformType.currentPlatform.name}").toPath
 
 nativeImageOptions += "--no-fallback"
 nativeImageOptions += "-Djava.awt.headless=false"
 nativeImageOptions += "--strict-image-heap"
-nativeImageOptions += s"-H:ConfigurationFileDirectories=${baseDirectory.value / "src" / "native-image-config" / PlatformType.currentPlatform.name}"
+nativeImageOptions += s"-H:ConfigurationFileDirectories=${baseDirectory.value / "scripts" / "native-image-config" / PlatformType.currentPlatform.name}"
 
 Global / excludeLintKeys += nativeImageJvm
 Global / excludeLintKeys += nativeImageJvmIndex

@@ -67,6 +67,10 @@
   "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
 },
 {
+  "name":"com.formdev.flatlaf.demo.NewDialog",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
   "name":"com.formdev.flatlaf.demo.OptionPanePanel",
   "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
 },
@@ -342,6 +346,14 @@
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
 {
+  "name":"com.formdev.flatlaf.ui.FlatFileChooserUI",
+  "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
+},
+{
+  "name":"com.formdev.flatlaf.ui.FlatFileChooserUI$FlatShortcutsPanel",
+  "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
+},
+{
   "name":"com.formdev.flatlaf.ui.FlatFormattedTextFieldUI",
   "methods":[{"name":"createUI","parameterTypes":["javax.swing.JComponent"] }]
 },
@@ -609,6 +621,12 @@
   "methods":[{"name":"coalesceEvents","parameterTypes":["java.awt.AWTEvent","java.awt.AWTEvent"] }]
 },
 {
+  "name":"com.intellij.codeInsight.editorActions.FoldingData"
+},
+{
+  "name":"com.intellij.openapi.editor.impl.EditorCopyPasteHelperImpl$CopyPasteOptionsTransferableData"
+},
+{
   "name":"com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 },
@@ -671,6 +689,16 @@
   "name":"java.nio.CharBuffer"
 },
 {
+  "name":"java.rmi.MarshalledObject",
+  "methods":[{"name":"<init>","parameterTypes":["java.lang.Object"] }, {"name":"get","parameterTypes":[] }]
+},
+{
+  "name":"java.rmi.Remote"
+},
+{
+  "name":"java.security.SecureRandomParameters"
+},
+{
   "name":"java.util.List"
 },
 {
@@ -719,6 +747,13 @@
 {
   "name":"javax.swing.PopupFactory",
   "methods":[{"name":"getPopup","parameterTypes":["java.awt.Component","java.awt.Component","int","int","boolean"] }]
+},
+{
+  "name":"javax.swing.filechooser.FileSystemView",
+  "methods":[{"name":"getChooserShortcutPanelFiles","parameterTypes":[] }]
+},
+{
+  "name":"javax.swing.filechooser.UnixFileSystemView"
 },
 {
   "name":"javax.swing.plaf.basic.BasicButtonListener",
@@ -797,7 +832,19 @@
   "name":"net.miginfocom.swing.MigLayout"
 },
 {
+  "name":"sun.awt.shell.ShellFolderManager",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
   "name":"sun.java2d.marlin.DMarlinRenderingEngine",
+  "methods":[{"name":"<init>","parameterTypes":[] }]
+},
+{
+  "name":"sun.security.provider.NativePRNG",
+  "methods":[{"name":"<init>","parameterTypes":[] }, {"name":"<init>","parameterTypes":["java.security.SecureRandomParameters"] }]
+},
+{
+  "name":"sun.security.provider.SHA",
   "methods":[{"name":"<init>","parameterTypes":[] }]
 }
 ]

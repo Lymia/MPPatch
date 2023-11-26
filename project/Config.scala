@@ -26,19 +26,10 @@ object Config {
 
   val config_win32_cc = "clang"
   val config_linux_cc = "clang"
-  val config_nasm     = "nasm"
 
   val config_target_win32 = "i686-w64-mingw32"
   val config_target_linux = "i686-unknown-linux-gnu"
 
   val config_win32_secureFlags  = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
   val config_common_secureFlags = Seq("-fstack-protector", "-fstack-protector-strong", "-D_FORTIFY_SOURCE=2")
-
-  val config_steam_sdlbin_path = "libsdl2_2.0.3+steamrt1+srt4_i386.deb"
-  val config_steam_sdldev_path = "libsdl2-dev_2.0.3+steamrt1+srt4_i386.deb"
-  val config_steam_sdlbin_name = "libSDL2-2.0.so.0"
-
-  val config_linux_graalvm_url =
-    "https://download.bell-sw.com/vm/23.1.1/bellsoft-liberica-vm-openjdk21.0.1+12-23.1.1+1-linux-amd64.tar.gz"
-  val config_linux_graalvm_dir = "bellsoft-liberica-vm-openjdk21-23.1.1"
 }

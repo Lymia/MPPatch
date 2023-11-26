@@ -20,6 +20,26 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+#  Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>
+#
+#  Permission is hereby granted, free of charge, to any person obtaining a copy
+#  of this software and associated documentation files (the "Software"), to deal
+#  in the Software without restriction, including without limitation the rights
+#  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#  copies of the Software, and to permit persons to whom the Software is
+#  furnished to do so, subject to the following conditions:
+#
+#  The above copyright notice and this permission notice shall be included in
+#  all copies or substantial portions of the Software.
+#
+#  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#  THE SOFTWARE.
+
 import json
 import sys
 
@@ -122,12 +142,12 @@ def merge_resource_config(file_a, file_b, output):
     open(output, "w").write(json.dumps(new_json, indent=2))
 
 
-merge_jni_config(f"src/native-image-config/common-flatlaf-{platform}/jni-config.json",
+merge_jni_config(f"scripts/native-image-config/common-flatlaf-{platform}/jni-config.json",
                  "target/native-image-config-temp/jni-config.json",
-                 f"src/native-image-config/{platform}/jni-config.json")
-merge_jni_config(f"src/native-image-config/common-flatlaf-{platform}/reflect-config.json",
+                 f"scripts/native-image-config/{platform}/jni-config.json")
+merge_jni_config(f"scripts/native-image-config/common-flatlaf-{platform}/reflect-config.json",
                  "target/native-image-config-temp/reflect-config.json",
-                 f"src/native-image-config/{platform}/reflect-config.json")
-merge_resource_config(f"src/native-image-config/common-flatlaf-{platform}/resource-config.json",
+                 f"scripts/native-image-config/{platform}/reflect-config.json")
+merge_resource_config(f"scripts/native-image-config/common-flatlaf-{platform}/resource-config.json",
                       "target/native-image-config-temp/resource-config.json",
-                      f"src/native-image-config/{platform}/resource-config.json")
+                      f"scripts/native-image-config/{platform}/resource-config.json")

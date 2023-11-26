@@ -48,11 +48,11 @@ cd target/dist-build/linux/AppDir || exit 1
   mkdir -pv usr/bin usr/lib usr/share/applications usr/share/icons/hicolor/scalable/apps || exit 1
   mv -v mppatch-installer usr/bin/ || exit 1
   mv -v *.so usr/lib/ || exit 1
-  cp -v ../../../../scripts/mppatch-installer.desktop usr/share/applications/ || exit 1
-  cp -v ../../../../scripts/mppatch-installer.svg usr/share/icons/hicolor/scalable/apps/ || exit 1
+  cp -v ../../../../scripts/res/mppatch-installer.desktop usr/share/applications/ || exit 1
+  cp -v ../../../../scripts/res/mppatch-installer.svg usr/share/icons/hicolor/scalable/apps/ || exit 1
   for scale in {8,16,22,24,32,48,64,256}; do
     mkdir -pv usr/share/icons/hicolor/"${scale}x${scale}"/apps || exit 1
-    cp -v ../../../../scripts/mppatch-installer-$scale.png usr/share/icons/hicolor/"${scale}x${scale}"/apps/mppatch-installer.png || exit 1
+    cp -v ../../../../scripts/res/mppatch-installer-$scale.png usr/share/icons/hicolor/"${scale}x${scale}"/apps/mppatch-installer.png || exit 1
   done
 cd ../../../.. || exit 1
 

@@ -14,9 +14,6 @@
         "pattern": "\\QMETA-INF/services/java.net.spi.InetAddressResolverProvider\\E"
       },
       {
-        "pattern": "\\QMETA-INF/services/java.net.spi.URLStreamHandlerProvider\\E"
-      },
-      {
         "pattern": "\\QMETA-INF/services/java.nio.charset.spi.CharsetProvider\\E"
       },
       {
@@ -53,6 +50,9 @@
         "pattern": "java.base:\\Qsun/text/resources/LineBreakIteratorData\\E"
       },
       {
+        "pattern": "java.base:\\Qsun/text/resources/WordBreakIteratorData\\E"
+      },
+      {
         "pattern": "java.datatransfer:\\Qsun/datatransfer/resources/flavormap.properties\\E"
       },
       {
@@ -72,21 +72,6 @@
       },
       {
         "pattern": "java.desktop:\\Qjavax/swing/text/html/parser/html32.bdtd\\E"
-      },
-      {
-        "pattern": "java.desktop:\\Qsun/awt/resources/cursors/CopyDrop32x32.gif\\E"
-      },
-      {
-        "pattern": "java.desktop:\\Qsun/awt/resources/cursors/LinkDrop32x32.gif\\E"
-      },
-      {
-        "pattern": "java.desktop:\\Qsun/awt/resources/cursors/MoveDrop32x32.gif\\E"
-      },
-      {
-        "pattern": "java.desktop:\\Qsun/awt/resources/cursors/cursors.properties\\E"
-      },
-      {
-        "pattern": "java.desktop:\\Qsun/awt/resources/cursors/invalid32x32.gif\\E"
       },
       {
         "pattern": "java.xml:\\Qcom/sun/org/apache/xml/internal/serializer/Encodings.properties\\E"
@@ -116,15 +101,15 @@
       ]
     },
     {
-      "name": "sun.awt.resources.awt",
-      "classNames": [
-        "sun.awt.resources.awt"
-      ]
-    },
-    {
       "name": "com.sun.swing.internal.plaf.metal.resources.metal",
       "classNames": [
         "com.sun.swing.internal.plaf.metal.resources.metal"
+      ]
+    },
+    {
+      "name": "sun.awt.resources.awt",
+      "classNames": [
+        "sun.awt.resources.awt"
       ]
     }
   ]

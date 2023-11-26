@@ -22,6 +22,9 @@
 # THE SOFTWARE.
 #
 
+. scripts/ci/install-graalvm_linux.sh
+install_for_linux || exit 1
+
 echo "Extracting native tarballs..."
 rm -rfv target/native-bin || exit 1
 mkdir -vp target/native-bin || exit 1

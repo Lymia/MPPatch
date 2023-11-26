@@ -31,8 +31,6 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/FlatLightLaf.properties\\E"
   }, {
-    "pattern":"\\Qcom/formdev/flatlaf/IntelliJTheme$ThemeLaf.properties\\E"
-  }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/FlatDarculaLaf.properties\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/FlatDarkLaf.properties\\E"
@@ -48,8 +46,6 @@
     "pattern":"\\Qcom/formdev/flatlaf/demo/FlatMacDarkLaf.properties\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/FlatMacLightLaf.properties\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/ThemeLaf.properties\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/extras/svg/actions/colors.svg\\E"
   }, {
@@ -117,8 +113,6 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/RecentlyUsed.svg\\E"
   }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/RecentlyUsed_dark.svg\\E"
-  }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/back.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/back_dark.svg\\E"
@@ -129,11 +123,7 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/buildLoadChanges.svg\\E"
   }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/buildLoadChanges_dark.svg\\E"
-  }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/commit.svg\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/commit_dark.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/copy.svg\\E"
   }, {
@@ -141,15 +131,11 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/diff.svg\\E"
   }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/diff_dark.svg\\E"
-  }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/download.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/download_dark.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/favorite.svg\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/favorite_dark.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/forward.svg\\E"
   }, {
@@ -163,9 +149,11 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/listFiles.svg\\E"
   }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/listFiles_dark.svg\\E"
-  }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/matchCase.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/matchCaseHovered.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/matchCaseSelected.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/matchCase_dark.svg\\E"
   }, {
@@ -179,8 +167,6 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/project.svg\\E"
   }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/project_dark.svg\\E"
-  }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/redo.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/refresh.svg\\E"
@@ -189,11 +175,13 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/regex.svg\\E"
   }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/regexHovered.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/regexSelected.svg\\E"
+  }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/regex_dark.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/search.svg\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/search_dark.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/show.svg\\E"
   }, {
@@ -211,11 +199,23 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/words.svg\\E"
   }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/wordsHovered.svg\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/demo/icons/wordsSelected.svg\\E"
+  }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/icons/words_dark.svg\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/demo/intellijthemes/themes.json\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/extras/resources/DerivedColorKeys.properties\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/fonts/inter/Inter-Bold.otf\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/fonts/inter/Inter-BoldItalic.otf\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/fonts/inter/Inter-Italic.otf\\E"
+  }, {
+    "pattern":"\\Qcom/formdev/flatlaf/fonts/inter/Inter-Regular.otf\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/icons/JavaCup16.png\\E"
   }, {
@@ -223,63 +223,7 @@
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/icons/image-failed.png\\E"
   }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Carbon.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Cobalt_2.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Cyan.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/DarkFlatTheme.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/DarkPurple.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Dracula.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gradianto_Nature_Green.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gradianto_dark_fuchsia.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gradianto_deep_ocean.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gradianto_midnight_blue.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Gray.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/HiberbeeDark.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/HighContrast.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/LightFlatTheme.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/MaterialTheme.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/Monocai.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/SolarizedLight.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/arc-theme-orange.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/arc-theme.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/arc_theme_dark.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/arc_theme_dark_orange.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/gruvbox_dark_hard.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/gruvbox_dark_medium.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/gruvbox_dark_soft.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/Atom One Light.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/GitHub.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/Light Owl.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/Material Lighter.theme.json\\E"
-  }, {
-    "pattern":"\\Qcom/formdev/flatlaf/intellijthemes/themes/material-theme-ui-lite/Solarized Light.theme.json\\E"
+    "pattern":"\\Qcom/formdev/flatlaf/natives/libflatlaf-linux-x86_64.so\\E"
   }, {
     "pattern":"\\Qcom/formdev/flatlaf/themes/FlatMacDarkLaf.properties\\E"
   }, {
@@ -292,6 +236,8 @@
     "pattern":"java.base:\\Qjdk/internal/icu/impl/data/icudt72b/ubidi.icu\\E"
   }, {
     "pattern":"java.base:\\Qsun/text/resources/LineBreakIteratorData\\E"
+  }, {
+    "pattern":"java.base:\\Qsun/text/resources/WordBreakIteratorData\\E"
   }, {
     "pattern":"java.datatransfer:\\Qsun/datatransfer/resources/flavormap.properties\\E"
   }, {
@@ -307,16 +253,6 @@
   }, {
     "pattern":"java.desktop:\\Qjavax/swing/text/html/parser/html32.bdtd\\E"
   }, {
-    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/CopyDrop32x32.gif\\E"
-  }, {
-    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/LinkDrop32x32.gif\\E"
-  }, {
-    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/MoveDrop32x32.gif\\E"
-  }, {
-    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/cursors.properties\\E"
-  }, {
-    "pattern":"java.desktop:\\Qsun/awt/resources/cursors/invalid32x32.gif\\E"
-  }, {
     "pattern":"java.xml:\\Qcom/sun/org/apache/xml/internal/serializer/Encodings.properties\\E"
   }]},
   "bundles":[{
@@ -328,6 +264,9 @@
   }, {
     "name":"com.sun.swing.internal.plaf.basic.resources.basic",
     "classNames":["com.sun.swing.internal.plaf.basic.resources.basic"]
+  }, {
+    "name":"com.sun.swing.internal.plaf.metal.resources.metal",
+    "classNames":["com.sun.swing.internal.plaf.metal.resources.metal"]
   }, {
     "name":"sun.awt.resources.awt",
     "classNames":["sun.awt.resources.awt"]

@@ -115,7 +115,8 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
       FlatLaf.setPreferredSemiboldFontFamily(FlatRobotoFont.FAMILY_SEMIBOLD)
       FlatIntelliJLaf.setup()
 
-      if (args.length > 0 && args.head == "@nativeImageGenerateConfig") {
+      val checkUuid = "9e3c6db9-2a2f-4a22-9eb5-fba1a710449c"
+      if (args.length == 2 && args(0) == "@nativeImageGenerateConfig" && args(1) == checkUuid) {
         // generate native image configs
         log.warn("Generating native image configs...")
         log.warn("If you did not intend this, I don't know what to say.")
