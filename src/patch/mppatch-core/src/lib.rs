@@ -26,12 +26,12 @@
 use crate::rt_init::MppatchFeature;
 use ctor::ctor;
 
-#[cfg(windows)]
-mod hook_dbproxy;
 mod hook_lua;
 #[cfg(unix)]
 mod hook_luajit;
 mod hook_netpatch;
+#[cfg(windows)]
+mod hook_proxy;
 mod rt_cpplist;
 mod rt_init;
 mod rt_linking;

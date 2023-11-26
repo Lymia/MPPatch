@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-use crate::versions::*;
-use anyhow::{bail, ensure, Result};
+use crate::versions::{find_info, VersionInfo};
+use anyhow::{ensure, Result};
 use enumset::*;
 use log::{info, trace, LevelFilter};
 use serde::*;
@@ -32,6 +32,8 @@ use simplelog::{
 use std::{
     fs::File,
     path::{Path, PathBuf},
+    ptr::null_mut,
+    sync::atomic::{AtomicPtr, Ordering},
 };
 
 /// The context for a particular load of the binary.
@@ -39,7 +41,7 @@ use std::{
 pub struct MppatchCtx {
     exe_dir: PathBuf,
     config: MppatchConfig,
-    version_info: VersionInfo,
+    pub version_info: VersionInfo,
 }
 impl MppatchCtx {
     pub fn exe_dir(&self) -> &Path {
@@ -62,22 +64,6 @@ impl MppatchCtx {
     }
     pub fn has_feature(&self, feature: MppatchFeature) -> bool {
         self.config.features.contains(feature)
-    }
-
-    #[cfg(windows)]
-    pub fn into_win32(&self) -> Result<VersionInfoWindows> {
-        match self.version_info {
-            VersionInfo::Windows(info) => Ok(info),
-            _ => bail!("Version is not Windows-based."),
-        }
-    }
-
-    #[cfg(unix)]
-    pub fn info_linux(&self) -> Result<VersionInfoLinux> {
-        match self.version_info {
-            VersionInfo::Linux(info) => Ok(info),
-            _ => bail!("Version is not Linux-based."),
-        }
     }
 }
 
@@ -151,14 +137,35 @@ fn setup_logging(ctx: &MppatchCtx) {
     CombinedLogger::init(loggers).unwrap();
 }
 
-pub fn run() -> Result<MppatchCtx> {
+static CTX: AtomicPtr<MppatchCtx> = AtomicPtr::new(null_mut());
+
+pub fn run() -> Result<&'static MppatchCtx> {
     early_setup();
     let ctx = create_ctx()?;
     setup_logging(&ctx);
 
     info!("mppatch-core v{} loaded", ctx.version());
+    info!("Game version: {}", ctx.version_info.name);
+    info!("");
     trace!("build-id: {}", ctx.build_id());
     trace!("ctx: {ctx:#?}");
 
-    Ok(ctx)
+    assert!(CTX
+        .swap(Box::leak(Box::new(ctx)), Ordering::SeqCst)
+        .is_null());
+    Ok(get_ctx())
+}
+
+pub fn get_ctx() -> &'static MppatchCtx {
+    let ptr = CTX.load(Ordering::SeqCst);
+    assert!(!ptr.is_null());
+    unsafe { &*ptr }
+}
+
+#[ctor::dtor]
+fn destroy_ctx() {
+    let ptr = CTX.swap(null_mut(), Ordering::SeqCst);
+    if !ptr.is_null() {
+        unsafe { drop(Box::from_raw(ptr)) }
+    }
 }

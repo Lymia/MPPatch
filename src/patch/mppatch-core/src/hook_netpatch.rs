@@ -38,13 +38,24 @@ use std::{
     sync::Mutex,
 };
 
-type FnType = unsafe extern "C" fn(
+#[cfg(windows)]
+type FnType = unsafe extern "thiscall-unwind" fn(
     *mut c_void,
     *mut CppListRaw<Guid>,
     *mut CppListRaw<ModInfo>,
     bool,
     bool,
 ) -> c_int;
+
+#[cfg(unix)]
+type FnType = unsafe extern "C-unwind" fn(
+    *mut c_void,
+    *mut CppListRaw<Guid>,
+    *mut CppListRaw<ModInfo>,
+    bool,
+    bool,
+) -> c_int;
+
 static SET_ACTIVE_DLC_AND_MODS: Mutex<PatcherContext<FnType>> = Mutex::new(PatcherContext::new());
 
 pub unsafe fn SetActiveDLCAndMods(
@@ -66,7 +77,6 @@ fn destroy_set_dlc() {
 #[cfg(windows)]
 mod platform_impl {
     use super::*;
-    use crate::versions::VersionInfoLinux;
     use dlopen::raw::Library;
 
     pub fn init(ctx: &MppatchCtx) -> Result<()> {
@@ -85,16 +95,14 @@ mod platform_impl {
 #[cfg(unix)]
 mod platform_impl {
     use super::*;
-    use crate::versions::VersionInfoLinux;
 
     pub fn init(ctx: &MppatchCtx) -> Result<()> {
         log::info!("Applying SetActiveDLCAndMods patch...");
-        let linux_info: VersionInfoLinux = ctx.info_linux()?;
         unsafe {
             SET_ACTIVE_DLC_AND_MODS
                 .lock()
                 .unwrap()
-                .patch_exe_sym(linux_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy)?;
+                .patch(ctx.version_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy)?;
         }
         Ok(())
     }
@@ -198,7 +206,7 @@ pub fn reset() {
     lock.reset();
 }
 
-pub unsafe extern "C" fn SetActiveDLCAndModsProxy(
+unsafe fn SetActiveDLCAndModsProxy_impl(
     this: *mut c_void,
     dlc_list: *mut CppListRaw<Guid>,
     mod_list: *mut CppListRaw<ModInfo>,
@@ -245,6 +253,28 @@ pub unsafe extern "C" fn SetActiveDLCAndModsProxy(
     debug!("[SetActiveDLCAndModsProxy call end]");
 
     result
+}
+
+#[cfg(windows)]
+pub unsafe extern "thiscall-unwind" fn SetActiveDLCAndModsProxy(
+    this: *mut c_void,
+    dlc_list: *mut CppListRaw<Guid>,
+    mod_list: *mut CppListRaw<ModInfo>,
+    reload_dlc: bool,
+    reload_mods: bool,
+) -> c_int {
+    SetActiveDLCAndModsProxy_impl(this, dlc_list, mod_list, reload_dlc, reload_mods)
+}
+
+#[cfg(unix)]
+pub unsafe extern "C-unwind" fn SetActiveDLCAndModsProxy(
+    this: *mut c_void,
+    dlc_list: *mut CppListRaw<Guid>,
+    mod_list: *mut CppListRaw<ModInfo>,
+    reload_dlc: bool,
+    reload_mods: bool,
+) -> c_int {
+    SetActiveDLCAndModsProxy_impl(this, dlc_list, mod_list, reload_dlc, reload_mods)
 }
 
 pub fn init(ctx: &MppatchCtx) -> Result<()> {

@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-use crate::rt_patch::PatchedFunction;
+use crate::{rt_patch::PatchedFunction, versions::SymbolInfo};
 use anyhow::Result;
 use dlopen::raw::Library;
 use std::{any::type_name, ffi::c_void, marker::PhantomData, mem::size_of, ptr};
@@ -42,20 +42,26 @@ impl<T: Copy> PatcherContext<T> {
         PatcherContext { patch_info: None, _phantom: PhantomData }
     }
 
-    pub unsafe fn patch_exe_sym(
-        &mut self,
-        (sym, sym_size): (&str, usize),
-        target: T,
-    ) -> Result<()> {
+    pub unsafe fn patch(&mut self, sym_info: SymbolInfo, target: T) -> Result<()> {
         unsafe {
-            let dylib_civ = Library::open_self()?;
-            let patch = PatchedFunction::create(
-                dylib_civ.symbol(sym)?,
-                runtime_transmute::<T, *const c_void>(target),
-                sym_size,
-                sym,
-            );
-            self.patch_info = Some(patch);
+            // remove an old patch if one existed
+            self.patch_info.take();
+
+            // patch the target location
+            match sym_info {
+                SymbolInfo::DllProxy(_, _) => todo!(),
+                SymbolInfo::PublicNamed(sym, sym_size) => {
+                    let dylib_civ = Library::open_self()?;
+                    let patch = PatchedFunction::create(
+                        dylib_civ.symbol(sym)?,
+                        runtime_transmute::<T, *const c_void>(target),
+                        sym_size,
+                        sym,
+                    );
+                    self.patch_info = Some(patch);
+                }
+                SymbolInfo::Win32Offsets(_) => todo!(),
+            }
         }
 
         Ok(())

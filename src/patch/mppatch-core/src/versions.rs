@@ -25,39 +25,69 @@
 use anyhow::*;
 
 #[derive(Copy, Clone, Debug)]
-pub enum VersionInfo {
-    Windows(VersionInfoWindows),
-    Linux(VersionInfoLinux),
+pub enum Platform {
+    Win32,
+    MacOS,
+    Linux,
+}
+impl Platform {
+    pub fn name(&self) -> &'static str {
+        match self {
+            Platform::Win32 => "win32",
+            Platform::MacOS => "macos",
+            Platform::Linux => "linux",
+        }
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct VersionInfoWindows {
-    pub sym_lGetMemoryUsage: &'static str,
-    pub sym_SetActiveDLCAndMods_dx9: (usize, usize),
-    pub sym_SetActiveDLCAndMods_dx11: (usize, usize),
-    pub sym_SetActiveDLCAndMods_tablet: (usize, usize),
-    pub binary_base: usize,
+pub struct VersionInfo {
+    pub name: &'static str,
+    pub platform: Platform,
+    pub sym_lGetMemoryUsage: SymbolInfo,
+    pub sym_SetActiveDLCAndMods: SymbolInfo,
+    pub binary_base: Option<usize>,
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct VersionInfoLinux {
-    pub sym_lGetMemoryUsage: (&'static str, usize),
-    pub sym_SetActiveDLCAndMods: (&'static str, usize),
+pub enum ProxySource {
+    CvGameDatabase,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum SymbolInfo {
+    DllProxy(ProxySource, &'static str),
+    PublicNamed(&'static str, usize),
+    Win32Offsets(SymWin32Offsets),
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct SymWin32Offsets {
+    dx9: (usize, usize),
+    dx11: (usize, usize),
+    tablet: (usize, usize),
 }
 
 pub fn find_info(sha256: &str) -> Result<VersionInfo> {
     Ok(match sha256 {
-        "cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca" => VersionInfo::Linux(VersionInfoLinux {
-            sym_lGetMemoryUsage: ("_ZN8Database9Scripting3Lua15lGetMemoryUsageEP9lua_State", 7),
-            sym_SetActiveDLCAndMods: ("_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb", 10),
-        }),
-        "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563" => VersionInfo::Windows(VersionInfoWindows {
-            sym_lGetMemoryUsage: "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z",
-            sym_SetActiveDLCAndMods_dx9: (0x006CD160, 6),
-            sym_SetActiveDLCAndMods_dx11: (0x006B8E50, 6),
-            sym_SetActiveDLCAndMods_tablet: (0x0065DC10, 6),
-            binary_base: 0x00400000,
-        }),
+        "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563" => VersionInfo {
+            name: "Civilization V / 1.0.3.279 / Win32 + Steam",
+            platform: Platform::Win32,
+            sym_lGetMemoryUsage: SymbolInfo::DllProxy(ProxySource::CvGameDatabase, "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z"),
+            sym_SetActiveDLCAndMods: SymbolInfo::Win32Offsets(SymWin32Offsets {
+                dx9: (0x006CD160, 6),
+                dx11: (0x006B8E50, 6),
+                tablet: (0x0065DC10, 6),
+            }),
+            binary_base: Some(0x00400000),
+        },
+        "cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca" => VersionInfo {
+            name: "Civilization V / 1.0.3.279 / Linux + Steam",
+            platform: Platform::Linux,
+            sym_lGetMemoryUsage: SymbolInfo::PublicNamed("_ZN8Database9Scripting3Lua15lGetMemoryUsageEP9lua_State", 7),
+            sym_SetActiveDLCAndMods: SymbolInfo::PublicNamed("_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb", 10),
+            binary_base: None,
+        },
         _ => bail!("Unknown version: {sha256}"),
     })
 }

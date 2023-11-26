@@ -25,6 +25,7 @@
 use crate::{
     hook_netpatch,
     hook_netpatch::OverrideType,
+    rt_init,
     rt_init::{MppatchCtx, MppatchFeature},
 };
 use anyhow::Result;
@@ -58,14 +59,12 @@ mod platform_impl {
         // TODO: Set GET_MEMORY_USAGE
         Ok(())
     }
-
-    pub const PLATFORM: &str = "win32";
 }
 
 #[cfg(unix)]
 mod platform_impl {
     use super::*;
-    use crate::{rt_linking::PatcherContext, versions::VersionInfoLinux};
+    use crate::rt_linking::PatcherContext;
 
     static GET_MEMORY_USAGE: Mutex<PatcherContext<FnType>> = Mutex::new(PatcherContext::new());
 
@@ -76,12 +75,11 @@ mod platform_impl {
 
     pub fn init(ctx: &MppatchCtx) -> Result<()> {
         log::info!("Applying lGetMemory patch...");
-        let linux_info: VersionInfoLinux = ctx.info_linux()?;
         unsafe {
             GET_MEMORY_USAGE
                 .lock()
                 .unwrap()
-                .patch_exe_sym(linux_info.sym_lGetMemoryUsage, lGetMemoryUsageProxy)?;
+                .patch(ctx.version_info.sym_lGetMemoryUsage, lGetMemoryUsageProxy)?;
         }
         Ok(())
     }
@@ -90,12 +88,6 @@ mod platform_impl {
     fn destroy_usage() {
         GET_MEMORY_USAGE.lock().unwrap().unpatch();
     }
-
-    #[cfg(target_os = "macos")]
-    pub const PLATFORM: &str = "macos";
-
-    #[cfg(target_os = "linux")]
-    pub const PLATFORM: &str = "linux";
 }
 
 const LUA_SENTINEL: &str = "216f0090-85dd-4061-8371-3d8ba2099a70";
@@ -114,13 +106,10 @@ const LUA_FUNC_GET_GLOBALS_C: &CStr =
         Err(_) => panic!("???"),
     };
 
-static CTX: Mutex<Option<MppatchCtx>> = Mutex::new(None);
-
 fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
     trace!("Building MPPatch function table...");
 
-    let ctx = CTX.lock().unwrap();
-    let ctx = ctx.as_ref().unwrap();
+    let ctx = rt_init::get_ctx();
 
     let patch_table = lua.create_table()?;
     patch_table.set("__mppatch_marker", 1)?;
@@ -142,7 +131,7 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
     {
         let version_table = lua.create_table()?;
         version_table.set("versionString", ctx.version())?;
-        version_table.set("platform", platform_impl::PLATFORM)?;
+        version_table.set("platform", ctx.version_info.platform.name())?;
         version_table.set("sha256", ctx.sha256())?;
         version_table.set("buildId", ctx.build_id())?;
         patch_table.set("version", version_table)?;
@@ -287,7 +276,5 @@ pub unsafe extern "C-unwind" fn lGetMemoryUsageProxy(lua_c: *mut lua_State) -> c
 }
 
 pub fn init(ctx: &MppatchCtx) -> Result<()> {
-    *CTX.lock().unwrap() = Some(ctx.clone());
-    platform_impl::init(ctx)?;
-    Ok(())
+    platform_impl::init(ctx)
 }
