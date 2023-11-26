@@ -14,7 +14,7 @@ jobs:
     container: archlinux/archlinux:multilib-devel
     steps:
       # Install packages
-      - run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang nasm rustup
+      - run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang nasm rustup python3
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: nightly
