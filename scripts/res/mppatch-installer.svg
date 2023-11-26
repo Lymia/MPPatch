@@ -1,4 +1,26 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  - Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>
+  -
+  - Permission is hereby granted, free of charge, to any person obtaining a copy
+  - of this software and associated documentation files (the "Software"), to deal
+  - in the Software without restriction, including without limitation the rights
+  - to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  - copies of the Software, and to permit persons to whom the Software is
+  - furnished to do so, subject to the following conditions:
+  -
+  - The above copyright notice and this permission notice shall be included in
+  - all copies or substantial portions of the Software.
+  -
+  - THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  - IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  - FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  - AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  - LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  - OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  - THE SOFTWARE.
+  -->
+
 <svg
    width="64"
    height="64"
@@ -20,15 +42,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="13.534466"
-     inkscape:cx="32.103224"
-     inkscape:cy="34.984757"
+     inkscape:zoom="19.140625"
+     inkscape:cx="32.104489"
+     inkscape:cy="34.977959"
      inkscape:window-width="2256"
      inkscape:window-height="1428"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg136" />
+     inkscape:current-layer="g135" />
   <defs
      id="defs4">
     <linearGradient
@@ -38,7 +60,7 @@
        x2="324.44"
        y1="472.16"
        y2="539.7"
-       gradientTransform="translate(8.363 -261.33)"
+       gradientTransform="translate(8.363,-261.33)"
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        id="a">
@@ -636,11 +658,11 @@
     </g>
     <path
        fill="url(#e)"
-       d="M315.85 191.12h158.68v93.15H315.85z"
+       d="m 315.85,191.12 h 158.68 v 93.15 H 315.85 Z"
        filter="url(#f)"
-       opacity=".8"
-       style="mix-blend-mode:luminosity"
-       transform="rotate(-46.2 48.463 42.16) scale(.0963)"
+       opacity="0.8"
+       style="mix-blend-mode:luminosity;fill:url(#e)"
+       transform="matrix(0.06941256,-0.07238275,0.07238275,0.06941256,-17.304764,48.273416)"
        id="path135" />
     <use
        xlink:href="#g"

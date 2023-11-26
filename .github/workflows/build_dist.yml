@@ -36,13 +36,13 @@ jobs:
       - run: git fetch --prune --unshallow --tags
 
       # Do the actual build
-      - run: scripts/build_linux_natives.sh
+      - run: scripts/ci/build-natives_linux.sh
 
       # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
-          name: mppatch_linux_natives.tar.gz
-          path: mppatch_linux_natives.tar.gz
+          name: mppatch_ci_natives-linux.tar.gz
+          path: target/mppatch_ci_natives-linux.tar.gz
 
   buildInstallerLinux:
     runs-on: ubuntu-latest
@@ -64,19 +64,19 @@ jobs:
       # Download artifacts
       - uses: actions/download-artifact@v3
         with:
-          name: mppatch_linux_natives.tar.gz
-          path: mppatch_linux_natives
-      - run: mv mppatch_linux_natives/* .
-      - run: rm -rf mppatch_linux_natives
+          name: mppatch_ci_natives-linux.tar.gz
+          path: target/mppatch_ci_natives-linux
+      - run: mv target/mppatch_ci_natives-linux/* target/
+      - run: rm -rf target/mppatch_ci_natives-linux
 
       # Do the actual build
-      - run: scripts/build_linux_installer.sh
+      - run: scripts/ci/build-installer_linux.sh
 
       # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
-          name: mppatch_linux_installer.tar.gz
-          path: mppatch_linux_installer.tar.gz
+          name: mppatch_ci_installer-linux.tar.gz
+          path: target/mppatch_ci_installer-linux.tar.gz
 
   buildDist:
     runs-on: ubuntu-20.04
@@ -92,13 +92,13 @@ jobs:
       # Download artifacts
       - uses: actions/download-artifact@v3
         with:
-          name: mppatch_linux_installer.tar.gz
-          path: mppatch_linux_installer
-      - run: mv mppatch_linux_installer/* .
-      - run: rm -rf mppatch_linux_installer
+          name: mppatch_ci_installer-linux.tar.gz
+          path: target/mppatch_ci_installer-linux
+      - run: mv target/mppatch_ci_installer-linux/* target/
+      - run: rm -rf target/mppatch_ci_installer-linux
 
       # Do the actual build
-      - run: scripts/build_dist.sh
+      - run: scripts/ci/build-dist.sh
 
       # Upload artifacts
       - uses: actions/upload-artifact@v3

@@ -22,7 +22,7 @@
 # THE SOFTWARE.
 #
 
-src/patch/stub/make_win32_wrapper.py \
+scripts/python/make-win32-wrapper-asm.py \
   src/patch/mppatch-core/target/i686-pc-windows-gnu/release/mppatch_core.dll \
   >src/patch/mppatch-core/target/i686-pc-windows-gnu/release/mppatch_core_wrapper.s || exit 1
 nasm -f win32 \

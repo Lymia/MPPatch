@@ -14,6 +14,9 @@
         "pattern": "\\QMETA-INF/services/java.net.spi.InetAddressResolverProvider\\E"
       },
       {
+        "pattern": "\\QMETA-INF/services/java.net.spi.URLStreamHandlerProvider\\E"
+      },
+      {
         "pattern": "\\QMETA-INF/services/java.nio.charset.spi.CharsetProvider\\E"
       },
       {

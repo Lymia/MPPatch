@@ -1,3 +1,5 @@
+#!/bin/sh
+
 #
 # Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>
 #
@@ -20,18 +22,9 @@
 # THE SOFTWARE.
 #
 
-rm -vf scripts/mppatch-installer-*.png scripts/mppatch-installer.ico || exit 1
+JAR_NAME="$(sbt "print assembly" --error || exit 1)"
 
-for i in {16,20,24,30,32,36,40,48,60,64,72,80,96,256}; do
-  resvg -w $i -h $i scripts/mppatch-installer.svg scripts/mppatch-installer-$i.png || exit 1
-done
-
-convert scripts/mppatch-installer-{16,20,24,30,32,36,40,48,60,64,72,80,96,256}.png scripts/mppatch-installer.ico || exit 1
-
-for i in {8,22}; do
-  resvg -w $i -h $i scripts/mppatch-installer.svg scripts/mppatch-installer-$i.png || exit 1
-done
-
-for i in {20,30,36,40,60,72,80,96}; do
-  rm -v scripts/mppatch-installer-$i.png
-done
+rm -rfv target/native-image-config-temp src/native-image-config/linux || exit 1
+mkdir -p src/native-image-config/linux || exit 1
+java -agentlib:native-image-agent=config-output-dir=target/native-image-config-temp -jar "$JAR_NAME" @nativeImageGenerateConfig || exit 1
+scripts/python/merge-configs.py linux || exit 1

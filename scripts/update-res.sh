@@ -1,5 +1,3 @@
-#!/bin/sh
-
 #
 # Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>
 #
@@ -22,11 +20,18 @@
 # THE SOFTWARE.
 #
 
-echo "Building Linux native binaries..."
-sbt buildNative || exit 1
+rm -vf scripts/res/mppatch-installer-*.png scripts/res/mppatch-installer.ico || exit 1
 
-echo "Creating Linux native binaries tarball..."
-cd target/native-bin || exit 1
-  tar --gzip -cv -f mppatch_linux_natives.tar.gz * || exit 1
-cd ../.. || exit 1
-cp -v target/native-bin/mppatch_linux_natives.tar.gz . || exit 1
+for i in {16,20,24,30,32,36,40,48,60,64,72,80,96,256}; do
+  resvg -w $i -h $i scripts/res/mppatch-installer.svg scripts/res/mppatch-installer-$i.png || exit 1
+done
+
+convert scripts/res/mppatch-installer-{16,20,24,30,32,36,40,48,60,64,72,80,96,256}.png scripts/res/mppatch-installer.ico || exit 1
+
+for i in {8,22}; do
+  resvg -w $i -h $i scripts/res/mppatch-installer.svg scripts/res/mppatch-installer-$i.png || exit 1
+done
+
+for i in {20,30,36,40,60,72,80,96}; do
+  rm -v scripts/res/mppatch-installer-$i.png
+done

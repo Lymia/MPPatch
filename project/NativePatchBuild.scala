@@ -62,7 +62,7 @@ object NativePatchBuild {
     Keys.win32Wrapper := {
       if (PlatformType.currentPlatform.shouldBuildNative(PlatformType.Win32)) {
         val __ = Keys.nativeVersions.value // make an artifical dependency
-        runProcess(Seq("src/patch/stub/build_win32_wrapper.sh"))
+        runProcess(Seq("scripts/ci/build-win32-wrapper.sh"))
         val coreDir = baseDirectory.value / "src" / "patch" / "mppatch-core";
         Some(coreDir / "target" / "i686-pc-windows-gnu" / "release" / "mppatch_core_wrapper.dll")
       } else None

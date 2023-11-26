@@ -22,26 +22,11 @@
 # THE SOFTWARE.
 #
 
-echo "Extracting native tarballs..."
-rm -rfv target/native-bin || exit 1
-mkdir -vp target/native-bin || exit 1
+echo "Building Linux native binaries..."
+sbt buildNative || exit 1
+
+echo "Creating Linux native binaries tarball..."
 cd target/native-bin || exit 1
-  tar -xv -f ../../mppatch_linux_natives.tar.gz
+  tar --gzip -cv -f mppatch_ci_natives-linux.tar.gz * || exit 1
 cd ../.. || exit 1
-
-echo "Building Linux installer...."
-rm -rfv target/native-image || exit 1
-sbt nativeImage || exit 1
-chmod +x target/native-image/*.so || exit 1
-
-echo "Building assembly jar..."
-sbt "print scalaVersion" || exit 1 # get results cached, required to wrangle CI
-ASSEMBLY_JAR="$(sbt "print assembly" --error || exit 1)"
-echo "ASSEMBLY_JAR=$ASSEMBLY_JAR"
-cp "$(echo "$ASSEMBLY_JAR" | head -n 1 | tr -d '\n')" target/native-image/assembly.jar || exit 1
-
-echo "Creating Linux installer tarball..."
-cd target/native-image || exit 1
-  tar --gzip -cv -f mppatch_linux_installer.tar.gz * || exit 1
-cd ../.. || exit 1
-cp -v target/native-image/mppatch_linux_installer.tar.gz . || exit 1
+cp -v target/native-bin/mppatch_ci_natives-linux.tar.gz target/ || exit 1

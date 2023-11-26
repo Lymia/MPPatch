@@ -43,7 +43,7 @@ mkdir -pv target/dist-build/linux/AppDir || exit 1
 
 # Build basic directory structure
 cd target/dist-build/linux/AppDir || exit 1
-  tar -xv -f ../../../../mppatch_linux_installer.tar.gz || exit 1
+  tar -xv -f ../../../../target/mppatch_ci_installer-linux.tar.gz || exit 1
   mv -v assembly.jar ../.. || exit 1
   mkdir -pv usr/bin usr/lib usr/share/applications usr/share/icons/hicolor/scalable/apps || exit 1
   mv -v mppatch-installer usr/bin/ || exit 1
@@ -68,6 +68,6 @@ cp -v target/dist-build/assembly.jar target/dist/MPPatch_Installer-universal-$VE
 
 # Building tarball
 cd target/dist || exit 1
-  tar --gzip -cv -f mppatch_dist.tar.gz * || exit 1
+  tar --gzip -cv -f mpatch_ci_dist.tar.gz * || exit 1
 cd ../.. || exit 1
-cp target/dist/mppatch_dist.tar.gz . || exit 1
+cp target/dist/mppatch_ci_dist.tar.gz target/ || exit 1
