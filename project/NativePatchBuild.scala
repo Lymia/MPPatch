@@ -35,7 +35,7 @@ object NativePatchBuild {
       val logger   = streams.value.log
 
       for (
-        platform <- Seq[PlatformType](PlatformType.Linux)
+        platform <- Seq[PlatformType](PlatformType.Win32, PlatformType.Linux)
         if PlatformType.currentPlatform.shouldBuildNative(platform)
       ) yield {
         val (rustTarget, outName, targetName) = platform match {
@@ -61,11 +61,20 @@ object NativePatchBuild {
         // make the patches list
         PatchFile(outName, crateDir / "target" / rustTarget / "release" / targetName, buildId.toString)
       }
-    }
+    },
+    Keys.win32Wrapper := {
+      if (PlatformType.currentPlatform.shouldBuildNative(PlatformType.Win32)) {
+        val __ = Keys.nativeVersions.value // make an artifical dependency
+        runProcess(Seq("src/patch/stub/build_win32_wrapper.sh"))
+        val coreDir = baseDirectory.value / "src" / "patch" / "mppatch-core";
+        Some(coreDir / "target" / "i686-pc-windows-gnu" / "release" / "mppatch_core_wrapper.dll")
+      } else None
+    },
   )
 
   case class PatchFile(name: String, file: File, buildId: String)
   object Keys {
-    val nativeVersions = TaskKey[Seq[PatchFile]]("native-patch-files")
+    val nativeVersions = TaskKey[Seq[PatchFile]]("mppatch-native-versions")
+    val win32Wrapper = TaskKey[Option[File]]("mppatch-native-win32-wrapper")
   }
 }

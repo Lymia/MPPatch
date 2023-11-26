@@ -20,7 +20,7 @@
  * THE SOFTWARE.
  */
 
-use crate::versions::{find_info, VersionInfo, VersionInfoLinux};
+use crate::versions::*;
 use anyhow::{bail, ensure, Result};
 use enumset::*;
 use log::{info, trace, LevelFilter};
@@ -63,6 +63,16 @@ impl MppatchCtx {
     pub fn has_feature(&self, feature: MppatchFeature) -> bool {
         self.config.features.contains(feature)
     }
+
+    #[cfg(windows)]
+    pub fn into_win32(&self) -> Result<VersionInfoWindows> {
+        match self.version_info {
+            VersionInfo::Windows(info) => Ok(info),
+            _ => bail!("Version is not Windows-based."),
+        }
+    }
+
+    #[cfg(unix)]
     pub fn info_linux(&self) -> Result<VersionInfoLinux> {
         match self.version_info {
             VersionInfo::Linux(info) => Ok(info),

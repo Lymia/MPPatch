@@ -22,6 +22,48 @@
 
 //! Low-level platform-specific functions
 
+#[cfg(windows)]
+mod platform_impl {
+    use libc::*;
+    use std::ptr::null_mut;
+    use winapi::um::{
+        memoryapi::{VirtualAlloc, VirtualFree, VirtualProtect},
+        winnt::{MEM_COMMIT, MEM_RELEASE, PAGE_EXECUTE_READWRITE},
+    };
+
+    unsafe fn virtual_protect(start: *mut c_void, len: usize, new: u32) -> ProtectionInfo {
+        let mut old = 0;
+        if VirtualProtect(start, len, new, &mut old) == 0 {
+            panic!("VirtualProtect failed");
+        }
+        old
+    }
+
+    pub type ProtectionInfo = u32;
+    pub unsafe fn unprotect_region(start: *mut c_void, len: usize) -> ProtectionInfo {
+        virtual_protect(start, len, PAGE_EXECUTE_READWRITE)
+    }
+    pub unsafe fn reprotect_region(start: *mut c_void, len: usize, old: ProtectionInfo) {
+        virtual_protect(start, len, old);
+    }
+
+    pub unsafe fn exec_mem_mmap(len: usize) -> *mut u8 {
+        let ptr = VirtualAlloc(null_mut(), len, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+        if ptr.is_null() {
+            panic!("VirtualAlloc failed")
+        }
+        ptr as *mut u8
+    }
+    pub unsafe fn exec_mem_prepare(ptr: *mut u8, len: usize) {
+        // do nothing
+    }
+    pub unsafe fn exec_mem_munmap(ptr: *mut u8, len: usize) {
+        if VirtualFree(ptr as *mut c_void, len, MEM_RELEASE) == 0 {
+            panic!("munmap failed");
+        }
+    }
+}
+
 #[cfg(unix)]
 mod platform_impl {
     use libc::*;

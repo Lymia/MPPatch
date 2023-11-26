@@ -41,51 +41,54 @@ use mlua::{
 };
 use std::{ffi::CStr, sync::Mutex};
 
-#[cfg(unix)]
+type FnType = unsafe extern "C-unwind" fn(*mut lua_State) -> c_int;
+
+#[cfg(windows)]
 mod platform_impl {
     use super::*;
-    use crate::{rt_patch::PatchedFunction, versions::VersionInfoLinux};
-    use dlopen::raw::Library;
-    use std::ffi::c_void;
 
-    static GET_MEMORY_USAGE: Mutex<Option<PatchedFunction>> = Mutex::new(None);
+    static GET_MEMORY_USAGE: Mutex<Option<FnType>> = Mutex::new(None);
 
     pub unsafe fn lGetMemoryUsage(lua: *mut lua_State) -> c_int {
-        let func: unsafe extern "C" fn(*mut lua_State) -> c_int = std::mem::transmute(
-            GET_MEMORY_USAGE
-                .lock()
-                .unwrap()
-                .as_ref()
-                .unwrap()
-                .old_function(),
-        );
+        let func = *GET_MEMORY_USAGE.lock().unwrap().as_ref().unwrap();
         func(lua)
     }
 
     pub fn init(ctx: &MppatchCtx) -> Result<()> {
-        log::info!("Applying lGetMemoryUsage patch...");
+        // TODO: Set GET_MEMORY_USAGE
+        Ok(())
+    }
 
+    pub const PLATFORM: &str = "win32";
+}
+
+#[cfg(unix)]
+mod platform_impl {
+    use super::*;
+    use crate::{rt_linking::PatcherContext, versions::VersionInfoLinux};
+
+    static GET_MEMORY_USAGE: Mutex<PatcherContext<FnType>> = Mutex::new(PatcherContext::new());
+
+    pub unsafe fn lGetMemoryUsage(lua: *mut lua_State) -> c_int {
+        let func = GET_MEMORY_USAGE.lock().unwrap().as_func();
+        func(lua)
+    }
+
+    pub fn init(ctx: &MppatchCtx) -> Result<()> {
+        log::info!("Applying lGetMemory patch...");
         let linux_info: VersionInfoLinux = ctx.info_linux()?;
-
-        let (sym, sym_size) = linux_info.sym_lGetMemoryUsage;
-
         unsafe {
-            let dylib_civ = Library::open_self()?;
-            let patch = PatchedFunction::create(
-                dylib_civ.symbol(sym)?,
-                lGetMemoryUsageProxy as usize as *const c_void,
-                sym_size,
-                "lGetMemoryUsage",
-            );
-            *GET_MEMORY_USAGE.lock().unwrap() = Some(patch);
+            GET_MEMORY_USAGE
+                .lock()
+                .unwrap()
+                .patch_exe_sym(linux_info.sym_lGetMemoryUsage, lGetMemoryUsageProxy)?;
         }
-
         Ok(())
     }
 
     #[ctor::dtor]
     fn destroy_usage() {
-        GET_MEMORY_USAGE.lock().unwrap().take();
+        GET_MEMORY_USAGE.lock().unwrap().unpatch();
     }
 
     #[cfg(target_os = "macos")]

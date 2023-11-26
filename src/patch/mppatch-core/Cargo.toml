@@ -19,6 +19,12 @@ serde = { version = "1.0", features = ["derive"] }
 simplelog = { version = "0.12", features = ["paris"] }
 toml = { version = "0.8", default-features = false, features = ["parse"] }
 
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["memoryapi"] }
+
+[build-dependencies]
+nasm-rs = "0.2"
+
 [profile.release]
 opt-level = 2
 lto = true

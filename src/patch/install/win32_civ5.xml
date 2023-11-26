@@ -30,7 +30,8 @@
 
     <Package Name="multiplayer">
         <RenameFile Path="CvGameDatabaseWin32Final Release.dll" RenameTo="CvGameDatabase_Original.dll"/>
-        <AdditionalFile Path="CvGameDatabaseWin32Final Release.dll" Source="native/mppatch_core.dll"/>
+        <AdditionalFile Path="CvGameDatabaseWin32Final Release.dll" Source="native/mppatch_core_wrapper.dll"/>
+        <AdditionalFile Path="mppatch_core.dll" Source="native/mppatch_core.dll"/>
         <WriteConfig Path="mppatch_config.toml"/>
         <WriteDLC Source="ui/mppatch.xml" DLCData="DLC/MPPatch" TextData="Gameplay/XML/NewText/MPPatch_TextData"/>
         <EnableFeature Name="Multiplayer"/>

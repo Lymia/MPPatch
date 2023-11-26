@@ -20,39 +20,15 @@
  * THE SOFTWARE.
  */
 
-#![feature(c_unwind)]
-#![cfg_attr(windows, feature(naked_functions))]
+pub fn main() {
+    println!("cargo:rerun-if-env-changed=MPPATCH_VERSION");
+    println!("cargo:rerun-if-env-changed=MPPATCH_BUILDID");
 
-use crate::rt_init::MppatchFeature;
-use ctor::ctor;
-
-#[cfg(windows)]
-mod hook_dbproxy;
-mod hook_lua;
-#[cfg(unix)]
-mod hook_luajit;
-mod hook_netpatch;
-mod rt_cpplist;
-mod rt_init;
-mod rt_linking;
-mod rt_patch;
-mod rt_platform;
-mod versions;
-
-fn ctor_impl() -> anyhow::Result<()> {
-    let ctx = rt_init::run()?;
-    #[cfg(unix)]
-    if ctx.has_feature(MppatchFeature::LuaJit) {
-        hook_luajit::init(&ctx)?;
+    if std::env::var("TARGET").unwrap() == "i686-pc-windows-gnu" {
+        println!("cargo:rustc-link-lib=lua51_Win32");
+        println!(
+            "cargo:rustc-link-search=native={}/../stub/",
+            std::env::var("CARGO_MANIFEST_DIR").unwrap()
+        );
     }
-    if ctx.has_feature(MppatchFeature::Multiplayer) {
-        hook_lua::init(&ctx)?;
-        hook_netpatch::init(&ctx)?;
-    }
-    Ok(())
-}
-
-#[ctor]
-fn ctor() {
-    ctor_impl().unwrap();
 }

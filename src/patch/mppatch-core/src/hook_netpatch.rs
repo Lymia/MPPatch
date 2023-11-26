@@ -25,6 +25,7 @@
 use crate::{
     rt_cpplist::{CppList, CppListRaw},
     rt_init::MppatchCtx,
+    rt_linking::PatcherContext,
 };
 use anyhow::Result;
 use enumset::*;
@@ -37,56 +38,64 @@ use std::{
     sync::Mutex,
 };
 
+type FnType = unsafe extern "C" fn(
+    *mut c_void,
+    *mut CppListRaw<Guid>,
+    *mut CppListRaw<ModInfo>,
+    bool,
+    bool,
+) -> c_int;
+static SET_ACTIVE_DLC_AND_MODS: Mutex<PatcherContext<FnType>> = Mutex::new(PatcherContext::new());
+
+pub unsafe fn SetActiveDLCAndMods(
+    this: *mut c_void,
+    dlc_list: *mut CppListRaw<Guid>,
+    mod_list: *mut CppListRaw<ModInfo>,
+    reload_dlc: bool,
+    reload_mods: bool,
+) -> c_int {
+    let func = SET_ACTIVE_DLC_AND_MODS.lock().unwrap().as_func();
+    func(this, dlc_list, mod_list, reload_dlc, reload_mods)
+}
+
+#[ctor::dtor]
+fn destroy_set_dlc() {
+    SET_ACTIVE_DLC_AND_MODS.lock().unwrap().unpatch();
+}
+
+#[cfg(windows)]
+mod platform_impl {
+    use super::*;
+    use crate::versions::VersionInfoLinux;
+    use dlopen::raw::Library;
+
+    pub fn init(ctx: &MppatchCtx) -> Result<()> {
+        // TODO: init
+        Ok(())
+    }
+
+    pub fn install() {
+        // TODO: solve CEG
+    }
+    pub fn uninstall() {
+        // TODO: solve CEG
+    }
+}
+
 #[cfg(unix)]
 mod platform_impl {
     use super::*;
-    use crate::{rt_patch::PatchedFunction, versions::VersionInfoLinux};
-    use dlopen::raw::Library;
+    use crate::versions::VersionInfoLinux;
 
-    static SET_ACTIVE_DLC_AND_MODS: Mutex<Option<PatchedFunction>> = Mutex::new(None);
-
-    pub unsafe fn SetActiveDLCAndMods(
-        this: *mut c_void,
-        dlc_list: *mut CppListRaw<Guid>,
-        mod_list: *mut CppListRaw<ModInfo>,
-        reload_dlc: bool,
-        reload_mods: bool,
-    ) -> c_int {
-        let func: unsafe extern "C" fn(
-            *mut c_void,
-            *mut CppListRaw<Guid>,
-            *mut CppListRaw<ModInfo>,
-            bool,
-            bool,
-        ) -> c_int = mem::transmute(
+    pub fn init(ctx: &MppatchCtx) -> Result<()> {
+        log::info!("Applying SetActiveDLCAndMods patch...");
+        let linux_info: VersionInfoLinux = ctx.info_linux()?;
+        unsafe {
             SET_ACTIVE_DLC_AND_MODS
                 .lock()
                 .unwrap()
-                .as_ref()
-                .unwrap()
-                .old_function(),
-        );
-        func(this, dlc_list, mod_list, reload_dlc, reload_mods)
-    }
-
-    pub fn init(ctx: &MppatchCtx) -> Result<()> {
-        log::info!("Applying SetActiveDLCAndModsProxy patch...");
-
-        let linux_info: VersionInfoLinux = ctx.info_linux()?;
-
-        let (sym, sym_size) = linux_info.sym_SetActiveDLCAndMods;
-
-        unsafe {
-            let dylib_civ = Library::open_self()?;
-            let patch = PatchedFunction::create(
-                dylib_civ.symbol(sym)?,
-                SetActiveDLCAndModsProxy as usize as *const c_void,
-                sym_size,
-                "SetActiveDLCAndModsProxy",
-            );
-            *SET_ACTIVE_DLC_AND_MODS.lock().unwrap() = Some(patch);
+                .patch_exe_sym(linux_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy)?;
         }
-
         Ok(())
     }
 
@@ -95,11 +104,6 @@ mod platform_impl {
     }
     pub fn uninstall() {
         // no CEG on unix, so we don't need this mechanism
-    }
-
-    #[ctor::dtor]
-    fn destroy_usage() {
-        SET_ACTIVE_DLC_AND_MODS.lock().unwrap().take();
     }
 }
 
@@ -235,13 +239,8 @@ pub unsafe extern "C" fn SetActiveDLCAndModsProxy(
     let reload_dlc = reload_dlc | state.overrides.contains(OverrideType::ForceReloadDlcs);
     let reload_mods = reload_mods | state.overrides.contains(OverrideType::ForceReloadMods);
 
-    let result = platform_impl::SetActiveDLCAndMods(
-        this,
-        dlc_list.as_raw(),
-        mod_list.as_raw(),
-        reload_dlc,
-        reload_mods,
-    );
+    let result =
+        SetActiveDLCAndMods(this, dlc_list.as_raw(), mod_list.as_raw(), reload_dlc, reload_mods);
 
     debug!("[SetActiveDLCAndModsProxy call end]");
 

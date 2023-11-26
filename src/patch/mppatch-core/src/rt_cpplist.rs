@@ -89,6 +89,7 @@ pub struct CppListRaw<T> {
     unk0: u32, // refcount?
     head: *mut CppListLink,
     length: c_int,
+    _phantom: PhantomData<T>,
 }
 
 #[cfg(unix)]
@@ -118,7 +119,7 @@ impl<T> CppListRaw<T> {
 
     #[cfg(windows)]
     unsafe fn alloc() -> *mut Self {
-        let alloc: *mut Self = libc::malloc(mem::size_of::<Self>());
+        let alloc: *mut Self = mem::transmute(libc::malloc(mem::size_of::<Self>()));
         (*alloc).unk0 = 0;
         (*alloc).head = CppListLink::new::<()>(());
         (*alloc).length = 0;
@@ -135,7 +136,7 @@ impl<T> CppListRaw<T> {
     #[cfg(windows)]
     unsafe fn free(this: *mut Self) {
         CppListLink::free((*this).head);
-        libc::free(this);
+        libc::free(mem::transmute(this));
     }
 
     #[cfg(unix)]

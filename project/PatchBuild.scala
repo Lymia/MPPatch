@@ -46,6 +46,10 @@ object PatchBuild {
         IO.copyFile(nativeBin.file, dir / nativeBin.name)
         IO.write(dir / s"${nativeBin.name}.build-id", nativeBin.buildId)
       }
+      for (wrapperBin <- NativePatchBuild.Keys.win32Wrapper.value) {
+        log.log(Level.Info, s"Copying $wrapperBin to output directory.")
+        IO.copyFile(wrapperBin, dir / wrapperBin.getName)
+      }
 
       // return directory
       dir
