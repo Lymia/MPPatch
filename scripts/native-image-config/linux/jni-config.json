@@ -118,7 +118,11 @@
   },
   {
     "name": "java.awt.event.KeyEvent",
-    "allPublicFields": true
+    "fields": [
+      {
+        "name": "isProxyActive"
+      }
+    ]
   },
   {
     "name": "java.awt.geom.AffineTransform",

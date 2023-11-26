@@ -68,6 +68,6 @@ cp -v target/dist-build/assembly.jar target/dist/MPPatch_Installer-universal-$VE
 
 # Building tarball
 cd target/dist || exit 1
-  tar --gzip -cv -f mpatch_ci_dist.tar.gz * || exit 1
+  tar --gzip -cv -f mppatch_ci_dist.tar.gz * || exit 1
 cd ../.. || exit 1
 cp target/dist/mppatch_ci_dist.tar.gz target/ || exit 1

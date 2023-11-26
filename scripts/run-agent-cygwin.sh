@@ -22,4 +22,14 @@
 # THE SOFTWARE.
 #
 
-rm -rfv mppatch_* target src/patch/mppatch-core/target || exit 1
+. scripts/ci/install-graalvm.sh
+install_for_win32 || exit 1
+
+JAR_NAME="$(sbt "print assembly" --error || exit 1)"
+
+rm -rfv target/native-image-config-temp scripts/native-image-config/win32 || exit 1
+mkdir -p scripts/native-image-config/win32 || exit 1
+target/graalvm-win32/bin/java.exe \
+  -agentlib:native-image-agent=config-output-dir=target/native-image-config-temp \
+  -jar "$JAR_NAME" @nativeImageGenerateConfig 9e3c6db9-2a2f-4a22-9eb5-fba1a710449c || exit 1
+scripts/python/merge-configs.py win32 || exit 1

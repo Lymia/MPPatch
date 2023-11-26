@@ -22,7 +22,7 @@
 # THE SOFTWARE.
 #
 
-. scripts/ci/install-graalvm_linux.sh
+. scripts/ci/install-graalvm.sh
 install_for_linux || exit 1
 
 wget https://download.formdev.com/files/flatlaf/flatlaf-demo-3.2.5.jar -O target/flatlaf-demo-3.2.5.jar || exit 1

@@ -22,7 +22,7 @@
 # THE SOFTWARE.
 #
 
-. scripts/ci/install-graalvm_linux.sh
+. scripts/ci/install-graalvm.sh
 install_for_linux || exit 1
 
 JAR_NAME="$(sbt "print assembly" --error || exit 1)"

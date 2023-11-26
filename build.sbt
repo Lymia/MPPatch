@@ -68,7 +68,7 @@ ThisBuild / assemblyMergeStrategy := {
 
 // Build native binaries
 nativeImageInstalled := true
-nativeImageGraalHome := (target.value / f"graalvm_${PlatformType.currentPlatform.name}").toPath
+nativeImageGraalHome := (target.value / f"graalvm-${PlatformType.currentPlatform.name}").toPath
 
 nativeImageOptions += "--no-fallback"
 nativeImageOptions += "-Djava.awt.headless=false"

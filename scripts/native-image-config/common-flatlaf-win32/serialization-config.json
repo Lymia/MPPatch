@@ -1,0 +1,11 @@
+{
+  "types":[
+    {
+      "name":"java.lang.String"
+    }
+  ],
+  "lambdaCapturingTypes":[
+  ],
+  "proxies":[
+  ]
+}

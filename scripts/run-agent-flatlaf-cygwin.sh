@@ -22,4 +22,10 @@
 # THE SOFTWARE.
 #
 
-rm -rfv mppatch_* target src/patch/mppatch-core/target || exit 1
+. scripts/ci/install-graalvm.sh
+install_for_win32 || exit 1
+
+wget https://download.formdev.com/files/flatlaf/flatlaf-demo-3.2.5.jar -O target/flatlaf-demo-3.2.5.jar || exit 1
+target/graalvm-win32/bin/java.exe \
+  -agentlib:native-image-agent=config-output-dir=scripts/native-image-config/common-flatlaf-win32 \
+  -jar target/flatlaf-demo-3.2.5.jar || exit 1

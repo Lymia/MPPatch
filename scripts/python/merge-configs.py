@@ -61,9 +61,17 @@ def merge_jni_config(file_a, file_b, output):
 
     for name in names:
         if is_swing_class(names[name]):
-            del names[name]["methods"]
-            names[name]["allDeclaredMethods"] = True
-        if names[name]["name"] == "java.awt.event.KeyEvent":
+            synthetic_line = {
+                "name": name,
+                "methods": [
+                    {'name': 'createUI', 'parameterTypes': ['javax.swing.JComponent']},
+                    {'name': 'coalesceEvents', 'parameterTypes': ['java.awt.AWTEvent', 'java.awt.AWTEvent']},
+                    {'name': 'loadActionMap', 'parameterTypes': ['javax.swing.plaf.basic.LazyActionMap']},
+                ],
+            }
+            names[name] = merge_jni_line(names[name], synthetic_line)
+            names[name]["allDeclaredFields"] = True
+        if names[name]["name"] == "java.awt.evnent.KeyEvent":
             del names[name]["fields"]
             names[name]["allPublicFields"] = True
         if names[name]["name"] == "sun.java2d.loops.SurfaceType":
@@ -100,7 +108,7 @@ def merge_jni_line(line_a, line_b):
             line_a["fields"].append(field)
     for method in line_b["methods"]:
         if not method in line_a["methods"]:
-            line_a["methods"].append(field)
+            line_a["methods"].append(method)
 
     line_a["fields"].sort(key=lambda x: x["name"])
     line_a["methods"].sort(key=lambda x: x["name"])
