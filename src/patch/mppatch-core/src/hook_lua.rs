@@ -27,6 +27,7 @@ use crate::{
     hook_netpatch::OverrideType,
     rt_init,
     rt_init::{MppatchCtx, MppatchFeature},
+    rt_linking::PatcherContext,
 };
 use anyhow::Result;
 use libc::c_int;
@@ -44,50 +45,27 @@ use std::{ffi::CStr, sync::Mutex};
 
 type FnType = unsafe extern "C-unwind" fn(*mut lua_State) -> c_int;
 
-#[cfg(windows)]
-mod platform_impl {
-    use super::*;
+static GET_MEMORY_USAGE: Mutex<PatcherContext<FnType>> = Mutex::new(PatcherContext::new());
 
-    static GET_MEMORY_USAGE: Mutex<Option<FnType>> = Mutex::new(None);
-
-    pub unsafe fn lGetMemoryUsage(lua: *mut lua_State) -> c_int {
-        let func = *GET_MEMORY_USAGE.lock().unwrap().as_ref().unwrap();
-        func(lua)
-    }
-
-    pub fn init(ctx: &MppatchCtx) -> Result<()> {
-        // TODO: Set GET_MEMORY_USAGE
-        Ok(())
-    }
+unsafe fn lGetMemoryUsage(lua: *mut lua_State) -> c_int {
+    let func = GET_MEMORY_USAGE.lock().unwrap().as_func();
+    func(lua)
 }
 
-#[cfg(unix)]
-mod platform_impl {
-    use super::*;
-    use crate::rt_linking::PatcherContext;
-
-    static GET_MEMORY_USAGE: Mutex<PatcherContext<FnType>> = Mutex::new(PatcherContext::new());
-
-    pub unsafe fn lGetMemoryUsage(lua: *mut lua_State) -> c_int {
-        let func = GET_MEMORY_USAGE.lock().unwrap().as_func();
-        func(lua)
+pub fn init(ctx: &MppatchCtx) -> Result<()> {
+    log::info!("Applying lGetMemoryUsage patch...");
+    unsafe {
+        GET_MEMORY_USAGE
+            .lock()
+            .unwrap()
+            .patch(ctx.version_info.sym_lGetMemoryUsage, lGetMemoryUsageProxy)?;
     }
+    Ok(())
+}
 
-    pub fn init(ctx: &MppatchCtx) -> Result<()> {
-        log::info!("Applying lGetMemory patch...");
-        unsafe {
-            GET_MEMORY_USAGE
-                .lock()
-                .unwrap()
-                .patch(ctx.version_info.sym_lGetMemoryUsage, lGetMemoryUsageProxy)?;
-        }
-        Ok(())
-    }
-
-    #[ctor::dtor]
-    fn destroy_usage() {
-        GET_MEMORY_USAGE.lock().unwrap().unpatch();
-    }
+#[ctor::dtor]
+fn destroy_usage() {
+    GET_MEMORY_USAGE.lock().unwrap().unpatch();
 }
 
 const LUA_SENTINEL: &str = "216f0090-85dd-4061-8371-3d8ba2099a70";
@@ -261,7 +239,7 @@ pub unsafe extern "C-unwind" fn lGetMemoryUsageProxy(lua_c: *mut lua_State) -> c
             lua_pop(lua_c, 1);
 
             let lua = Lua::init_from_ptr(lua_c);
-            create_mppatch_table(lua_c, &lua).unwrap(); // TODO: Error handling
+            rt_init::check_error(create_mppatch_table(lua_c, &lua));
             drop(lua);
         } else {
             lua_pop(lua_c, 1);
@@ -271,10 +249,6 @@ pub unsafe extern "C-unwind" fn lGetMemoryUsageProxy(lua_c: *mut lua_State) -> c
         lua_gettable(lua_c, LUA_REGISTRYINDEX);
         1
     } else {
-        platform_impl::lGetMemoryUsage(lua_c)
+        lGetMemoryUsage(lua_c)
     }
-}
-
-pub fn init(ctx: &MppatchCtx) -> Result<()> {
-    platform_impl::init(ctx)
 }

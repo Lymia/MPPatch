@@ -24,6 +24,7 @@
 
 use crate::{
     rt_cpplist::{CppList, CppListRaw},
+    rt_init,
     rt_init::MppatchCtx,
     rt_linking::PatcherContext,
 };
@@ -65,54 +66,39 @@ pub unsafe fn SetActiveDLCAndMods(
     reload_dlc: bool,
     reload_mods: bool,
 ) -> c_int {
-    let func = SET_ACTIVE_DLC_AND_MODS.lock().unwrap().as_func();
+    let ctx = rt_init::get_ctx();
+    let func = SET_ACTIVE_DLC_AND_MODS
+        .lock()
+        .unwrap()
+        .as_func_fallback(ctx.version_info.sym_SetActiveDLCAndMods);
     func(this, dlc_list, mod_list, reload_dlc, reload_mods)
+}
+
+fn hook_install() {
+    let ctx = rt_init::get_ctx();
+    log::info!("Applying SetActiveDLCAndMods patch...");
+    unsafe {
+        rt_init::check_error(
+            SET_ACTIVE_DLC_AND_MODS
+                .lock()
+                .unwrap()
+                .patch(ctx.version_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy),
+        );
+    }
+}
+fn hook_unpatch() {
+    SET_ACTIVE_DLC_AND_MODS.lock().unwrap().unpatch();
+}
+
+pub fn init(_: &MppatchCtx) -> Result<()> {
+    #[cfg(unix)]
+    hook_install();
+    Ok(())
 }
 
 #[ctor::dtor]
 fn destroy_set_dlc() {
-    SET_ACTIVE_DLC_AND_MODS.lock().unwrap().unpatch();
-}
-
-#[cfg(windows)]
-mod platform_impl {
-    use super::*;
-    use dlopen::raw::Library;
-
-    pub fn init(ctx: &MppatchCtx) -> Result<()> {
-        // TODO: init
-        Ok(())
-    }
-
-    pub fn install() {
-        // TODO: solve CEG
-    }
-    pub fn uninstall() {
-        // TODO: solve CEG
-    }
-}
-
-#[cfg(unix)]
-mod platform_impl {
-    use super::*;
-
-    pub fn init(ctx: &MppatchCtx) -> Result<()> {
-        log::info!("Applying SetActiveDLCAndMods patch...");
-        unsafe {
-            SET_ACTIVE_DLC_AND_MODS
-                .lock()
-                .unwrap()
-                .patch(ctx.version_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy)?;
-        }
-        Ok(())
-    }
-
-    pub fn install() {
-        // no CEG on unix, so we don't need this mechanism
-    }
-    pub fn uninstall() {
-        // no CEG on unix, so we don't need this mechanism
-    }
+    hook_unpatch()
 }
 
 #[derive(Debug)]
@@ -198,11 +184,13 @@ impl Debug for ModInfo {
 }
 
 pub fn install() {
-    platform_impl::install();
+    #[cfg(windows)]
+    hook_install();
 }
 pub fn reset() {
     let mut lock = STATE.lock().unwrap();
-    platform_impl::uninstall();
+    #[cfg(windows)]
+    hook_unpatch();
     lock.reset();
 }
 
@@ -215,7 +203,8 @@ unsafe fn SetActiveDLCAndModsProxy_impl(
 ) -> c_int {
     let state = {
         let mut lock = STATE.lock().unwrap();
-        platform_impl::uninstall();
+        #[cfg(windows)]
+        hook_unpatch();
         lock.take()
     };
 
@@ -275,8 +264,4 @@ pub unsafe extern "C-unwind" fn SetActiveDLCAndModsProxy(
     reload_mods: bool,
 ) -> c_int {
     SetActiveDLCAndModsProxy_impl(this, dlc_list, mod_list, reload_dlc, reload_mods)
-}
-
-pub fn init(ctx: &MppatchCtx) -> Result<()> {
-    platform_impl::init(ctx)
 }

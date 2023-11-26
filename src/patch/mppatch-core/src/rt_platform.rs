@@ -27,6 +27,7 @@ mod platform_impl {
     use libc::*;
     use std::ptr::null_mut;
     use winapi::um::{
+        errhandlingapi::GetLastError,
         memoryapi::{VirtualAlloc, VirtualFree, VirtualProtect},
         winnt::{MEM_COMMIT, MEM_RELEASE, PAGE_EXECUTE_READWRITE},
     };
@@ -34,7 +35,7 @@ mod platform_impl {
     unsafe fn virtual_protect(start: *mut c_void, len: usize, new: u32) -> ProtectionInfo {
         let mut old = 0;
         if VirtualProtect(start, len, new, &mut old) == 0 {
-            panic!("VirtualProtect failed");
+            panic!("VirtualProtect failed: 0x{:08x}", GetLastError());
         }
         old
     }
@@ -50,16 +51,16 @@ mod platform_impl {
     pub unsafe fn exec_mem_mmap(len: usize) -> *mut u8 {
         let ptr = VirtualAlloc(null_mut(), len, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
         if ptr.is_null() {
-            panic!("VirtualAlloc failed")
+            panic!("VirtualAlloc failed: 0x{:08x}", GetLastError())
         }
         ptr as *mut u8
     }
-    pub unsafe fn exec_mem_prepare(ptr: *mut u8, len: usize) {
+    pub unsafe fn exec_mem_prepare(_: *mut u8, _: usize) {
         // do nothing
     }
-    pub unsafe fn exec_mem_munmap(ptr: *mut u8, len: usize) {
-        if VirtualFree(ptr as *mut c_void, len, MEM_RELEASE) == 0 {
-            panic!("munmap failed");
+    pub unsafe fn exec_mem_munmap(ptr: *mut u8, _: usize) {
+        if VirtualFree(ptr as *mut c_void, 0, MEM_RELEASE) == 0 {
+            panic!("VirtualFree failed: 0x{:08x}", GetLastError());
         }
     }
 }
@@ -116,7 +117,7 @@ pub struct ExecutableMemory {
 impl ExecutableMemory {
     pub unsafe fn alloc(len: usize) -> Self {
         let new_alloc = platform_impl::exec_mem_mmap(len);
-        ExecutableMemory { len, is_prepared: false, data: new_alloc as *mut u8 }
+        ExecutableMemory { len, is_prepared: false, data: new_alloc }
     }
 
     pub fn prepare(&mut self) {

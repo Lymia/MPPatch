@@ -24,13 +24,23 @@
 
 use anyhow::*;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum Platform {
     Win32,
+    #[allow(dead_code)]
     MacOS,
     Linux,
 }
 impl Platform {
+    #[cfg(windows)]
+    pub const CURRENT: Platform = Platform::Win32;
+
+    #[cfg(target_os = "macos")]
+    pub const CURRENT: Platform = Platform::MacOS;
+
+    #[cfg(target_os = "linux")]
+    pub const CURRENT: Platform = Platform::Linux;
+
     pub fn name(&self) -> &'static str {
         match self {
             Platform::Win32 => "win32",
@@ -46,7 +56,7 @@ pub struct VersionInfo {
     pub platform: Platform,
     pub sym_lGetMemoryUsage: SymbolInfo,
     pub sym_SetActiveDLCAndMods: SymbolInfo,
-    pub binary_base: Option<usize>,
+    pub binary_base: usize,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -63,9 +73,10 @@ pub enum SymbolInfo {
 
 #[derive(Copy, Clone, Debug)]
 pub struct SymWin32Offsets {
-    dx9: (usize, usize),
-    dx11: (usize, usize),
-    tablet: (usize, usize),
+    pub name: &'static str,
+    pub dx9: (usize, usize),
+    pub dx11: (usize, usize),
+    pub tablet: (usize, usize),
 }
 
 pub fn find_info(sha256: &str) -> Result<VersionInfo> {
@@ -75,18 +86,19 @@ pub fn find_info(sha256: &str) -> Result<VersionInfo> {
             platform: Platform::Win32,
             sym_lGetMemoryUsage: SymbolInfo::DllProxy(ProxySource::CvGameDatabase, "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z"),
             sym_SetActiveDLCAndMods: SymbolInfo::Win32Offsets(SymWin32Offsets {
+                name: "SetActiveDLCAndMods",
                 dx9: (0x006CD160, 6),
                 dx11: (0x006B8E50, 6),
                 tablet: (0x0065DC10, 6),
             }),
-            binary_base: Some(0x00400000),
+            binary_base: 0x00400000,
         },
         "cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca" => VersionInfo {
             name: "Civilization V / 1.0.3.279 / Linux + Steam",
             platform: Platform::Linux,
             sym_lGetMemoryUsage: SymbolInfo::PublicNamed("_ZN8Database9Scripting3Lua15lGetMemoryUsageEP9lua_State", 7),
             sym_SetActiveDLCAndMods: SymbolInfo::PublicNamed("_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb", 10),
-            binary_base: None,
+            binary_base: 0x08048000,
         },
         _ => bail!("Unknown version: {sha256}"),
     })

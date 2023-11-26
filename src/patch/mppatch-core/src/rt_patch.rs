@@ -80,6 +80,8 @@ impl Drop for PatchedFunction {
             ptr::copy(self.patch_target.ptr(), self.patch_addr as *mut u8, self.patch_bytes);
             reprotect_region(self.patch_addr, self.patch_bytes, old_prot);
         }
+
+        debug!("(done)")
     }
 }
 unsafe impl Send for PatchedFunction {}

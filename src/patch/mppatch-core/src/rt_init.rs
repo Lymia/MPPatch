@@ -20,17 +20,19 @@
  * THE SOFTWARE.
  */
 
-use crate::versions::{find_info, VersionInfo};
+use crate::versions::{find_info, Platform, VersionInfo};
 use anyhow::{ensure, Result};
 use enumset::*;
-use log::{info, trace, LevelFilter};
+use log::{error, info, trace, LevelFilter};
 use serde::*;
 use simplelog::{
     ColorChoice, CombinedLogger, ConfigBuilder, SharedLogger, TermLogger, TerminalMode,
     ThreadLogMode, WriteLogger,
 };
 use std::{
+    backtrace::Backtrace,
     fs::File,
+    panic,
     path::{Path, PathBuf},
     ptr::null_mut,
     sync::atomic::{AtomicPtr, Ordering},
@@ -127,7 +129,7 @@ fn setup_logging(ctx: &MppatchCtx) {
             ConfigBuilder::default()
                 .set_thread_level(LevelFilter::Error)
                 .set_thread_mode(ThreadLogMode::Both)
-                .set_target_level(LevelFilter::Error)
+                .set_target_level(LevelFilter::Off)
                 .set_location_level(LevelFilter::Error)
                 .set_time_format_rfc2822()
                 .build(),
@@ -143,6 +145,10 @@ pub fn run() -> Result<&'static MppatchCtx> {
     early_setup();
     let ctx = create_ctx()?;
     setup_logging(&ctx);
+    register_panic_hook();
+    if ctx.version_info.platform != Platform::CURRENT {
+        panic!("Specified Civilization version is not compatible with this patch.");
+    }
 
     info!("mppatch-core v{} loaded", ctx.version());
     info!("Game version: {}", ctx.version_info.name);
@@ -153,6 +159,7 @@ pub fn run() -> Result<&'static MppatchCtx> {
     assert!(CTX
         .swap(Box::leak(Box::new(ctx)), Ordering::SeqCst)
         .is_null());
+
     Ok(get_ctx())
 }
 
@@ -168,4 +175,54 @@ fn destroy_ctx() {
     if !ptr.is_null() {
         unsafe { drop(Box::from_raw(ptr)) }
     }
+}
+
+fn register_panic_hook() {
+    panic::set_hook(Box::new(move |info| {
+        let str = if let Some(str) = info.payload().downcast_ref::<&'static str>() {
+            (*str).to_owned()
+        } else if let Some(str) = info.payload().downcast_ref::<String>() {
+            str.clone()
+        } else {
+            "(no message found)".to_string()
+        };
+        error!("{str}");
+        dump_backtrace(&Backtrace::force_capture());
+        fatal_error(&format!("Internal error: {str}"));
+    }));
+}
+
+pub fn check_error<T>(err: Result<T>) -> T {
+    match err {
+        Ok(v) => v,
+        Err(e) => {
+            error!("Error occurred: {e}");
+            dump_backtrace(e.backtrace());
+            fatal_error(&format!("Internal error: {e}"));
+        }
+    }
+}
+
+fn dump_backtrace(backtrace: &Backtrace) {
+    error!("Backtrace:");
+    let backtrace_str = format!("{backtrace}");
+
+    let mut counter = 0;
+    for line in backtrace_str.split('\n') {
+        if line.contains("<unknown>") {
+            counter += 1;
+            if counter == 3 {
+                error!("(further lines skipped)");
+                break;
+            }
+        } else {
+            counter = 0;
+        }
+        error!("{line}");
+    }
+}
+
+fn fatal_error(_: &str) -> ! {
+    // TODO: Show a msgbox
+    std::process::abort()
 }

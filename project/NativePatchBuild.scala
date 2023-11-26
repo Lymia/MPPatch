@@ -44,9 +44,6 @@ object NativePatchBuild {
           case _                  => sys.error("unreachable")
         }
 
-        // clean build the package
-        IO.delete(crateDir / "target" / rustTarget)
-
         // run Cargo
         val buildId = UUID.randomUUID()
         runProcess(

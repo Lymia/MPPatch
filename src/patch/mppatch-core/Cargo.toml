@@ -4,11 +4,14 @@ version = "0.0.0"
 authors = ["Lymia Kanokawa <lymia@lymia.moe>"]
 edition = "2021"
 
+
 [lib]
 crate-type = ["cdylib"]
 
 [dependencies]
-anyhow = { version = "1.0", features = ["backtrace"] }
+anyhow = "1.0"
+atomic = "0.6"
+bytemuck = { version = "1.14", features = ["derive"] }
 ctor = "0.2"
 dlopen = "0.1"
 enumset = { version = "1.1", features = ["serde"] }
@@ -20,11 +23,16 @@ simplelog = { version = "0.12", features = ["paris"] }
 toml = { version = "0.8", default-features = false, features = ["parse"] }
 
 [target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3", features = ["memoryapi"] }
+winapi = { version = "0.3", features = ["memoryapi", "libloaderapi"] }
 
 [build-dependencies]
 nasm-rs = "0.2"
 
+[profile.dev]
+panic = "abort"
+
 [profile.release]
 opt-level = 2
 lto = true
+debug = "line-tables-only"
+panic = "abort"
