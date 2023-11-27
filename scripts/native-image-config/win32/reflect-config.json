@@ -1,0 +1,3987 @@
+[
+  {
+    "name": "[B"
+  },
+  {
+    "name": "[C"
+  },
+  {
+    "name": "[Ljava.awt.event.MouseMotionListener;"
+  },
+  {
+    "name": "[Ljava.lang.String;"
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatDarculaLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatDarkLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatIntelliJLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.FlatLightLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.BasicComponentsPanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.ControlBar",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.DataComponentsPanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.DemoFrame",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.HintManager$HintPanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.HintManager$HintPanel$2",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.LookAndFeelsComboBox",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.LookAndFeelsComboBox$1",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.MoreComponentsPanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.NewDialog",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.OptionPanePanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.OptionPanePanel$ShowDialogLinkLabel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.ScrollablePanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.TabsPanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.extras.ExtrasPanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.intellijthemes.IJThemesPanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.demo.intellijthemes.IJThemesPanel$2",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.FlatAnimatedLafChange$1",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.FlatUIDefaultsInspector$KeyRenderer",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.FlatUIDefaultsInspector$Renderer",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.FlatUIDefaultsInspector$ValueRenderer",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.components.FlatButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.components.FlatTextField",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.extras.components.FlatTriStateCheckBox",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatAscendingSortIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatCapsLockIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatCheckBoxIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatCheckBoxMenuItemIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatClearIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatDescendingSortIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserDetailsViewIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserHomeFolderIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserListViewIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserNewFolderIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileChooserUpFolderIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewComputerIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewDirectoryIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewFileIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewFloppyDriveIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatFileViewHardDriveIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatHelpButtonIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatInternalFrameCloseIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatInternalFrameIconifyIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatInternalFrameMaximizeIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatInternalFrameRestoreIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatMenuArrowIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatMenuItemArrowIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatOptionPaneErrorIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatOptionPaneInformationIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatOptionPaneQuestionIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatOptionPaneWarningIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatRadioButtonIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatRadioButtonMenuItemIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatRevealIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTabbedPaneCloseIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeClosedIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeCollapsedIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeExpandedIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeLeafIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatTreeOpenIcon",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatWindowCloseIcon",
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatWindowIconifyIcon",
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatWindowMaximizeIcon",
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.icons.FlatWindowRestoreIcon",
+    "queryAllDeclaredConstructors": true,
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      },
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.String"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.themes.FlatMacDarkLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.themes.FlatMacLightLaf",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatArrowButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatBorder",
+    "fields": [
+      {
+        "name": "focusable"
+      },
+      {
+        "name": "font"
+      },
+      {
+        "name": "icon"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatButtonBorder",
+    "fields": [
+      {
+        "name": "focusable"
+      },
+      {
+        "name": "font"
+      },
+      {
+        "name": "icon"
+      },
+      {
+        "name": "toolbarMargin"
+      },
+      {
+        "name": "toolbarSpacingInsets"
+      }
+    ],
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatButtonUI",
+    "fields": [
+      {
+        "name": "focusable"
+      },
+      {
+        "name": "font"
+      },
+      {
+        "name": "icon"
+      },
+      {
+        "name": "toolbarHoverBackground"
+      },
+      {
+        "name": "toolbarMargin"
+      },
+      {
+        "name": "toolbarPressedBackground"
+      },
+      {
+        "name": "toolbarSelectedBackground"
+      },
+      {
+        "name": "toolbarSpacingInsets"
+      }
+    ],
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatCheckBoxMenuItemUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatCheckBoxUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatComboBoxUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatComboBoxUI$FlatComboBoxButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatComboBoxUI$FlatComboPopup",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatEditorPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatEmptyBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatFileChooserUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatFileChooserUI$FlatShortcutsPanel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatFormattedTextFieldUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatInternalFrameUI$FlatInternalFrameBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatLabelUI",
+    "fields": [
+      {
+        "name": "font"
+      }
+    ],
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatListCellBorder$Default",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatListCellBorder$Focused",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatListCellBorder$Selected",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatListUI",
+    "fields": [
+      {
+        "name": "selectionArc"
+      },
+      {
+        "name": "selectionInsets"
+      }
+    ],
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMarginBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuBarBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuBarUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuItemBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuItemUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatMenuUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatOptionPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPanelUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPasswordFieldUI",
+    "fields": [
+      {
+        "name": "showRevealButton"
+      }
+    ],
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPopupMenuBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPopupMenuSeparatorUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatPopupMenuUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatProgressBarUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRadioButtonMenuItemUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRadioButtonUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRootPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRootPaneUI$FlatWindowBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatRoundBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatScrollBarUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatScrollBarUI$FlatScrollBarButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatScrollPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSeparatorUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSliderUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSpinnerUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSpinnerUI$1",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSplitPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatSplitPaneUI$FlatSplitPaneDivider",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$ContainerUIResource",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$FlatMoreTabsButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$FlatScrollableTabButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$FlatTabAreaButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTabbedPaneUI$TabCloseButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableCellBorder$Default",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableCellBorder$Focused",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableCellBorder$Selected",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableHeaderBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableHeaderUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTableUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTextAreaUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTextBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTextFieldUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTextPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane$1",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane$2",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane$4",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTitlePane$5",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToggleButtonUI",
+    "fields": [
+      {
+        "name": "focusable"
+      },
+      {
+        "name": "font"
+      },
+      {
+        "name": "toolbarHoverBackground"
+      },
+      {
+        "name": "toolbarMargin"
+      },
+      {
+        "name": "toolbarPressedBackground"
+      },
+      {
+        "name": "toolbarSelectedBackground"
+      },
+      {
+        "name": "toolbarSpacingInsets"
+      }
+    ],
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToolBarBorder",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToolBarSeparatorUI",
+    "fields": [
+      {
+        "name": "separatorWidth"
+      }
+    ],
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToolBarUI",
+    "fields": [
+      {
+        "name": "borderMargins"
+      },
+      {
+        "name": "floatable"
+      },
+      {
+        "name": "opaque"
+      }
+    ],
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatToolTipUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatTreeUI",
+    "fields": [
+      {
+        "name": "selectionArc"
+      },
+      {
+        "name": "selectionInsets"
+      }
+    ],
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.formdev.flatlaf.ui.FlatViewportUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "com.sun.xml.internal.stream.XMLInputFactoryImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.awt.Component",
+    "methods": [
+      {
+        "name": "getFont",
+        "parameterTypes": []
+      },
+      {
+        "name": "isFocusable",
+        "parameterTypes": []
+      },
+      {
+        "name": "setFocusable",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "java.awt.Image"
+  },
+  {
+    "name": "java.awt.SequencedEvent"
+  },
+  {
+    "name": "java.awt.event.KeyEvent",
+    "fields": [
+      {
+        "name": "VK_A"
+      },
+      {
+        "name": "VK_ADD"
+      },
+      {
+        "name": "VK_BACK_SLASH"
+      },
+      {
+        "name": "VK_BACK_SPACE"
+      },
+      {
+        "name": "VK_C"
+      },
+      {
+        "name": "VK_CONTEXT_MENU"
+      },
+      {
+        "name": "VK_COPY"
+      },
+      {
+        "name": "VK_CUT"
+      },
+      {
+        "name": "VK_DELETE"
+      },
+      {
+        "name": "VK_DOWN"
+      },
+      {
+        "name": "VK_END"
+      },
+      {
+        "name": "VK_ENTER"
+      },
+      {
+        "name": "VK_ESCAPE"
+      },
+      {
+        "name": "VK_F10"
+      },
+      {
+        "name": "VK_F12"
+      },
+      {
+        "name": "VK_F2"
+      },
+      {
+        "name": "VK_F4"
+      },
+      {
+        "name": "VK_F5"
+      },
+      {
+        "name": "VK_F6"
+      },
+      {
+        "name": "VK_F7"
+      },
+      {
+        "name": "VK_F8"
+      },
+      {
+        "name": "VK_F9"
+      },
+      {
+        "name": "VK_H"
+      },
+      {
+        "name": "VK_HOME"
+      },
+      {
+        "name": "VK_INSERT"
+      },
+      {
+        "name": "VK_KP_DOWN"
+      },
+      {
+        "name": "VK_KP_LEFT"
+      },
+      {
+        "name": "VK_KP_RIGHT"
+      },
+      {
+        "name": "VK_KP_UP"
+      },
+      {
+        "name": "VK_LEFT"
+      },
+      {
+        "name": "VK_O"
+      },
+      {
+        "name": "VK_PAGE_DOWN"
+      },
+      {
+        "name": "VK_PAGE_UP"
+      },
+      {
+        "name": "VK_PASTE"
+      },
+      {
+        "name": "VK_RETURN"
+      },
+      {
+        "name": "VK_RIGHT"
+      },
+      {
+        "name": "VK_SLASH"
+      },
+      {
+        "name": "VK_SPACE"
+      },
+      {
+        "name": "VK_SUBTRACT"
+      },
+      {
+        "name": "VK_T"
+      },
+      {
+        "name": "VK_TAB"
+      },
+      {
+        "name": "VK_UP"
+      },
+      {
+        "name": "VK_V"
+      },
+      {
+        "name": "VK_X"
+      },
+      {
+        "name": "VK_Y"
+      }
+    ]
+  },
+  {
+    "name": "java.awt.geom.Path2D",
+    "methods": [
+      {
+        "name": "trimToSize",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.beans.Beans"
+  },
+  {
+    "name": "java.beans.PropertyVetoException"
+  },
+  {
+    "name": "java.io.InputStream"
+  },
+  {
+    "name": "java.io.Reader"
+  },
+  {
+    "name": "java.lang.ClassValue"
+  },
+  {
+    "name": "java.lang.Object",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "java.lang.ObjectCustomizer"
+  },
+  {
+    "name": "java.lang.String"
+  },
+  {
+    "name": "java.lang.invoke.VarHandle",
+    "methods": [
+      {
+        "name": "releaseFence",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.net.URL"
+  },
+  {
+    "name": "java.nio.ByteBuffer"
+  },
+  {
+    "name": "java.nio.CharBuffer"
+  },
+  {
+    "name": "java.rmi.MarshalledObject",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.lang.Object"
+        ]
+      },
+      {
+        "name": "get",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "java.rmi.Remote"
+  },
+  {
+    "name": "java.security.SecureRandomParameters"
+  },
+  {
+    "name": "java.util.List"
+  },
+  {
+    "name": "java.util.concurrent.atomic.AtomicBoolean",
+    "fields": [
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.AbstractButton",
+    "methods": [
+      {
+        "name": "getIcon",
+        "parameterTypes": []
+      },
+      {
+        "name": "setIcon",
+        "parameterTypes": [
+          "javax.swing.Icon"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JButton",
+    "methods": [
+      {
+        "name": "getFocusable",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JComponent",
+    "methods": [
+      {
+        "name": "isOpaque",
+        "parameterTypes": []
+      },
+      {
+        "name": "setFont",
+        "parameterTypes": [
+          "java.awt.Font"
+        ]
+      },
+      {
+        "name": "setOpaque",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JLabel"
+  },
+  {
+    "name": "javax.swing.JList",
+    "methods": [
+      {
+        "name": "getUI",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JPanel",
+    "methods": [
+      {
+        "name": "getUI",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JTable",
+    "methods": [
+      {
+        "name": "getUI",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JTextField",
+    "methods": [
+      {
+        "name": "processInputMethodEvent",
+        "parameterTypes": [
+          "java.awt.event.InputMethodEvent"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JToggleButton",
+    "methods": [
+      {
+        "name": "getFocusable",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.JToolBar",
+    "methods": [
+      {
+        "name": "getFloatable",
+        "parameterTypes": []
+      },
+      {
+        "name": "getOpaque",
+        "parameterTypes": []
+      },
+      {
+        "name": "isFloatable",
+        "parameterTypes": []
+      },
+      {
+        "name": "setFloatable",
+        "parameterTypes": [
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.PopupFactory",
+    "methods": [
+      {
+        "name": "getPopup",
+        "parameterTypes": [
+          "java.awt.Component",
+          "java.awt.Component",
+          "int",
+          "int",
+          "boolean"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.filechooser.FileSystemView",
+    "methods": [
+      {
+        "name": "getChooserShortcutPanelFiles",
+        "parameterTypes": []
+      },
+      {
+        "name": "getSystemIcon",
+        "parameterTypes": [
+          "java.io.File",
+          "int",
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.filechooser.WindowsFileSystemView"
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicButtonListener",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicComboBoxUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicComboPopup$1"
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicGraphicsUtils",
+    "methods": [
+      {
+        "name": "drawStringUnderlineCharAt",
+        "parameterTypes": [
+          "javax.swing.JComponent",
+          "java.awt.Graphics2D",
+          "java.lang.String",
+          "int",
+          "float",
+          "float"
+        ]
+      },
+      {
+        "name": "getClippedString",
+        "parameterTypes": [
+          "javax.swing.JComponent",
+          "java.awt.FontMetrics",
+          "java.lang.String",
+          "int"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicLabelUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicListUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicMenuBarUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicMenuItemUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicMenuUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicOptionPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicPopupMenuUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicRootPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicSpinnerUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicTabbedPaneUI",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "javax.swing.plaf.basic.BasicTabbedPaneUI$ScrollableTabPanel"
+  },
+  {
+    "name": "javax.swing.text.html.HTMLEditorKit",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.CivDlcBuilder",
+    "fields": [
+      {
+        "name": "libraryFiles$lzy1"
+      },
+      {
+        "name": "luaPatchList$lzy1"
+      },
+      {
+        "name": "newScreenFiles$lzy1"
+      },
+      {
+        "name": "patchFileList$lzy1"
+      },
+      {
+        "name": "patchFileMap$lzy1"
+      },
+      {
+        "name": "softHookFiles$lzy1"
+      },
+      {
+        "name": "softHookInfo$lzy1"
+      },
+      {
+        "name": "softHookInfoFragments$lzy1"
+      },
+      {
+        "name": "textFiles$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.InstallFileSet",
+    "fields": [
+      {
+        "name": "renames$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.InstallScript",
+    "fields": [
+      {
+        "name": "cleanup$lzy1"
+      },
+      {
+        "name": "patchManifest$lzy2"
+      },
+      {
+        "name": "source$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.PatchPackage",
+    "fields": [
+      {
+        "name": "patchManifest$lzy1"
+      },
+      {
+        "name": "scripts$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.PatchState",
+    "fields": [
+      {
+        "name": "expectedPaths$lzy1"
+      },
+      {
+        "name": "nonreplacementFiles$lzy1"
+      },
+      {
+        "name": "replacementTargets$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.Platform$",
+    "fields": [
+      {
+        "name": "currentPlatform$lzy2"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.core.PlatformType$",
+    "fields": [
+      {
+        "name": "currentPlatform$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.AboutDialog",
+    "fields": [
+      {
+        "name": "ActionButton$lzy1"
+      },
+      {
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.FrameBase$ActionButton",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.FrameUtils$",
+    "fields": [
+      {
+        "name": "symbolFont$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.FrameUtils$FontLabel",
+    "methods": [
+      {
+        "name": "coalesceEvents",
+        "parameterTypes": [
+          "java.awt.AWTEvent",
+          "java.awt.AWTEvent"
+        ]
+      },
+      {
+        "name": "createUI",
+        "parameterTypes": [
+          "javax.swing.JComponent"
+        ]
+      },
+      {
+        "name": "loadActionMap",
+        "parameterTypes": [
+          "javax.swing.plaf.basic.LazyActionMap"
+        ]
+      }
+    ],
+    "allDeclaredFields": true
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.InstallerMain",
+    "fields": [
+      {
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.MainFrame",
+    "fields": [
+      {
+        "name": "ActionButton$lzy1"
+      },
+      {
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.SettingsDialog",
+    "fields": [
+      {
+        "name": "ActionButton$lzy1"
+      },
+      {
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.util.VersionInfo",
+    "fields": [
+      {
+        "name": "buildDate$lzy1"
+      },
+      {
+        "name": "buildHostname$lzy1"
+      },
+      {
+        "name": "buildID$lzy1"
+      },
+      {
+        "name": "buildUser$lzy1"
+      },
+      {
+        "name": "commit$lzy1"
+      },
+      {
+        "name": "isDirty$lzy1"
+      },
+      {
+        "name": "treeStatus$lzy1"
+      },
+      {
+        "name": "versionString$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "net.miginfocom.layout.BoundSize",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "net.miginfocom.layout.BoundSizeCustomizer"
+  },
+  {
+    "name": "net.miginfocom.layout.UnitValue",
+    "queryAllPublicMethods": true
+  },
+  {
+    "name": "net.miginfocom.layout.UnitValueCustomizer"
+  },
+  {
+    "name": "net.miginfocom.swing.MigLayout"
+  },
+  {
+    "name": "scala.xml.PrettyPrinter",
+    "fields": [
+      {
+        "name": "0bitmap$1"
+      }
+    ]
+  },
+  {
+    "name": "scala.xml.XML$",
+    "fields": [
+      {
+        "name": "0bitmap$2"
+      }
+    ]
+  },
+  {
+    "name": "scala.xml.parsing.FactoryAdapter",
+    "fields": [
+      {
+        "name": "0bitmap$1"
+      }
+    ]
+  },
+  {
+    "name": "sun.awt.Symbol",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.awt.shell.Win32ShellFolderManager2",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.awt.windows.WingDings",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.SetDrawLineANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.SetDrawPathANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.SetDrawPolygonsANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.SetDrawRectANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.SetFillPathANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.SetFillRectANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.SetFillSpansANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorDrawGlyphListAAANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorDrawGlyphListANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorDrawLineANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorDrawPathANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorDrawPolygonsANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorDrawRectANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorFillPathANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorFillRectANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.loops.XorFillSpansANY",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.java2d.marlin.DMarlinRenderingEngine",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.misc.Unsafe",
+    "fields": [
+      {
+        "name": "theUnsafe"
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.DRBG",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": [
+          "java.security.SecureRandomParameters"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "sun.security.provider.SHA2$SHA256",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
+  }
+]

@@ -22,8 +22,7 @@
 
 package moe.lymia.mppatch.core
 
-import moe.lymia.mppatch.util.win32.WindowsRegistry
-import moe.lymia.mppatch.util.{SimpleLogger, Steam}
+import moe.lymia.mppatch.util.{SimpleLogger, Steam, WindowsRegistry}
 
 import java.nio.file.{Path, Paths}
 import java.util.Locale
@@ -78,14 +77,21 @@ object Platform {
 object Win32Platform extends Platform {
   override val platformName = "win32"
 
-  override def defaultSystemPaths: Seq[Path] = try
-    WindowsRegistry
-      .HKCU("Software\\Valve\\Steam", "SteamPath")
+  override def defaultSystemPaths: Seq[Path] = try {
+    val steamPaths = WindowsRegistry
+      .regQuery("HKCU\\Software\\Valve\\Steam", "SteamPath")
       .toSeq
       .flatMap(x => Steam.loadLibraryFolders(Paths.get(x)))
-      .map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V")) ++
-      WindowsRegistry.HKCU("Software\\Firaxis\\Civilization5", "LastKnownPath").toSeq.map(x => Paths.get(x))
-  catch {
+      .map(_.resolve("SteamApps\\common\\Sid Meier's Civilization V"))
+    val registryLastKnownPath =
+      WindowsRegistry.regQuery("HKCU\\Software\\Firaxis\\Civilization5", "LastKnownPath").toSeq.map(x => Paths.get(x))
+    val registryUninstallInfo =
+      WindowsRegistry
+        .regQuery("HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Steam App 8930", "InstallLocation")
+        .toSeq
+        .map(x => Paths.get(x))
+    steamPaths ++ registryLastKnownPath ++ registryUninstallInfo
+  } catch {
     case e: Exception =>
       SimpleLogger.error("Could not load default system paths from registery.", e)
       Seq()

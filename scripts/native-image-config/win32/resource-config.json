@@ -1,0 +1,95 @@
+{
+  "resources": {
+    "includes": [
+      {
+        "pattern": "\\QMETA-INF/services/com.formdev.flatlaf.FlatDefaultsAddon\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/java.awt.im.spi.InputMethodDescriptor\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/java.lang.System$LoggerFinder\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/java.time.zone.ZoneRulesProvider\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/java.util.prefs.PreferencesFactory\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/javax.xml.parsers.SAXParserFactory\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/javax.xml.stream.XMLInputFactory\\E"
+      },
+      {
+        "pattern": "com/formdev/flatlaf/.*"
+      },
+      {
+        "pattern": "java.base:\\Qjava/util/currency.data\\E"
+      },
+      {
+        "pattern": "java.base:\\Qjdk/internal/icu/impl/data/icudt72b/nfc.nrm\\E"
+      },
+      {
+        "pattern": "java.base:\\Qjdk/internal/icu/impl/data/icudt72b/ubidi.icu\\E"
+      },
+      {
+        "pattern": "java.base:\\Qsun/text/resources/LineBreakIteratorData\\E"
+      },
+      {
+        "pattern": "java.base:\\Qsun/text/resources/WordBreakIteratorData\\E"
+      },
+      {
+        "pattern": "java.datatransfer:\\Qsun/datatransfer/resources/flavormap.properties\\E"
+      },
+      {
+        "pattern": "java.desktop:\\Qcom/formdev/flatlaf/resources/Bundle.properties\\E"
+      },
+      {
+        "pattern": "java.desktop:\\Qjavax/swing/plaf/basic/icons/JavaCup16.png\\E"
+      },
+      {
+        "pattern": "java.desktop:\\Qjavax/swing/plaf/basic/icons/image-delayed.png\\E"
+      },
+      {
+        "pattern": "java.desktop:\\Qjavax/swing/plaf/basic/icons/image-failed.png\\E"
+      },
+      {
+        "pattern": "java.desktop:\\Qjavax/swing/text/html/default.css\\E"
+      },
+      {
+        "pattern": "java.desktop:\\Qjavax/swing/text/html/parser/html32.bdtd\\E"
+      },
+      {
+        "pattern": "moe/lymia/mppatch/.*"
+      }
+    ]
+  },
+  "bundles": [
+    {
+      "name": "com.formdev.flatlaf.resources.Bundle",
+      "locales": [
+        ""
+      ]
+    },
+    {
+      "name": "com.sun.swing.internal.plaf.basic.resources.basic",
+      "classNames": [
+        "com.sun.swing.internal.plaf.basic.resources.basic"
+      ]
+    },
+    {
+      "name": "com.sun.swing.internal.plaf.metal.resources.metal",
+      "classNames": [
+        "com.sun.swing.internal.plaf.metal.resources.metal"
+      ]
+    },
+    {
+      "name": "sun.awt.resources.awt",
+      "classNames": [
+        "sun.awt.resources.awt"
+      ]
+    }
+  ]
+}
