@@ -6,3 +6,5 @@
 /target
 
 /mppatch_*
+
+/install.ps1 # Github actions
