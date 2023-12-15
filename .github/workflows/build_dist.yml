@@ -115,6 +115,7 @@ jobs:
 
       # Do the actual build
       - run: scripts/ci/build-installer_win32.ps1
+        shell: powershell
 
       # Upload artifacts
       - uses: actions/upload-artifact@v3
