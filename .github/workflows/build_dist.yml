@@ -95,7 +95,7 @@ jobs:
           submodules: 'recursive'
       - run: git fetch --prune --unshallow --tags
 
-      # Install NSIS
+      # Install dependencies
       - name: Install NSIS
         run: |
           iwr -useb get.scoop.sh -outfile 'install.ps1'
@@ -103,6 +103,7 @@ jobs:
           scoop update
           scoop bucket add extras
           scoop install nsis
+      - uses: GuillaumeFalourd/setup-windows10-sdk-action@v1.12
 
       # Download artifacts
       - uses: actions/download-artifact@v3
