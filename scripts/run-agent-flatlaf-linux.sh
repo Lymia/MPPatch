@@ -26,5 +26,5 @@
 
 wget https://download.formdev.com/files/flatlaf/flatlaf-demo-3.2.5.jar -O target/flatlaf-demo-3.2.5.jar || exit 1
 target/graalvm-linux/bin/java \
-  -agentlib:native-image-agent=config-output-dir=scripts/native-image-config/common-flatlaf-linux \
+  -agentlib:native-image-agent=config-merge-dir=scripts/native-image-config/common-flatlaf-linux \
   -jar target/flatlaf-demo-3.2.5.jar || exit 1

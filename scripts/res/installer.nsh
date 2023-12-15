@@ -1,20 +1,7 @@
 Name "MPPatch"
 SetCompressor /SOLID /FINAL lzma
-OutFile ..\..\target\mppatch-installer.exe
-Icon mppatch-installer.ico
-
-RequestExecutionLevel user
-ManifestDPIAware true
-
-VIProductVersion "$%NSIS_FILE_VERSION%"
-VIFileVersion "$%NSIS_FILE_VERSION%"
-VIAddVersionKey /LANG=0 "OriginalFilename" "MPPatch-Installer_win32_$%NSIS_VERSION%.exe"
-
-!define LANG_ENGLISH 1033
-VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "MPPatch"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "MPPatch Installer"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "(C) Lymia Kanokawa; available under the MIT License"
-VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "MPPatch Version $%NSIS_VERSION%"
+OutFile ..\..\target\mppatch-installer-unmodified.exe
+CRCCheck off ; We will be altering the final binary in a way that invalidates the CRC
 
 ; Mutex code, from https://nsis.sourceforge.io/Allow_only_one_installer_instance
 !define INSTALLERMUTEXNAME "MPPatch NSIS Wrapper / 24d1f759-689d-4707-8fb9-3508574253e7"

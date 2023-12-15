@@ -1223,6 +1223,10 @@
         "parameterTypes": []
       },
       {
+        "name": "dynamicallyLayoutContainer",
+        "parameterTypes": []
+      },
+      {
         "name": "handleExpose",
         "parameterTypes": [
           "int",

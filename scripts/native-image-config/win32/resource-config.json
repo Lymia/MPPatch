@@ -70,7 +70,8 @@
     {
       "name": "com.formdev.flatlaf.resources.Bundle",
       "locales": [
-        ""
+        "",
+        "und"
       ]
     },
     {
@@ -89,6 +90,12 @@
       "name": "sun.awt.resources.awt",
       "classNames": [
         "sun.awt.resources.awt"
+      ]
+    },
+    {
+      "name": "com.formdev.flatlaf.resources.Bundle",
+      "locales": [
+        ""
       ]
     }
   ]
