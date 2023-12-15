@@ -96,6 +96,7 @@ jobs:
       - run: git fetch --prune --unshallow --tags
 
       # Install dependencies
+      - uses: ilammy/msvc-dev-cmd@v1
       - name: Install NSIS
         run: |
           iwr -useb get.scoop.sh -outfile 'install.ps1'
@@ -103,8 +104,7 @@ jobs:
           scoop update
           scoop bucket add extras
           scoop install nsis
-      - uses: fbactions/setup-winsdk@v2
-      
+
       # Download artifacts
       - uses: actions/download-artifact@v3
         with:
