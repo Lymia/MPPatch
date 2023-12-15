@@ -78,6 +78,49 @@ jobs:
           name: mppatch_ci_installer-linux.tar.gz
           path: target/mppatch_ci_installer-linux.tar.gz
 
+  buildInstallerWindows:
+    runs-on: windows-latest
+    needs:
+      - buildNative
+    steps:
+      # Install packages
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'liberica'
+          java-version: '21'
+
+      # Initialize git
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: git fetch --prune --unshallow --tags
+
+      # Install NSIS
+      - name: Install NSIS
+        run: |
+          iwr -useb get.scoop.sh -outfile 'install.ps1'
+          .\install.ps1 -RunAsAdmin
+          scoop update
+          scoop bucket add extras
+          scoop install nsis
+
+      # Download artifacts
+      - uses: actions/download-artifact@v3
+        with:
+          name: mppatch_ci_natives-linux.tar.gz
+          path: target/mppatch_ci_natives-linux
+      - run: mv target/mppatch_ci_natives-linux/* target/
+      - run: rm -Recursive -Force -Verbose target/mppatch_ci_natives-linux
+
+      # Do the actual build
+      - run: scripts/ci/build-installer_win32.ps1
+
+      # Upload artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mppatch_ci_installer-win32.tar.gz
+          path: target/mppatch_ci_installer-win32.tar.gz
+
   buildDist:
     runs-on: ubuntu-20.04
     needs:
@@ -96,6 +139,13 @@ jobs:
           path: target/mppatch_ci_installer-linux
       - run: mv target/mppatch_ci_installer-linux/* target/
       - run: rm -rf target/mppatch_ci_installer-linux
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: mppatch_ci_installer-win32.tar.gz
+          path: target/mppatch_ci_installer-win32
+      - run: mv target/mppatch_ci_installer-win32/* target/
+      - run: rm -rf target/mppatch_ci_installer-win32
 
       # Do the actual build
       - run: scripts/ci/build-dist.sh

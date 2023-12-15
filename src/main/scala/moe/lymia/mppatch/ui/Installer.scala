@@ -32,24 +32,30 @@ import java.io.{File, FileOutputStream, OutputStreamWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
 import java.text.DateFormat
 import java.util.Locale
-import javax.swing.JFrame
+import javax.swing.{JFrame, JOptionPane}
 
 object InstallerMain {
-  val isAppImage = PlatformType.currentPlatform == PlatformType.Linux && System.getenv("APPIMAGE") != null
+  val NsisMarker = "018c6bba-54e0-7cf2-b16a-7b6abb9215e0"
 
-  val appImageFileLocation = if (isAppImage) {
-    Some(new File(System.getenv("APPIMAGE")).getCanonicalFile)
+  val isAppImage = PlatformType.currentPlatform == PlatformType.Linux && System.getenv("APPIMAGE") != null
+  val isNsis = PlatformType.currentPlatform == PlatformType.Win32 && System.getenv("NSIS_LAUNCH_MARKER") == NsisMarker
+
+  private[this] def fileForEnv(test: Boolean, env: String) = if (test) {
+    Some(new File(System.getenv(env)).getCanonicalFile)
   } else {
     None
   }
-  val appImageContents = if (isAppImage) {
-    Some(new File(System.getenv("APPDIR")).getCanonicalFile)
-  } else {
-    None
-  }
+
+  val appImageFileLocation = fileForEnv(isAppImage, "APPIMAGE")
+  val appImageContents     = fileForEnv(isAppImage, "APPDIR")
+
+  val nsisFileLocation = fileForEnv(isNsis, "NSIS_LAUNCH_EXE")
+  val nsisContents     = fileForEnv(isNsis, "NSIS_LAUNCH_TEMPDIR")
 
   val baseDirectory = if (isAppImage) {
     appImageFileLocation.get.getParentFile
+  } else if (isNsis) {
+    nsisFileLocation.get.getParentFile
   } else {
     new File(".").getCanonicalFile
   }
@@ -106,6 +112,22 @@ class InstallerMain extends FrameError[JFrame] with I18NTrait {
         for (l <- lines.tail) log.logRaw(indent + l)
       }
       log.logRaw(line)
+      log.logRaw("")
+
+      // check runtime environment
+      if (InstallerMain.isAppImage) {
+        log.info("Running from appimage")
+        log.info(f"AppImage binary: ${InstallerMain.appImageFileLocation.get}")
+        log.info(f"AppImage directory: ${InstallerMain.appImageContents.get}")
+      } else if (InstallerMain.isNsis) {
+        log.info("Running from NSIS wrapper")
+        log.info(f"NSIS binary: ${InstallerMain.nsisFileLocation.get}")
+        log.info(f"NSIS temporary directory: ${InstallerMain.nsisContents.get}")
+      } else {
+        log.info("Running from .jar")
+      }
+      log.info(f"Platform: ${PlatformType.currentPlatform}")
+      log.info(f"Base directory: ${InstallerMain.baseDirectory}")
       log.logRaw("")
 
       // install look-and-feel

@@ -26,6 +26,7 @@ IntCmpU $0 183 "" launch launch ; ERROR_ALREADY_EXISTS?
 	Abort
 launch:
 !macroend
+; End mutex code
 
 Function .onInit
 SetSilent silent
@@ -35,15 +36,19 @@ FunctionEnd
 Function un.onInit
 !insertmacro SingleInstanceMutex
 FunctionEnd
-; End mutex code
 
 Section ""
-    RMDir $TEMP\MPPatchInstaller
+    RMDir /r $TEMP\MPPatchInstaller
     SetOutPath $TEMP\MPPatchInstaller
 
     File ..\..\target\native-image\*
+
+    System::Call 'Kernel32::SetEnvironmentVariable(t, t)i ("NSIS_LAUNCH_MARKER", "018c6bba-54e0-7cf2-b16a-7b6abb9215e0").r0'
+    System::Call 'Kernel32::SetEnvironmentVariable(t, t)i ("NSIS_LAUNCH_EXE", "$EXEPATH").r0'
+    System::Call 'Kernel32::SetEnvironmentVariable(t, t)i ("NSIS_LAUNCH_TEMPDIR", "$TEMP\MPPatchInstaller").r0'
+
     ExecWait '"$OUTDIR\mppatch-installer.exe"'
 
     SetOutPath $TEMP
-    RMDir $TEMP\MPPatchInstaller
+    RMDir /r $TEMP\MPPatchInstaller
 SectionEnd

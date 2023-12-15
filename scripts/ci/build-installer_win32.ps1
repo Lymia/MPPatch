@@ -2,6 +2,9 @@ $ErrorActionPreference = "Stop"
 
 $URL_RCEDIT="https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe"
 
+# Install graalvm
+scripts/ci/install-graalvm.ps1
+
 # Extract native tarballs
 echo "Extracting native tarballs..."
 rm -Recurse -Force -Verbose target/native-bin
@@ -13,6 +16,7 @@ cd ../..
 # Download rcedit if it isn't already downloaded
 if (-Not (Test-Path "target/rcedit.exe" -PathType Leaf)) {
     echo "Downloading 'rcedit.exe'..."
+    $ProgressPreference = 'SilentlyContinue'
     Invoke-WebRequest -Uri "$URL_RCEDIT" -OutFile "target/rcedit.exe"
 }
 

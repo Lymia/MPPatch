@@ -22,30 +22,14 @@
 # THE SOFTWARE.
 #
 
-GRAALVM_WIN32="https://download.bell-sw.com/vm/23.1.1/bellsoft-liberica-vm-openjdk21.0.1+12-23.1.1+1-windows-amd64.zip"
-GRAALVM_WIN32_DIR="bellsoft-liberica-vm-openjdk21-23.1.1"
-
 GRAALVM_LINUX="https://download.bell-sw.com/vm/23.1.1/bellsoft-liberica-vm-openjdk21.0.1+12-23.1.1+1-linux-amd64.tar.gz"
 GRAALVM_LINUX_DIR="bellsoft-liberica-vm-openjdk21-23.1.1"
 
-install_for_win32() {
-  if [ ! -d target/graalvm-win32 ]; then
-    wget $GRAALVM_WIN32 -O target/graalvm-win32.zip || exit 1
-    cd target/ || exit 1
-      unzip graalvm-win32.zip || exit 1
-      mv -v $GRAALVM_WIN32_DIR graalvm-win32 || exit 1
-      rm -rf graalvm-win32.tar.gz || exit 1
-    cd .. || exit 1
-  fi
-}
-
-install_for_linux() {
-  if [ ! -d target/graalvm-linux ]; then
-    wget $GRAALVM_LINUX -O target/graalvm-linux.tar.gz || exit 1
-    cd target/ || exit 1
-      tar -xv -f graalvm-linux.tar.gz || exit 1
-      mv -v $GRAALVM_LINUX_DIR graalvm-linux || exit 1
-      rm -rf graalvm-linux.tar.gz || exit 1
-    cd .. || exit 1
-  fi
-}
+if [ ! -d target/graalvm-linux ]; then
+  wget $GRAALVM_LINUX -O target/graalvm-linux.tar.gz || exit 1
+  cd target/ || exit 1
+    tar -xv -f graalvm-linux.tar.gz || exit 1
+    mv -v $GRAALVM_LINUX_DIR graalvm-linux || exit 1
+    rm -rf graalvm-linux.tar.gz || exit 1
+  cd .. || exit 1
+fi

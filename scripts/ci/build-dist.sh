@@ -62,7 +62,13 @@ cd target/dist-build/linux || exit 1
   LDAI_COMP=xz ../linuxdeploy --appdir AppDir/ --output appimage || exit 1
 cd ../../.. || exit 1
 
+echo "Extracting Windows installer..."
+cd target/dist-build || exit 1
+  tar -xv -f ../../target/mppatch_ci_installer-win32.tar.gz || exit 1
+cd ../.. || exit 1
+
 # Copy to dist directory
+cp -v target/dist-build/mppatch-installer.exe target/dist/MPPatch_Installer-win32-$VERSION.exe || exit 1
 cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/dist/MPPatch_Installer-linux-$VERSION.AppImage || exit 1
 cp -v target/dist-build/assembly.jar target/dist/MPPatch_Installer-universal-$VERSION.jar || exit 1
 
