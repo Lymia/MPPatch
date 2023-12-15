@@ -155,5 +155,44 @@ jobs:
       # Upload artifacts
       - uses: actions/upload-artifact@v3
         with:
-          name: mppatch_dist.tar.gz
-          path: mppatch_dist.tar.gz
+          name: mppatch_ci_dist
+          path: target/dist/*
+
+  publishArtifacts:
+    runs-on: ubuntu-latest
+    needs:
+      - buildDist
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - name: Fetch git tags.
+        run: git fetch --prune --unshallow --tags
+
+      - name: Get version as Github variable.
+        run: 'echo "VERSION_STR=ci_draft-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV'
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: mppatch_ci_dist
+          path: target/mppatch_ci_dist
+
+      - name: Remove git hooks (hack to make action-create-tag work)
+        run: 'rm -rfv .git/hooks/*'
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ env.VERSION_STR }}
+          message: CI release ${{ env.VERSION_STR }}
+      - uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.VERSION_STR }}
+          tag_name: ${{ env.VERSION_STR }}
+          body: |
+            CI Build ${{ env.VERSION_STR }}
+            This is an development build.
+            Expect that things may be completely broken or for there to be subtle game-breaking bugs.
+            Use this build at your own risk.
+          prerelease: true
+          files: target/mppatch_ci_dist/**
+          fail_on_unmatched_files: true
+          generate_release_notes: true

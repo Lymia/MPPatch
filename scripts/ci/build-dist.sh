@@ -71,9 +71,3 @@ cd ../.. || exit 1
 cp -v target/dist-build/mppatch-installer.exe target/dist/MPPatch_Installer-win32-$VERSION.exe || exit 1
 cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/dist/MPPatch_Installer-linux-$VERSION.AppImage || exit 1
 cp -v target/dist-build/assembly.jar target/dist/MPPatch_Installer-universal-$VERSION.jar || exit 1
-
-# Building tarball
-cd target/dist || exit 1
-  tar --gzip -cv -f mppatch_ci_dist.tar.gz * || exit 1
-cd ../.. || exit 1
-cp target/dist/mppatch_ci_dist.tar.gz target/ || exit 1
