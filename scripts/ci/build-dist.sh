@@ -68,6 +68,6 @@ cd target/dist-build || exit 1
 cd ../.. || exit 1
 
 # Copy to dist directory
-cp -v target/dist-build/mppatch-installer.exe target/dist/MPPatch_Installer-win32-$VERSION.exe || exit 1
-cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/dist/MPPatch_Installer-linux-$VERSION.AppImage || exit 1
-cp -v target/dist-build/assembly.jar target/dist/MPPatch_Installer-universal-$VERSION.jar || exit 1
+cp -v target/dist-build/mppatch-installer.exe target/dist/MPPatch-Installer_win32_$VERSION.exe || exit 1
+cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/dist/MPPatch-Installer_linux_$VERSION.AppImage || exit 1
+cp -v target/dist-build/assembly.jar target/dist/MPPatch-Installer_universal_$VERSION.jar || exit 1

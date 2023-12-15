@@ -3643,31 +3643,6 @@
     ]
   },
   {
-    "name": "moe.lymia.mppatch.ui.FrameUtils$FontLabel",
-    "methods": [
-      {
-        "name": "coalesceEvents",
-        "parameterTypes": [
-          "java.awt.AWTEvent",
-          "java.awt.AWTEvent"
-        ]
-      },
-      {
-        "name": "createUI",
-        "parameterTypes": [
-          "javax.swing.JComponent"
-        ]
-      },
-      {
-        "name": "loadActionMap",
-        "parameterTypes": [
-          "javax.swing.plaf.basic.LazyActionMap"
-        ]
-      }
-    ],
-    "allDeclaredFields": true
-  },
-  {
     "name": "moe.lymia.mppatch.ui.InstallerMain",
     "fields": [
       {

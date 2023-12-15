@@ -6,38 +6,38 @@ Icon mppatch-installer.ico
 RequestExecutionLevel user
 ManifestDPIAware true
 
+VIProductVersion "$%NSIS_FILE_VERSION%"
+VIFileVersion "$%NSIS_FILE_VERSION%"
+VIAddVersionKey /LANG=0 "OriginalFilename" "MPPatch-Installer_win32_$%NSIS_VERSION%.exe"
+
+!define LANG_ENGLISH 1033
+VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "MPPatch"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "MPPatch Installer"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "(C) Lymia Kanokawa; available under the MIT License"
+VIAddVersionKey /LANG=${LANG_ENGLISH} "Comments" "MPPatch Version $%NSIS_VERSION%"
+
 ; Mutex code, from https://nsis.sourceforge.io/Allow_only_one_installer_instance
 !define INSTALLERMUTEXNAME "MPPatch NSIS Wrapper / 24d1f759-689d-4707-8fb9-3508574253e7"
-
-!ifndef NSIS_PTR_SIZE & SYSTYPE_PTR
-!define SYSTYPE_PTR i ; NSIS v2.x
-!else
-!define /ifndef SYSTYPE_PTR p ; NSIS v3.0+
-!endif
-
 !macro SingleInstanceMutex
-!ifndef INSTALLERMUTEXNAME
-!error "Must define INSTALLERMUTEXNAME"
-!endif
-System::Call 'KERNEL32::CreateMutex(${SYSTYPE_PTR}0, i1, t"${INSTALLERMUTEXNAME}")?e'
-Pop $0
-IntCmpU $0 183 "" launch launch ; ERROR_ALREADY_EXISTS?
-    MessageBox MB_ICONSTOP "MPPatch Installer is already running!"
-	Abort
-launch:
+    System::Call 'KERNEL32::CreateMutex(p0, i1, t"${INSTALLERMUTEXNAME}")?e'
+    Pop $0
+    IntCmpU $0 183 "" launch launch ; ERROR_ALREADY_EXISTS?
+        MessageBox MB_ICONSTOP "MPPatch Installer is already running!"
+        Abort
+    launch:
 !macroend
 ; End mutex code
 
 Function .onInit
-SetSilent silent
-!insertmacro SingleInstanceMutex
+    SetSilent silent
+    !insertmacro SingleInstanceMutex
 FunctionEnd
 
 Function un.onInit
-!insertmacro SingleInstanceMutex
+    !insertmacro SingleInstanceMutex
 FunctionEnd
 
-Section ""
+Section "Extract and execute wrapped installer"
     RMDir /r $TEMP\MPPatchInstaller
     SetOutPath $TEMP\MPPatchInstaller
 

@@ -22,6 +22,11 @@ if (-Not (Test-Path "target/rcedit.exe" -PathType Leaf)) {
     Invoke-WebRequest -Uri "$URL_RCEDIT" -OutFile "target/rcedit.exe"
 }
 
+# Find the current version
+$VERSION="$(sbt "print version" --error)".Trim()
+$FILE_VERSION="$VERSION".Split("-")[0]
+$FILE_VERSION="$FILE_VERSION.$(git rev-list HEAD --count)"
+
 # Build the native-image
 echo "Building native-image installer"
 if (Test-Path target/native-image) {
@@ -29,12 +34,21 @@ if (Test-Path target/native-image) {
 }
 sbt nativeImage
 target/rcedit.exe "target/native-image/mppatch-installer.exe" `
+    --set-version-string "FileDescription" "MPPatch Installer - Native Image Installer" `
+    --set-file-version "$FILE_VERSION" `
+    --set-version-string "ProductName" "MPPatch" `
+    --set-product-version "$VERSION" `
+    --set-version-string "LegalCopyright" "©Lymia Kanokawa; available under the MIT License" `
+    --set-version-string "OriginalFilename" "mppatch-installer.exe" `
+    --set-version-string "Comments" "This is the internal installer. It should not be downloaded seperately." `
     --set-icon "scripts/res/mppatch-installer.ico" `
     --application-manifest "scripts/res/win32-manifest.xml"
 editbin /SUBSYSTEM:WINDOWS "target/native-image/mppatch-installer.exe"
 
 # Build NSIS image
 echo "Building NSIS installer wrapper"
+$Env:NSIS_VERSION="$VERSION"
+$Env:NSIS_FILE_VERSION="$FILE_VERSION"
 makensis scripts/res/installer.nsis
 
 # Create tarball

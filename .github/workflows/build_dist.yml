@@ -170,7 +170,7 @@ jobs:
         run: git fetch --prune --unshallow --tags
 
       - name: Get version as Github variable.
-        run: 'echo "VERSION_STR=ci_draft-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV'
+        run: 'echo "VERSION_STR=ci_build-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV'
 
       - uses: actions/download-artifact@v2
         with:
