@@ -42,7 +42,7 @@ git.formattedShaVersion := {
   val base   = git.baseVersion.?.value
   val suffix = git.makeUncommittedSignifierSuffix(git.gitUncommittedChanges.value, git.uncommittedSignifier.value)
   git.gitHeadCommit.value map { rawSha =>
-    val sha = "dev_" + rawSha.substring(0, 8)
+    val sha = "r" + rawSha.substring(0, 7)
     git.defaultFormatShaVersion(base, sha, suffix)
   }
 }
