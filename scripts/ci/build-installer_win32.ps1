@@ -7,7 +7,9 @@ scripts/ci/install-graalvm.ps1
 
 # Extract native tarballs
 echo "Extracting native tarballs..."
-rm -Recurse -Force -Verbose target/native-bin
+if (Test-Path target/native-bin) {
+    rm -Recurse -Force -Verbose target/native-bin
+}
 New-Item target/native-bin -ItemType Directory -ea 0 -Verbose
 cd target/native-bin
     tar -xv -f ../../target/mppatch_ci_natives-linux.tar.gz
@@ -22,7 +24,9 @@ if (-Not (Test-Path "target/rcedit.exe" -PathType Leaf)) {
 
 # Build the native-image
 echo "Building native-image installer"
-rm -Recurse -Force -Verbose target/native-image
+if (Test-Path target/native-image) {
+    rm -Recurse -Force -Verbose target/native-image
+}
 sbt nativeImage
 target/rcedit.exe "target/native-image/mppatch-installer.exe" `
     --set-icon "scripts/res/mppatch-installer.ico" `
