@@ -86,7 +86,7 @@ class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog
       new FontLabel(
         Font.PLAIN,
         i18n(
-          "about.1",
+          if (VersionInfo.isCi) "about.1.ci" else "about.1",
           VersionInfo.commit.substring(0, 8),
           if (VersionInfo.isDirty) i18n("about.dirty") else "",
           dateFormat.format(VersionInfo.buildDate),

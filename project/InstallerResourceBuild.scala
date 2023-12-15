@@ -50,7 +50,8 @@ object InstallerResourceBuild {
         "build.time"             -> new java.util.Date().getTime.toString,
         "build.timestr"          -> dateFormat.format(new java.util.Date()),
         "build.path"             -> baseDirectory.value.getAbsolutePath,
-        "build.treestatus"       -> propertyFromProcess("git", "status", "--porcelain")
+        "build.treestatus"       -> propertyFromProcess("git", "status", "--porcelain"),
+        "build.ci"               -> (System.getenv("CI") != null && System.getenv("GITHUB_ACTIONS") != null).toString
       )
     },
     Keys.versionFile := {
