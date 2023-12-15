@@ -49,7 +49,7 @@ git.formattedShaVersion := {
 
 // Scala configuration
 scalaVersion := "3.3.1"
-scalacOptions ++= "-release:21 -deprecation -unchecked".split(" ").toSeq
+scalacOptions ++= "-release:17 -deprecation -unchecked".split(" ").toSeq
 crossPaths := false
 
 // Dependencies
