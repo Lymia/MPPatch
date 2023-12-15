@@ -110,7 +110,7 @@ jobs:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux
       - run: mv target/mppatch_ci_natives-linux/* target/
-      - run: rm -Recursive -Force -Verbose target/mppatch_ci_natives-linux
+      - run: rm -Recurse -Force -Verbose target/mppatch_ci_natives-linux
 
       # Do the actual build
       - run: scripts/ci/build-installer_win32.ps1
@@ -125,6 +125,7 @@ jobs:
     runs-on: ubuntu-20.04
     needs:
       - buildInstallerLinux
+      - buildInstallerWindows
     steps:
       # Initialize git
       - uses: actions/checkout@v2
