@@ -32,7 +32,7 @@ import java.io.{File, FileOutputStream, OutputStreamWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
 import java.text.DateFormat
 import java.util.Locale
-import javax.swing.{JFrame, JOptionPane}
+import javax.swing.{JFrame, JOptionPane, UIManager}
 
 object InstallerMain {
   val NsisMarker = "018c6bba-54e0-7cf2-b16a-7b6abb9215e0"

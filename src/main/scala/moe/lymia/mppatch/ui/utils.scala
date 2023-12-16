@@ -23,17 +23,22 @@
 package moe.lymia.mppatch.ui
 
 import java.awt.event.ActionEvent
-import java.awt._
+import java.awt.*
 import java.util.Locale
-import javax.swing._
-
+import javax.swing.*
 import moe.lymia.mppatch.util.{SimpleLogger, VersionInfo}
 import moe.lymia.mppatch.util.io.IOUtils
 
+import javax.imageio.ImageIO
 import scala.language.implicitConversions
+import scala.jdk.CollectionConverters.*
 
 object FrameUtils {
   lazy val symbolFont = Font.createFont(Font.TRUETYPE_FONT, IOUtils.getResource("text/Symbola_hint_subset.ttf"))
+
+  lazy val iconSet =
+    for (sizes <- Seq(8, 16, 22, 24, 32, 48, 64, 256, 512))
+      yield ImageIO.read(IOUtils.getResource(f"ui/mppatch-installer-$sizes.png"))
 }
 import FrameUtils._
 
@@ -206,6 +211,7 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
   def showForm(): Unit = {
     buildForm()
     update()
+    frame.setIconImages(FrameUtils.iconSet.asJava)
     frame.pack()
     frame.setLocationRelativeTo(null)
     frame.setVisible(true)

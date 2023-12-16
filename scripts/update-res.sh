@@ -28,7 +28,7 @@ done
 
 convert scripts/res/mppatch-installer-{16,20,24,30,32,36,40,48,60,64,72,80,96,256}.png scripts/res/mppatch-installer.ico || exit 1
 
-for i in {8,22}; do
+for i in {8,22,512}; do
   resvg -w $i -h $i scripts/res/mppatch-installer.svg scripts/res/mppatch-installer-$i.png || exit 1
 done
 
