@@ -38,7 +38,7 @@ target/rcedit.exe "target/native-image/mppatch-installer.exe" `
     --set-file-version "$FILE_VERSION" `
     --set-version-string "ProductName" "MPPatch" `
     --set-product-version "$VERSION" `
-    --set-version-string "LegalCopyright" "©Lymia Kanokawa; available under the MIT License" `
+    --set-version-string "LegalCopyright" "(C) Lymia Kanokawa; available under the MIT License" `
     --set-version-string "OriginalFilename" "mppatch-installer.exe" `
     --set-version-string "Comments" "This is the internal installer. It should not be downloaded seperately." `
     --set-icon "scripts/res/mppatch-installer.ico" `
@@ -78,7 +78,7 @@ target/rcedit.exe "target/mppatch-installer-stub.exe" `
     --set-file-version "$FILE_VERSION" `
     --set-version-string "ProductName" "MPPatch" `
     --set-product-version "$VERSION" `
-    --set-version-string "LegalCopyright" "©Lymia Kanokawa; available under the MIT License" `
+    --set-version-string "LegalCopyright" "(C) Lymia Kanokawa; available under the MIT License" `
     --set-version-string "OriginalFilename" "MPPatch-Installer_win32_$VERSION.exe" `
     --set-icon "scripts/res/mppatch-installer.ico" `
     --application-manifest "scripts/res/win32-manifest.xml"
