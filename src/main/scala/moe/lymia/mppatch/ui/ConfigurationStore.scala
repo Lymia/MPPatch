@@ -30,6 +30,7 @@ import play.api.libs.json.Writes.*
 import java.nio.file.{Path, Paths}
 import java.util.Locale
 import javax.swing.JFrame
+import scala.collection.mutable
 
 object ConfigurationStore extends LaunchFrameError {
   private val prefs = java.util.prefs.Preferences.userNodeForPackage(getClass)
@@ -56,17 +57,18 @@ object ConfigurationStore extends LaunchFrameError {
   }
 
   private val configVersion = new ConfigKey[Int]("installer_config_version")
-  val installationDirs      = new ConfigKey[Seq[String]]("installer_v1_installation_dirs", Seq())
+  val installationDirs      = new ConfigKey[Set[String]]("installer_v1_installation_dirs", Set())
+  val suppressedDirs        = new ConfigKey[Set[String]]("installer_v1_suppressed_dirs", Set())
   def installationConf(path: Path) = {
     val canonical = path.toRealPath().toString
-    new ConfigKey[InstallationConfiguration](s"installer_v1_conf|$canonical")
+    new ConfigKey[InstallationConfiguration](s"installer_v1_conf|$canonical", InstallationConfiguration.default)
   }
 
-  val legacyInstallationDirectory: ConfigKey[String]   = new RawStringConfigKey("installationDirectory")
-  val legacyEnableDebug: ConfigKey[Boolean]            = new ConfigKey("enableDebug", false)
-  val legacyEnableLogging: ConfigKey[Boolean]          = new ConfigKey("enableLogging", true)
-  val legacyEnableMultiplayerPatch: ConfigKey[Boolean] = new ConfigKey("enableMultiplayerPatch", true)
-  val legacyEnableLuaJIT: ConfigKey[Boolean]           = new ConfigKey("enableLuaJIT", true)
+  private val legacyInstallationDirectory  = new RawStringConfigKey("installationDirectory")
+  private val legacyEnableDebug            = new ConfigKey("enableDebug", false)
+  private val legacyEnableLogging          = new ConfigKey("enableLogging", true)
+  private val legacyEnableMultiplayerPatch = new ConfigKey("enableMultiplayerPatch", true)
+  private val legacyEnableLuaJIT           = new ConfigKey("enableLuaJIT", true)
 
   private def hasLegacyValues: Boolean =
     legacyInstallationDirectory.hasValue || legacyEnableDebug.hasValue || legacyEnableLogging.hasValue ||
@@ -77,7 +79,7 @@ object ConfigurationStore extends LaunchFrameError {
       val defaultDirectory = legacyInstallationDirectory.valueOption match {
         case Some(x) =>
           val realPath = Paths.get(x).toRealPath().toString
-          installationDirs.value = installationDirs.value :+ realPath
+          installationDirs.value = installationDirs.value + realPath
           Some(Paths.get(x))
         case None =>
           val _ = installationDirs.value // make sure the key exists, but don't do anything else
@@ -85,12 +87,21 @@ object ConfigurationStore extends LaunchFrameError {
       }
       defaultDirectory match {
         case Some(defaultDirectory) =>
+          val seq = mutable.HashSet.empty[String]
+          if (legacyEnableDebug.value) seq.add("debug")
+          if (legacyEnableLogging.value) seq.add("logging")
+          if (legacyEnableMultiplayerPatch.value) seq.add("multiplayer")
+          if (legacyEnableLuaJIT.value) seq.add("luajit")
           installationConf(defaultDirectory).value = InstallationConfiguration(
-            enableDebug = legacyEnableDebug.value,
-            enableLogging = legacyEnableLogging.value,
-            enableMultiplayerPatch = legacyEnableMultiplayerPatch.value,
-            enableLuaJit = legacyEnableLuaJIT.value
+            isManuallyAdded = legacyInstallationDirectory.hasValue,
+            packages = seq.toSet
           )
+
+          legacyInstallationDirectory.clear()
+          legacyEnableDebug.clear()
+          legacyEnableLogging.clear()
+          legacyEnableMultiplayerPatch.clear()
+          legacyEnableLuaJIT.clear()
         case _ =>
       }
     } else if (configVersion.hasValue && configVersion.value != 1) {
@@ -100,6 +111,6 @@ object ConfigurationStore extends LaunchFrameError {
         throw new InstallerException("Cancelling configuration downgrade", null)
       }
     } else {
-      // do nothing
+      configVersion.value = 1
     }
 }

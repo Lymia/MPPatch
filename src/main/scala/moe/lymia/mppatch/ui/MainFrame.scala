@@ -37,41 +37,31 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   protected var targetVersion: JTextField     = _
   protected var currentStatus: JTextField     = _
 
-  private def packages = {
-    val logging     = if (ConfigurationStore.legacyEnableLogging.value) Set("logging") else Set[String]()
-    val multiplayer = if (ConfigurationStore.legacyEnableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
-    val luajit      = if (ConfigurationStore.legacyEnableLuaJIT.value) Set("luajit") else Set[String]()
-    val debug       = if (ConfigurationStore.legacyEnableDebug.value) Set("debug") else Set[String]()
-    debug ++ multiplayer ++ luajit ++ logging
-  }
-
-  private val platform = Platform.currentPlatform.getOrElse(error("error.unknownplatform"))
-  private def checkPath(path: Path) =
-    Files.exists(path) && Files.isDirectory(path) &&
-      patchPackage.detectInstallationPlatform(path).isDefined
-  private def resolvePaths(paths: Seq[Path]) = paths.find(checkPath)
+  private val installationManager = new InstallationManager()
 
   private val syncLock                          = new Object
-  private var patchPackage: PatchPackage         = _
+  private var patchPackage: PatchPackage        = _
   private var isUserChange                      = false
   private var isValid                           = false
   private var installer: Option[PatchInstaller] = None
 
   private def getInstallerUnsafe = installer.getOrElse(sys.error("installer does not exist"))
+  private def installation       = new Installation(getInstallerUnsafe.basePath)
+  private def packages           = installation.config.packages
 
   def getPatch     = patchPackage
   def getInstaller = installer
   def changeInstaller(path: Path, changeByUser: Boolean = true): Unit = syncLock synchronized {
     log.info(s"Changing installer path to ${path.toString}")
     val installPlatform = patchPackage.detectInstallationPlatform(path).get
-    val instance = new PatchInstaller(path, installPlatform, platform)
+    val instance        = new PatchInstaller(path, installPlatform, MPPatchInstaller.platform)
     isUserChange = changeByUser
     if (Files.exists(path)) {
-      isValid = checkPath(path)
+      isValid = new Installation(path).isValid(patchPackage)
       installer.foreach(_.releaseLock())
       if (isValid) {
         instance.acquireLock()
-        if (changeByUser) ConfigurationStore.legacyInstallationDirectory.value = path.toFile.toString
+        if (changeByUser) installationManager.addDirectory(path)
       }
       installer = Some(instance)
     } else {
@@ -86,22 +76,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     log.info("Changing patch package...")
     patchPackage = new PatchPackage(pack)
     reloadInstaller()
+    installationManager.patchPackage = patchPackage
   }
 
   changePatchPackage(ResourceDataSource("builtin_patch"))
-
-  private def pathFromRegistry() = resolvePaths(platform.defaultSystemPaths) match {
-    case Some(x) => changeInstaller(x, false)
-    case None    =>
-  }
-  if (ConfigurationStore.legacyInstallationDirectory.hasValue) {
-    val configPath = Paths.get(ConfigurationStore.legacyInstallationDirectory.value)
-    if (checkPath(configPath)) changeInstaller(configPath, false)
-    else {
-      ConfigurationStore.legacyInstallationDirectory.clear()
-      pathFromRegistry()
-    }
-  } else pathFromRegistry()
+  changeInstaller(installationManager.installations.head.rootDir, changeByUser = false)
 
   private var lastPatchStatus: Option[PatchStatus] = _
   private def checkPatchStatus() = {

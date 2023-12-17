@@ -30,7 +30,7 @@ import moe.lymia.mppatch.util.{Logger, SimpleLogger, VersionInfo}
 
 import java.io.{File, FileOutputStream, OutputStreamWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
-import java.nio.file.Path
+import java.nio.file.{Files, Path}
 import java.text.DateFormat
 import java.util.Locale
 import javax.swing.{JFrame, JOptionPane, UIManager}
@@ -116,7 +116,7 @@ object MPPatchInstaller extends LaunchFrameError {
 
       // check runtime environment
       if (isAppImage) {
-        log.info("Running from appimage")
+        log.info("Running from .AppImage")
         log.info(f"AppImage binary: ${appImageFileLocation.get}")
         log.info(f"AppImage directory: ${appImageContents.get}")
       } else if (isNsis) {
@@ -126,7 +126,7 @@ object MPPatchInstaller extends LaunchFrameError {
       } else {
         log.info("Running from .jar")
       }
-      log.info(f"Platform: ${PlatformType.currentPlatform}")
+      log.info(f"Platform: ${platform.platformName}")
       log.info(f"Base directory: ${baseDirectory}")
       log.logRaw("")
 
@@ -159,11 +159,18 @@ object MPPatchInstaller extends LaunchFrameError {
         }
     }
 
+  lazy val platform = PlatformType.currentPlatform match {
+    case PlatformType.Win32 => Platform(PlatformType.Win32).get
+    case PlatformType.MacOS => error("error.macos_support")
+    case PlatformType.Linux => Platform(PlatformType.Linux).get
+    case _                  => error("error.unknown_platform")
+  }
+
+  lazy val defaultPackageSource = ResourceDataSource("builtin_patch")
+
   private def defaultCivilizationPath: Option[Path] = {
-    val pkg      = new PatchPackage(ResourceDataSource("builtin_patch"))
-    val platform = Platform(PlatformType.currentPlatform).get
-    val validPaths =
-      for (path <- platform.defaultSystemPaths if pkg.detectInstallationPlatform(path).isDefined) yield path
+    val pkg        = new PatchPackage(defaultPackageSource)
+    val validPaths = for (path <- platform.defaultSystemPaths if new Installation(path).isValid(pkg)) yield path
     validPaths.headOption
   }
 }
