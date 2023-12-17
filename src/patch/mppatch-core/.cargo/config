@@ -1,0 +1,4 @@
+[target.i686-pc-windows-gnu]
+linker = "i686-w64-mingw32-gcc"
+ar = "i686-w64-mingw32-gcc-ar"
+

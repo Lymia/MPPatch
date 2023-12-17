@@ -24,11 +24,13 @@ package moe.lymia.mppatch.ui
 
 import com.formdev.flatlaf.fonts.roboto.FlatRobotoFont
 import com.formdev.flatlaf.{FlatIntelliJLaf, FlatLaf}
-import moe.lymia.mppatch.core.PlatformType
+import moe.lymia.mppatch.core.{PatchPackage, Platform, PlatformType}
+import moe.lymia.mppatch.util.io.ResourceDataSource
 import moe.lymia.mppatch.util.{Logger, SimpleLogger, VersionInfo}
 
 import java.io.{File, FileOutputStream, OutputStreamWriter, PrintWriter}
 import java.nio.charset.StandardCharsets
+import java.nio.file.Path
 import java.text.DateFormat
 import java.util.Locale
 import javax.swing.{JFrame, JOptionPane, UIManager}
@@ -141,11 +143,11 @@ object MPPatchInstaller extends LaunchFrameError {
         // generate native image configs
         log.warn("Generating native image configs...")
         log.warn("If you did not intend this, I don't know what to say.")
-        Preferences.updatePreferences()
+        ConfigurationStore.updatePreferences(defaultCivilizationPath)
         NativeImageGenConfig.run()
       } else {
         // start main frame
-        Preferences.updatePreferences()
+        ConfigurationStore.updatePreferences(defaultCivilizationPath)
         new MainFrame(locale).showForm()
       }
     } catch {
@@ -156,4 +158,12 @@ object MPPatchInstaller extends LaunchFrameError {
           case _: InstallerException => // ignored
         }
     }
+
+  private def defaultCivilizationPath: Option[Path] = {
+    val pkg      = new PatchPackage(ResourceDataSource("builtin_patch"))
+    val platform = Platform(PlatformType.currentPlatform).get
+    val validPaths =
+      for (path <- platform.defaultSystemPaths if pkg.detectInstallationPlatform(path).isDefined) yield path
+    validPaths.headOption
+  }
 }

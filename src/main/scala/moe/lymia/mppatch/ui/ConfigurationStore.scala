@@ -1,0 +1,105 @@
+/*
+ * Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+package moe.lymia.mppatch.ui
+
+import moe.lymia.mppatch.ui.InstallationConfiguration.*
+import play.api.libs.json.*
+import play.api.libs.json.Reads.*
+import play.api.libs.json.Writes.*
+
+import java.nio.file.{Path, Paths}
+import java.util.Locale
+import javax.swing.JFrame
+
+object ConfigurationStore extends LaunchFrameError {
+  private val prefs = java.util.prefs.Preferences.userNodeForPackage(getClass)
+  class ConfigKey[T: Reads: Format](val name: String, default: => T) {
+    def this(name: String) = this(name, sys.error("preference " + name + " not set"))
+
+    protected def encode(v: T): String = Json.stringify(Json.toJson(v))
+    protected def decode(s: String): T = Json.fromJson(Json.parse(s)).get
+
+    def hasValue = prefs.get(name, null) != null
+    def clear()  = prefs.remove(name)
+    def valueOption = try {
+      val pref = prefs.get(name, null)
+      if (pref == null) None else Some(decode(pref))
+    } catch {
+      case _: Exception => None
+    }
+    def value         = valueOption.fold(default)(identity)
+    def value_=(t: T) = prefs.put(name, encode(t))
+  }
+  private class RawStringConfigKey(name: String) extends ConfigKey[String](name) {
+    override protected def encode(v: String): String = v
+    override protected def decode(s: String): String = s
+  }
+
+  private val configVersion = new ConfigKey[Int]("installer_config_version")
+  val installationDirs      = new ConfigKey[Seq[String]]("installer_v1_installation_dirs", Seq())
+  def installationConf(path: Path) = {
+    val canonical = path.toRealPath().toString
+    new ConfigKey[InstallationConfiguration](s"installer_v1_conf|$canonical")
+  }
+
+  val legacyInstallationDirectory: ConfigKey[String]   = new RawStringConfigKey("installationDirectory")
+  val legacyEnableDebug: ConfigKey[Boolean]            = new ConfigKey("enableDebug", false)
+  val legacyEnableLogging: ConfigKey[Boolean]          = new ConfigKey("enableLogging", true)
+  val legacyEnableMultiplayerPatch: ConfigKey[Boolean] = new ConfigKey("enableMultiplayerPatch", true)
+  val legacyEnableLuaJIT: ConfigKey[Boolean]           = new ConfigKey("enableLuaJIT", true)
+
+  private def hasLegacyValues: Boolean =
+    legacyInstallationDirectory.hasValue || legacyEnableDebug.hasValue || legacyEnableLogging.hasValue ||
+      legacyEnableMultiplayerPatch.hasValue || legacyEnableLuaJIT.hasValue
+  def updatePreferences(findDefaultDirectory: => Option[Path]): Unit =
+    if (!configVersion.hasValue && hasLegacyValues) {
+      configVersion.value = 1
+      val defaultDirectory = legacyInstallationDirectory.valueOption match {
+        case Some(x) =>
+          val realPath = Paths.get(x).toRealPath().toString
+          installationDirs.value = installationDirs.value :+ realPath
+          Some(Paths.get(x))
+        case None =>
+          val _ = installationDirs.value // make sure the key exists, but don't do anything else
+          findDefaultDirectory
+      }
+      defaultDirectory match {
+        case Some(defaultDirectory) =>
+          installationConf(defaultDirectory).value = InstallationConfiguration(
+            enableDebug = legacyEnableDebug.value,
+            enableLogging = legacyEnableLogging.value,
+            enableMultiplayerPatch = legacyEnableMultiplayerPatch.value,
+            enableLuaJit = legacyEnableLuaJIT.value
+          )
+        case _ =>
+      }
+    } else if (configVersion.hasValue && configVersion.value != 1) {
+      if (confirmDialog("error.configVersionTooNew")) {
+        configVersion.value = 1
+      } else {
+        throw new InstallerException("Cancelling configuration downgrade", null)
+      }
+    } else {
+      // do nothing
+    }
+}

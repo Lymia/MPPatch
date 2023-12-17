@@ -22,6 +22,8 @@
 
 package moe.lymia.mppatch.ui
 
+import play.api.libs.json.{Json, OFormat}
+
 import java.nio.file.Path
 
 case class InstallationConfiguration(
@@ -30,9 +32,10 @@ case class InstallationConfiguration(
     enableMultiplayerPatch: Boolean,
     enableLuaJit: Boolean
 )
-
-class Installation(rootDir: Path) {
-
+object InstallationConfiguration {
+  implicit val jsonFormat: OFormat[InstallationConfiguration] = Json.format[InstallationConfiguration]
 }
+
+class Installation(rootDir: Path) {}
 
 class InstallationManager {}

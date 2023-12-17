@@ -38,10 +38,10 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   protected var currentStatus: JTextField     = _
 
   private def packages = {
-    val logging     = if (Preferences.legacyEnableLogging.value) Set("logging") else Set[String]()
-    val multiplayer = if (Preferences.legacyEnableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
-    val luajit      = if (Preferences.legacyEnableLuaJIT.value) Set("luajit") else Set[String]()
-    val debug       = if (Preferences.legacyEnableDebug.value) Set("debug") else Set[String]()
+    val logging     = if (ConfigurationStore.legacyEnableLogging.value) Set("logging") else Set[String]()
+    val multiplayer = if (ConfigurationStore.legacyEnableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
+    val luajit      = if (ConfigurationStore.legacyEnableLuaJIT.value) Set("luajit") else Set[String]()
+    val debug       = if (ConfigurationStore.legacyEnableDebug.value) Set("debug") else Set[String]()
     debug ++ multiplayer ++ luajit ++ logging
   }
 
@@ -71,7 +71,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
       installer.foreach(_.releaseLock())
       if (isValid) {
         instance.acquireLock()
-        if (changeByUser) Preferences.legacyInstallationDirectory.value = path.toFile.toString
+        if (changeByUser) ConfigurationStore.legacyInstallationDirectory.value = path.toFile.toString
       }
       installer = Some(instance)
     } else {
@@ -94,11 +94,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     case Some(x) => changeInstaller(x, false)
     case None    =>
   }
-  if (Preferences.legacyInstallationDirectory.hasValue) {
-    val configPath = Paths.get(Preferences.legacyInstallationDirectory.value)
+  if (ConfigurationStore.legacyInstallationDirectory.hasValue) {
+    val configPath = Paths.get(ConfigurationStore.legacyInstallationDirectory.value)
     if (checkPath(configPath)) changeInstaller(configPath, false)
     else {
-      Preferences.legacyInstallationDirectory.clear()
+      ConfigurationStore.legacyInstallationDirectory.clear()
       pathFromRegistry()
     }
   } else pathFromRegistry()
