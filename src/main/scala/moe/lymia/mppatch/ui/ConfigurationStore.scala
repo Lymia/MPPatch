@@ -56,9 +56,9 @@ object ConfigurationStore extends LaunchFrameError {
     override protected def decode(s: String): String = s
   }
 
-  private val configVersion = new ConfigKey[Int]("installer_config_version")
-  val installationDirs      = new ConfigKey[Set[String]]("installer_v1_installation_dirs", Set())
-  val suppressedDirs        = new ConfigKey[Set[String]]("installer_v1_suppressed_dirs", Set())
+  private val configVersion = new ConfigKey[Int]("installer.config_ver")
+  val installationDirs      = new ConfigKey[Set[String]]("installer.v1.installation_dirs", Set())
+  val suppressedDirs        = new ConfigKey[Set[String]]("installer.v1.suppressed_dirs", Set())
   def installationConf(path: Path) = {
     val canonical = path.toRealPath().toString
     new ConfigKey[InstallationConfiguration](s"installer_v1_conf|$canonical", InstallationConfiguration.default)
