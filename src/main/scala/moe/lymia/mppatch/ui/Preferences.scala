@@ -22,7 +22,10 @@
 
 package moe.lymia.mppatch.ui
 
-object Preferences {
+import java.util.Locale
+import javax.swing.JFrame
+
+object Preferences extends LaunchFrameError {
   trait PreferenceSerializer[T] {
     def encode(t: T): String
     def decode(s: String): T
@@ -32,12 +35,27 @@ object Preferences {
     def decode(s: String): T = decodeF(s)
   }
 
-  implicit val StringPreference: SimplePreferenceSerializer[String] =
+  private implicit val StringPreference: SimplePreferenceSerializer[String] =
     SimplePreferenceSerializer[String](identity, identity)
-  implicit val BooleanPreference: SimplePreferenceSerializer[Boolean] =
+  private implicit val BooleanPreference: SimplePreferenceSerializer[Boolean] =
     SimplePreferenceSerializer[Boolean](_.toString, _.toBoolean)
+  private implicit val IntPreference: SimplePreferenceSerializer[Int] =
+    SimplePreferenceSerializer[Int](_.toString, _.toInt)
 
-  val prefs = java.util.prefs.Preferences.userNodeForPackage(getClass)
+  private case class SeqPreferenceImpl[T: PreferenceSerializer]() extends PreferenceSerializer[Seq[T]] {
+    override def encode(t: Seq[T]): String =
+      t.map(x => implicitly[PreferenceSerializer[T]].encode(x).replace("|", "|X").replace("_", "__").replace("|", "_"))
+        .mkString("|")
+    override def decode(s: String): Seq[T] = s
+      .split("\\|")
+      .toSeq
+      .map(x => x.replace("_X", "|").replace("__", "_"))
+      .map(x => implicitly[PreferenceSerializer[T]].decode(x))
+  }
+  private implicit def SeqPreference[T](implicit root: PreferenceSerializer[T]): SeqPreferenceImpl[T] =
+    SeqPreferenceImpl()
+
+  private val prefs = java.util.prefs.Preferences.userNodeForPackage(getClass)
   class PreferenceKey[T: PreferenceSerializer](val name: String, default: => T) {
     def this(name: String) = this(name, sys.error("preference " + name + " not set"))
 
@@ -55,9 +73,28 @@ object Preferences {
     def value_=(t: T) = prefs.put(name, encoder.encode(t))
   }
 
-  val installationDirectory  = new PreferenceKey[String]("installationDirectory")
-  val enableDebug            = new PreferenceKey[Boolean]("enableDebug", false)
-  val enableLogging          = new PreferenceKey[Boolean]("enableLogging", true)
-  val enableMultiplayerPatch = new PreferenceKey[Boolean]("enableMultiplayerPatch", true)
-  val enableLuaJIT           = new PreferenceKey[Boolean]("enableLuaJIT", true)
+  private val preferencesVersion = new PreferenceKey[Int]("preferenceVersion")
+  val installationDirs           = new PreferenceKey[Seq[String]]("installationDirs")
+
+  val legacyInstallationDirectory  = new PreferenceKey[String]("installationDirectory")
+  val legacyEnableDebug            = new PreferenceKey[Boolean]("enableDebug", false)
+  val legacyEnableLogging          = new PreferenceKey[Boolean]("enableLogging", true)
+  val legacyEnableMultiplayerPatch = new PreferenceKey[Boolean]("enableMultiplayerPatch", true)
+  val legacyEnableLuaJIT           = new PreferenceKey[Boolean]("enableLuaJIT", true)
+
+  private def hasLegacyValues: Boolean =
+    legacyInstallationDirectory.hasValue || legacyEnableDebug.hasValue || legacyEnableLogging.hasValue ||
+      legacyEnableMultiplayerPatch.hasValue || legacyEnableLuaJIT.hasValue
+  def updatePreferences(): Unit =
+    if (!preferencesVersion.hasValue && hasLegacyValues) {
+      preferencesVersion.value = 1
+    } else if (preferencesVersion.hasValue && preferencesVersion.value != 1) {
+      if (confirmDialog("error.configVersionTooNew")) {
+        preferencesVersion.value = 1
+      } else {
+        throw new InstallerException("Cancelling configuration downgrade", null)
+      }
+    } else {
+      // do nothing
+    }
 }

@@ -54,13 +54,14 @@ crossPaths := false
 
 // Dependencies
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml"            % "2.1.0"
+libraryDependencies += "org.playframework"      %% "play-json"            % "3.0.1"
 libraryDependencies += "com.formdev"             % "flatlaf"              % "3.2.5"
 libraryDependencies += "com.formdev"             % "flatlaf-fonts-roboto" % "2.137"
 
 // Build assembled jar
 ThisBuild / assemblyMergeStrategy := {
-  case x if x.startsWith("moe/lymia") => MergeStrategy.first
-  case "module-info.class"            => MergeStrategy.discard
+  case x if x.startsWith("moe/lymia")       => MergeStrategy.first
+  case x if x.endsWith("module-info.class") => MergeStrategy.discard
   case x =>
     val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
     oldStrategy(x)

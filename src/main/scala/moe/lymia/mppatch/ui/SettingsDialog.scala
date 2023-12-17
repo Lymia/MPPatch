@@ -46,10 +46,10 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
   private def applySettings(): Unit = {
     main.changeInstaller(Paths.get(installPath.getText))
 
-    Preferences.enableDebug.value = enableDebug.isSelected
-    Preferences.enableLogging.value = enableLogging.isSelected
-    Preferences.enableMultiplayerPatch.value = enableMultiplayerPatch.isSelected
-    Preferences.enableLuaJIT.value = enableLuaJIT.isSelected
+    Preferences.legacyEnableDebug.value = enableDebug.isSelected
+    Preferences.legacyEnableLogging.value = enableLogging.isSelected
+    Preferences.legacyEnableMultiplayerPatch.value = enableMultiplayerPatch.isSelected
+    Preferences.legacyEnableLuaJIT.value = enableLuaJIT.isSelected
 
     main.update()
   }
@@ -79,16 +79,16 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       }
 
       enableLogging = options.gridCheckRow(1, "logging")
-      enableLogging.setSelected(Preferences.enableLogging.value)
+      enableLogging.setSelected(Preferences.legacyEnableLogging.value)
 
       enableMultiplayerPatch = options.gridCheckRow(2, "modding")
-      enableMultiplayerPatch.setSelected(Preferences.enableMultiplayerPatch.value)
+      enableMultiplayerPatch.setSelected(Preferences.legacyEnableMultiplayerPatch.value)
 
       enableLuaJIT = options.gridCheckRow(3, "luajit")
-      enableLuaJIT.setSelected(Preferences.enableLuaJIT.value)
+      enableLuaJIT.setSelected(Preferences.legacyEnableLuaJIT.value)
 
       enableDebug = options.gridCheckRow(4, "debug")
-      enableDebug.setSelected(Preferences.enableDebug.value)
+      enableDebug.setSelected(Preferences.legacyEnableDebug.value)
     }
 
     frame.add(
@@ -98,7 +98,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
 
     frame.subFrame(constraints(gridy = 2, fill = GridBagConstraints.BOTH)) { frameButtons =>
       val viewLog = new ActionButton(false)
-      viewLog.setAction("action.viewlog", () => desktop.open(InstallerMain.logFile))
+      viewLog.setAction("action.viewlog", () => desktop.open(MPPatchInstaller.logFile))
       frameButtons.add(viewLog, constraints())
 
       frameButtons.add(new JPanel, constraints(gridx = 1, weightx = 1))

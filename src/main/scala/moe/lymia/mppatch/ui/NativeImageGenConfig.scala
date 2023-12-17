@@ -74,7 +74,7 @@ object NativeImageGenConfig {
     chooser.setVisible(false)
 
     // desktop open
-    Desktop.getDesktop.open(InstallerMain.logFile)
+    Desktop.getDesktop.open(MPPatchInstaller.logFile)
   }
 
   def run(): Unit = {

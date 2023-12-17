@@ -169,17 +169,28 @@ trait FrameError[F <: Window] extends HasLogger {
 
   protected def titleString = i18n("title", VersionInfo.versionString)
 
+  private def getFrameParam = if (frame != null && frame.isVisible) frame else null
+
+  private def confirmDialog0(format: String, data: Seq[Any]) = {
+    val string = i18n(format, data: _*)
+    val result = JOptionPane.showConfirmDialog(
+      getFrameParam,
+      string,
+      titleString,
+      JOptionPane.YES_NO_OPTION,
+      JOptionPane.ERROR_MESSAGE
+    )
+    result == JOptionPane.YES_OPTION
+  }
+  protected def confirmDialog(string: String, data: Any*) = confirmDialog0(string, data)
+
   private def warn0(format: String, needPrint: Boolean, data: Seq[Any]) = {
     val string = i18n(format, data: _*)
     if (needPrint) log.warn(string)
-    JOptionPane.showMessageDialog(
-      if (frame != null && frame.isVisible) frame else null,
-      string,
-      titleString,
-      JOptionPane.ERROR_MESSAGE
-    )
+    JOptionPane.showMessageDialog(getFrameParam, string, titleString, JOptionPane.ERROR_MESSAGE)
   }
   protected def warn(string: String, data: Any*) = warn0(string, true, data)
+
   private def error0[T](format: String, ex: Option[Throwable], data: Seq[Any]): T = {
     val string = i18n(format, data: _*)
     warn0(format, false, data)
@@ -194,8 +205,14 @@ trait FrameError[F <: Window] extends HasLogger {
     throw new InstallerException(string, ex.orNull)
   }
   protected def error[T](string: String, data: Any*) = error0(string, None, data)
-  protected def dumpException[T](errorString: String, e: Exception, exArgs: Object*): T =
+
+  protected def reportException[T](errorString: String, e: Exception, exArgs: Object*): T =
     error0(errorString, Some(e), f"${e.getClass}: ${e.getMessage}" +: exArgs)
+}
+
+trait LaunchFrameError extends FrameError[JFrame] with I18NTrait {
+  protected def locale                 = Locale.getDefault
+  override protected def frame: JFrame = null
 }
 
 trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasLogger {
@@ -235,7 +252,7 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
           JOptionPane.showMessageDialog(frame, i18n(text + ".completed"))
       } catch {
         case e: Exception =>
-          dumpException(
+          reportException(
             if (i18n.hasKey(text + ".continuous")) "error.commandfailed" else "error.commandfailed.generic",
             e,
             i18n(text + ".continuous")
