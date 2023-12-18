@@ -87,9 +87,3 @@ target/rcedit.exe "target/mppatch-installer-stub.exe" `
     --set-icon "scripts/res/mppatch-installer.ico" `
     --application-manifest "scripts/res/win32-manifest.xml"
 cmd /c copy /b "target\mppatch-installer-stub.exe" + "target\mppatch-installer-data.dat" "target\$INSTALLER_NAME"
-
-# Create tarball
-echo "Creating Windows installer tarball..."
-cd target
-    tar --gzip -cv -f "mppatch_ci_installer-win32.tar.gz" "$INSTALLER_NAME"
-cd ..

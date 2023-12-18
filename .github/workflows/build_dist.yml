@@ -39,7 +39,7 @@ jobs:
       - run: scripts/ci/build-natives_linux.sh
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux.tar.gz
@@ -63,7 +63,7 @@ jobs:
       - run: git fetch --prune --unshallow --tags
 
       # Download artifacts
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux
@@ -74,10 +74,10 @@ jobs:
       - run: scripts/ci/build-installer_linux.sh
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: mppatch_ci_installer-linux.tar.gz
-          path: target/mppatch_ci_installer-linux.tar.gz
+          name: mppatch_ci_installer-linux
+          path: target/MPPatch-Installer_*
 
   buildInstallerWindows:
     runs-on: windows-latest
@@ -107,7 +107,7 @@ jobs:
           scoop install nsis
 
       # Download artifacts
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux
@@ -118,10 +118,10 @@ jobs:
       - run: powershell -file scripts/ci/build-installer_win32.ps1
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: mppatch_ci_installer-win32.tar.gz
-          path: target/mppatch_ci_installer-win32.tar.gz
+          name: mppatch_ci_installer-win32
+          path: target/MPPatch-Installer_*
 
   publishArtifacts:
     runs-on: ubuntu-latest
@@ -139,21 +139,19 @@ jobs:
         run: 'echo "VERSION_STR=ci_build-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV'
 
       # Download artifacts
-      - run: mkdir -pv target
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
-          name: mppatch_ci_installer-linux.tar.gz
-          path: target/mppatch_ci_installer-linux
-      - uses: actions/download-artifact@v3
+          name: mppatch_ci_installer-linux
+          path: mppatch_ci_installer-linux
+      - uses: actions/download-artifact@v4
         with:
-          name: mppatch_ci_installer-win32.tar.gz
-          path: target/mppatch_ci_installer-win32
+          name: mppatch_ci_installer-win32
+          path: mppatch_ci_installer-win32
       - name: Build directory structure
         run: |
           mkdir -pv target/dist
-          cd target/dist
-          tar -xv -f ../mppatch_ci_installer-linux/mppatch_ci_installer-linux.tar.gz
-          tar -xv -f ../mppatch_ci_installer-win32/mppatch_ci_installer-win32.tar.gz
+          cp -v mppatch_ci_installer-linux/mppatch_ci_installer-linux/* target/dist/
+          cp -v mppatch_ci_installer-win32/mppatch_ci_installer-win32/* target/dist/
 
       # Upload the build to GitHub
       - name: Remove git hooks (hack to make action-create-tag work)
