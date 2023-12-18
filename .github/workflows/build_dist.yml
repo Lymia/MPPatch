@@ -54,6 +54,7 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: '21'
+      - run: sudo apt install libfuse2
 
       # Initialize git
       - uses: actions/checkout@v2
