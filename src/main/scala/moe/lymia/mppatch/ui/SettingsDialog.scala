@@ -28,7 +28,7 @@ import java.nio.file.Paths
 import java.util.Locale
 import javax.swing._
 
-class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
+class SettingsDialog(val locale: Locale, main: LegacyMainFrame) extends FrameBase[JDialog] {
   private var installPath: JTextField = _
 
   private var enableDebug: JCheckBox            = _

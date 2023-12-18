@@ -32,7 +32,7 @@ import javax.swing.event.HyperlinkEvent
 import moe.lymia.mppatch.util.VersionInfo
 import moe.lymia.mppatch.util.io.IOUtils
 
-class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
+class AboutDialog(val locale: Locale, main: LegacyMainFrame) extends FrameBase[JDialog] {
   private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
   private val desktop    = Desktop.getDesktop
   override protected def buildForm(): Unit = {

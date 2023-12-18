@@ -20,20 +20,10 @@
  * THE SOFTWARE.
  */
 
-package moe.lymia.mppatch.ui
+package moe.lymia.mppatch.ui;
 
-import java.awt.{Dimension, GridBagLayout}
-import java.util.Locale
-import javax.swing.{JFrame, JLabel, WindowConstants}
+import javax.swing.*;
 
-class MainFrame(protected val locale: Locale) extends FrameBase[JFrame] {
-  override protected def buildForm() = {
-    frame = new JFrame(titleString)
-    frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
-
-    frame.setPreferredSize(new Dimension(600, 450))
-
-    val test = new FormChooseInstallation()
-    frame.add(test.getRootComponent)
-  }
+public interface FormPanel {
+    public JComponent getRootComponent();
 }

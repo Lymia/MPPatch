@@ -55,6 +55,7 @@ crossPaths := false
 // Dependencies
 libraryDependencies += "org.scala-lang.modules" %% "scala-xml"            % "2.1.0"
 libraryDependencies += "org.playframework"      %% "play-json"            % "3.0.1"
+libraryDependencies += "com.intellij"            % "forms_rt"             % "7.0.3"
 libraryDependencies += "com.formdev"             % "flatlaf"              % "3.2.5"
 libraryDependencies += "com.formdev"             % "flatlaf-fonts-roboto" % "2.137"
 

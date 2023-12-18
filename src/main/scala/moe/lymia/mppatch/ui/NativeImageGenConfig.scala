@@ -29,7 +29,7 @@ object NativeImageGenConfig {
   private val sleepDur = 1000
 
   private def forLocale(locale: Locale): Unit = {
-    class MainFrameExt(locale: Locale) extends MainFrame(locale) {
+    class TestFrame(locale: Locale) extends LegacyMainFrame(locale) {
       override protected val neverShowMessage: Boolean = true
       def doInstallUninstall(): Unit = {
         if (uninstallButton.isEnabled) uninstallButton.doClick()
@@ -43,7 +43,7 @@ object NativeImageGenConfig {
       }
     }
 
-    val mainFrame = new MainFrameExt(locale)
+    val mainFrame = new TestFrame(locale)
     new Thread(() => mainFrame.showForm()).start()
     Thread.sleep(sleepDur)
 
