@@ -6,3 +6,4 @@ addSbtPlugin("org.scalameta"    % "sbt-native-image" % "0.3.2")
 resolvers += "SpringSource" at "https://repository.springsource.com/maven/bundles/external"
 
 libraryDependencies += "com.github.rjeschke" % "txtmark" % "0.13"
+libraryDependencies += "org.tukaani"         % "xz"      % "1.9"
