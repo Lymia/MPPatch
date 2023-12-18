@@ -115,8 +115,7 @@ jobs:
       - run: rm -Recurse -Force -Verbose target/mppatch_ci_natives-linux
 
       # Do the actual build
-      - run: scripts/ci/build-installer_win32.ps1
-        shell: powershell
+      - run: powershell -file scripts/ci/build-installer_win32.ps1
 
       # Upload artifacts
       - uses: actions/upload-artifact@v3
