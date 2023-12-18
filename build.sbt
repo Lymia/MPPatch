@@ -82,3 +82,7 @@ Global / excludeLintKeys += nativeImageJvmIndex
 Global / excludeLintKeys += nativeImageVersion
 
 InputKey[Unit]("buildNative") := PatchBuild.Keys.buildDylibDir.value
+
+// Runtime configuration
+run / fork    := true
+run / envVars := Map("MPPATCH_SBT_LAUNCH" -> "018c7e5e-473e-7273-b818-e677c7fe1439")

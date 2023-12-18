@@ -37,8 +37,10 @@ import javax.swing.{JFrame, JOptionPane, UIManager}
 
 object MPPatchInstaller extends LaunchFrameError {
   private val nsisMarker = "018c6bba-54e0-7cf2-b16a-7b6abb9215e0"
+  private var sbtMarker = "018c7e5e-473e-7273-b818-e677c7fe1439"
   private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)
 
+  private lazy val isSbt = System.getenv("MPPATCH_SBT_LAUNCH") == sbtMarker
   private lazy val isAppImage =
     PlatformType.currentPlatform == PlatformType.Linux && System.getenv("APPIMAGE") != null
   private lazy val isNsis =
@@ -123,6 +125,8 @@ object MPPatchInstaller extends LaunchFrameError {
         log.info("Running from NSIS wrapper")
         log.info(f"NSIS binary: ${nsisFileLocation.get}")
         log.info(f"NSIS temporary directory: ${nsisContents.get}")
+      } else if (isSbt) {
+        log.info("Running from SBT")
       } else {
         log.info("Running from .jar")
       }
@@ -145,8 +149,13 @@ object MPPatchInstaller extends LaunchFrameError {
         log.warn("If you did not intend this, I don't know what to say.")
         ConfigurationStore.updatePreferences(defaultCivilizationPath)
         NativeImageGenConfig.run()
-      } else {
+      } else if (!isSbt) {
         // start main frame
+        ConfigurationStore.updatePreferences(defaultCivilizationPath)
+        new LegacyMainFrame(locale).showForm()
+      } else {
+        // start development main frame
+        log.warn("Launching development installer version!")
         ConfigurationStore.updatePreferences(defaultCivilizationPath)
         new MainFrame(locale).showForm()
       }
