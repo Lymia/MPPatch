@@ -12,7 +12,7 @@ if (Test-Path target/native-bin) {
 }
 New-Item target/native-bin -ItemType Directory -ea 0 -Verbose
 cd target/native-bin
-tar -xv -f ../../target/mppatch_ci_natives-linux.tar.gz
+    tar -xv -f ../../target/mppatch_ci_natives-linux.tar.gz
 cd ../..
 
 # Download rcedit if it isn't already downloaded
@@ -26,6 +26,7 @@ if (-Not(Test-Path "target/rcedit.exe" -PathType Leaf)) {
 $VERSION = "$( sbt "print version" --error )".Trim()
 $FILE_VERSION = "$VERSION".Split("-")[0]
 $FILE_VERSION = "$FILE_VERSION.$( git rev-list HEAD --count )"
+$INSTALLER_NAME = "MPPatch-Installer_win32_$VERSION.exe"
 
 # Build the native-image
 echo "Building native-image installer"
@@ -79,14 +80,14 @@ target/rcedit.exe "target/mppatch-installer-stub.exe" `
     --set-version-string "ProductName" "MPPatch" `
     --set-product-version "$VERSION" `
     --set-version-string "LegalCopyright" "(C) Lymia Kanokawa; available under the MIT License" `
-    --set-version-string "OriginalFilename" "MPPatch-Installer_win32_$VERSION.exe" `
+    --set-version-string "OriginalFilename" "$INSTALLER_NAME" `
     --set-icon "scripts/res/mppatch-installer.ico" `
     --application-manifest "scripts/res/win32-manifest.xml"
 Get-Content "target/mppatch-installer-stub.exe", "target/mppatch-installer-data.dat" -Encoding Byte -Read 1024 `
-    | Set-Content "target/mppatch-installer.exe" -Encoding Byte
+    | Set-Content "target/$INSTALLER_NAME" -Encoding Byte
 
 # Create tarball
 echo "Creating Windows installer tarball..."
 cd target
-tar --gzip -cv -f "mppatch_ci_installer-win32.tar.gz" mppatch-installer.exe
+    tar --gzip -cv -f "mppatch_ci_installer-win32.tar.gz" "target/$INSTALLER_NAME"
 cd ..

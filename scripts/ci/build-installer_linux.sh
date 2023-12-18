@@ -24,6 +24,8 @@
 
 . scripts/ci/install-graalvm.sh
 
+LINUXDEPLOY_DL="https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20231026-1/linuxdeploy-x86_64.AppImage"
+
 echo "Extracting native tarballs..."
 rm -rfv target/native-bin || exit 1
 mkdir -vp target/native-bin || exit 1
@@ -31,19 +33,58 @@ cd target/native-bin || exit 1
   tar -xv -f ../../target/mppatch_ci_natives-linux.tar.gz
 cd ../.. || exit 1
 
+echo "Gathering facts from SBT..."
+sbt "print scalaVersion" || exit 1 # get project files cached, required to wrangle CI
+VERSION="$(sbt "print version" --error || exit 1)"
+VERSION="$(echo "$VERSION" | head -n 1 | tr -d '\n')"
+echo "VERSION=$VERSION"
+APPIMAGE_NAME="MPPatch-Installer_linux_$VERSION.AppImage"
+ASSEMBLY_NAME="MPPatch-Installer_universal_$VERSION.jar"
+
+echo "Building assembly jar..."
+ASSEMBLY_JAR="$(sbt "print assembly" --error || exit 1)"
+echo "ASSEMBLY_JAR=$ASSEMBLY_JAR"
+cp "$(echo "$ASSEMBLY_JAR" | head -n 1 | tr -d '\n')" target/"$ASSEMBLY_NAME" || exit 1
+
+echo "Downloading tools..."
+if [ ! -f target/linuxdeploy ]; then
+  wget -O target/linuxdeploy "$LINUXDEPLOY_DL" || exit 1
+  chmod +x target/linuxdeploy || exit 1
+fi
+
+echo "Cleaning up after previous scripts..."
+rm -rfv target/native-image target/dist-build || exit 1
+mkdir -p target/native-image target/dist-build || exit 1
+
 echo "Building Linux installer...."
-rm -rfv target/native-image || exit 1
 sbt nativeImage || exit 1
 chmod +x target/native-image/*.so || exit 1
 
-echo "Building assembly jar..."
-sbt "print scalaVersion" || exit 1 # get results cached, required to wrangle CI
-ASSEMBLY_JAR="$(sbt "print assembly" --error || exit 1)"
-echo "ASSEMBLY_JAR=$ASSEMBLY_JAR"
-cp "$(echo "$ASSEMBLY_JAR" | head -n 1 | tr -d '\n')" target/native-image/assembly.jar || exit 1
+echo "Building AppDir for Linux installer..."
+mkdir -pv target/dist-build/linux/AppDir || exit 1
+
+# Build basic directory structure
+cd target/dist-build/linux/AppDir || exit 1
+  cp -rv ../../../native-image/* . || exit 1
+  mkdir -pv usr/bin usr/lib usr/share/applications usr/share/icons/hicolor/scalable/apps || exit 1
+  mv -v mppatch-installer usr/bin/ || exit 1
+  mv -v *.so usr/lib/ || exit 1
+  cp -v ../../../../scripts/res/mppatch-installer.desktop usr/share/applications/ || exit 1
+  cp -v ../../../../scripts/res/mppatch-installer.svg usr/share/icons/hicolor/scalable/apps/ || exit 1
+  for scale in {8,16,22,24,32,48,64,256}; do
+    mkdir -pv usr/share/icons/hicolor/"${scale}x${scale}"/apps || exit 1
+    cp -v ../../../../scripts/res/mppatch-installer-$scale.png usr/share/icons/hicolor/"${scale}x${scale}"/apps/mppatch-installer.png || exit 1
+  done
+cd ../../../.. || exit 1
+
+# Build AppImage
+echo "Building AppImage..."
+cd target/dist-build/linux || exit 1
+  LDAI_COMP=xz ../../linuxdeploy --appdir AppDir/ --output appimage || exit 1
+cd ../../.. || exit 1
+cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/"$APPIMAGE_NAME" || exit 1
 
 echo "Creating Linux installer tarball..."
-cd target/native-image || exit 1
-  tar --gzip -cv -f mppatch_ci_installer-linux.tar.gz * || exit 1
-cd ../.. || exit 1
-cp -v target/native-image/mppatch_ci_installer-linux.tar.gz target/ || exit 1
+cd target || exit 1
+  tar --gzip -cv -f mppatch_ci_installer-linux.tar.gz "$APPIMAGE_NAME" "$ASSEMBLY_NAME" || exit 1
+cd .. || exit 1
