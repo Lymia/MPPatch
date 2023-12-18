@@ -27,6 +27,9 @@ $VERSION = "$( sbt "print version" --error )".Trim()
 $FILE_VERSION = "$VERSION".Split("-")[0]
 $FILE_VERSION = "$FILE_VERSION.$( git rev-list HEAD --count )"
 $INSTALLER_NAME = "MPPatch-Installer_win32_$VERSION.exe"
+echo "VERSION=$VERSION"
+echo "FILE_VERSION=$FILE_VERSION"
+echo "INSTALLER_NAME=$INSTALLER_NAME"
 
 # Build the native-image
 echo "Building native-image installer"
@@ -83,11 +86,10 @@ target/rcedit.exe "target/mppatch-installer-stub.exe" `
     --set-version-string "OriginalFilename" "$INSTALLER_NAME" `
     --set-icon "scripts/res/mppatch-installer.ico" `
     --application-manifest "scripts/res/win32-manifest.xml"
-Get-Content "target/mppatch-installer-stub.exe", "target/mppatch-installer-data.dat" -Encoding Byte -Read 1024 `
-    | Set-Content "target/$INSTALLER_NAME" -Encoding Byte
+cmd /c copy /b "target/mppatch-installer-stub.exe"+"target/mppatch-installer-data.dat" "target/$INSTALLER_NAME"
 
 # Create tarball
 echo "Creating Windows installer tarball..."
 cd target
-    tar --gzip -cv -f "mppatch_ci_installer-win32.tar.gz" "target/$INSTALLER_NAME"
+    tar --gzip -cv -f "mppatch_ci_installer-win32.tar.gz" "$INSTALLER_NAME"
 cd ..
