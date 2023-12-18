@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #
 # Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>
 #
