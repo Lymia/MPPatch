@@ -31,7 +31,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
+import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class FormChooseInstallation implements FormPanel {
 
@@ -75,10 +77,10 @@ public class FormChooseInstallation implements FormPanel {
         label1.setEnabled(true);
         Font label1Font = this.$$$getFont$$$(null, Font.BOLD, 16, label1.getFont());
         if (label1Font != null) label1.setFont(label1Font);
-        label1.setText("Choose Installation");
+        this.$$$loadLabelText$$$(label1, this.$$$getMessageFromBundle$$$("moe/lymia/mppatch/ui/TextData", "screen.chooseInstallation.name"));
         mainPane.add(label1, cc.xyw(3, 3, 3));
         final JLabel label2 = new JLabel();
-        label2.setText("Please select the correct Civilization V installation directory.");
+        this.$$$loadLabelText$$$(label2, this.$$$getMessageFromBundle$$$("moe/lymia/mppatch/ui/TextData", "screen.chooseInstallation.desc"));
         mainPane.add(label2, cc.xyw(3, 5, 3));
         selectDirectoryButton = new JButton();
         selectDirectoryButton.setText("Select Directory");
@@ -108,6 +110,50 @@ public class FormChooseInstallation implements FormPanel {
         boolean isMac = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).startsWith("mac");
         Font fontWithFallback = isMac ? new Font(font.getFamily(), font.getStyle(), font.getSize()) : new StyleContext().getFont(font.getFamily(), font.getStyle(), font.getSize());
         return fontWithFallback instanceof FontUIResource ? fontWithFallback : new FontUIResource(fontWithFallback);
+    }
+
+    private static Method $$$cachedGetBundleMethod$$$ = null;
+
+    private String $$$getMessageFromBundle$$$(String path, String key) {
+        ResourceBundle bundle;
+        try {
+            Class<?> thisClass = this.getClass();
+            if ($$$cachedGetBundleMethod$$$ == null) {
+                Class<?> dynamicBundleClass = thisClass.getClassLoader().loadClass("com.intellij.DynamicBundle");
+                $$$cachedGetBundleMethod$$$ = dynamicBundleClass.getMethod("getBundle", String.class, Class.class);
+            }
+            bundle = (ResourceBundle) $$$cachedGetBundleMethod$$$.invoke(null, path, thisClass);
+        } catch (Exception e) {
+            bundle = ResourceBundle.getBundle(path);
+        }
+        return bundle.getString(key);
+    }
+
+    /**
+     * @noinspection ALL
+     */
+    private void $$$loadLabelText$$$(JLabel component, String text) {
+        StringBuffer result = new StringBuffer();
+        boolean haveMnemonic = false;
+        char mnemonic = '\0';
+        int mnemonicIndex = -1;
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '&') {
+                i++;
+                if (i == text.length()) break;
+                if (!haveMnemonic && text.charAt(i) != '&') {
+                    haveMnemonic = true;
+                    mnemonic = text.charAt(i);
+                    mnemonicIndex = result.length();
+                }
+            }
+            result.append(text.charAt(i));
+        }
+        component.setText(result.toString());
+        if (haveMnemonic) {
+            component.setDisplayedMnemonic(mnemonic);
+            component.setDisplayedMnemonicIndex(mnemonicIndex);
+        }
     }
 
     /**

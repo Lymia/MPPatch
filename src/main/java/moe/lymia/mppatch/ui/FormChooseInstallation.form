@@ -57,7 +57,7 @@
         <properties>
           <enabled value="true"/>
           <font size="16" style="1"/>
-          <text value="Choose Installation"/>
+          <text resource-bundle="moe/lymia/mppatch/ui/TextData" key="screen.chooseInstallation.name"/>
         </properties>
       </component>
       <component id="aef0c" class="javax.swing.JLabel">
@@ -66,7 +66,7 @@
           <forms/>
         </constraints>
         <properties>
-          <text value="Please select the correct Civilization V installation directory."/>
+          <text resource-bundle="moe/lymia/mppatch/ui/TextData" key="screen.chooseInstallation.desc"/>
         </properties>
       </component>
       <component id="7dd2d" class="javax.swing.JButton" binding="selectDirectoryButton" default-binding="true">
