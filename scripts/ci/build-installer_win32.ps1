@@ -23,7 +23,7 @@ if (-Not(Test-Path "target/rcedit.exe" -PathType Leaf)) {
 }
 
 # Find the current version
-$VERSION = "$( sbt "print version" --error )".Trim()
+$VERSION = "$( sbt "print version" --error )".Trim().Replace(" ", "")
 $FILE_VERSION = "$VERSION".Split("-")[0]
 $FILE_VERSION = "$FILE_VERSION.$( git rev-list HEAD --count )"
 $INSTALLER_NAME = "MPPatch-Installer_win32_$VERSION.exe"
