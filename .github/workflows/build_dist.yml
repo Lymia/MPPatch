@@ -144,8 +144,8 @@ jobs:
       - name: Build directory structure
         run: |
           mkdir -pv target/dist
-          cp -v mppatch_ci_installer-linux/mppatch_ci_installer-linux/* target/dist/
-          cp -v mppatch_ci_installer-win32/mppatch_ci_installer-win32/* target/dist/
+          cp -v mppatch_ci_installer-linux/* target/dist/
+          cp -v mppatch_ci_installer-win32/* target/dist/
 
       # Upload the build to GitHub
       - name: Remove git hooks (hack to make action-create-tag work)
