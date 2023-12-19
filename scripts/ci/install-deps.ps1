@@ -54,11 +54,13 @@ New-Item "target/deps/dl" -ItemType Directory -ea 0 -Verbose
 if (-Not(Test-Path "target/deps/graalvm-win32" -PathType Container)) {
     echo "Downloading GraalVM for Windows..."
     Download-Dependency -Name "graalvm-win32.zip" -Uri "$GRAALVM_WIN32_URL" -Sha256 "$GRAALVM_WIN32_SHA"
-    Expand-Archive -Path "target/deps/dl/graalvm-win32.zip" -DestinationPath "target/deps/graalvm-win32"
+    Expand-Archive -Path "target/deps/dl/graalvm-win32.zip" -DestinationPath "target/deps/graalvm-win32-tmp"
+    Move-Item "target/deps/graalvm-win32-tmp/$GRAALVM_WIN32_DIR" "target/deps/graalvm-win32"
+    Remove-Item "target/deps/graalvm-win32-tmp"
 }
 
 # Install rcedit
-if (-Not (Test-Path "target/deps/rcedit.exe" -PathType Container)) {
+if (-Not (Test-Path "target/deps/rcedit.exe" -PathType Leaf)) {
     echo "Downloading rcedit..."
     Download-Dependency -Name "rcedit.exe" -Uri "$RCEDIT_URL" -Sha256 "$RCEDIT_SHA"
     Copy-Item "target/deps/dl/rcedit.exe" "target/deps/rcedit.exe"

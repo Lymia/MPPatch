@@ -58,7 +58,6 @@ libraryDependencies += "org.playframework"      %% "play-json"            % "3.0
 libraryDependencies += "com.intellij"            % "forms_rt"             % "7.0.3"
 libraryDependencies += "com.formdev"             % "flatlaf"              % "3.2.5"
 libraryDependencies += "com.formdev"             % "flatlaf-fonts-roboto" % "2.137"
-libraryDependencies += "org.tukaani"             % "xz"                   % "1.9"
 
 // Build assembled jar
 ThisBuild / assemblyMergeStrategy := {
