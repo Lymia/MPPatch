@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-import Config.*
 import Utils.*
 import sbt.*
 import sbt.Keys.*
@@ -66,12 +65,12 @@ object NativePatchBuild {
         val coreDir = baseDirectory.value / "src" / "patch" / "mppatch-core";
         Some(coreDir / "target" / "i686-pc-windows-gnu" / "release" / "mppatch_core_wrapper.dll")
       } else None
-    },
+    }
   )
 
   case class PatchFile(name: String, file: File, buildId: String)
   object Keys {
     val nativeVersions = TaskKey[Seq[PatchFile]]("mppatch-native-versions")
-    val win32Wrapper = TaskKey[Option[File]]("mppatch-native-win32-wrapper")
+    val win32Wrapper   = TaskKey[Option[File]]("mppatch-native-win32-wrapper")
   }
 }

@@ -118,6 +118,6 @@ object LuaJITBuild {
   object Keys {
     val luajitCacheDir  = SettingKey[File]("luajit-cache-dir")
     val luajitSourceDir = SettingKey[File]("luajit-source-dir")
-    val luajitFiles = TaskKey[Seq[LuaJITPatchFile]]("luajit-files")
+    val luajitFiles     = TaskKey[Seq[LuaJITPatchFile]]("luajit-files")
   }
 }
