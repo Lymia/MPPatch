@@ -98,13 +98,7 @@ jobs:
 
       # Install dependencies
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Install NSIS
-        run: |
-          iwr -useb get.scoop.sh -outfile 'install.ps1'
-          .\install.ps1 -RunAsAdmin
-          scoop update
-          scoop bucket add extras
-          scoop install nsis
+      - run: choco install nsis
 
       # Download artifacts
       - uses: actions/download-artifact@v3
