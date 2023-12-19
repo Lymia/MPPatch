@@ -23,6 +23,24 @@
         "pattern": "\\QMETA-INF/services/java.util.prefs.PreferencesFactory\\E"
       },
       {
+        "pattern": "\\QMETA-INF/services/java.util.spi.ResourceBundleControlProvider\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/javax.imageio.spi.ImageInputStreamSpi\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/javax.imageio.spi.ImageOutputStreamSpi\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/javax.imageio.spi.ImageReaderSpi\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/javax.imageio.spi.ImageTranscoderSpi\\E"
+      },
+      {
+        "pattern": "\\QMETA-INF/services/javax.imageio.spi.ImageWriterSpi\\E"
+      },
+      {
         "pattern": "\\QMETA-INF/services/javax.xml.parsers.DocumentBuilderFactory\\E"
       },
       {
@@ -85,13 +103,15 @@
     {
       "name": "com.formdev.flatlaf.resources.Bundle",
       "locales": [
-        ""
+        "",
+        "und"
       ]
     },
     {
       "name": "com.sun.org.apache.xml.internal.serializer.XMLEntities",
       "locales": [
-        ""
+        "",
+        "und"
       ]
     },
     {
@@ -110,6 +130,25 @@
       "name": "sun.awt.resources.awt",
       "classNames": [
         "sun.awt.resources.awt"
+      ]
+    },
+    {
+      "name": "com.formdev.flatlaf.resources.Bundle",
+      "locales": [
+        ""
+      ]
+    },
+    {
+      "name": "com.sun.org.apache.xml.internal.serializer.XMLEntities",
+      "locales": [
+        ""
+      ]
+    },
+    {
+      "name": "moe.lymia.mppatch.ui.TextData",
+      "locales": [
+        "",
+        "en"
       ]
     }
   ]

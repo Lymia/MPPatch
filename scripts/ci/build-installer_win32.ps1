@@ -1,9 +1,29 @@
+#
+# Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+# THE SOFTWARE.
+#
+
 $ErrorActionPreference = "Stop"
 
-$URL_RCEDIT = "https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe"
-
 # Install graalvm
-scripts/ci/install-graalvm.ps1
+scripts/ci/install-deps.ps1
 
 # Extract native tarballs
 echo "Extracting native tarballs..."
@@ -14,13 +34,6 @@ New-Item target/native-bin -ItemType Directory -ea 0 -Verbose
 cd target/native-bin
     tar -xv -f ../../target/mppatch_ci_natives-linux.tar.gz
 cd ../..
-
-# Download rcedit if it isn't already downloaded
-if (-Not(Test-Path "target/rcedit.exe" -PathType Leaf)) {
-    echo "Downloading 'rcedit.exe'..."
-    $ProgressPreference = 'SilentlyContinue'
-    Invoke-WebRequest -Uri "$URL_RCEDIT" -OutFile "target/rcedit.exe"
-}
 
 # Find the current version
 $VERSION = "$( sbt "print version" --error )".Trim()
@@ -38,7 +51,7 @@ if (Test-Path target/native-image) {
     rm -Recurse -Force -Verbose target/native-image
 }
 sbt nativeImage
-target/rcedit.exe "target/native-image/mppatch-installer.exe" `
+target/deps/rcedit.exe "target/native-image/mppatch-installer.exe" `
     --set-version-string "FileDescription" "MPPatch Installer - Native Image Installer" `
     --set-file-version "$FILE_VERSION" `
     --set-version-string "ProductName" "MPPatch" `
@@ -78,7 +91,7 @@ echo "Writing NSIS split resources..."
 [System.IO.File]::WriteAllBytes("target/mppatch-installer-data.dat", @($bytes[$nsisLocation..($bytes.Count - 1)]))
 
 echo "Building final installer..."
-target/rcedit.exe "target/mppatch-installer-stub.exe" `
+target/deps/rcedit.exe "target/mppatch-installer-stub.exe" `
     --set-version-string "FileDescription" "MPPatch Installer" `
     --set-file-version "$FILE_VERSION" `
     --set-version-string "ProductName" "MPPatch" `

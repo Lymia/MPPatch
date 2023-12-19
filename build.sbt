@@ -64,6 +64,7 @@ libraryDependencies += "org.tukaani"             % "xz"                   % "1.9
 ThisBuild / assemblyMergeStrategy := {
   case x if x.startsWith("moe/lymia")       => MergeStrategy.first
   case x if x.endsWith("module-info.class") => MergeStrategy.discard
+  case x if x.startsWith("com/intellij")    => MergeStrategy.first // for debug builds
   case x =>
     val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
     oldStrategy(x)
@@ -71,7 +72,7 @@ ThisBuild / assemblyMergeStrategy := {
 
 // Build native binaries
 nativeImageInstalled := true
-nativeImageGraalHome := (target.value / f"graalvm-${PlatformType.currentPlatform.name}").toPath
+nativeImageGraalHome := (target.value / "deps" / f"graalvm-${PlatformType.currentPlatform.name}").toPath
 
 nativeImageOptions += "--no-fallback"
 nativeImageOptions += "-Djava.awt.headless=false"

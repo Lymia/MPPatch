@@ -22,13 +22,13 @@
 # THE SOFTWARE.
 #
 
-. scripts/ci/install-graalvm.sh
+. scripts/ci/install-deps.sh
 
 JAR_NAME="$(sbt "print assembly" --error || exit 1)"
 
 rm -rfv target/native-image-config-temp scripts/native-image-config/linux || exit 1
 mkdir -p scripts/native-image-config/linux || exit 1
-target/graalvm-linux/bin/java \
+target/deps/graalvm-linux/bin/java \
   -agentlib:native-image-agent=config-output-dir=target/native-image-config-temp \
   -jar "$JAR_NAME" @nativeImageGenerateConfig 9e3c6db9-2a2f-4a22-9eb5-fba1a710449c || exit 1
 scripts/python/merge-configs.py linux || exit 1

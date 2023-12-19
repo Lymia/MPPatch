@@ -6,6 +6,12 @@
     "name": "[C"
   },
   {
+    "name": "[Lcom.fasterxml.jackson.databind.deser.Deserializers;"
+  },
+  {
+    "name": "[Lcom.fasterxml.jackson.databind.ser.Serializers;"
+  },
+  {
     "name": "[Ljava.awt.event.MouseMotionListener;"
   },
   {
@@ -16,6 +22,21 @@
   },
   {
     "name": "[Ljava.lang.String;"
+  },
+  {
+    "name": "[Lplay.api.libs.json.JsResult;"
+  },
+  {
+    "name": "[Lplay.api.libs.json.JsValue;"
+  },
+  {
+    "name": "com.fasterxml.jackson.databind.ext.Java7SupportImpl",
+    "methods": [
+      {
+        "name": "<init>",
+        "parameterTypes": []
+      }
+    ]
   },
   {
     "name": "com.formdev.flatlaf.FlatDarculaLaf",
@@ -3121,6 +3142,14 @@
     ]
   },
   {
+    "name": "java.util.concurrent.atomic.AtomicReference",
+    "fields": [
+      {
+        "name": "value"
+      }
+    ]
+  },
+  {
     "name": "java.util.concurrent.atomic.Striped64",
     "fields": [
       {
@@ -3130,6 +3159,29 @@
         "name": "cellsBusy"
       }
     ]
+  },
+  {
+    "name": "javax.imageio.spi.ImageReaderSpi"
+  },
+  {
+    "name": "javax.imageio.spi.ImageReaderWriterSpi",
+    "methods": [
+      {
+        "name": "getFileSuffixes",
+        "parameterTypes": []
+      },
+      {
+        "name": "getFormatNames",
+        "parameterTypes": []
+      },
+      {
+        "name": "getMIMETypes",
+        "parameterTypes": []
+      }
+    ]
+  },
+  {
+    "name": "javax.imageio.spi.ImageWriterSpi"
   },
   {
     "name": "javax.swing.AbstractButton",
@@ -3697,6 +3749,14 @@
     ]
   },
   {
+    "name": "moe.lymia.mppatch.ui.ConfigurationStore$",
+    "fields": [
+      {
+        "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
     "name": "moe.lymia.mppatch.ui.FrameBase$ActionButton",
     "methods": [
       {
@@ -3724,6 +3784,9 @@
   {
     "name": "moe.lymia.mppatch.ui.FrameUtils$",
     "fields": [
+      {
+        "name": "iconSet$lzy1"
+      },
       {
         "name": "symbolFont$lzy1"
       }
@@ -3755,21 +3818,70 @@
     "allDeclaredFields": true
   },
   {
-    "name": "moe.lymia.mppatch.ui.InstallerMain",
+    "name": "moe.lymia.mppatch.ui.InstallationConfiguration$$anon$1",
     "fields": [
       {
-        "name": "i18n$lzy1"
+        "name": "underlying$lzy1"
       }
     ]
   },
   {
-    "name": "moe.lymia.mppatch.ui.MainFrame",
+    "name": "moe.lymia.mppatch.ui.InstallationConfiguration$$anon$2",
+    "fields": [
+      {
+        "name": "underlying$lzy2"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.LegacyMainFrame",
     "fields": [
       {
         "name": "ActionButton$lzy1"
       },
       {
         "name": "i18n$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "moe.lymia.mppatch.ui.MPPatchInstaller$",
+    "fields": [
+      {
+        "name": "appImageContents$lzy1"
+      },
+      {
+        "name": "appImageFileLocation$lzy1"
+      },
+      {
+        "name": "baseDirectory$lzy1"
+      },
+      {
+        "name": "defaultPackageSource$lzy1"
+      },
+      {
+        "name": "i18n$lzy1"
+      },
+      {
+        "name": "isAppImage$lzy1"
+      },
+      {
+        "name": "isNsis$lzy1"
+      },
+      {
+        "name": "isSbt$lzy1"
+      },
+      {
+        "name": "logFile$lzy1"
+      },
+      {
+        "name": "nsisContents$lzy1"
+      },
+      {
+        "name": "nsisFileLocation$lzy1"
+      },
+      {
+        "name": "platform$lzy1"
       }
     ]
   },
@@ -3803,6 +3915,9 @@
         "name": "commit$lzy1"
       },
       {
+        "name": "isCi$lzy1"
+      },
+      {
         "name": "isDirty$lzy1"
       },
       {
@@ -3829,6 +3944,146 @@
   },
   {
     "name": "net.miginfocom.swing.MigLayout"
+  },
+  {
+    "name": "play.api.libs.json.JsPath",
+    "fields": [
+      {
+        "name": "PathMissingError$lzy1"
+      },
+      {
+        "name": "json$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "play.api.libs.json.Json$",
+    "fields": [
+      {
+        "name": "Placeholder$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "play.api.libs.json.Reads$",
+    "fields": [
+      {
+        "name": "ArrayNodeReads$lzy1"
+      },
+      {
+        "name": "BigIntReads$lzy1"
+      },
+      {
+        "name": "BigIntegerReads$lzy1"
+      },
+      {
+        "name": "BooleanReads$lzy1"
+      },
+      {
+        "name": "ByteReads$lzy1"
+      },
+      {
+        "name": "DoubleReads$lzy1"
+      },
+      {
+        "name": "FloatReads$lzy1"
+      },
+      {
+        "name": "IntReads$lzy1"
+      },
+      {
+        "name": "IsoDateReads$lzy1"
+      },
+      {
+        "name": "JsArrayReads$lzy1"
+      },
+      {
+        "name": "JsBooleanReads$lzy1"
+      },
+      {
+        "name": "JsNumberReads$lzy1"
+      },
+      {
+        "name": "JsObjectReads$lzy1"
+      },
+      {
+        "name": "JsStringReads$lzy1"
+      },
+      {
+        "name": "JsValueReads$lzy1"
+      },
+      {
+        "name": "JsonNodeReads$lzy1"
+      },
+      {
+        "name": "LongReads$lzy1"
+      },
+      {
+        "name": "ObjectNodeReads$lzy1"
+      },
+      {
+        "name": "ShortReads$lzy1"
+      },
+      {
+        "name": "StringReads$lzy1"
+      },
+      {
+        "name": "TemporalParser$lzy1"
+      }
+    ]
+  },
+  {
+    "name": "play.api.libs.json.Writes$",
+    "fields": [
+      {
+        "name": "BigDecimalWrites$lzy1"
+      },
+      {
+        "name": "BigIntWrites$lzy1"
+      },
+      {
+        "name": "BigIntegerWrites$lzy1"
+      },
+      {
+        "name": "BooleanWrites$lzy1"
+      },
+      {
+        "name": "ByteWrites$lzy1"
+      },
+      {
+        "name": "DefaultDateWrites$lzy1"
+      },
+      {
+        "name": "DoubleWrites$lzy1"
+      },
+      {
+        "name": "FloatWrites$lzy1"
+      },
+      {
+        "name": "IntWrites$lzy1"
+      },
+      {
+        "name": "JsValueWrites$lzy1"
+      },
+      {
+        "name": "JsonNodeWrites$lzy1"
+      },
+      {
+        "name": "LongWrites$lzy1"
+      },
+      {
+        "name": "ShortWrites$lzy1"
+      },
+      {
+        "name": "StringWrites$lzy1"
+      },
+      {
+        "name": "TemporalFormatter$lzy1"
+      },
+      {
+        "name": "UuidWrites$lzy1"
+      }
+    ]
   },
   {
     "name": "scala.xml.PrettyPrinter",

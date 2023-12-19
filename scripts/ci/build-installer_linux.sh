@@ -22,9 +22,7 @@
 # THE SOFTWARE.
 #
 
-. scripts/ci/install-graalvm.sh
-
-LINUXDEPLOY_DL="https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20231026-1/linuxdeploy-x86_64.AppImage"
+. scripts/ci/install-deps.sh
 
 echo "Extracting native tarballs..."
 rm -rfv target/native-bin || exit 1
@@ -45,12 +43,6 @@ echo "Building assembly jar..."
 ASSEMBLY_JAR="$(sbt "print assembly" --error || exit 1)"
 echo "ASSEMBLY_JAR=$ASSEMBLY_JAR"
 cp "$(echo "$ASSEMBLY_JAR" | head -n 1 | tr -d '\n')" target/"$ASSEMBLY_NAME" || exit 1
-
-echo "Downloading tools..."
-if [ ! -f target/linuxdeploy ]; then
-  wget -O target/linuxdeploy "$LINUXDEPLOY_DL" || exit 1
-  chmod +x target/linuxdeploy || exit 1
-fi
 
 echo "Cleaning up after previous scripts..."
 rm -rfv target/native-image target/dist-build || exit 1
@@ -80,6 +72,6 @@ cd ../../../.. || exit 1
 # Build AppImage
 echo "Building AppImage..."
 cd target/dist-build/linux || exit 1
-  LDAI_COMP=xz ../../linuxdeploy --appdir AppDir/ --output appimage || exit 1
+  LDAI_COMP=xz ../../deps/linuxdeploy --appdir AppDir/ --output appimage || exit 1
 cd ../../.. || exit 1
 cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/"$APPIMAGE_NAME" || exit 1

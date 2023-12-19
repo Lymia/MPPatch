@@ -257,10 +257,10 @@
   }]},
   "bundles":[{
     "name":"com.formdev.flatlaf.resources.Bundle",
-    "locales":[""]
+    "locales":["", "und"]
   }, {
     "name":"com.sun.org.apache.xml.internal.serializer.XMLEntities",
-    "locales":[""]
+    "locales":["", "und"]
   }, {
     "name":"com.sun.swing.internal.plaf.basic.resources.basic",
     "classNames":["com.sun.swing.internal.plaf.basic.resources.basic"]
