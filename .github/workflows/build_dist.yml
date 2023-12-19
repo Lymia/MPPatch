@@ -39,7 +39,7 @@ jobs:
       - run: scripts/ci/build-natives_linux.sh
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux.tar.gz
@@ -63,7 +63,7 @@ jobs:
       - run: git fetch --prune --unshallow --tags
 
       # Download artifacts
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux
@@ -74,7 +74,7 @@ jobs:
       - run: scripts/ci/build-installer_linux.sh
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: mppatch_ci_installer-linux
           path: target/MPPatch-Installer_*
@@ -107,7 +107,7 @@ jobs:
           scoop install nsis
 
       # Download artifacts
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux
@@ -118,7 +118,7 @@ jobs:
       - run: powershell -file scripts/ci/build-installer_win32.ps1
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v3
         with:
           name: mppatch_ci_installer-win32
           path: target/MPPatch-Installer_*
@@ -139,11 +139,11 @@ jobs:
         run: 'echo "VERSION_STR=ci_build-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV'
 
       # Download artifacts
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: mppatch_ci_installer-linux
           path: mppatch_ci_installer-linux
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v3
         with:
           name: mppatch_ci_installer-win32
           path: mppatch_ci_installer-win32

@@ -83,3 +83,6 @@ cd target/dist-build/linux || exit 1
   LDAI_COMP=xz ../../linuxdeploy --appdir AppDir/ --output appimage || exit 1
 cd ../../.. || exit 1
 cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/"$APPIMAGE_NAME" || exit 1
+
+# Debug
+ls target
