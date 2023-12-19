@@ -23,8 +23,9 @@
 package moe.lymia.mppatch.util
 
 import java.util.{Date, Properties}
-
 import moe.lymia.mppatch.util.io.IOUtils
+
+import java.io.StringReader
 
 trait VersionInfoSource {
   def apply(key: String, default: String): String
@@ -45,6 +46,11 @@ object NullSource extends VersionInfoSource {
   def apply(key: String, default: String) = default
 }
 case class PropertiesSource(prop: Properties) extends VersionInfoSource {
+  def this(str: String) = this({
+      val prop = new Properties()
+      prop.load(new StringReader(str))
+      prop
+  })
   def apply(key: String, default: String) = {
     val p = prop.getProperty(key)
     if (p == null || p.trim.isEmpty) default else p

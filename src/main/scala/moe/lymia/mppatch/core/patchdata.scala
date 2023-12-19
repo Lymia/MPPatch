@@ -22,6 +22,7 @@
 
 package moe.lymia.mppatch.core
 
+import moe.lymia.mppatch.util.{PropertiesSource, VersionInfo}
 import moe.lymia.mppatch.util.io.*
 import moe.lymia.mppatch.util.io.XMLUtils.*
 
@@ -30,17 +31,15 @@ import java.nio.file.{Files, Path}
 import scala.xml.{Node, XML}
 
 case class XmlPatchManifest(
-    patchVersion: String,
-    timestamp: Long,
     installScripts: Seq[String]
 )
 object XmlPatchManifest {
-  def loadFromXML(xml: Node) = {
+  def loadFromSource(source: DataSource) = {
+    val xml = XML.loadString(source.loadResource("manifest.xml"))
+
     val manifestVersion = getAttribute(xml, "ManifestVersion")
     if (manifestVersion != "1") sys.error("Unknown ManifestVersion: " + manifestVersion)
     XmlPatchManifest(
-      getAttribute(xml, "PatchVersion"),
-      getAttribute(xml, "Timestamp").toLong,
       (xml \ "InstallScript").map(loadSource)
     )
   }
@@ -131,7 +130,10 @@ object XmlCleanupData {
 class PatchPackage(val source: DataSource) {
 
   /** The manifest for this patch. */
-  lazy val patchManifest = XmlPatchManifest.loadFromXML(XML.loadString(source.loadResource("manifest.xml")))
+  lazy val patchManifest = XmlPatchManifest.loadFromSource(source)
+
+  /** The version information stored in this patch. */
+  lazy val versionInfo = new VersionInfo(new PropertiesSource(source.loadResource("version.properties")))
 
   /** The list of install scripts available in this package. */
   lazy val scripts = patchManifest.installScripts.map(x => XmlInstallScript.loadFromXML(source.loadXML(x)))
@@ -155,6 +157,7 @@ class InstallScript private[core] (val pkg: PatchPackage, val script: XmlInstall
 
   lazy val source        = pkg.source
   lazy val patchManifest = pkg.patchManifest
+  lazy val versionInfo   = pkg.versionInfo
   lazy val cleanup       = script.cleanupData
 
   def makeFileSet(packages: Set[String], sha256: String) =

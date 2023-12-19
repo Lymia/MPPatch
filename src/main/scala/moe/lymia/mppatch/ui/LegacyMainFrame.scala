@@ -158,7 +158,7 @@ class LegacyMainFrame(val locale: Locale) extends FrameBase[JFrame] {
     uninstallButton.setEnabled(false)
     uninstallButton.setStatusAction("action.uninstall", actionUninstall)
 
-    targetVersion.setText(patchPackage.patchManifest.patchVersion)
+    targetVersion.setText(patchPackage.versionInfo.versionString)
 
     lastPatchStatus = None
 

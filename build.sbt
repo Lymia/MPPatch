@@ -64,6 +64,7 @@ ThisBuild / assemblyMergeStrategy := {
   case x if x.startsWith("moe/lymia")       => MergeStrategy.first
   case x if x.endsWith("module-info.class") => MergeStrategy.discard
   case x if x.startsWith("com/intellij")    => MergeStrategy.first // for debug builds
+  case x if x.endsWith(".tasty")            => MergeStrategy.discard
   case x =>
     val oldStrategy = (ThisBuild / assemblyMergeStrategy).value
     oldStrategy(x)
@@ -71,6 +72,10 @@ ThisBuild / assemblyMergeStrategy := {
 
 // Build native binaries
 nativeImageInstalled := true
+nativeImageOutput := {
+  IO.createDirectory(target.value / s"native-image-${PlatformType.currentPlatform.name}")
+  target.value / s"native-image-${PlatformType.currentPlatform.name}" / name.value
+}
 nativeImageGraalHome := (target.value / "deps" / f"graalvm-${PlatformType.currentPlatform.name}").toPath
 
 nativeImageOptions += "--no-fallback"
@@ -81,6 +86,7 @@ nativeImageOptions += s"-H:ConfigurationFileDirectories=${baseDirectory.value / 
 Global / excludeLintKeys += nativeImageJvm
 Global / excludeLintKeys += nativeImageJvmIndex
 Global / excludeLintKeys += nativeImageVersion
+Global / excludeLintKeys += NativeImage / name
 
 InputKey[Unit]("buildNative") := PatchBuild.Keys.buildDylibDir.value
 

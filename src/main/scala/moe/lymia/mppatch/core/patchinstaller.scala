@@ -187,7 +187,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   }
 
   def installedVersion = loadPatchState().map(_.installedVersion)
-  def isDowngrade      = loadPatchState().fold(0L)(_.installedTimestamp) > install.patchManifest.timestamp
+  def isDowngrade      = loadPatchState().fold(0L)(_.installedTimestamp) > install.versionInfo.buildDate.getTime
 
   private def intCheckPatchStatus(packages: Set[String]) = {
     log.info("Checking patch status...")
@@ -220,8 +220,8 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
                 else PatchStatus.UnknownUpdate
               } else if (install.supportedHash(patchState.sha256)) {
                 if (
-                  patchState.installedTimestamp != install.patchManifest.timestamp ||
-                  patchState.installedVersion != install.patchManifest.patchVersion
+                  patchState.installedTimestamp != install.versionInfo.buildDate.getTime ||
+                  patchState.installedVersion != install.versionInfo.versionString
                 ) PatchStatus.NeedsUpdate
                 else if (patchState.packages != packages) PatchStatus.PackageChange
                 else PatchStatus.Installed
@@ -285,8 +285,8 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
       renameData,
       patchNewFiles.map(_._1),
       patchNewFiles.flatMap(_._2),
-      install.patchManifest.patchVersion,
-      install.patchManifest.timestamp
+      install.versionInfo.versionString,
+      install.versionInfo.buildDate.getTime
     )
     IOUtils.writeXML(patchStatePath, PatchState.serialize(state))
   }

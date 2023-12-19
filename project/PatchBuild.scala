@@ -58,14 +58,8 @@ object PatchBuild {
       val log = streams.value.log
 
       def loadFromDir(dir: File) =
-        Path
-          .allSubpaths(dir)
-          .filter(_._1.isFile)
-          .map(x => PatchFile(dir.getName + "/" + x._2, IO.readBytes(x._1)))
-          .toSeq
-
-      val patchPath   = baseDirectory.value / "src" / "patch"
-      val copiedFiles = loadFromDir(patchPath / "install") ++ loadFromDir(patchPath / "ui")
+        Path.allSubpaths(dir).filter(_._1.isFile).map(x => PatchFile(x._2, IO.readBytes(x._1))).toSeq
+      val copiedFiles = loadFromDir(baseDirectory.value / "src" / "patch" / "static")
 
       val nativeDirFiles = Keys.nativesDir.value.listFiles()
       if (nativeDirFiles == null) sys.error("native-bin does not exist!")
@@ -107,16 +101,8 @@ object PatchBuild {
 
       val versionFile = PatchFile("version.properties", IO.readBytes(InstallerResourceBuild.Keys.versionFile.value))
 
-      val xmlWriter = new PrettyPrinter(Int.MaxValue, 4)
-      val output = <PatchManifest ManifestVersion="1" PatchVersion={version.value}
-                                  Timestamp={System.currentTimeMillis().toString}>
-        {XML.loadString(IO.read(patchPath / "manifest.xml")).child}
-      </PatchManifest>
-      val manifestFile =
-        PatchFile("manifest.xml", "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" + xmlWriter.format(output))
-
       // Final generated files list
-      (versionInfo +: versionFile +: manifestFile +: (patchFiles ++ copiedFiles)).toMap
+      (versionInfo +: versionFile +: (patchFiles ++ copiedFiles)).toMap
     },
     Compile / resourceGenerators += Def.task {
       val basePath    = (Compile / resourceManaged).value

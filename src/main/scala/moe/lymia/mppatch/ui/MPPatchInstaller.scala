@@ -157,7 +157,8 @@ object MPPatchInstaller extends LaunchFrameError {
         // start development main frame
         log.warn("Launching development installer version!")
         ConfigurationStore.updatePreferences(defaultCivilizationPath)
-        new MainFrame(locale).showForm()
+        if (args.length == 1 && args(0) == "--new") new MainFrame(locale).showForm()
+        else new LegacyMainFrame(locale).showForm()
       }
     } catch {
       case _: InstallerException => // ignored
