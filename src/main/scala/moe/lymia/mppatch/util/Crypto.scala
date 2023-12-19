@@ -22,7 +22,9 @@
 
 package moe.lymia.mppatch.util
 
+import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
+import java.util.Base64
 
 object Crypto {
   def digest(algorithm: String, data: Array[Byte]) = {
@@ -32,11 +34,18 @@ object Crypto {
   }
   def hexdigest(algorithm: String, data: Array[Byte]) =
     digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
+  def b64digest(algorithm: String, data: Array[Byte]) =
+    new String(Base64.getEncoder.encode(digest(algorithm, data)), StandardCharsets.UTF_8).replace("=", "")
 
   def md5_hex(data: Array[Byte])    = hexdigest("MD5", data)
   def sha1_hex(data: Array[Byte])   = hexdigest("SHA-1", data)
   def sha256_hex(data: Array[Byte]) = hexdigest("SHA-256", data)
   def sha512_hex(data: Array[Byte]) = hexdigest("SHA-512", data)
+
+  def md5_b64(data: Array[Byte])    = b64digest("MD5", data)
+  def sha1_b64(data: Array[Byte])   = b64digest("SHA-1", data)
+  def sha256_b64(data: Array[Byte]) = b64digest("SHA-256", data)
+  def sha512_b64(data: Array[Byte]) = b64digest("SHA-512", data)
 
   def md5(data: Array[Byte])    = digest("MD5", data)
   def sha1(data: Array[Byte])   = digest("SHA-1", data)
