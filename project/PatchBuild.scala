@@ -129,8 +129,9 @@ object PatchBuild {
   }
 
   object Keys {
-    val nativesDir    = TaskKey[File]("patch-natives-dir")
-    val patchFiles    = TaskKey[Map[String, Array[Byte]]]("patch-build-files")
-    val buildDylibDir = TaskKey[File]("build-dylib-dir")
+    val nativesDir        = TaskKey[File]("patch-natives-dir")
+    val patchFiles        = TaskKey[Map[String, Array[Byte]]]("patch-build-files")
+    val buildDylibDir     = TaskKey[File]("build-dylib-dir")
+    val buildPatchPackage = TaskKey[Unit]("mppatch-build-patch-package")
   }
 }

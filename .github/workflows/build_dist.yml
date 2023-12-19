@@ -44,19 +44,16 @@ jobs:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux.tar.gz
 
-  buildInstallerLinux:
+  buildNativeImageLinux:
     runs-on: ubuntu-latest
     needs:
       - buildNative
     steps:
-      # Install packages
+      # Initialize
       - uses: actions/setup-java@v3
         with:
           distribution: 'liberica'
           java-version: '21'
-      - run: sudo apt install libfuse2
-
-      # Initialize git
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
@@ -71,6 +68,70 @@ jobs:
       - run: rm -rf target/mppatch_ci_natives-linux
 
       # Do the actual build
+      - run: scripts/ci/build-ni_linux.sh
+
+      # Upload artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mppatch_ci_ni-linux
+          path: target/native-image-linux/*
+
+  buildNativeImageWindows:
+    runs-on: windows-latest
+    needs:
+      - buildNative
+    steps:
+      # Initialize
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'liberica'
+          java-version: '21'
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: git fetch --prune --unshallow --tags
+
+      # Download artifacts
+      - uses: actions/download-artifact@v3
+        with:
+          name: mppatch_ci_natives-linux.tar.gz
+          path: target/mppatch_ci_natives-linux
+      - run: mv target/mppatch_ci_natives-linux/* target/
+      - run: rm -Recurse -Force -Verbose target/mppatch_ci_natives-linux
+
+      # Do the actual build
+      - uses: ilammy/msvc-dev-cmd@v1
+      - run: pwsh -file scripts/ci/build-ni_win32.ps1
+
+      # Upload artifacts
+      - uses: actions/upload-artifact@v3
+        with:
+          name: mppatch_ci_ni-win32
+          path: target/native-image-win32/*
+
+  buildInstallerLinux:
+    runs-on: ubuntu-latest
+    needs:
+      - buildNativeImageLinux
+    steps:
+      # Initialize
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'liberica'
+          java-version: '21'
+      - uses: actions/checkout@v2
+        with:
+          submodules: 'recursive'
+      - run: git fetch --prune --unshallow --tags
+      - run: sudo apt install libfuse2
+
+      # Download artifacts
+      - uses: actions/download-artifact@v3
+        with:
+          name: mppatch_ci_ni-linux
+          path: target/native-image-linux
+
+      # Do the actual build
       - run: scripts/ci/build-installer_linux.sh
 
       # Upload artifacts
@@ -82,33 +143,26 @@ jobs:
   buildInstallerWindows:
     runs-on: windows-latest
     needs:
-      - buildNative
+      - buildNativeImageWindows
     steps:
-      # Install packages
+      # Initialize
       - uses: actions/setup-java@v3
         with:
           distribution: 'liberica'
           java-version: '21'
-
-      # Initialize git
       - uses: actions/checkout@v2
         with:
           submodules: 'recursive'
       - run: git fetch --prune --unshallow --tags
 
-      # Install dependencies
-      - uses: ilammy/msvc-dev-cmd@v1
-      - run: choco install nsis
-
       # Download artifacts
       - uses: actions/download-artifact@v3
         with:
-          name: mppatch_ci_natives-linux.tar.gz
-          path: target/mppatch_ci_natives-linux
-      - run: mv target/mppatch_ci_natives-linux/* target/
-      - run: rm -Recurse -Force -Verbose target/mppatch_ci_natives-linux
+          name: mppatch_ci_ni-win32
+          path: target/native-image-win32
 
       # Do the actual build
+      - run: choco install nsis
       - run: pwsh -file scripts/ci/build-installer_win32.ps1
 
       # Upload artifacts

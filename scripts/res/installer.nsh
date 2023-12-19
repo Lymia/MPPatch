@@ -28,7 +28,7 @@ Section "Extract and execute wrapped installer"
     RMDir /r $TEMP\MPPatchInstaller
     SetOutPath $TEMP\MPPatchInstaller
 
-    File ..\..\target\native-image\*
+    File ..\..\target\native-image-win32\*
 
     System::Call 'Kernel32::SetEnvironmentVariable(t, t)i ("NSIS_LAUNCH_MARKER", "018c6bba-54e0-7cf2-b16a-7b6abb9215e0").r0'
     System::Call 'Kernel32::SetEnvironmentVariable(t, t)i ("NSIS_LAUNCH_EXE", "$EXEPATH").r0'

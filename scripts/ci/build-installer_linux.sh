@@ -24,40 +24,22 @@
 
 . scripts/ci/install-deps.sh
 
-echo "Extracting native tarballs..."
-rm -rfv target/native-bin || exit 1
-mkdir -vp target/native-bin || exit 1
-cd target/native-bin || exit 1
-  tar -xv -f ../../target/mppatch_ci_natives-linux.tar.gz
-cd ../.. || exit 1
-
 echo "Gathering facts from SBT..."
 sbt "print scalaVersion" || exit 1 # get project files cached, required to wrangle CI
 VERSION="$(sbt "print version" --error || exit 1)"
 VERSION="$(echo "$VERSION" | head -n 1 | tr -d '\n')"
-echo "VERSION=$VERSION"
 APPIMAGE_NAME="MPPatch-Installer_linux_$VERSION.AppImage"
-ASSEMBLY_NAME="MPPatch-Installer_universal_$VERSION.jar"
-
-echo "Building assembly jar..."
-ASSEMBLY_JAR="$(sbt "print assembly" --error || exit 1)"
-echo "ASSEMBLY_JAR=$ASSEMBLY_JAR"
-cp "$(echo "$ASSEMBLY_JAR" | head -n 1 | tr -d '\n')" target/"$ASSEMBLY_NAME" || exit 1
 
 echo "Cleaning up after previous scripts..."
-rm -rfv target/native-image target/dist-build || exit 1
-mkdir -p target/native-image target/dist-build || exit 1
-
-echo "Building Linux installer...."
-sbt nativeImage || exit 1
-chmod +x target/native-image/*.so || exit 1
+rm -rfv target/dist-build || exit 1
+mkdir -p target/dist-build || exit 1
 
 echo "Building AppDir for Linux installer..."
 mkdir -pv target/dist-build/linux/AppDir || exit 1
 
 # Build basic directory structure
 cd target/dist-build/linux/AppDir || exit 1
-  cp -rv ../../../native-image/* . || exit 1
+  cp -rv ../../../native-image-linux/* . || exit 1
   mkdir -pv usr/bin usr/lib usr/share/applications usr/share/icons/hicolor/scalable/apps || exit 1
   mv -v mppatch-installer usr/bin/ || exit 1
   mv -v *.so usr/lib/ || exit 1
