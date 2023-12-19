@@ -23,7 +23,8 @@ if (-Not(Test-Path "target/rcedit.exe" -PathType Leaf)) {
 }
 
 # Find the current version
-$VERSION = "$( sbt "print version" --error )".Trim().Replace(" ", "")
+$VERSION = "$( sbt "print version" --error )".Trim()
+$VERSION = $VERSION.Split(" ")[0].Trim() # fix a weird Github Actions difference
 $FILE_VERSION = "$VERSION".Split("-")[0]
 $FILE_VERSION = "$FILE_VERSION.$( git rev-list HEAD --count )"
 $INSTALLER_NAME = "MPPatch-Installer_win32_$VERSION.exe"
@@ -86,11 +87,4 @@ target/rcedit.exe "target/mppatch-installer-stub.exe" `
     --set-version-string "OriginalFilename" "$INSTALLER_NAME" `
     --set-icon "scripts/res/mppatch-installer.ico" `
     --application-manifest "scripts/res/win32-manifest.xml"
-
-if ((get-host).version.major -le 5) {
-    Get-Content "target/mppatch-installer-stub.exe","target\mppatch-installer-data.dat" -Encoding Byte -Read 1024 `
-        | Set-Content "target\$INSTALLER_NAME" -Encoding Byte
-} else {
-    Get-Content "target/mppatch-installer-stub.exe","target\mppatch-installer-data.dat" -AsByteStream -Read 1024 `
-        | Set-Content "target\$INSTALLER_NAME" -AsByteStream
-}
+cmd /c copy /b "target\mppatch-installer-stub.exe" + "target\mppatch-installer-data.dat" "target\$INSTALLER_NAME"
