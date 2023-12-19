@@ -86,4 +86,11 @@ target/rcedit.exe "target/mppatch-installer-stub.exe" `
     --set-version-string "OriginalFilename" "$INSTALLER_NAME" `
     --set-icon "scripts/res/mppatch-installer.ico" `
     --application-manifest "scripts/res/win32-manifest.xml"
-cmd /c copy /b "target\mppatch-installer-stub.exe" + "target\mppatch-installer-data.dat" "target\$INSTALLER_NAME"
+
+if ((get-host).version.major -le 5) {
+    Get-Content "target/mppatch-installer-stub.exe","target\mppatch-installer-data.dat" -Encoding Byte -Read 1024 `
+        | Set-Content "target\$INSTALLER_NAME" -Encoding Byte
+} else {
+    Get-Content "target/mppatch-installer-stub.exe","target\mppatch-installer-data.dat" -AsByteStream -Read 1024 `
+        | Set-Content "target\$INSTALLER_NAME" -AsByteStream
+}
