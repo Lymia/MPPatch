@@ -22,104 +22,69 @@
 
 package moe.lymia.mppatch.core
 
-import moe.lymia.mppatch.util.{PropertiesSource, VersionInfo}
 import moe.lymia.mppatch.util.io.*
 import moe.lymia.mppatch.util.io.XMLUtils.*
+import moe.lymia.mppatch.util.{EncodingUtils, PropertiesSource, VersionInfo}
+import play.api.libs.json.{Json, OFormat}
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
-import scala.xml.{Node, XML}
+import scala.xml.Node
 
-case class XmlPatchManifest(
-    installScripts: Seq[String]
-)
-object XmlPatchManifest {
-  def loadFromSource(source: DataSource) = {
-    val xml = XML.loadString(source.loadResource("manifest.xml"))
-
-    val manifestVersion = getAttribute(xml, "ManifestVersion")
-    if (manifestVersion != "1") sys.error("Unknown ManifestVersion: " + manifestVersion)
-    XmlPatchManifest(
-      (xml \ "InstallScript").map(loadSource)
-    )
-  }
-}
-
-case class XmlInstallScript(
+case class JsonPatchManifest(installScripts: Seq[String])
+case class JsonInstallScript(
+    game: String,
+    gameType: String,
     platform: String,
     steamId: Int,
     assetsPath: String,
     checkFor: Set[String],
     hashFrom: String,
-    supportedHashes: Set[String],
-    packages: Map[String, XmlPackage],
-    cleanupData: XmlCleanupData
-) {
-  def loadPackage(name: String) = packages.getOrElse(name, sys.error("no such package " + name))
+    supportedHashes: Map[String, String],
+    packages: Map[String, JsonPackage],
+    cleanup: JsonCleanup
+)
+case class JsonCleanup(renames: Seq[JsonRename], checkFile: Seq[String])
+case class JsonPackage(
+    depends: Option[Set[String]],
+    renameFile: Option[Seq[JsonRename]],
+    writeFile: Option[Seq[JsonWriteFile]],
+    writeConfig: Option[Seq[String]],
+    writeDlc: Option[Seq[JsonWriteDLC]],
+    enableFeature: Option[Set[String]]
+)
+case class JsonRename(from: String, to: String)
+case class JsonWriteFile(from: String, to: String, exec: Option[Boolean])
+case class JsonWriteDLC(from: String, to: String, textData: String)
+
+object JsonFormats {
+  implicit lazy val PatchManifest: OFormat[JsonPatchManifest] = Json.format[JsonPatchManifest]
+  implicit lazy val InstallScript: OFormat[JsonInstallScript] = Json.format[JsonInstallScript]
+  implicit lazy val Cleanup: OFormat[JsonCleanup]             = Json.format[JsonCleanup]
+  implicit lazy val Package: OFormat[JsonPackage]             = Json.format[JsonPackage]
+  implicit lazy val Rename: OFormat[JsonRename]               = Json.format[JsonRename]
+  implicit lazy val WriteFile: OFormat[JsonWriteFile]         = Json.format[JsonWriteFile]
+  implicit lazy val WriteDLC: OFormat[JsonWriteDLC]           = Json.format[JsonWriteDLC]
+}
+import JsonFormats.*
+
+private object PackageUtils {
+  def loadPackage(script: JsonInstallScript, name: String) =
+    script.packages.getOrElse(name, sys.error(f"no such package $name"))
 
   @annotation.tailrec
-  final def loadPackages(toLoad: Set[String], packages: Set[XmlPackage] = Set()): Set[XmlPackage] = {
-    val loaded = packages.map(_.name)
-    if (loaded == toLoad) packages
+  final def loadPackages(
+      script: JsonInstallScript,
+      toLoad: Set[String],
+      packages: Seq[(String, JsonPackage)] = Seq()
+  ): Seq[JsonPackage] = {
+    val loaded = packages.map(_._1).toSet
+    if (loaded == toLoad) packages.map(_._2)
     else {
-      val newPackages = (toLoad -- loaded).map(loadPackage)
-      loadPackages(toLoad ++ newPackages.flatMap(_.dependencies), packages ++ newPackages)
+      val newPackages = (toLoad -- loaded).map(x => (x, loadPackage(script, x)))
+      loadPackages(script, toLoad ++ newPackages.flatMap(_._2.depends.getOrElse(Set())), packages ++ newPackages)
     }
   }
-}
-object XmlInstallScript {
-  def loadFromXML(xml: Node) =
-    XmlInstallScript(
-      getAttribute(xml, "Platform"),
-      getNodeText(xml, "SteamId").toInt,
-      (xml \ "AssetsPath").map(loadPath).head,
-      (xml \ "CheckFor").map(loadPath).toSet,
-      (xml \ "HashFrom").map(loadPath).head,
-      (xml \ "SupportedHash").map(loadHash).toSet,
-      (xml \ "Package").map(XmlPackage.loadFromXML).map(x => x.name -> x).toMap,
-      (xml \ "Cleanup").map(XmlCleanupData.loadFromXML).head
-    )
-}
-
-case class XmlPackage(
-    name: String,
-    dependencies: Set[String],
-    renames: Seq[XmlRenameFile],
-    writeConfig: Seq[String],
-    additionalFile: Seq[XmlAdditionalFile],
-    writeDLC: Seq[XmlWriteDLC],
-    enableFeature: Set[String]
-)
-object XmlPackage {
-  def loadAdditionalFile(xml: Node) =
-    XmlAdditionalFile(loadPath(xml), loadSource(xml), getBoolAttribute(xml, "SetExecutable"))
-  def loadWriteDLC(xml: Node) =
-    XmlWriteDLC(loadSource(xml), getAttribute(xml, "DLCData"), getAttribute(xml, "TextData"))
-  def loadFromXML(xml: Node) =
-    XmlPackage(
-      getAttribute(xml, "Name"),
-      getOptionalAttribute(xml, "Depends").fold(Set[String]())(_.split(",").toSet),
-      (xml \ "RenameFile").map(XmlRenameFile.loadFromXML),
-      (xml \ "WriteConfig").map(loadPath),
-      (xml \ "AdditionalFile").map(loadAdditionalFile),
-      (xml \ "WriteDLC").map(loadWriteDLC),
-      (xml \ "EnableFeature").map(x => getAttribute(x, "Name")).toSet
-    )
-}
-
-case class XmlRenameFile(filename: String, renameTo: String)
-object XmlRenameFile {
-  def loadFromXML(xml: Node) = XmlRenameFile(loadPath(xml), getAttribute(xml, "RenameTo"))
-}
-
-case class XmlWriteConfig(filename: String, section: String)
-case class XmlAdditionalFile(filename: String, source: String, isExecutable: Boolean)
-case class XmlWriteDLC(source: String, target: String, textData: String)
-
-case class XmlCleanupData(rename: Seq[XmlRenameFile], checkFile: Seq[String])
-object XmlCleanupData {
-  def loadFromXML(xml: Node) =
-    XmlCleanupData((xml \ "RenameIfExists").map(XmlRenameFile.loadFromXML), (xml \ "CheckFile").map(loadPath))
 }
 
 /** Main loader for the game's patch packages.
@@ -128,15 +93,23 @@ object XmlCleanupData {
   *   Where to load patch from.
   */
 class PatchPackage(val source: DataSource) {
+  source.loadResource("manifest_version.txt").strip() match {
+    case "1.0" => // ok
+    case unk   => sys.error(f"Unknown .mppatch-pkg version: $unk")
+  }
 
   /** The manifest for this patch. */
-  lazy val patchManifest = XmlPatchManifest.loadFromSource(source)
+  lazy val patchManifest =
+    EncodingUtils.unwrapJson(Json.fromJson[JsonPatchManifest](Json.parse(source.loadResource("manifest.json"))))
 
   /** The version information stored in this patch. */
   lazy val versionInfo = new VersionInfo(new PropertiesSource(source.loadResource("version.properties")))
 
   /** The list of install scripts available in this package. */
-  lazy val scripts = patchManifest.installScripts.map(x => XmlInstallScript.loadFromXML(source.loadXML(x)))
+  lazy val scripts =
+    patchManifest.installScripts.map(x =>
+      EncodingUtils.unwrapJson(Json.fromJson[JsonInstallScript](Json.parse(source.loadResource(x))))
+    )
 
   /** Detects the platform a Civilization installation directory is for. */
   def detectInstallationPlatform(root: Path): Option[InstallScript] = {
@@ -152,45 +125,47 @@ class PatchPackage(val source: DataSource) {
 }
 
 /** A specific installation script for a specific version of Civilization. */
-class InstallScript private[core] (val pkg: PatchPackage, val script: XmlInstallScript) {
+class InstallScript private[core] (val pkg: PatchPackage, val script: JsonInstallScript) {
   val platform = Platform.forName(script.platform).get
 
-  lazy val source        = pkg.source
-  lazy val patchManifest = pkg.patchManifest
-  lazy val versionInfo   = pkg.versionInfo
-  lazy val cleanup       = script.cleanupData
+  lazy val source      = pkg.source
+  lazy val versionInfo = pkg.versionInfo
+  lazy val cleanup     = script.cleanup
 
   def makeFileSet(packages: Set[String], sha256: String) =
-    InstallFileSet(this, sha256, script.loadPackages(packages).toSeq)
-
-  def supportedHash(hash: String) =
-    script.supportedHashes.contains(hash)
+    InstallFileSet(this, sha256, PackageUtils.loadPackages(script, packages))
+  def supportedHash(hash: String) = script.supportedHashes.contains(hash)
 }
 
 /** A set of files which to be added to a Civilization directory. */
-case class InstallFileSet private[core] (script: InstallScript, sha256: String, packages: Seq[XmlPackage]) {
-  lazy val renames = packages.flatMap(_.renames)
+case class InstallFileSet private[core] (script: InstallScript, sha256: String, packages: Seq[JsonPackage]) {
+  lazy val renames = packages.flatMap(_.renameFile.getOrElse(Seq()))
   def getFiles(basePath: Path, versionName: String): Seq[OutputFile] = {
     val configFileBody =
       f"""# Generated by MPPatch. Do not edit manually.
          |bin_sha256 = "$sha256"
-         |features = [${packages.flatMap(_.enableFeature).map(x => "\"" + x + "\"").distinct.sorted.mkString(",")}]
+         |features = [${packages
+          .flatMap(_.enableFeature.getOrElse(Set()))
+          .map(x => "\"" + x + "\"")
+          .distinct
+          .sorted
+          .mkString(",")}]
          |""".stripMargin
 
     val configFiles = packages
-      .flatMap(_.writeConfig)
+      .flatMap(_.writeConfig.getOrElse(Seq()))
       .map(x => OutputFile(x, configFileBody.getBytes(StandardCharsets.UTF_8)))
     val additionalFiles = packages
-      .flatMap(_.additionalFile)
-      .map(x => OutputFile(x.filename, script.source.loadBinaryResource(x.source), x.isExecutable))
+      .flatMap(_.writeFile.getOrElse(Seq()))
+      .map(x => OutputFile(x.to, script.source.loadBinaryResource(x.from), x.exec.getOrElse(false)))
 
     val assetPath = script.script.assetsPath
     val assets    = script.platform.resolve(basePath, assetPath)
-    val dlcFiles = packages.flatMap(_.writeDLC).flatMap { x =>
-      val uiPatch = script.pkg.loadUIPatch(x.source)
+    val dlcFiles = packages.flatMap(_.writeDlc.getOrElse(Seq())).flatMap { x =>
+      val uiPatch = script.pkg.loadUIPatch(x.from)
       val dlc     = new CivDlcBuilder(script.source, uiPatch).generateBaseDLC(assets, script.platform)
       val dlcMap = DLCDataWriter.writeDLC(
-        s"$assetPath/${script.platform.mapPath(x.target)}",
+        s"$assetPath/${script.platform.mapPath(x.to)}",
         Some(s"$assetPath/${script.platform.mapPath(x.textData)}"),
         dlc,
         script.platform

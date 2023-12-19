@@ -23,7 +23,7 @@
 package moe.lymia.mppatch.core
 
 import moe.lymia.mppatch.util.io.*
-import moe.lymia.mppatch.util.{Crypto, Logger, SimpleLogger}
+import moe.lymia.mppatch.util.{EncodingUtils, Logger, SimpleLogger}
 
 import java.nio.file.attribute.PosixFilePermission.*
 import java.nio.file.{Files, Path}
@@ -162,7 +162,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
       log.warn(s"- File $pathName is not a regular file")
       false
     } else {
-      val sha256 = Crypto.sha256_hex(Files.readAllBytes(path))
+      val sha256 = EncodingUtils.sha256_hex(Files.readAllBytes(path))
       if (sha256 != expectedSha256) {
         log.warn(s"- File $pathName failed to validate. (Actual sha256: $sha256, expected: $expectedSha256")
         false
@@ -175,7 +175,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   private def validatePatchFile(file: PatchFile): Boolean = validatePatchFile(file.path, file.expectedSha256)
 
   private def isVersionKnown(path: String) =
-    install.supportedHash(Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
+    install.supportedHash(EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
   private def loadPatchState() = try
     if (Files.exists(patchStatePath))
       PatchState.unserialize(IOUtils.readXML(patchStatePath))
@@ -241,15 +241,15 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   private def installPatch(packages: Set[String]) = {
     log.info("Installing patch...")
 
-    val targetVersion = Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(install.script.hashFrom)))
+    val targetVersion = EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(install.script.hashFrom)))
     log.info(s"- Target version: $targetVersion")
 
     val newFileSet = install.makeFileSet(packages, targetVersion)
     val newFiles   = newFileSet.getFiles(basePath, targetVersion)
 
     for (rename <- newFileSet.renames) {
-      log.info(s"- Renaming ${rename.filename} -> ${rename.renameTo}")
-      Files.move(basePath.resolve(rename.filename), basePath.resolve(rename.renameTo))
+      log.info(s"- Renaming ${rename.from} -> ${rename.to}")
+      Files.move(basePath.resolve(rename.from), basePath.resolve(rename.to))
     }
     val patchNewFiles = for (OutputFile(name, data, executable) <- newFiles) yield {
       val path = basePath.resolve(name)
@@ -268,14 +268,14 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
           path,
           (Files.getPosixFilePermissions(path).asScala.toSet + OWNER_EXECUTE + GROUP_EXECUTE + OTHERS_EXECUTE).asJava
         )
-      (PatchFile(name, Crypto.sha256_hex(data)), newDirs.flatten)
+      (PatchFile(name, EncodingUtils.sha256_hex(data)), newDirs.flatten)
     }
 
     def patchFileFromPath(path: String) =
-      PatchFile(path, Crypto.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
+      PatchFile(path, EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
     val renameData =
       for (rename <- newFileSet.renames)
-        yield RenameData(patchFileFromPath(rename.filename), patchFileFromPath(rename.renameTo))
+        yield RenameData(patchFileFromPath(rename.from), patchFileFromPath(rename.to))
 
     log.info("- Writing patch state")
     val state = PatchState(
@@ -340,7 +340,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
       case Some(_) => uninstallPatch()
     }
     log.info("Cleaning up remaining files...")
-    for (XmlRenameFile(from, to) <- install.cleanup.rename) {
+    for (JsonRename(from, to) <- install.cleanup.renames) {
       log.info(s"- Renaming $from -> $to...")
       if (Files.exists(basePath.resolve(from))) {
         if (Files.exists(basePath.resolve(to))) IOUtils.deleteDirectory(basePath.resolve(to))

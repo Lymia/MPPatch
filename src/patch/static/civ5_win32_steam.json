@@ -1,0 +1,61 @@
+{
+  "game": "civ5",
+  "gameType": "steam",
+  "platform": "win32",
+  "steamId": 8930,
+  "assetsPath": "Assets",
+
+  "checkFor": ["CivilizationV.exe", "CvGameDatabaseWin32Final Release.dll", "steam_api.dll"],
+  "hashFrom": "CvGameDatabaseWin32Final Release.dll",
+  "supportedHashes": {
+    "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563": "1.0.3.279"
+  },
+
+  "packages": {
+    "multiplayer": {
+      "renameFile": [
+        {"from": "CvGameDatabaseWin32Final Release.dll", "to": "CvGameDatabase_Original.dll"}
+      ],
+      "writeFile": [
+        {"from": "native/mppatch_core_wrapper.dll", "to": "CvGameDatabaseWin32Final Release.dll"},
+        {"from": "native/mppatch_core.dll", "to": "mppatch_core.dll"}
+      ],
+      "writeConfig": [
+        "mppatch_config.toml"
+      ],
+      "writeDlc": [
+        {"from": "ui/mppatch.xml", "to": "DLC/MPPatch", "textData": "Gameplay/XML/NewText/MPPatch_TextData"}
+      ],
+      "enableFeature": ["Multiplayer"]
+    },
+    "luajit": {
+      "renameFile": [
+        {"from": "lua51_Win32.dll", "to": "lua51_Win32.dll.bak"}
+      ],
+      "writeFile": [
+        {"from": "native/luajit_win32.dll", "to": "lua51_Win32.dll"}
+      ],
+      "enableFeature": ["LuaJit"]
+    },
+    "logging": {
+      "enableFeature": ["Logging"]
+    },
+    "debug": {
+      "enableFeature": ["Debug"]
+    }
+  },
+
+  "cleanup": {
+    "renames": [
+      {"from": "CvGameDatabase_Original.dll", "to": "CvGameDatabaseWin32Final Release.dll"},
+      {"from": "lua51_Win32.dll.bak", "to": "lua51_Win32.dll"}
+    ],
+    "checkFile": [
+      "lua51_Win32.dll.bak",
+      "CvGameDatabase_Original.dll",
+      "mppatch_config.ini",
+      "steamassets/assets/DLC/MPPatch",
+      "steamassets/assets/Gameplay/XML/NewText/MPPatch_TextData"
+    ]
+  }
+}

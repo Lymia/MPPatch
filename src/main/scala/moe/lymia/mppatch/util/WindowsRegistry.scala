@@ -22,9 +22,6 @@
 
 package moe.lymia.mppatch.util
 
-import java.nio.charset.StandardCharsets
-import java.util.Locale
-import java.util.prefs.Preferences
 import scala.sys.process.Process
 
 object WindowsRegistry {

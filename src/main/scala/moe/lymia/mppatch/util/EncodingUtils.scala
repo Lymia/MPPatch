@@ -22,19 +22,21 @@
 
 package moe.lymia.mppatch.util
 
+import play.api.libs.json.{JsError, JsResult, JsSuccess}
+
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.Base64
 
-object Crypto {
-  def digest(algorithm: String, data: Array[Byte]) = {
+object EncodingUtils {
+  private def digest(algorithm: String, data: Array[Byte]) = {
     val md   = MessageDigest.getInstance(algorithm)
     val hash = md.digest(data)
     hash
   }
-  def hexdigest(algorithm: String, data: Array[Byte]) =
+  private def hexdigest(algorithm: String, data: Array[Byte]) =
     digest(algorithm, data).map(x => "%02x".format(x)).reduce(_ + _)
-  def b64digest(algorithm: String, data: Array[Byte]) =
+  private def b64digest(algorithm: String, data: Array[Byte]) =
     new String(Base64.getEncoder.encode(digest(algorithm, data)), StandardCharsets.UTF_8).replace("=", "")
 
   def md5_hex(data: Array[Byte])    = hexdigest("MD5", data)
@@ -51,4 +53,12 @@ object Crypto {
   def sha1(data: Array[Byte])   = digest("SHA-1", data)
   def sha256(data: Array[Byte]) = digest("SHA-256", data)
   def sha512(data: Array[Byte]) = digest("SHA-512", data)
+
+  def unwrapJson[T](json: JsResult[T]) = json match {
+    case JsSuccess(value, _) => value
+    case JsError(errors) => {
+      SimpleLogger.error(s"JSON error encountered: $errors")
+      sys.error("JSON error encountered")
+    }
+  }
 }

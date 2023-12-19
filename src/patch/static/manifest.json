@@ -1,0 +1,6 @@
+{
+  "installScripts": [
+    "civ5_linux_steam.json",
+    "civ5_win32_steam.json"
+  ]
+}

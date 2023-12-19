@@ -23,15 +23,13 @@
 package moe.lymia.mppatch.ui
 
 import moe.lymia.mppatch.ui.InstallationConfiguration.*
-import moe.lymia.mppatch.util.Crypto
+import moe.lymia.mppatch.util.EncodingUtils
 import play.api.libs.json.*
 import play.api.libs.json.Reads.*
 import play.api.libs.json.Writes.*
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Path, Paths}
-import java.util.Locale
-import javax.swing.JFrame
 import scala.collection.mutable
 
 object ConfigurationStore extends LaunchFrameError {
@@ -40,7 +38,7 @@ object ConfigurationStore extends LaunchFrameError {
     def this(name: String) = this(name, sys.error("preference " + name + " not set"))
 
     protected def encode(v: T): String = Json.stringify(Json.toJson(v))
-    protected def decode(s: String): T = Json.fromJson(Json.parse(s)).get
+    protected def decode(s: String): T = EncodingUtils.unwrapJson(Json.fromJson(Json.parse(s)))
 
     def hasValue = prefs.get(name, null) != null
     def clear()  = prefs.remove(name)
@@ -62,7 +60,7 @@ object ConfigurationStore extends LaunchFrameError {
   val installationDirs      = new ConfigKey[Set[String]]("installer.v1.installation_dirs", Set())
   val suppressedDirs        = new ConfigKey[Set[String]]("installer.v1.suppressed_dirs", Set())
   def installationConf(path: Path) = {
-    val canonical = Crypto.sha256_b64(path.toRealPath().toString.getBytes(StandardCharsets.UTF_8))
+    val canonical = EncodingUtils.sha256_b64(path.toRealPath().toString.getBytes(StandardCharsets.UTF_8))
     new ConfigKey[InstallationConfiguration](s"installer.v1.conf|$canonical", InstallationConfiguration.default)
   }
 

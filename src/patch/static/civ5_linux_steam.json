@@ -1,0 +1,64 @@
+{
+  "game": "civ5",
+  "gameType": "steam",
+  "platform": "linux",
+  "steamId": 8930,
+  "assetsPath": "steamassets/assets",
+
+  "checkFor": ["Civ5XP", "steamclient.so", "libCvGameCoreDLL.so"],
+  "hashFrom": "Civ5XP",
+  "supportedHashes": {
+    "cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca": "1.0.3.279"
+  },
+
+  "packages": {
+    "core": {
+      "renameFile": [
+        {"from": "Civ5XP", "to": "Civ5XP.orig"}
+      ],
+      "writeFile": [
+        {"from": "Civ5XP.sh", "to": "Civ5XP", "exec": true},
+        {"from": "Civ5XP.launch.sh", "to": "Civ5XP.launch", "exec": true},
+        {"from": "native/mppatch_core.so", "to": "mppatch_core.so", "exec": true}
+      ],
+      "writeConfig": [
+        "mppatch_config.toml"
+      ]
+    },
+    "multiplayer": {
+      "depends": ["core"],
+      "writeDlc": [
+        {"from": "ui/mppatch.xml", "to": "dlc/mppatch", "textData": "gameplay/xml/newtext/mppatch_textdata"}
+      ],
+      "enableFeature": ["Multiplayer"]
+    },
+    "luajit": {
+      "depends": ["core"],
+      "writeFile": [
+        {"from": "native/luajit_linux.so", "to": "mppatch_luajit.so"}
+      ],
+      "enableFeature": ["LuaJit"]
+    },
+    "logging": {
+      "enableFeature": ["Logging"]
+    },
+    "debug": {
+      "enableFeature": ["Debug"]
+    }
+  },
+
+  "cleanup": {
+    "renames": [
+      {"from": "Civ5XP.orig", "to": "Civ5XP"}
+    ],
+    "checkFile": [
+      "Civ5XP.launch",
+      "Civ5XP.orig",
+      "mppatch_core.so",
+      "mppatch_luajit.so",
+      "mppatch_config.ini",
+      "steamassets/assets/dlc/mppatch",
+      "steamassets/assets/gameplay/xml/newtext/mppatch_textdata"
+    ]
+  }
+}
