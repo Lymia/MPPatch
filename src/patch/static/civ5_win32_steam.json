@@ -8,7 +8,8 @@
   "checkFor": ["CivilizationV.exe", "CvGameDatabaseWin32Final Release.dll", "steam_api.dll"],
   "hashFrom": "CvGameDatabaseWin32Final Release.dll",
   "supportedHashes": {
-    "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563": "1.0.3.279"
+    "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563": "1.0.3.279",
+    "d9231d313fb24fe88c6020d250a44b6ad754b78922325473a03a6e6c002911c4": "1.0.3.279 (Build 4390913)"
   },
 
   "packages": {

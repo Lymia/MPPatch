@@ -47,11 +47,10 @@ macro_rules! make_proxy {
             #[link_section = ".text_proxy"]
             unsafe extern "C" fn $sym(number: usize) -> usize {
                 static mut UNIQUE_ADDR: u8 = 0; // ensures the MergeFunctions pass doesn't eat us
-                std::arch::asm!(
+                std::arch::naked_asm!(
                     ".long {}\n",
                     ".long 0\n",
-                    sym UNIQUE_ADDR,
-                    options(noreturn)
+                    sym UNIQUE_ADDR
                 )
             }
         )*

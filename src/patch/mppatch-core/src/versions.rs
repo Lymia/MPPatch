@@ -82,7 +82,19 @@ pub struct SymWin32Offsets {
 pub fn find_info(sha256: &str) -> Result<VersionInfo> {
     Ok(match sha256 {
         "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563" => VersionInfo {
-            name: "Civilization V / 1.0.3.279 / Win32 + Steam",
+            name: "Civilization V / 1.0.3.279 / Win32 + Steam (Old Build)",
+            platform: Platform::Win32,
+            sym_lGetMemoryUsage: SymbolInfo::DllProxy(ProxySource::CvGameDatabase, "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z"),
+            sym_SetActiveDLCAndMods: SymbolInfo::Win32Offsets(SymWin32Offsets {
+                name: "SetActiveDLCAndMods",
+                dx9: (0x006CD160, 6),
+                dx11: (0x006B8E50, 6),
+                tablet: (0x0065DC10, 6),
+            }),
+            binary_base: 0x00400000,
+        },
+        "d9231d313fb24fe88c6020d250a44b6ad754b78922325473a03a6e6c002911c4" => VersionInfo {
+            name: "Civilization V / 1.0.3.279 / Win32 + Steam (Build 4390913)",
             platform: Platform::Win32,
             sym_lGetMemoryUsage: SymbolInfo::DllProxy(ProxySource::CvGameDatabase, "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z"),
             sym_SetActiveDLCAndMods: SymbolInfo::Win32Offsets(SymWin32Offsets {
