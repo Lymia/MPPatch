@@ -1,3 +1,9 @@
+> # Maintance Warning
+> 
+> The current version of MPPatch has not been properly maintained since early 2020, as I moved into a different living arrangement and lost access to my desktop. I currently (as of September 2026) have access to a second computer again, so I can continue work on this project. Expect a properly working version again within one to two months.
+>
+> Note that I still lack access to a Mac, and will likely drop Mac support for the foreseeable future. If you have access to a mac, and have the proper skills to work on a project like this, please email me! I'd appreciate the help.
+
 MPPatch
 =======
 
