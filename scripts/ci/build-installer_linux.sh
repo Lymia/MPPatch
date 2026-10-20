@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Copyright (c) 2015-2023 Lymia Kanokawa <lymia@lymia.moe>

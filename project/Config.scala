@@ -32,4 +32,6 @@ object Config {
 
   val config_win32_secureFlags  = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
   val config_common_secureFlags = Seq("-fstack-protector", "-fstack-protector-strong", "-D_FORTIFY_SOURCE=2")
+
+  val config_native_platforms: Seq[PlatformType] = Seq(PlatformType.Linux)
 }

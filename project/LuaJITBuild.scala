@@ -37,7 +37,7 @@ object LuaJITBuild {
       IO.createDirectory(patchDirectory)
 
       for (
-        platform <- Seq(PlatformType.Win32, PlatformType.Linux)
+        platform <- Config.config_native_platforms
         if PlatformType.currentPlatform.shouldBuildNative(platform)
       ) yield {
         val (platformEnv, flags, outputFile, extension, target_cc, target) =
@@ -67,6 +67,7 @@ object LuaJITBuild {
                 config_linux_cc,
                 config_target_linux
               )
+            case _ => ???
           }
         val env = Map(
           "HOST_CC"      -> s"$config_linux_cc -m32",

@@ -34,19 +34,19 @@ object NativePatchBuild {
       val logger   = streams.value.log
 
       for (
-        platform <- Seq[PlatformType](PlatformType.Win32, PlatformType.Linux)
+        platform <- Config.config_native_platforms
         if PlatformType.currentPlatform.shouldBuildNative(platform)
       ) yield {
         val (rustTarget, outName, targetName) = platform match {
           case PlatformType.Win32 => ("i686-pc-windows-gnu", "mppatch_core.dll", "mppatch_core.dll")
           case PlatformType.Linux => ("i686-unknown-linux-gnu", "mppatch_core.so", "libmppatch_core.so")
-          case _                  => sys.error("unreachable")
+          case _                  => ???
         }
 
         // run Cargo
         val buildId = UUID.randomUUID()
         runProcess(
-          Seq("cargo", "build", "--target", rustTarget, "--release"),
+          Seq("cargo", "zigbuild", "--target", rustTarget, "--release"),
           crateDir,
           Map(
             "MPPATCH_VERSION" -> version.value,
