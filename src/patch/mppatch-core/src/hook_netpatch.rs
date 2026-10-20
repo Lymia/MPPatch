@@ -117,7 +117,7 @@ impl NetPatchState {
 }
 
 const DEFAULT_PATCH_STATE: NetPatchState =
-    NetPatchState { dlc_list: Vec::new(), mod_list: Vec::new(), overrides: EnumSet::EMPTY };
+    NetPatchState { dlc_list: Vec::new(), mod_list: Vec::new(), overrides: EnumSet::empty() };
 static STATE: Mutex<NetPatchState> = Mutex::new(DEFAULT_PATCH_STATE);
 
 #[derive(EnumSetType, Debug)]

@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-#![feature(c_unwind)]
 #![cfg_attr(windows, feature(naked_functions))]
 
 use crate::rt_init::MppatchFeature;

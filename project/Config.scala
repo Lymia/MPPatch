@@ -24,10 +24,10 @@ object Config {
   val config_make         = "make"
   val config_mingw_prefix = "i686-w64-mingw32-"
 
-  val config_win32_cc = "clang"
+  val config_win32_cc = "zig cc"
   val config_linux_cc = "clang"
 
-  val config_target_win32 = "i686-w64-mingw32"
+  val config_target_win32 = "x86-w64-mingw32"
   val config_target_linux = "i686-unknown-linux-gnu"
 
   val config_win32_secureFlags  = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
