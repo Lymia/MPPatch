@@ -24,14 +24,14 @@ object Config {
   val config_make         = "make"
   val config_mingw_prefix = "i686-w64-mingw32-"
 
-  val config_win32_cc = "zig cc"
+  val config_win32_cc = "clang"
   val config_linux_cc = "clang"
 
-  val config_target_win32 = "x86-w64-mingw32"
+  val config_target_win32 = "i686-win7-windows-gnu"
   val config_target_linux = "i686-unknown-linux-gnu"
 
   val config_win32_secureFlags  = Seq("-Wl,-Bstatic", "-lssp", "-Wl,--dynamicbase,--nxcompat")
   val config_common_secureFlags = Seq("-fstack-protector", "-fstack-protector-strong", "-D_FORTIFY_SOURCE=2")
 
-  val config_native_platforms: Seq[PlatformType] = Seq(PlatformType.Linux)
+  val config_native_platforms: Seq[PlatformType] = Seq(PlatformType.Win32, PlatformType.Linux)
 }

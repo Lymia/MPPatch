@@ -46,6 +46,7 @@ object LuaJITBuild {
               (
                 Map("CROSS" -> config_mingw_prefix, "TARGET_SYS" -> "Windows"),
                 Seq(
+                  "-fuse-ld=lld",
                   "-static-libgcc",
                   "-Wl,--start-group",
                   "-lmsvcr90",

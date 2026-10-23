@@ -1,0 +1,5 @@
+[unstable]
+build-std = ["core", "alloc", "std", "panic_abort"]
+
+[target.i686-unknown-linux-gnu]
+linker = "clang"

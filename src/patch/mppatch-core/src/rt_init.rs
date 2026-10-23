@@ -169,7 +169,7 @@ pub fn get_ctx() -> &'static MppatchCtx {
     unsafe { &*ptr }
 }
 
-#[ctor::dtor]
+#[linktime::dtor(unsafe)]
 fn destroy_ctx() {
     let ptr = CTX.swap(null_mut(), Ordering::SeqCst);
     if !ptr.is_null() {

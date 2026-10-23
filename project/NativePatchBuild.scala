@@ -38,7 +38,7 @@ object NativePatchBuild {
         if PlatformType.currentPlatform.shouldBuildNative(platform)
       ) yield {
         val (rustTarget, outName, targetName) = platform match {
-          case PlatformType.Win32 => ("i686-pc-windows-gnu", "mppatch_core.dll", "mppatch_core.dll")
+          case PlatformType.Win32 => ("i686-win7-windows-gnu", "mppatch_core.dll", "mppatch_core.dll")
           case PlatformType.Linux => ("i686-unknown-linux-gnu", "mppatch_core.so", "libmppatch_core.so")
           case _                  => ???
         }
@@ -46,7 +46,7 @@ object NativePatchBuild {
         // run Cargo
         val buildId = UUID.randomUUID()
         runProcess(
-          Seq("cargo", "zigbuild", "--target", rustTarget, "--release"),
+          Seq("cargo", "build", "--target", rustTarget, "--release"),
           crateDir,
           Map(
             "MPPATCH_VERSION" -> version.value,
@@ -63,7 +63,7 @@ object NativePatchBuild {
         val __ = Keys.nativeVersions.value // make an artifical dependency
         runProcess(Seq("scripts/ci/build-win32-wrapper.sh"))
         val coreDir = baseDirectory.value / "src" / "patch" / "mppatch-core";
-        Some(coreDir / "target" / "i686-pc-windows-gnu" / "release" / "mppatch_core_wrapper.dll")
+        Some(coreDir / "target" / "i686-win7-windows-gnu" / "release" / "mppatch_core_wrapper.dll")
       } else None
     }
   )

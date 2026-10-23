@@ -71,12 +71,11 @@ checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "ctor"
-version = "0.2.9"
+version = "1.0.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "32a2785755761f3ddc1492979ce1e48d2c00d09311c39e4466429188f3dd6501"
+checksum = "914a755b7c2d4af2bdcff7ce1739e2db9a1b81a9b07123d8015786ae03c0980d"
 dependencies = [
- "quote 1.0.47",
- "syn 2.0.119",
+ "linktime-proc-macro",
 ]
 
 [[package]]
@@ -140,6 +139,15 @@ dependencies = [
  "libc",
  "quote 0.6.13",
  "syn 0.15.44",
+]
+
+[[package]]
+name = "dtor"
+version = "1.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cd3f6c362b2bbd7063090886afd78978f5dbf1f11da7efcc40f81d32c943fac1"
+dependencies = [
+ "linktime-proc-macro",
 ]
 
 [[package]]
@@ -217,6 +225,33 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a"
 
 [[package]]
+name = "link-section"
+version = "0.19.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "39c29a617ce3df32c08497bdc1ab6e2376e0b17948ac166a2fbe5977c5954cd9"
+dependencies = [
+ "linktime-proc-macro",
+]
+
+[[package]]
+name = "linktime"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e69a9e2780a5e20ee9ef734fa17fa97ad02dd66face418654ede43ff0ade4c09"
+dependencies = [
+ "ctor",
+ "dtor",
+ "link-section",
+ "linktime-proc-macro",
+]
+
+[[package]]
+name = "linktime-proc-macro"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7e57c38c1e860fd37c604281cdfb1dd2216977fd76a50f85ba2f388ef3219616"
+
+[[package]]
 name = "log"
 version = "0.4.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -271,24 +306,17 @@ dependencies = [
  "anyhow",
  "atomic",
  "bytemuck",
- "ctor",
  "dlopen",
  "enumset",
  "libc",
+ "linktime",
  "log",
  "mlua",
- "nasm-rs",
  "serde",
  "simplelog",
  "toml",
  "winapi",
 ]
-
-[[package]]
-name = "nasm-rs"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fe4d98d0065f4b1daf164b3eafb11974c94662e5e2396cf03f32d0bb5c17da51"
 
 [[package]]
 name = "num-conv"

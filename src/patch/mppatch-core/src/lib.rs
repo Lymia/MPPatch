@@ -20,10 +20,8 @@
  * THE SOFTWARE.
  */
 
-#![cfg_attr(windows, feature(naked_functions))]
-
 use crate::rt_init::MppatchFeature;
-use ctor::ctor;
+use linktime::ctor;
 
 mod hook_lua;
 #[cfg(unix)]
@@ -54,7 +52,7 @@ fn ctor_impl() -> anyhow::Result<()> {
     Ok(())
 }
 
-#[ctor]
+#[ctor(unsafe)]
 fn ctor() {
     rt_init::check_error(ctor_impl());
 }

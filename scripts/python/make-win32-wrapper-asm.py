@@ -31,7 +31,7 @@ syms = map(lambda x: x.split(" ")[2][1+len(prefix):], syms)
 
 print("segment .text")
 for sym in syms:
-    print(f"global _{sym}")
+    print(f"global {sym}")
     print(f"extern _{prefix}{sym}")
-    print(f"_{sym}: jmp _{prefix}{sym}")
+    print(f"{sym}: jmp _{prefix}{sym}")
     print(f"export {sym}")

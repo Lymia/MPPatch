@@ -96,7 +96,7 @@ pub fn init(_: &MppatchCtx) -> Result<()> {
     Ok(())
 }
 
-#[ctor::dtor]
+#[linktime::dtor(unsafe)]
 fn destroy_set_dlc() {
     hook_unpatch()
 }

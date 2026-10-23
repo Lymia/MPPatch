@@ -63,7 +63,7 @@ pub fn init(ctx: &MppatchCtx) -> Result<()> {
     Ok(())
 }
 
-#[ctor::dtor]
+#[linktime::dtor(unsafe)]
 fn destroy_usage() {
     GET_MEMORY_USAGE.lock().unwrap().unpatch();
 }
