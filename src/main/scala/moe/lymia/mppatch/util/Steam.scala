@@ -31,7 +31,7 @@ import scala.jdk.CollectionConverters._
 
 object Steam {
   // TODO: Parse this properly instead of this weirdness.
-  val lineRegex = "\"[0-9]+\"\\s+\"(.*)\"".r
+  val lineRegex = "\"path\"\\s+\"(.*)\"".r
   def loadLibraryFolders(p: Path): Seq[Path] =
     if (Files.exists(p))
       (for (
