@@ -46,10 +46,10 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
   private def applySettings(): Unit = {
     main.changeInstaller(Paths.get(installPath.getText))
 
-    // TODO ConfigurationStore.legacyEnableDebug.value = enableDebug.isSelected
-    // TODO ConfigurationStore.legacyEnableLogging.value = enableLogging.isSelected
-    // TODO ConfigurationStore.legacyEnableMultiplayerPatch.value = enableMultiplayerPatch.isSelected
-    // TODO ConfigurationStore.legacyEnableLuaJIT.value = enableLuaJIT.isSelected
+    Preferences.enableDebug.value = enableDebug.isSelected
+    Preferences.enableLogging.value = enableLogging.isSelected
+    Preferences.enableMultiplayerPatch.value = enableMultiplayerPatch.isSelected
+    Preferences.enableLuaJIT.value = enableLuaJIT.isSelected
 
     main.update()
   }
@@ -79,16 +79,16 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       }
 
       enableLogging = options.gridCheckRow(1, "logging")
-      // TODO enableLogging.setSelected(ConfigurationStore.legacyEnableLogging.value)
+      enableLogging.setSelected(Preferences.enableLogging.value)
 
       enableMultiplayerPatch = options.gridCheckRow(2, "modding")
-      // TODO enableMultiplayerPatch.setSelected(ConfigurationStore.legacyEnableMultiplayerPatch.value)
+      enableMultiplayerPatch.setSelected(Preferences.enableMultiplayerPatch.value)
 
       enableLuaJIT = options.gridCheckRow(3, "luajit")
-      // TODO enableLuaJIT.setSelected(ConfigurationStore.legacyEnableLuaJIT.value)
+      enableLuaJIT.setSelected(Preferences.enableLuaJIT.value)
 
       enableDebug = options.gridCheckRow(4, "debug")
-      // TODO enableDebug.setSelected(ConfigurationStore.legacyEnableDebug.value)
+      enableDebug.setSelected(Preferences.enableDebug.value)
     }
 
     frame.add(

@@ -37,7 +37,18 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   protected var targetVersion: JTextField     = scala.compiletime.uninitialized
   protected var currentStatus: JTextField     = scala.compiletime.uninitialized
 
-  private val installationManager = new InstallationManager()
+  private def packages = {
+    val logging     = if (Preferences.enableLogging.value) Set("logging") else Set[String]()
+    val multiplayer = if (Preferences.enableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
+    val luajit      = if (Preferences.enableLuaJIT.value) Set("luajit") else Set[String]()
+    val debug       = if (Preferences.enableDebug.value) Set("debug") else Set[String]()
+    debug ++ multiplayer ++ luajit ++ logging
+  }
+
+  private def checkPath(path: Path) =
+    Files.exists(path) && Files.isDirectory(path) &&
+      patchPackage.detectInstallationPlatform(path).isDefined
+  private def resolvePaths(paths: Seq[Path]) = paths.find(checkPath)
 
   private val syncLock                          = new Object
   private var patchPackage: PatchPackage        = scala.compiletime.uninitialized
@@ -46,8 +57,6 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   private var installer: Option[PatchInstaller] = None
 
   private def getInstallerUnsafe = installer.getOrElse(sys.error("installer does not exist"))
-  private def installation       = new Installation(getInstallerUnsafe.basePath)
-  private def packages           = installation.config.packages
 
   def getPatch     = patchPackage
   def getInstaller = installer
@@ -57,11 +66,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     val instance        = new PatchInstaller(path, installPlatform, MPPatchInstaller.platform)
     isUserChange = changeByUser
     if (Files.exists(path)) {
-      isValid = new Installation(path).isValid(patchPackage)
+      isValid = checkPath(path)
       installer.foreach(_.releaseLock())
       if (isValid) {
         instance.acquireLock()
-        if (changeByUser) installationManager.addDirectory(path)
+        if (changeByUser) Preferences.installationDirectory.value = path.toFile.toString
       }
       installer = Some(instance)
     } else {
@@ -76,11 +85,22 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     log.info("Changing patch package...")
     patchPackage = new PatchPackage(pack)
     reloadInstaller()
-    installationManager.patchPackage = patchPackage
   }
 
   changePatchPackage(ResourceDataSource("builtin_patch"))
-  changeInstaller(installationManager.installations.head.rootDir, changeByUser = false)
+
+  private def pathFromRegistry() = resolvePaths(MPPatchInstaller.platform.defaultSystemPaths) match {
+    case Some(x) => changeInstaller(x, false)
+    case None    =>
+  }
+  if (Preferences.installationDirectory.hasValue) {
+    val configPath = Paths.get(Preferences.installationDirectory.value)
+    if (checkPath(configPath)) changeInstaller(configPath, false)
+    else {
+      Preferences.installationDirectory.clear()
+      pathFromRegistry()
+    }
+  } else pathFromRegistry()
 
   private var lastPatchStatus: Option[PatchStatus] = scala.compiletime.uninitialized
   private def checkPatchStatus() = {
