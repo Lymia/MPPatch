@@ -23,7 +23,7 @@
 import Config.*
 import Utils.*
 import com.github.rjeschke.txtmark.Processor
-import com.typesafe.sbt.SbtGit.*
+import com.github.sbt.git.SbtGit.*
 import sbt.*
 import sbt.Keys.*
 
