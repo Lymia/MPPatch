@@ -141,8 +141,8 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
     // globals table
     {
         let globals_table = lua.create_table()?;
-        globals_table.set("rawget", globals.get::<_, LuaFunction>("rawget")?)?;
-        globals_table.set("rawset", globals.get::<_, LuaFunction>("rawset")?)?;
+        globals_table.set("rawget", globals.get::<LuaFunction>("rawget")?)?;
+        globals_table.set("rawset", globals.get::<LuaFunction>("rawset")?)?;
         patch_table.set("globals", globals_table)?;
     }
 
@@ -238,9 +238,8 @@ pub unsafe extern "C-unwind" fn lGetMemoryUsageProxy(lua_c: *mut lua_State) -> c
         if lua_isnil(lua_c, lua_gettop(lua_c)) != 0 {
             lua_pop(lua_c, 1);
 
-            let lua = Lua::init_from_ptr(lua_c);
+            let lua = Lua::get_or_init_from_ptr(lua_c);
             rt_init::check_error(create_mppatch_table(lua_c, &lua));
-            drop(lua);
         } else {
             lua_pop(lua_c, 1);
         }

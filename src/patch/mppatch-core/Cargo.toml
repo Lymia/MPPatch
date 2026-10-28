@@ -17,7 +17,7 @@ enumset = { version = "1.1", features = ["serde"] }
 libc = "0.2"
 linktime = "0.19"
 log = { version = "0.4", features = ["std"] }
-mlua = { version = "0.9", features = ["lua51", "module"] }
+mlua = { version = "0.12", features = ["lua51", "module", "error-send"] }
 serde = { version = "1.0", features = ["derive"] }
 simplelog = { version = "0.12", features = ["paris"] }
 toml = { version = "1.1", default-features = false, features = ["parse", "serde"] }
