@@ -17,7 +17,6 @@ jobs:
       - run: sudo dnf update
       - run: sudo dnf install -y mingw32-gcc mingw32-binutils java-25-openjdk-devel nasm make clang lld rustup libgcc.i686 glibc-devel.i686
       - run: rustup-init -y
-      - run: . "$HOME/.cargo/env"
 
       # Initialize git
       - uses: actions/checkout@v7
@@ -27,7 +26,10 @@ jobs:
       - run: git fetch --prune --unshallow --tags
 
       # Do the actual build
-      - run: scripts/ci/build-natives_linux.sh
+      - name: Build native binaries
+        run: |
+          . "$HOME/.cargo/env"
+          scripts/ci/build-natives_linux.sh
 
       # Upload artifacts
       - uses: actions/upload-artifact@v7
