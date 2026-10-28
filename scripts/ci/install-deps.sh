@@ -22,12 +22,12 @@
 # THE SOFTWARE.
 #
 
-GRAALVM_LINUX_URL="https://download.bell-sw.com/vm/23.1.1/bellsoft-liberica-vm-openjdk21.0.1+12-23.1.1+1-linux-amd64.tar.gz"
-GRAALVM_LINUX_DIR="bellsoft-liberica-vm-openjdk21-23.1.1"
-GRAALVM_LINUX_SHA="8b3549e3a53cd4bb5e27bf1fa373cf9573874218c55b70681799a68004d088fa"
+GRAALVM_LINUX_URL="https://download.bell-sw.com/vm/25.0.4.1/bellsoft-liberica-vm-openjdk25.0.4.1+2-25.0.4.1+1-linux-amd64.tar.gz"
+GRAALVM_LINUX_DIR="bellsoft-liberica-vm-openjdk25-25.0.4.1"
+GRAALVM_LINUX_SHA="66f1fb47df32c7c81e0a1adca5546ddcf208b31311d95638e2fc38e8fa610a21"
 
-LINUXDEPLOY_URL="https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20231026-1/linuxdeploy-x86_64.AppImage"
-LINUXDEPLOY_SHA="c242e21f573532c03adc2c356b70055ee0de2ae66e235d086b714e69d2cae529"
+LINUXDEPLOY_URL="https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20251107-1/linuxdeploy-x86_64.AppImage"
+LINUXDEPLOY_SHA="c20cd71e3a4e3b80c3483cef793cda3f4e990aca14014d23c544ca3ce1270b4d"
 
 mkdir -pv target/deps target/deps/dl || exit 1
 

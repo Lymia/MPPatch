@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Copyright (c) 2015-2026 Rimi Kanokawa <rimi@rimin.moe>

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 #
 # Copyright (c) 2015-2026 Rimi Kanokawa <rimi@rimin.moe>
@@ -24,7 +24,9 @@
 
 . scripts/ci/install-deps.sh
 
-wget https://download.formdev.com/files/flatlaf/flatlaf-demo-3.2.5.jar -O target/flatlaf-demo-3.2.5.jar || exit 1
+if [ ! -f target/flatlaf-demo-3.7.2.jar ]; then
+    wget https://download.formdev.com/files/flatlaf/flatlaf-demo-3.7.2.jar -O target/flatlaf-demo-3.7.2.jar || exit 1
+fi
 target/deps/graalvm-linux/bin/java \
   -agentlib:native-image-agent=config-merge-dir=scripts/native-image-config/common-flatlaf-linux \
-  -jar target/flatlaf-demo-3.2.5.jar || exit 1
+  -jar target/flatlaf-demo-3.7.2.jar || exit 1
