@@ -29,12 +29,12 @@ import java.util.Locale
 import javax.swing._
 
 class SettingsDialog(val locale: Locale, main: LegacyMainFrame) extends FrameBase[JDialog] {
-  private var installPath: JTextField = _
+  private var installPath: JTextField = scala.compiletime.uninitialized
 
-  private var enableDebug: JCheckBox            = _
-  private var enableLogging: JCheckBox          = _
-  private var enableMultiplayerPatch: JCheckBox = _
-  private var enableLuaJIT: JCheckBox           = _
+  private var enableDebug: JCheckBox            = scala.compiletime.uninitialized
+  private var enableLogging: JCheckBox          = scala.compiletime.uninitialized
+  private var enableMultiplayerPatch: JCheckBox = scala.compiletime.uninitialized
+  private var enableLuaJIT: JCheckBox           = scala.compiletime.uninitialized
 
   private val desktop = Desktop.getDesktop
 

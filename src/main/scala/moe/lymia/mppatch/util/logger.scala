@@ -41,26 +41,26 @@ trait Logger {
   def flush(): Unit
 
   def log(format: String, level: String, vals: Any*): Unit =
-    logRaw(formatString.format(dateFormat.format(new Date()), level, format.format(vals: _*)))
+    logRaw(formatString.format(dateFormat.format(new Date()), level, format.format(vals*)))
 
-  def info(format: String, vals: Any*): Unit  = log(format, "INFO", vals: _*)
-  def warn(format: String, vals: Any*): Unit  = log(format, "WARN", vals: _*)
-  def error(format: String, vals: Any*): Unit = log(format, "ERROR", vals: _*)
+  def info(format: String, vals: Any*): Unit  = log(format, "INFO", vals*)
+  def warn(format: String, vals: Any*): Unit  = log(format, "WARN", vals*)
+  def error(format: String, vals: Any*): Unit = log(format, "ERROR", vals*)
 
   def info(str: String): Unit  = info("%s", str)
   def warn(str: String): Unit  = warn("%s", str)
   def error(str: String): Unit = error("%s", str)
 
   def info(format: String, t: Throwable, vals: Any*): Unit = {
-    info(format, vals: _*)
+    info(format, vals*)
     logException(t)
   }
   def warn(format: String, t: Throwable, vals: Any*): Unit = {
-    warn(format, vals: _*)
+    warn(format, vals*)
     logException(t)
   }
   def error(format: String, t: Throwable, vals: Any*): Unit = {
-    error(format, vals: _*)
+    error(format, vals*)
     logException(t)
   }
 

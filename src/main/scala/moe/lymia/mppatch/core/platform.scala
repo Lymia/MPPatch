@@ -59,7 +59,7 @@ trait Platform {
 
   @tailrec final def resolve(path: Path, name: String*): Path =
     if (name.length == 1) path.resolve(mapPath(name.head))
-    else resolve(path.resolve(mapPath(name.head)), name.tail: _*)
+    else resolve(path.resolve(mapPath(name.head)), name.tail*)
 }
 object Platform {
   def forName(name: String) = Platform(PlatformType.forName(name))

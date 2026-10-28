@@ -31,16 +31,16 @@ import moe.lymia.mppatch.util.Steam
 import moe.lymia.mppatch.util.io.{DataSource, ResourceDataSource}
 
 class LegacyMainFrame(val locale: Locale) extends FrameBase[JFrame] {
-  protected var installButton: ActionButton   = _
-  protected var uninstallButton: ActionButton = _
-  protected var currentVersion: JTextField    = _
-  protected var targetVersion: JTextField     = _
-  protected var currentStatus: JTextField     = _
+  protected var installButton: ActionButton   = scala.compiletime.uninitialized
+  protected var uninstallButton: ActionButton = scala.compiletime.uninitialized
+  protected var currentVersion: JTextField    = scala.compiletime.uninitialized
+  protected var targetVersion: JTextField     = scala.compiletime.uninitialized
+  protected var currentStatus: JTextField     = scala.compiletime.uninitialized
 
   private val installationManager = new InstallationManager()
 
   private val syncLock                          = new Object
-  private var patchPackage: PatchPackage        = _
+  private var patchPackage: PatchPackage        = scala.compiletime.uninitialized
   private var isUserChange                      = false
   private var isValid                           = false
   private var installer: Option[PatchInstaller] = None
@@ -82,7 +82,7 @@ class LegacyMainFrame(val locale: Locale) extends FrameBase[JFrame] {
   changePatchPackage(ResourceDataSource("builtin_patch"))
   changeInstaller(installationManager.installations.head.rootDir, changeByUser = false)
 
-  private var lastPatchStatus: Option[PatchStatus] = _
+  private var lastPatchStatus: Option[PatchStatus] = scala.compiletime.uninitialized
   private def checkPatchStatus() = {
     val flag = lastPatchStatus match {
       case Some(x) => installer.fold(false)(_.checkPatchStatus(packages) == x)

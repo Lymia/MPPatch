@@ -122,7 +122,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   private var fileLock: Option[FileLock] = None
   private var manualLock                 = false
 
-  def isLockAcquired = syncLock synchronized fileLock.isDefined
+  def isLockAcquired = syncLock `synchronized` fileLock.isDefined
   def acquireLock(manualLock: Boolean = true) = syncLock synchronized {
     fileLock match {
       case Some(_) =>

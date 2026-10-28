@@ -172,7 +172,7 @@ trait FrameError[F <: Window] extends HasLogger {
   private def getFrameParam = if (frame != null && frame.isVisible) frame else null
 
   private def confirmDialog0(format: String, data: Seq[Any]) = {
-    val string = i18n(format, data: _*)
+    val string = i18n(format, data*)
     val result = JOptionPane.showConfirmDialog(
       getFrameParam,
       string,
@@ -185,14 +185,14 @@ trait FrameError[F <: Window] extends HasLogger {
   protected def confirmDialog(string: String, data: Any*) = confirmDialog0(string, data)
 
   private def warn0(format: String, needPrint: Boolean, data: Seq[Any]) = {
-    val string = i18n(format, data: _*)
+    val string = i18n(format, data*)
     if (needPrint) log.warn(string)
     JOptionPane.showMessageDialog(getFrameParam, string, titleString, JOptionPane.ERROR_MESSAGE)
   }
   protected def warn(string: String, data: Any*) = warn0(string, true, data)
 
   private def error0[T](format: String, ex: Option[Throwable], data: Seq[Any]): T = {
-    val string = i18n(format, data: _*)
+    val string = i18n(format, data*)
     warn0(format, false, data)
     if (frame != null) {
       frame.setVisible(false)
@@ -218,7 +218,7 @@ trait LaunchFrameError extends FrameError[JFrame] with I18NTrait {
 trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasLogger {
   protected val neverShowMessage = false
 
-  protected var frame: F = _
+  protected var frame: F = scala.compiletime.uninitialized
   def getFrame           = frame
 
   protected def buildForm(): Unit

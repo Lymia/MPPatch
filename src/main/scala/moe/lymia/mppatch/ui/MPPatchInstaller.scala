@@ -46,7 +46,7 @@ object MPPatchInstaller extends LaunchFrameError {
   private lazy val isNsis =
     PlatformType.currentPlatform == PlatformType.Win32 && System.getenv("NSIS_LAUNCH_MARKER") == nsisMarker
 
-  private[this] def fileForEnv(test: Boolean, env: String) = if (test) {
+  private def fileForEnv(test: Boolean, env: String) = if (test) {
     Some(new File(System.getenv(env)).getCanonicalFile)
   } else {
     None

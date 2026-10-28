@@ -169,7 +169,7 @@ class CivDlcBuilder(source: DataSource, patch: UIPatch) {
   private def prepareList(map: Map[String, String]) =
     map.view.mapValues(_.getBytes(StandardCharsets.UTF_8)).toMap
   private def findPathTargets(assetsPath: Path, platform: Platform, path: String*) =
-    findPatchTargets(platform.resolve(assetsPath, path: _*))
+    findPatchTargets(platform.resolve(assetsPath, path*))
   def generateBaseDLC(assetsPath: Path, platform: Platform) =
     DLCData(
       patch.dlcManifest,

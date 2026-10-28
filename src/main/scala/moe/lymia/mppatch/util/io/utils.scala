@@ -55,7 +55,7 @@ object IOUtils {
   def getResourceURL(s: String)            = checkNull(s, getClass.getResource(resPath + s))
   def getResource(s: String)               = checkNull(s, getClass.getResourceAsStream(resPath + s))
   def resourceExists(s: String)            = getClass.getResource(resPath + s) != null
-  def loadFromStream(s: InputStream)       = scala.io.Source.fromInputStream(s)(Codec.UTF8).mkString
+  def loadFromStream(s: InputStream)       = scala.io.Source.fromInputStream(s)(using Codec.UTF8).mkString
   def loadBinaryFromStream(s: InputStream) = LazyList.continually(s.read).takeWhile(_ != -1).map(_.toByte).toArray
   def loadResource(s: String)              = loadFromStream(getResource(s))
   def loadBinaryResource(s: String)        = loadBinaryFromStream(getResource(s))

@@ -48,15 +48,15 @@ git.formattedShaVersion := {
 }
 
 // Scala configuration
-scalaVersion := "3.3.1"
+scalaVersion := "3.10.0"
 scalacOptions ++= "-release:21 -deprecation -unchecked".split(" ").toSeq
 crossPaths := false
 
 // Dependencies
-libraryDependencies += "org.scala-lang.modules" %% "scala-xml"            % "2.1.0"
-libraryDependencies += "org.playframework"      %% "play-json"            % "3.0.1"
+libraryDependencies += "org.scala-lang.modules" %% "scala-xml"            % "2.5.0"
+libraryDependencies += "org.playframework"      %% "play-json"            % "3.0.6"
 libraryDependencies += "com.intellij"            % "forms_rt"             % "7.0.3"
-libraryDependencies += "com.formdev"             % "flatlaf"              % "3.2.5"
+libraryDependencies += "com.formdev"             % "flatlaf"              % "3.7.2"
 libraryDependencies += "com.formdev"             % "flatlaf-fonts-roboto" % "2.137"
 
 // Build assembled jar
