@@ -53,16 +53,10 @@ impl MppatchCtx {
         &self.config.bin_sha256
     }
     pub fn version(&self) -> &'static str {
-        match option_env!("MPPATCH_VERSION") {
-            Some(x) => x,
-            None => "<unknown>",
-        }
+        option_env!("MPPATCH_VERSION").unwrap_or_else(|| "<unknown>")
     }
     pub fn build_id(&self) -> &'static str {
-        match option_env!("MPPATCH_BUILDID") {
-            Some(x) => x,
-            None => "00000000-0000-0000-0000-000000000000",
-        }
+        option_env!("MPPATCH_BUILDID").unwrap_or_else(|| "00000000-0000-0000-0000-000000000000")
     }
     pub fn has_feature(&self, feature: MppatchFeature) -> bool {
         self.config.features.contains(feature)
