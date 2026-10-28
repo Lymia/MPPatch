@@ -11,25 +11,9 @@ env:
 jobs:
   buildNative:
     runs-on: ubuntu-latest
-    container: archlinux/archlinux:multilib-devel
     steps:
-      # Install packages
-      - run: pacman --noconfirm -Sy sbt jdk-openjdk git mingw-w64 clang nasm rustup python3
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          default: true
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          target: i686-pc-windows-gnu
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: nightly
-          target: i686-unknown-linux-gnu
-
       # Initialize git
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           submodules: 'recursive'
       - run: git config --global --add safe.directory /__w/MPPatch/MPPatch
@@ -39,7 +23,7 @@ jobs:
       - run: scripts/ci/build-natives_linux.sh
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v7
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux.tar.gz
@@ -54,13 +38,13 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: '21'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           submodules: 'recursive'
       - run: git fetch --prune --unshallow --tags
 
       # Download artifacts
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v8
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux
@@ -71,7 +55,7 @@ jobs:
       - run: scripts/ci/build-ni_linux.sh
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v7
         with:
           name: mppatch_ci_ni-linux
           path: target/native-image-linux/*
@@ -86,13 +70,13 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: '21'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           submodules: 'recursive'
       - run: git fetch --prune --unshallow --tags
 
       # Download artifacts
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v8
         with:
           name: mppatch_ci_natives-linux.tar.gz
           path: target/mppatch_ci_natives-linux
@@ -104,7 +88,7 @@ jobs:
       - run: pwsh -file scripts/ci/build-ni_win32.ps1
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v7
         with:
           name: mppatch_ci_ni-win32
           path: target/native-image-win32/*
@@ -119,14 +103,14 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: '21'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           submodules: 'recursive'
       - run: git fetch --prune --unshallow --tags
       - run: sudo apt install libfuse2
 
       # Download artifacts
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v8
         with:
           name: mppatch_ci_ni-linux
           path: target/native-image-linux
@@ -135,7 +119,7 @@ jobs:
       - run: scripts/ci/build-installer_linux.sh
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v7
         with:
           name: mppatch_ci_installer-linux
           path: target/MPPatch-Installer_*
@@ -150,13 +134,13 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: '21'
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           submodules: 'recursive'
       - run: git fetch --prune --unshallow --tags
 
       # Download artifacts
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v8
         with:
           name: mppatch_ci_ni-win32
           path: target/native-image-win32
@@ -166,7 +150,7 @@ jobs:
       - run: pwsh -file scripts/ci/build-installer_win32.ps1
 
       # Upload artifacts
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v7
         with:
           name: mppatch_ci_installer-win32
           path: target/MPPatch-Installer_*
@@ -178,7 +162,7 @@ jobs:
       - buildInstallerWindows
     steps:
       # Initialize git
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
         with:
           submodules: 'recursive'
       - name: Fetch git tags.
@@ -187,11 +171,11 @@ jobs:
         run: 'echo "VERSION_STR=ci_build-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV'
 
       # Download artifacts
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v8
         with:
           name: mppatch_ci_installer-linux
           path: mppatch_ci_installer-linux
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v8
         with:
           name: mppatch_ci_installer-win32
           path: mppatch_ci_installer-win32
