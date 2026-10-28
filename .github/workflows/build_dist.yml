@@ -163,7 +163,12 @@ jobs:
           path: target/native-image-win32
 
       # Do the actual build
-      - run: choco install nsis
+      - name: Install NSIS
+        shell: pwsh
+        run: |
+          choco install nsis -y --no-progress
+          # make it visible to all later steps
+          "C:\Program Files (x86)\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding utf8
       - run: pwsh -file scripts/ci/build-installer_win32.ps1
 
       # Upload artifacts
