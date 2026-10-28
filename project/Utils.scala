@@ -112,6 +112,7 @@ object LuaUtils {
   def quote(s: String) = {
     val buffer = new StringBuilder
     for (c <- s) c match {
+      case '\\'             => buffer.append("\\\\")
       case '\n'             => buffer.append("\\n")
       case '\r'             => buffer.append("\\r")
       case '"'              => buffer.append("\\\"")
