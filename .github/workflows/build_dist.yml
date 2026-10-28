@@ -17,6 +17,7 @@ jobs:
       - run: sudo dnf update
       - run: sudo dnf install -y mingw32-gcc mingw32-binutils java-25-openjdk-devel nasm make clang lld rustup libgcc.i686 glibc-devel.i686
       - run: rustup-init -y
+      - run: . "$HOME/.cargo/env"
 
       # Initialize git
       - uses: actions/checkout@v7
