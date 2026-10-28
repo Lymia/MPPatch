@@ -11,8 +11,11 @@ env:
 jobs:
   buildNative:
     runs-on: ubuntu-latest
+    container: registry.fedoraproject.org/fedora-toolbox:latest
     steps:
       - uses: sbt/setup-sbt@v1
+      - run: sudo dnf update
+      - run: sudo dnf install mingw32-gcc mingw32-binutils
 
       # Initialize git
       - uses: actions/checkout@v7
