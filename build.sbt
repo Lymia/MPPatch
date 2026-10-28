@@ -32,6 +32,7 @@ licenses     := Seq("MIT License" -> url("http://www.opensource.org/licenses/mit
 
 // Plugins for the project.
 InstallerResourceBuild.settings
+enablePlugins(NativeImagePlugin)
 NativeImagePlugin.projectSettings
 
 // Git versioning
