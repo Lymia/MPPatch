@@ -22,4 +22,6 @@
 # THE SOFTWARE.
 #
 
-rm -rfv mppatch_* target src/patch/mppatch-core/target || exit 1
+set -eu
+
+rm -rfv mppatch_* target src/patch/mppatch-core/target

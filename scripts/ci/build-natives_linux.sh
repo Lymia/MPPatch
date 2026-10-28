@@ -22,11 +22,13 @@
 # THE SOFTWARE.
 #
 
+set -eu
+
 echo "Building Linux native binaries..."
-sbt buildNative || exit 1
+sbt buildNative
 
 echo "Creating Linux native binaries tarball..."
-cd target/native-bin || exit 1
-  tar --gzip -cv -f mppatch_ci_natives-linux.tar.gz * || exit 1
-cd ../.. || exit 1
-cp -v target/native-bin/mppatch_ci_natives-linux.tar.gz target/ || exit 1
+cd target/native-bin
+  tar --gzip -cv -f mppatch_ci_natives-linux.tar.gz *
+cd ../..
+cp -v target/native-bin/mppatch_ci_natives-linux.tar.gz target/

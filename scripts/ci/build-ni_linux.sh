@@ -22,19 +22,21 @@
 # THE SOFTWARE.
 #
 
+set -eu
+
 . scripts/ci/install-deps.sh
 
 echo "Extracting native tarballs..."
-rm -rfv target/native-bin || exit 1
-mkdir -vp target/native-bin || exit 1
-cd target/native-bin || exit 1
+rm -rfv target/native-bin
+mkdir -vp target/native-bin 
+cd target/native-bin 
   tar -xv -f ../../target/mppatch_ci_natives-linux.tar.gz
-cd ../.. || exit 1
+cd ../.. 
 
 echo "Cleaning up after previous scripts..."
-rm -rfv target/native-image-linux || exit 1
-mkdir -p target/native-image-linux || exit 1
+rm -rfv target/native-image-linux 
+mkdir -p target/native-image-linux 
 
 echo "Building Linux installer...."
-sbt nativeImage || exit 1
-chmod +x target/native-image-linux/*.so || exit 1
+sbt nativeImage 
+chmod +x target/native-image-linux/*.so 

@@ -22,14 +22,16 @@
 # THE SOFTWARE.
 #
 
+set -eu
+
 scripts/python/make-win32-wrapper-asm.py \
   src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core.dll \
-  >src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.s || exit 1
+  >src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.s
 nasm -f win32 \
   src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.s \
-  -o src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.o || exit 1
+  -o src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.o
 clang -fuse-ld=lld -target i686-win7-windows-gnu -shared \
   src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.o \
   src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core.dll \
-  -o src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.dll || exit 1
-strip src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.dll || exit 1
+  -o src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.dll
+strip src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.dll

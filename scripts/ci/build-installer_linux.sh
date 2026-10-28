@@ -22,38 +22,41 @@
 # THE SOFTWARE.
 #
 
+set -eu
+
 . scripts/ci/install-deps.sh
 
 echo "Gathering facts from SBT..."
-sbt "print scalaVersion" || exit 1 # get project files cached, required to wrangle CI
-VERSION="$(sbt "print version" --error || exit 1)"
+sbt "print scalaVersion" # get project files cached, required to wrangle CI
+VERSION="$(sbt "print version" --error)"
 VERSION="$(echo "$VERSION" | head -n 1 | tr -d '\n')"
 APPIMAGE_NAME="MPPatch-Installer_linux_$VERSION.AppImage"
 
 echo "Cleaning up after previous scripts..."
-rm -rfv target/dist-build || exit 1
-mkdir -p target/dist-build || exit 1
+rm -rfv target/dist-build
+mkdir -p target/dist-build
 
 echo "Building AppDir for Linux installer..."
-mkdir -pv target/dist-build/linux/AppDir || exit 1
+mkdir -pv target/dist-build/linux/AppDir
 
 # Build basic directory structure
-cd target/dist-build/linux/AppDir || exit 1
-  cp -rv ../../../native-image-linux/* . || exit 1
-  mkdir -pv usr/bin usr/lib usr/share/applications usr/share/icons/hicolor/scalable/apps || exit 1
-  mv -v mppatch-installer usr/bin/ || exit 1
-  mv -v *.so usr/lib/ || exit 1
-  cp -v ../../../../scripts/res/mppatch-installer.desktop usr/share/applications/ || exit 1
-  cp -v ../../../../scripts/res/mppatch-installer.svg usr/share/icons/hicolor/scalable/apps/ || exit 1
+cd target/dist-build/linux/AppDir
+  cp -rv ../../../native-image-linux/* .
+  mkdir -pv usr/bin usr/lib usr/share/applications usr/share/icons/hicolor/scalable/apps
+  chmod +x mppatch-installer
+  mv -v mppatch-installer usr/bin/
+  mv -v *.so usr/lib/
+  cp -v ../../../../scripts/res/mppatch-installer.desktop usr/share/applications/
+  cp -v ../../../../scripts/res/mppatch-installer.svg usr/share/icons/hicolor/scalable/apps/
   for scale in {8,16,22,24,32,48,64,256}; do
-    mkdir -pv usr/share/icons/hicolor/"${scale}x${scale}"/apps || exit 1
-    cp -v ../../../../scripts/res/mppatch-installer-$scale.png usr/share/icons/hicolor/"${scale}x${scale}"/apps/mppatch-installer.png || exit 1
+    mkdir -pv usr/share/icons/hicolor/"${scale}x${scale}"/apps
+    cp -v ../../../../scripts/res/mppatch-installer-$scale.png usr/share/icons/hicolor/"${scale}x${scale}"/apps/mppatch-installer.png
   done
-cd ../../../.. || exit 1
+cd ../../../..
 
 # Build AppImage
 echo "Building AppImage..."
-cd target/dist-build/linux || exit 1
-  LDAI_COMP=zstd ../../deps/linuxdeploy --appdir AppDir/ --output appimage || exit 1
-cd ../../.. || exit 1
-cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/"$APPIMAGE_NAME" || exit 1
+cd target/dist-build/linux
+  LDAI_COMP=zstd ../../deps/linuxdeploy --appdir AppDir/ --output appimage
+cd ../../..
+cp -v target/dist-build/linux/MPPatch_Installer-x86_64.AppImage target/"$APPIMAGE_NAME"

@@ -22,18 +22,20 @@
 # THE SOFTWARE.
 #
 
-rm -vf scripts/res/mppatch-installer-*.png scripts/res/mppatch-installer.ico || exit 1
+set -eu
+
+rm -vf scripts/res/mppatch-installer-*.png scripts/res/mppatch-installer.ico
 
 for i in {16,20,24,30,32,36,40,48,60,64,72,80,96,256}; do
-  resvg -w $i -h $i scripts/res/mppatch-installer.svg scripts/res/mppatch-installer-$i.png || exit 1
+  resvg -w $i -h $i scripts/res/mppatch-installer.svg scripts/res/mppatch-installer-$i.png
 done
 
-convert scripts/res/mppatch-installer-{16,20,24,30,32,36,40,48,60,64,72,80,96,256}.png scripts/res/mppatch-installer.ico || exit 1
+convert scripts/res/mppatch-installer-{16,20,24,30,32,36,40,48,60,64,72,80,96,256}.png scripts/res/mppatch-installer.ico
 
 for i in {8,22,512}; do
-  resvg -w $i -h $i scripts/res/mppatch-installer.svg scripts/res/mppatch-installer-$i.png || exit 1
+  resvg -w $i -h $i scripts/res/mppatch-installer.svg scripts/res/mppatch-installer-$i.png
 done
 
 for i in {20,30,36,40,60,72,80,96}; do
-  rm -v scripts/res/mppatch-installer-$i.png
+  rm -v scripts/res/mppatch-installer-$i.png ||:
 done
