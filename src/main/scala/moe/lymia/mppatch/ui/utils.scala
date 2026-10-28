@@ -247,9 +247,10 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
       try {
         log.info("Executing: " + i18n(text + ".continuous") + "...")
         val actionStatus = action()
-        log.info(i18n(text + ".completed"))
-        if (!neverShowMessage && actionStatus && showCompleteMessage && i18n.hasKey(text + ".completed"))
+        if (!neverShowMessage && actionStatus && showCompleteMessage && i18n.hasKey(text + ".completed")) {
+          log.info(i18n(text + ".completed"))
           JOptionPane.showMessageDialog(frame, i18n(text + ".completed"))
+        }
       } catch {
         case e: Exception =>
           reportException(
