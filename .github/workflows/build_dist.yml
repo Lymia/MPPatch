@@ -11,7 +11,7 @@ env:
 jobs:
   buildNative:
     runs-on: ubuntu-latest
-    container: registry.fedoraproject.org/fedora-toolbox:latest
+    container: registry.fedoraproject.org/fedora-toolbox:44
     steps:
       - uses: sbt/setup-sbt@v1
       - run: sudo dnf update
