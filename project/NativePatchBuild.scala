@@ -37,9 +37,12 @@ object NativePatchBuild {
         platform <- Config.config_native_platforms
         if PlatformType.currentPlatform.shouldBuildNative(platform)
       ) yield {
-        val (rustTarget, outName, targetName) = platform match {
-          case PlatformType.Win32 => ("i686-win7-windows-gnu", "mppatch_core.dll", "mppatch_core.dll")
-          case PlatformType.Linux => ("i686-unknown-linux-gnu", "mppatch_core.so", "libmppatch_core.so")
+        val (rustTarget, outName, targetName, extraEnv) = platform match {
+          case PlatformType.Win32 => (
+            "i686-win7-windows-gnu", "mppatch_core.dll", "mppatch_core.dll",
+            Map("LUA_LIB_NAME" -> "lua51_Win32")
+          )
+          case PlatformType.Linux => ("i686-unknown-linux-gnu", "mppatch_core.so", "libmppatch_core.so", Map())
           case _                  => ???
         }
 
@@ -51,7 +54,7 @@ object NativePatchBuild {
           Map(
             "MPPATCH_VERSION" -> version.value,
             "MPPATCH_BUILDID" -> buildId.toString
-          )
+          ) ++ extraEnv
         )
 
         // make the patches list
