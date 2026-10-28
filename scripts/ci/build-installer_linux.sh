@@ -47,7 +47,6 @@ cd target/dist-build/linux/AppDir
   mv -v mppatch-installer usr/bin/
   mv -v *.so usr/lib/
   cp -v ../../../../scripts/res/mppatch-installer.desktop usr/share/applications/
-  cp -v ../../../../scripts/res/mppatch-installer.svg usr/share/icons/hicolor/scalable/apps/
   for scale in {8,16,22,24,32,48,64,256}; do
     mkdir -pv usr/share/icons/hicolor/"${scale}x${scale}"/apps
     cp -v ../../../../scripts/res/mppatch-installer-$scale.png usr/share/icons/hicolor/"${scale}x${scale}"/apps/mppatch-installer.png
