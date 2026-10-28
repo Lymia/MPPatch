@@ -149,16 +149,10 @@ object MPPatchInstaller extends LaunchFrameError {
         log.warn("If you did not intend this, I don't know what to say.")
         ConfigurationStore.updatePreferences(defaultCivilizationPath)
         NativeImageGenConfig.run()
-      } else if (!isSbt) {
+      } else {
         // start main frame
         ConfigurationStore.updatePreferences(defaultCivilizationPath)
-        new LegacyMainFrame(locale).showForm()
-      } else {
-        // start development main frame
-        log.warn("Launching development installer version!")
-        ConfigurationStore.updatePreferences(defaultCivilizationPath)
-        if (args.length == 1 && args(0) == "--new") new MainFrame(locale).showForm()
-        else new LegacyMainFrame(locale).showForm()
+        new MainFrame(locale).showForm()
       }
     } catch {
       case _: InstallerException => // ignored

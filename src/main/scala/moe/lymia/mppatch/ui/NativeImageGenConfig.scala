@@ -29,7 +29,7 @@ object NativeImageGenConfig {
   private val sleepDur = 1000
 
   private def forLocale(locale: Locale): Unit = {
-    class TestFrame(locale: Locale) extends LegacyMainFrame(locale) {
+    class TestFrame(locale: Locale) extends MainFrame(locale) {
       override protected val neverShowMessage: Boolean = true
       def doInstallUninstall(): Unit = {
         if (uninstallButton.isEnabled) uninstallButton.doClick()
