@@ -15,7 +15,8 @@ jobs:
     steps:
       - uses: sbt/setup-sbt@v1
       - run: sudo dnf update
-      - run: sudo dnf install -y mingw32-gcc mingw32-binutils java-25-openjdk-devel nasm make
+      - run: sudo dnf install -y mingw32-gcc mingw32-binutils java-25-openjdk-devel nasm make clang lld rustup
+      - run: rustup-init -y
 
       # Initialize git
       - uses: actions/checkout@v7
