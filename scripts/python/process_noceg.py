@@ -20,36 +20,59 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 #  THE SOFTWARE.
 
+import glob
 import json
+import os
+import shutil
 import sys
 
-ceg_file = sys.argv[1]
-ceg_json = json.loads(open(ceg_file).read())
+source_path = "res/noceg"
+target_path = "src/patch/mppatch-core/src/data"
 
-stub_functions = []
-for function in ceg_json["ConstantOrStolen"]:
-    assert len(function) == 1
-    key = list(function)[0]
-    data = function[key]
-    assert(key == data["Prologue"])
-    assert(not "IsFunction" in data)
-    assert(data["Type"] == 2 or data["Type"] == 3)
+if os.path.exists(target_path):
+    shutil.rmtree(target_path)
+    os.makedirs(target_path)
 
-    stub_functions.append((int(key, 16), int(data["Value"], 16)))
-if "Init" in ceg_json:
-    stub_functions.append((int(ceg_json["Init"], 16), 1))
-for offset in ceg_json["Integrity"]:
-    stub_functions.append((int(offset, 16), 1))
-for offset in ceg_json["RegisterThreads"]:
-    stub_functions.append((int(offset, 16), 1))
-if "Terminate" in ceg_json:
-    stub_functions.append((int(ceg_json["Terminate"], 16), 1))
-for offset in ceg_json["TestSecret"]:
-    stub_functions.append((int(offset, 16), 1))
+for ceg_file in glob.glob(f"{source_path}/*.json"):
+    print(f"Processing {ceg_file}...")
 
-print("CegPatches {")
-print("  stub_functions: &[")
-for stub in sorted(stub_functions):
-    print(f"    ({hex(stub[0])}, {stub[1]}),")
-print("  ],")
-print("}")
+    ceg_json = json.loads(open(ceg_file).read())
+
+    static_functions = []
+    stub_functions = []
+
+    for function in ceg_json["ConstantOrStolen"]:
+        assert len(function) == 1
+        key = list(function)[0]
+        data = function[key]
+        assert(key == data["Prologue"])
+        assert(not "IsFunction" in data)
+        assert(data["Type"] == 2 or data["Type"] == 3)
+
+        static_functions.append((int(key, 16), int(data["Value"], 16)))
+
+    if "Init" in ceg_json:
+        stub_functions.append(int(ceg_json["Init"], 16))
+    for offset in ceg_json["Integrity"]:
+        stub_functions.append(int(offset, 16))
+    for offset in ceg_json["RegisterThreads"]:
+        stub_functions.append(int(offset, 16))
+    if "Terminate" in ceg_json:
+        stub_functions.append(int(ceg_json["Terminate"], 16))
+    for offset in ceg_json["TestSecret"]:
+        stub_functions.append(int(offset, 16))
+
+    string = ""
+    string += "CegPatches {\n"
+    string += "  static_functions: &[\n"
+    for stub in sorted(static_functions):
+        string += f"    ({hex(stub[0])}, {hex(stub[1])}),\n"
+    string += "  ],\n"
+    string += "  stub_functions: &[\n"
+    for stub in sorted(stub_functions):
+        string += f"    {hex(stub)},\n"
+    string += "  ],\n"
+    string += "}\n"
+
+    basename = ceg_file.split("/")[-1].replace(".json", ".inc")
+    open(f"{target_path}/{basename}", "w").write(string)

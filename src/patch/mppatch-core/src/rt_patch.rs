@@ -65,19 +65,20 @@ impl Drop for PatchedFunction {
 unsafe impl Send for PatchedFunction {}
 unsafe impl Sync for PatchedFunction {}
 
-pub unsafe fn nop_function(patch_addr: *mut c_void, return_value: u32) {
-    debug!("Disabling function @ {patch_addr:?} => {return_value}");
-    if return_value <= 0xFF {
-        let old_prot = unprotect_region(patch_addr, 3);
-        (patch_addr as *mut u8).write_unaligned(0xb0);
-        (patch_addr.offset(1) as *mut u8).write_unaligned(return_value as u8);
-        (patch_addr.offset(2) as *mut u8).write_unaligned(0xc3);
-        reprotect_region(patch_addr, 5, old_prot);
-    } else {
-        let old_prot = unprotect_region(patch_addr, 6);
-        (patch_addr as *mut u8).write_unaligned(0xb8);
-        (patch_addr.offset(1) as *mut u32).write_unaligned(return_value);
-        (patch_addr.offset(5) as *mut u8).write_unaligned(0xc3);
-        reprotect_region(patch_addr, 5, old_prot);
-    }
+pub unsafe fn replace_function(patch_addr: *mut c_void, return_value: u32) {
+    debug!("Replacing protected function @ {patch_addr:?} => 0x{return_value:x}");
+    let old_prot = unprotect_region(patch_addr, 6);
+    (patch_addr as *mut u8).write_unaligned(0xB8);
+    (patch_addr.offset(1) as *mut u32).write_unaligned(return_value);
+    (patch_addr.offset(5) as *mut u8).write_unaligned(0xC3);
+    reprotect_region(patch_addr, 6, old_prot);
+}
+
+pub unsafe fn stub_function(patch_addr: *mut c_void) {
+    debug!("Disabling function @ {patch_addr:?}");
+    let old_prot = unprotect_region(patch_addr, 3);
+    (patch_addr as *mut u8).write_unaligned(0xB0);
+    (patch_addr.offset(1) as *mut u8).write_unaligned(1);
+    (patch_addr.offset(2) as *mut u8).write_unaligned(0xC3);
+    reprotect_region(patch_addr, 3, old_prot);
 }

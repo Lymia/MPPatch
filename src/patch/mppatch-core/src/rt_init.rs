@@ -68,20 +68,22 @@ fn early_setup() {
 fn win32_text_hash(path: &Path) -> String {
     use sha2::{Digest, Sha256};
 
-    let data = std::fs::read(path).ok().expect("Could not read Civilization V binary.");
+    let data = std::fs::read(path)
+        .ok()
+        .expect("Could not read Civilization V binary.");
     let pe = pe_parser::pe::parse_portable_executable(&data).expect("Could not parse PE file.");
     for section in pe.section_table {
         if section.name == *b".text\0\0\0" {
             let start = section.pointer_to_raw_data as usize;
             let len = section.size_of_raw_data.min(section.virtual_size) as usize;
-            let segment = &data[start..start+len];
+            let segment = &data[start..start + len];
 
             let mut out = String::new();
             for byte in Sha256::digest(segment) {
                 out.push_str(&format!("{byte:02x}"));
             }
             log::debug!(".text hash: {out}");
-            return out
+            return out;
         }
     }
     panic!("Could not find .text section!")

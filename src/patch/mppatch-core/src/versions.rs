@@ -53,11 +53,16 @@ pub enum SymbolInfo {
 
 #[derive(Copy, Clone)]
 pub struct CegPatches {
-    pub stub_functions: &'static [(usize, u32)],
+    pub static_functions: &'static [(usize, u32)],
+    pub stub_functions: &'static [usize],
 }
 impl Debug for CegPatches {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "CegDefinitions({} patches)", self.stub_functions.len())
+        write!(
+            f,
+            "CegDefinitions({} patches)",
+            self.static_functions.len() + self.stub_functions.len()
+        )
     }
 }
 

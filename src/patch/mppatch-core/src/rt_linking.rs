@@ -1,12 +1,12 @@
 use crate::{
     rt_init,
     rt_init::MppatchCtx,
-    rt_patch::PatchedFunction,
-    versions::{ProxySource, SymbolInfo},
+    rt_patch::{replace_function, stub_function, PatchedFunction},
+    versions::{CegPatches, ProxySource, SymbolInfo},
 };
 use anyhow::Result;
 use dlopen::raw::Library;
-use log::debug;
+use log::{debug, info};
 use std::{
     any::type_name,
     ffi::c_void,
@@ -15,8 +15,6 @@ use std::{
     ptr,
     sync::atomic::{AtomicUsize, Ordering},
 };
-use crate::rt_patch::nop_function;
-use crate::versions::CegPatches;
 
 unsafe fn runtime_transmute<T: Copy, V: Copy>(t: T) -> V {
     if size_of::<T>() == size_of::<V>() {
@@ -96,8 +94,9 @@ impl<T: Copy> PatcherContext<T> {
                     debug!("Original function pointer ({sym}) = {orig:?}");
                 }
                 #[cfg(unix)]
-                SymbolInfo::DllProxy(source, name) =>
-                    panic!("DllProxy does not exist on Unix: {source:?} / {name:?}"),
+                SymbolInfo::DllProxy(source, name) => {
+                    panic!("DllProxy does not exist on Unix: {source:?} / {name:?}")
+                }
                 SymbolInfo::PublicNamed(sym, sym_size) => {
                     let dylib_civ = Library::open_self()?;
                     let patch = PatchedFunction::create(
@@ -162,10 +161,14 @@ pub fn init(_: &MppatchCtx) -> Result<()> {
 
 pub unsafe fn apply_noceg(patches: &'static Option<CegPatches>) {
     if let Some(patches) = patches {
-        debug!("Applying noceg patches...");
-        for (offset, ret_v) in patches.stub_functions {
+        info!("Disabling CEG integrity checks...");
+        for (offset, ret_v) in patches.static_functions {
             let target: *mut c_void = runtime_transmute(adjust_offset(*offset));
-            nop_function(target, *ret_v);
+            replace_function(target, *ret_v);
+        }
+        for offset in patches.stub_functions {
+            let target: *mut c_void = runtime_transmute(adjust_offset(*offset));
+            stub_function(target);
         }
     }
 }
