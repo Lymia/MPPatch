@@ -64,8 +64,32 @@ fn early_setup() {
     }
 }
 
+#[cfg(windows)]
+fn win32_text_hash(path: &Path) -> String {
+    use sha2::{Digest, Sha256};
+
+    let data = std::fs::read(path).ok().expect("Could not read Civilization V binary.");
+    let pe = pe_parser::pe::parse_portable_executable(&data).expect("Could not parse PE file.");
+    for section in pe.section_table {
+        if section.name == *b".text\0\0\0" {
+            let start = section.pointer_to_raw_data as usize;
+            let len = section.size_of_raw_data.min(section.virtual_size) as usize;
+            let segment = &data[start..start+len];
+
+            let mut out = String::new();
+            for byte in Sha256::digest(segment) {
+                out.push_str(&format!("{byte:02x}"));
+            }
+            log::debug!(".text hash: {out}");
+            return out
+        }
+    }
+    panic!("Could not find .text section!")
+}
+
 fn create_ctx() -> Result<MppatchCtx> {
-    let mut exe_dir = std::env::current_exe()?.canonicalize()?;
+    let exe_path = std::env::current_exe()?;
+    let mut exe_dir = exe_path.canonicalize()?;
     exe_dir.pop();
 
     let mut config_file = exe_dir.clone();
@@ -74,7 +98,13 @@ fn create_ctx() -> Result<MppatchCtx> {
     let config = std::io::read_to_string(File::open(config_file)?)?;
     let config = toml::from_str::<MppatchConfig>(&config)?;
 
-    let version_info = find_info(&config.bin_sha256)?;
+    #[cfg(unix)]
+    let text_hash = String::new();
+
+    #[cfg(windows)]
+    let text_hash = win32_text_hash(&exe_path);
+
+    let version_info = find_info(&config.bin_sha256, &text_hash)?;
 
     Ok(MppatchCtx { exe_dir, config, version_info })
 }

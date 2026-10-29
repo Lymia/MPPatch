@@ -13,9 +13,10 @@ mod rt_patch;
 mod rt_platform;
 mod versions;
 
-fn ctor_impl() -> anyhow::Result<()> {
+unsafe fn ctor_impl() -> anyhow::Result<()> {
     let ctx = rt_init::run()?;
     rt_linking::init(ctx)?;
+    rt_linking::apply_noceg(&ctx.version_info.ceg_patches);
     if ctx.has_feature(MppatchFeature::Multiplayer) {
         #[cfg(windows)]
         hook_proxy::init(ctx)?;
@@ -30,6 +31,6 @@ fn ctor_impl() -> anyhow::Result<()> {
 }
 
 #[linktime::ctor(unsafe)]
-fn ctor() {
+unsafe fn ctor() {
     rt_init::check_error(ctor_impl());
 }

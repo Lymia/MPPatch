@@ -1,10 +1,9 @@
 /.idea
 /.bsp
 /*.iml
-
 /out
 /target
-
 /mppatch_*
-
 /install.ps1 # Github actions
+/venv
+*.kate-swp

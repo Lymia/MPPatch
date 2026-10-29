@@ -4,9 +4,7 @@ use crate::{
     rt_patch::PatchedFunction,
     versions::{ProxySource, SymbolInfo},
 };
-use anyhow::{bail, Result};
-use atomic::Atomic;
-use bytemuck::NoUninit;
+use anyhow::Result;
 use dlopen::raw::Library;
 use log::debug;
 use std::{
@@ -17,6 +15,8 @@ use std::{
     ptr,
     sync::atomic::{AtomicUsize, Ordering},
 };
+use crate::rt_patch::nop_function;
+use crate::versions::CegPatches;
 
 unsafe fn runtime_transmute<T: Copy, V: Copy>(t: T) -> V {
     if size_of::<T>() == size_of::<V>() {
@@ -96,7 +96,8 @@ impl<T: Copy> PatcherContext<T> {
                     debug!("Original function pointer ({sym}) = {orig:?}");
                 }
                 #[cfg(unix)]
-                SymbolInfo::DllProxy(_, _) => panic!("DllProxy does not exist on Unix."),
+                SymbolInfo::DllProxy(source, name) =>
+                    panic!("DllProxy does not exist on Unix: {source:?} / {name:?}"),
                 SymbolInfo::PublicNamed(sym, sym_size) => {
                     let dylib_civ = Library::open_self()?;
                     let patch = PatchedFunction::create(
@@ -107,14 +108,9 @@ impl<T: Copy> PatcherContext<T> {
                     );
                     self.patch_info = Some(PatchTarget::PatchedFunction(patch));
                 }
-                SymbolInfo::Win32Offsets(offsets) => match BINARY_TYPE.load(Ordering::Relaxed) {
-                    BinaryType::Dx9 => self.patch_offset(offsets.dx9, offsets.name, target)?,
-                    BinaryType::Dx11 => self.patch_offset(offsets.dx11, offsets.name, target)?,
-                    BinaryType::Tablet => {
-                        self.patch_offset(offsets.tablet, offsets.name, target)?
-                    }
-                    _ => bail!("incorrect BINARY_TYPE!"),
-                },
+                SymbolInfo::Offset(name, offset, length) => {
+                    self.patch_offset((offset, length), name, target)?
+                }
             }
         }
 
@@ -127,13 +123,7 @@ impl<T: Copy> PatcherContext<T> {
             None => match sym_info {
                 SymbolInfo::DllProxy(_, _) => unimplemented!("DllProxy fallback"),
                 SymbolInfo::PublicNamed(_, _) => unimplemented!("PublicNamed fallback"),
-                SymbolInfo::Win32Offsets(offsets) => {
-                    let offset = match BINARY_TYPE.load(Ordering::Relaxed) {
-                        BinaryType::Dx9 => offsets.dx9.0,
-                        BinaryType::Dx11 => offsets.dx11.0,
-                        BinaryType::Tablet => offsets.tablet.0,
-                        _ => panic!("incorrect BINARY_TYPE!"),
-                    };
+                SymbolInfo::Offset(_, offset, _) => {
                     let offset = adjust_offset(offset);
                     runtime_transmute(offset)
                 }
@@ -150,23 +140,6 @@ impl<T: Copy> PatcherContext<T> {
     }
 }
 
-/// The type of binary that was launched.
-#[derive(Copy, Clone, Debug, NoUninit)]
-#[repr(u8)]
-pub enum BinaryType {
-    /// DX9 Windows binaries
-    Dx9,
-    /// DX11 Windows binaries
-    Dx11,
-    /// Tablet Windows binaries
-    Tablet,
-    /// Any POSIX binary
-    Posix,
-    /// Not known
-    Unknown,
-}
-
-static BINARY_TYPE: Atomic<BinaryType> = Atomic::new(BinaryType::Unknown);
 static BINARY_BASE: AtomicUsize = AtomicUsize::new(0);
 
 fn adjust_offset(offset: usize) -> usize {
@@ -175,29 +148,6 @@ fn adjust_offset(offset: usize) -> usize {
 }
 
 pub fn init(_: &MppatchCtx) -> Result<()> {
-    let exe_name = std::env::current_exe()?;
-    let exe_name = exe_name.file_name().unwrap();
-
-    // find the binary type (mostly needed for Windows, where we hook a .dll)
-    let ty = match exe_name.to_string_lossy().as_ref() {
-        "CivilizationV.exe" => BinaryType::Dx9,
-        "CivilizationV_DX11.exe" => BinaryType::Dx11,
-        "CivilizationV_Tablet.exe" => BinaryType::Tablet,
-        "Civ5XP" => BinaryType::Posix,
-        "Civ5XP.orig" => BinaryType::Posix,
-        exe_name => {
-            #[cfg(unix)]
-            {
-                log::warn!("Unknown exe name: {exe_name}");
-                BinaryType::Posix
-            }
-
-            #[cfg(windows)]
-            bail!("Unknown exe name: {exe_name}")
-        }
-    };
-    BINARY_TYPE.store(ty, Ordering::Relaxed);
-
     // find the main executable base address
     #[cfg(windows)]
     let base_offset = unsafe { winapi::um::libloaderapi::GetModuleHandleA(ptr::null()) as usize };
@@ -206,7 +156,16 @@ pub fn init(_: &MppatchCtx) -> Result<()> {
     BINARY_BASE.store(base_offset, Ordering::Relaxed);
 
     // print information and return
-    debug!("Binary type: {:?}", BINARY_TYPE.load(Ordering::Relaxed));
     debug!("Binary offset: 0x{:08x}", BINARY_BASE.load(Ordering::Relaxed));
     Ok(())
+}
+
+pub unsafe fn apply_noceg(patches: &'static Option<CegPatches>) {
+    if let Some(patches) = patches {
+        debug!("Applying noceg patches...");
+        for (offset, ret_v) in patches.stub_functions {
+            let target: *mut c_void = runtime_transmute(adjust_offset(*offset));
+            nop_function(target, *ret_v);
+        }
+    }
 }
