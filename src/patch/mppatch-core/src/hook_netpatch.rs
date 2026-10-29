@@ -52,7 +52,7 @@ pub unsafe fn SetActiveDLCAndMods(
     func(this, dlc_list, mod_list, reload_dlc, reload_mods)
 }
 
-fn hook_install() {
+pub fn init(_: &MppatchCtx) -> Result<()> {
     let ctx = rt_init::get_ctx();
     log::info!("Applying SetActiveDLCAndMods patch...");
     unsafe {
@@ -63,20 +63,12 @@ fn hook_install() {
                 .patch(ctx.version_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy),
         );
     }
-}
-fn hook_unpatch() {
-    SET_ACTIVE_DLC_AND_MODS.lock().unwrap().unpatch();
-}
-
-pub fn init(_: &MppatchCtx) -> Result<()> {
-    #[cfg(unix)]
-    hook_install();
     Ok(())
 }
 
 #[linktime::dtor(unsafe)]
 fn destroy_set_dlc() {
-    hook_unpatch()
+    SET_ACTIVE_DLC_AND_MODS.lock().unwrap().unpatch();
 }
 
 #[derive(Debug)]
@@ -161,14 +153,8 @@ impl Debug for ModInfo {
     }
 }
 
-pub fn install() {
-    #[cfg(windows)]
-    hook_install();
-}
 pub fn reset() {
     let mut lock = STATE.lock().unwrap();
-    #[cfg(windows)]
-    hook_unpatch();
     lock.reset();
 }
 
@@ -181,8 +167,6 @@ unsafe fn SetActiveDLCAndModsProxy_impl(
 ) -> c_int {
     let state = {
         let mut lock = STATE.lock().unwrap();
-        #[cfg(windows)]
-        hook_unpatch();
         lock.take()
     };
 

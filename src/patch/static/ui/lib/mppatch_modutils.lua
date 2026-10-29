@@ -23,7 +23,6 @@ local patch = _mpPatch.patch
 function _mpPatch.forceReloadMods()
     patch.NetPatch.reset()
     patch.NetPatch.overrideReloadMods(true)
-    patch.NetPatch.install()
 end
 function _mpPatch.overrideWithModList(list)
     _mpPatch.debugPrint("Overriding mods...")
@@ -34,7 +33,6 @@ function _mpPatch.overrideWithModList(list)
         patch.NetPatch.pushMod(id, mod.Version)
     end
     patch.NetPatch.overrideModList()
-    patch.NetPatch.install()
 end
 
 function _mpPatch.overrideModsFromActivatedList()

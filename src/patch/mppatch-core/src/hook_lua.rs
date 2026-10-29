@@ -171,14 +171,6 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
                 Ok(())
             })?,
         )?;
-
-        net_patch_table.set(
-            "install",
-            lua.create_function(|_, _: ()| {
-                hook_netpatch::install();
-                Ok(())
-            })?,
-        )?;
         net_patch_table.set(
             "reset",
             lua.create_function(|_, _: ()| {
