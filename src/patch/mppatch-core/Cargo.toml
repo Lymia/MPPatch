@@ -29,7 +29,7 @@ winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "std"] }
 panic = "abort"
 
 [profile.release]
-opt-level = 2
+opt-level = "s"
 lto = true
 debug = "line-tables-only"
 panic = "abort"
