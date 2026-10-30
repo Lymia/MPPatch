@@ -73,7 +73,7 @@ object InstallerResourceBuild {
       for (sizes <- Seq(8, 16, 22, 24, 32, 48, 64, 256, 512)) yield {
         val fileName     = f"mppatch-installer-$sizes.png"
         val installerPng = (Compile / resourceManaged).value / "moe" / "lymia" / "mppatch" / "ui" / fileName
-        IO.copyFile(baseDirectory.value / "scripts" / "res" / fileName, installerPng)
+        IO.copyFile(baseDirectory.value / "res" / "installer" / fileName, installerPng)
         installerPng
       }
     }.taskValue,
