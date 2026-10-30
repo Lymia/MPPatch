@@ -168,7 +168,7 @@ pub unsafe fn apply_noceg(patches: &'static Option<CegPatches>) {
         }
         for (offset, ret_v) in patches.relative_functions {
             let target: *mut c_void = runtime_transmute(adjust_offset(*offset));
-            replace_function(target, adjust_offset(*ret_v));
+            replace_function(target, adjust_offset(*ret_v) as u32);
         }
         for offset in patches.stub_functions {
             let target: *mut c_void = runtime_transmute(adjust_offset(*offset));
