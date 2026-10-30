@@ -1,11 +1,8 @@
-cargo-features = ["panic-immediate-abort"]
-
 [package]
-name = "mppatch-core"
+name = "mppatch_native-patch"
 version = "0.0.0"
 authors = ["Lymia Kanokawa <lymia@lymia.moe>"]
 edition = "2021"
-
 
 [lib]
 crate-type = ["cdylib"]
@@ -26,15 +23,3 @@ toml = { version = "1.1", default-features = false, features = ["parse", "serde"
 pe-parser = "0.7.0"
 sha2 = "0.11.1"
 winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "std"] }
-
-[profile.dev]
-opt-level = "s"
-lto = true
-debug = "line-tables-only"
-panic = "abort"
-
-[profile.release]
-opt-level = "s"
-lto = true
-debug = "none"
-panic = "immediate-abort"

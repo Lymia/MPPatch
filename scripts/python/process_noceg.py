@@ -27,7 +27,7 @@ import shutil
 import sys
 
 source_path = "res/noceg"
-target_path = "src/patch/mppatch-core/src/data"
+target_path = "src/native-patch/src/data"
 
 if os.path.exists(target_path):
     shutil.rmtree(target_path)

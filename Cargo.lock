@@ -444,7 +444,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mppatch-core"
+name = "mppatch_native-patch"
 version = "0.0.0"
 dependencies = [
  "anyhow",

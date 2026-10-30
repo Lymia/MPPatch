@@ -30,7 +30,6 @@ object NativePatchBuild {
   // Patch build script
   val settings = Seq(
     Keys.nativeVersions := {
-      val crateDir = baseDirectory.value / "src" / "patch" / "mppatch-core"
       val logger   = streams.value.log
 
       for (
@@ -39,18 +38,21 @@ object NativePatchBuild {
       ) yield {
         val (rustTarget, outName, targetName, extraEnv) = platform match {
           case PlatformType.Win32 => (
-            "i686-win7-windows-gnu", "mppatch_core.dll", "mppatch_core.dll",
+            "i686-win7-windows-gnu", "mppatch_native-patch.dll", "mppatch_native_patch.dll",
             Map("LUA_LIB_NAME" -> "lua51_Win32")
           )
-          case PlatformType.Linux => ("i686-unknown-linux-gnu", "mppatch_core.so", "libmppatch_core.so", Map())
+          case PlatformType.Linux => (
+            "i686-unknown-linux-gnu", "mppatch_native-patch.so", "libmppatch_native_patch.so",
+            Map()
+          )
           case _                  => ???
         }
 
         // run Cargo
         val buildId = UUID.randomUUID()
         runProcess(
-          Seq("cargo", "build", "--target", rustTarget, "--release"),
-          crateDir,
+          Seq("cargo", "build", "--target", rustTarget, "--release", "-p", "mppatch_native-patch"),
+          baseDirectory.value,
           Map(
             "MPPATCH_VERSION" -> version.value,
             "MPPATCH_BUILDID" -> buildId.toString
@@ -58,15 +60,14 @@ object NativePatchBuild {
         )
 
         // make the patches list
-        PatchFile(outName, crateDir / "target" / rustTarget / "release" / targetName, buildId.toString)
+        PatchFile(outName, baseDirectory.value / "target" / rustTarget / "release" / targetName, buildId.toString)
       }
     },
     Keys.win32Wrapper := {
       if (PlatformType.currentPlatform.shouldBuildNative(PlatformType.Win32)) {
         val __ = Keys.nativeVersions.value // make an artifical dependency
         runProcess(Seq("scripts/ci/build-win32-wrapper.sh"))
-        val coreDir = baseDirectory.value / "src" / "patch" / "mppatch-core";
-        Some(coreDir / "target" / "i686-win7-windows-gnu" / "release" / "mppatch_core_wrapper.dll")
+        Some(baseDirectory.value / "target" / "i686-win7-windows-gnu" / "release" / "mppatch_native-patch_wrapper.dll")
       } else None
     }
   )

@@ -25,13 +25,13 @@
 set -eu
 
 scripts/python/make-win32-wrapper-asm.py \
-  src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core.dll \
-  >src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.s
+  target/i686-win7-windows-gnu/release/mppatch_native_patch.dll \
+  >target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.s
 nasm -f win32 \
-  src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.s \
-  -o src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.o
+  target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.s \
+  -o target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.o
 clang -fuse-ld=lld -target i686-win7-windows-gnu -shared \
-  src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.o \
-  src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core.dll \
-  -o src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.dll
-strip src/patch/mppatch-core/target/i686-win7-windows-gnu/release/mppatch_core_wrapper.dll
+  target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.o \
+  target/i686-win7-windows-gnu/release/mppatch_native_patch.dll \
+  -o target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.dll
+strip target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.dll

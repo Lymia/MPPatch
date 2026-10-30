@@ -17,8 +17,8 @@
         {"from": "CvGameDatabaseWin32Final Release.dll", "to": "CvGameDatabase_Original.dll"}
       ],
       "writeFile": [
-        {"from": "native/mppatch_core_wrapper.dll", "to": "CvGameDatabaseWin32Final Release.dll"},
-        {"from": "native/mppatch_core.dll", "to": "mppatch_core.dll"}
+        {"from": "native/mppatch_native-patch_wrapper.dll", "to": "CvGameDatabaseWin32Final Release.dll"},
+        {"from": "native/mppatch_native-patch.dll", "to": "mppatch_native-patch.dll"}
       ],
       "writeConfig": [
         "mppatch_config.toml"

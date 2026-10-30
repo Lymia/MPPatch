@@ -1,0 +1,19 @@
+cargo-features = ["panic-immediate-abort"]
+
+[workspace]
+resolver = "3"
+members = [
+    "src/native-patch"
+]
+
+[profile.dev]
+opt-level = "s"
+lto = true
+debug = "line-tables-only"
+panic = "abort"
+
+[profile.release]
+opt-level = "s"
+lto = true
+debug = "none"
+panic = "immediate-abort"

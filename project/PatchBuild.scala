@@ -77,9 +77,9 @@ object PatchBuild {
         .sorted
         .map { x =>
           val platform = x.getName match {
-            case "mppatch_core.dll.build-id"   => "win32"
-            case "mppatch_core.dylib.build-id" => "macos"
-            case "mppatch_core.so.build-id"    => "linux"
+            case "mppatch_native-patch.dll.build-id"   => "win32"
+            case "mppatch_native-patch.dylib.build-id" => "macos"
+            case "mppatch_native-patch.so.build-id"    => "linux"
           }
           s"_mpPatch.version.buildId[${LuaUtils.quote(platform)}] = ${LuaUtils.quote(IO.read(x))}"
         }

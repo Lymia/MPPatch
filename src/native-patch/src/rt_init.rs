@@ -154,7 +154,7 @@ pub fn run() -> Result<&'static MppatchCtx> {
         panic!("Specified Civilization version is not compatible with this patch.");
     }
 
-    info!("mppatch-core v{} loaded", ctx.version());
+    info!("mppatch_native-patch v{} loaded", ctx.version());
     info!("Game version: {}", ctx.version_info.name);
     info!("");
     trace!("build-id: {}", ctx.build_id());
