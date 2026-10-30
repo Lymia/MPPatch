@@ -34,7 +34,7 @@ $INSTALLER_NAME = "MPPatch-Installer_win32_$VERSION.exe"
 
 # Build NSIS image
 echo "Building NSIS installer wrapper"
-makensis scripts/res/installer.nsh
+makensis res/installer/installer.nsh
 
 # Extract NSIS resources partition and run rcedit
 [byte[]]$bytes = [System.IO.File]::ReadAllBytes("target/mppatch-installer-unmodified.exe")
@@ -67,6 +67,6 @@ target/deps/rcedit.exe "target/mppatch-installer-stub.exe" `
     --set-product-version "$VERSION" `
     --set-version-string "LegalCopyright" "(C) Lymia Kanokawa; available under the MIT License" `
     --set-version-string "OriginalFilename" "$INSTALLER_NAME" `
-    --set-icon "scripts/res/mppatch-installer.ico" `
-    --application-manifest "scripts/res/win32-manifest.xml"
+    --set-icon "res/installer/mppatch-installer.ico" `
+    --application-manifest "res/installer/win32-manifest.xml"
 cmd /c copy /b "target\mppatch-installer-stub.exe" + "target\mppatch-installer-data.dat" "target\$INSTALLER_NAME"

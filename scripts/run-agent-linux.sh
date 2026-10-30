@@ -28,8 +28,8 @@ set -eu
 
 JAR_NAME="$(sbt "print assembly" --error)"
 
-rm -rfv target/native-image-config-temp scripts/native-image-config/linux
-mkdir -p scripts/native-image-config/linux
+rm -rfv target/native-image-config-temp res/native-image-config/linux
+mkdir -p res/native-image-config/linux
 target/deps/graalvm-linux/bin/java \
   -agentlib:native-image-agent=config-output-dir=target/native-image-config-temp \
   -jar "$JAR_NAME" @nativeImageGenerateConfig 9e3c6db9-2a2f-4a22-9eb5-fba1a710449c

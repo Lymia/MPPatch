@@ -27,10 +27,10 @@ $JAR_NAME = "$( sbt "print assembly" --error )".Trim()
 if (Test-Path target/native-image-config-temp) {
     rm -Recurse -Force -Verbose target/native-image-config-temp
 }
-if (Test-Path scripts/native-image-config/win32) {
-    rm -Recurse -Force -Verbose scripts/native-image-config/win32
+if (Test-Path res/native-image-config/win32) {
+    rm -Recurse -Force -Verbose res/native-image-config/win32
 }
-mkdir scripts/native-image-config/win32
+mkdir res/native-image-config/win32
 
 target/graalvm-win32/bin/java.exe `
   -agentlib:native-image-agent=config-output-dir=target/native-image-config-temp `

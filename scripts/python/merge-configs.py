@@ -130,12 +130,12 @@ def merge_resource_config(file_a, file_b, output):
     open(output, "w").write(json.dumps(new_json, indent=2))
 
 
-merge_jni_config(f"scripts/native-image-config/common-flatlaf-{platform}/jni-config.json",
+merge_jni_config(f"res/native-image-config/common-flatlaf-{platform}/jni-config.json",
                  "target/native-image-config-temp/jni-config.json",
-                 f"scripts/native-image-config/{platform}/jni-config.json")
-merge_jni_config(f"scripts/native-image-config/common-flatlaf-{platform}/reflect-config.json",
+                 f"res/native-image-config/{platform}/jni-config.json")
+merge_jni_config(f"res/native-image-config/common-flatlaf-{platform}/reflect-config.json",
                  "target/native-image-config-temp/reflect-config.json",
-                 f"scripts/native-image-config/{platform}/reflect-config.json")
-merge_resource_config(f"scripts/native-image-config/common-flatlaf-{platform}/resource-config.json",
+                 f"res/native-image-config/{platform}/reflect-config.json")
+merge_resource_config(f"res/native-image-config/common-flatlaf-{platform}/resource-config.json",
                       "target/native-image-config-temp/resource-config.json",
-                      f"scripts/native-image-config/{platform}/resource-config.json")
+                      f"res/native-image-config/{platform}/resource-config.json")

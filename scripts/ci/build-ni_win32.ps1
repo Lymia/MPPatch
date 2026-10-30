@@ -56,6 +56,6 @@ target/deps/rcedit.exe "target/native-image-win32/mppatch-installer.exe" `
     --set-version-string "LegalCopyright" "(C) Lymia Kanokawa; available under the MIT License" `
     --set-version-string "OriginalFilename" "mppatch-installer.exe" `
     --set-version-string "Comments" "This is the internal installer. It should not be downloaded seperately." `
-    --set-icon "scripts/res/mppatch-installer.ico" `
-    --application-manifest "scripts/res/win32-manifest.xml"
+    --set-icon "res/installer/mppatch-installer.ico" `
+    --application-manifest "res/installer/win32-manifest.xml"
 editbin /SUBSYSTEM:WINDOWS "target/native-image-win32/mppatch-installer.exe"

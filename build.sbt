@@ -82,7 +82,7 @@ nativeImageGraalHome := (target.value / "deps" / f"graalvm-${PlatformType.curren
 nativeImageOptions += "--no-fallback"
 nativeImageOptions += "-Djava.awt.headless=false"
 nativeImageOptions += "--strict-image-heap"
-nativeImageOptions += s"-H:ConfigurationFileDirectories=${baseDirectory.value / "scripts" / "native-image-config" / PlatformType.currentPlatform.name}"
+nativeImageOptions += s"-H:ConfigurationFileDirectories=${baseDirectory.value / "res" / "native-image-config" / PlatformType.currentPlatform.name}"
 
 Global / excludeLintKeys += nativeImageJvm
 Global / excludeLintKeys += nativeImageJvmIndex
