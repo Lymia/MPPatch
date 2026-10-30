@@ -1,3 +1,5 @@
+cargo-features = ["panic-immediate-abort"]
+
 [package]
 name = "mppatch-core"
 version = "0.0.0"
@@ -26,10 +28,13 @@ sha2 = "0.11.1"
 winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "std"] }
 
 [profile.dev]
+opt-level = "s"
+lto = true
+debug = "line-tables-only"
 panic = "abort"
 
 [profile.release]
 opt-level = "s"
 lto = true
-debug = "line-tables-only"
-panic = "abort"
+debug = "none"
+panic = "immediate-abort"
