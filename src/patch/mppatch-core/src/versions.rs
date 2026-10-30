@@ -54,6 +54,7 @@ pub enum SymbolInfo {
 #[derive(Copy, Clone)]
 pub struct CegPatches {
     pub static_functions: &'static [(usize, u32)],
+    pub relative_functions: &'static [(usize, usize)],
     pub stub_functions: &'static [usize],
 }
 impl Debug for CegPatches {
