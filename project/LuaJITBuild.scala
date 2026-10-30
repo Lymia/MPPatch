@@ -30,7 +30,7 @@ object LuaJITBuild {
   // Patch build script
   val settings = Seq(
     Keys.luajitCacheDir  := crossTarget.value / "luajit-cache",
-    Keys.luajitSourceDir := baseDirectory.value / "src" / "patch" / "luajit",
+    Keys.luajitSourceDir := baseDirectory.value / "contrib" / "luajit",
     Keys.luajitFiles := {
       val patchDirectory = Keys.luajitCacheDir.value / "output"
       val logger         = streams.value.log
@@ -75,7 +75,7 @@ object LuaJITBuild {
           "STATIC_CC"    -> target_cc,
           "DYNAMIC_CC"   -> s"$target_cc -fPIC",
           "TARGET_LD"    -> target_cc,
-          "TARGET_FLAGS" -> (s"--target=$target" +: "-O2" +: (config_common_secureFlags ++ flags)).mkString(" ")
+          "TARGET_FLAGS" -> (s"--target=$target" +: "-Os" +: (config_common_secureFlags ++ flags)).mkString(" ")
         ) ++ platformEnv
         val excludeDeps = Set(
           "lj_bcdef.h",
