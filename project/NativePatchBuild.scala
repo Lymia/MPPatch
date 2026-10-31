@@ -38,11 +38,11 @@ object NativePatchBuild {
       ) yield {
         val (rustTarget, outName, targetName, extraEnv) = platform match {
           case PlatformType.Win32 => (
-            "i686-win7-windows-gnu", "mppatch_native-patch.dll", "mppatch_native_patch.dll",
+            "i686-win7-windows-gnu", "mpp_hooklib.dll", "mpp_hooklib.dll",
             Map("LUA_LIB_NAME" -> "lua51_Win32")
           )
           case PlatformType.Linux => (
-            "i686-unknown-linux-gnu", "mppatch_native-patch.so", "libmppatch_native_patch.so",
+            "i686-unknown-linux-gnu", "mpp_hooklib.so", "libmpp_hooklib.so",
             Map()
           )
           case _                  => ???
@@ -51,7 +51,7 @@ object NativePatchBuild {
         // run Cargo
         val buildId = UUID.randomUUID()
         runProcess(
-          Seq("cargo", "build", "--target", rustTarget, "--release", "-p", "mppatch_native-patch"),
+          Seq("cargo", "build", "--target", rustTarget, "--release", "-p", "mpp_hooklib"),
           baseDirectory.value,
           Map(
             "MPPATCH_VERSION" -> version.value,
@@ -67,7 +67,7 @@ object NativePatchBuild {
       if (PlatformType.currentPlatform.shouldBuildNative(PlatformType.Win32)) {
         val __ = Keys.nativeVersions.value // make an artifical dependency
         runProcess(Seq("scripts/ci/build-win32-wrapper.sh"))
-        Some(baseDirectory.value / "target" / "i686-win7-windows-gnu" / "release" / "mppatch_native-patch_wrapper.dll")
+        Some(baseDirectory.value / "target" / "i686-win7-windows-gnu" / "release" / "mpp_hooklib_wrapper.dll")
       } else None
     }
   )

@@ -444,7 +444,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "mppatch_native-patch"
+name = "mpp_hooklib"
 version = "0.0.0"
 dependencies = [
  "anyhow",

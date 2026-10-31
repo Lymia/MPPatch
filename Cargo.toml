@@ -3,7 +3,7 @@ cargo-features = ["panic-immediate-abort"]
 [workspace]
 resolver = "3"
 members = [
-    "src/native-patch"
+    "src/mpp_hooklib"
 ]
 
 [profile.dev]

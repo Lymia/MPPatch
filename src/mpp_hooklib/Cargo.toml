@@ -1,5 +1,5 @@
 [package]
-name = "mppatch_native-patch"
+name = "mpp_hooklib"
 version = "0.0.0"
 authors = ["Lymia Kanokawa <lymia@lymia.moe>"]
 edition = "2021"

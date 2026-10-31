@@ -25,13 +25,13 @@
 set -eu
 
 scripts/python/make-win32-wrapper-asm.py \
-  target/i686-win7-windows-gnu/release/mppatch_native_patch.dll \
-  >target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.s
+  target/i686-win7-windows-gnu/release/mpp_hooklib.dll \
+  >target/i686-win7-windows-gnu/release/mpp_hooklib_wrapper.s
 nasm -f win32 \
-  target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.s \
-  -o target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.o
+  target/i686-win7-windows-gnu/release/mpp_hooklib_wrapper.s \
+  -o target/i686-win7-windows-gnu/release/mpp_hooklib_wrapper.o
 clang -fuse-ld=lld -target i686-win7-windows-gnu -shared \
-  target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.o \
-  target/i686-win7-windows-gnu/release/mppatch_native_patch.dll \
-  -o target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.dll
-strip target/i686-win7-windows-gnu/release/mppatch_native-patch_wrapper.dll
+  target/i686-win7-windows-gnu/release/mpp_hooklib_wrapper.o \
+  target/i686-win7-windows-gnu/release/mpp_hooklib.dll \
+  -o target/i686-win7-windows-gnu/release/mpp_hooklib_wrapper.dll
+strip target/i686-win7-windows-gnu/release/mpp_hooklib_wrapper.dll

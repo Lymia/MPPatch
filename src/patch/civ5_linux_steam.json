@@ -19,7 +19,7 @@
       "writeFile": [
         {"from": "Civ5XP.sh", "to": "Civ5XP", "exec": true},
         {"from": "Civ5XP.launch.sh", "to": "Civ5XP.launch", "exec": true},
-        {"from": "native/mppatch_native-patch.so", "to": "mppatch_native-patch.so", "exec": true}
+        {"from": "native/mpp_hooklib.so", "to": "mpp_hooklib.so", "exec": true}
       ],
       "writeConfig": [
         "mppatch_config.toml"
@@ -54,7 +54,7 @@
     "checkFile": [
       "Civ5XP.launch",
       "Civ5XP.orig",
-      "mppatch_native-patch.so",
+      "mpp_hooklib.so",
       "mppatch_luajit.so",
       "mppatch_config.ini",
       "steamassets/assets/dlc/mppatch",
