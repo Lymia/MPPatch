@@ -3,7 +3,8 @@ cargo-features = ["panic-immediate-abort"]
 [workspace]
 resolver = "3"
 members = [
-    "src/mpp_hooklib"
+    "src/mpp_common",
+    "src/mpp_hooklib",
 ]
 
 [profile.dev]
@@ -17,3 +18,6 @@ opt-level = "s"
 lto = true
 debug = "none"
 panic = "immediate-abort"
+
+[workspace.dependencies]
+mpp_common = { version = "*", path = "src/mpp_common" }

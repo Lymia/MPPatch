@@ -1,6 +1,9 @@
 use crate::versions::{find_info, Platform, VersionInfo};
 use enumset::*;
-use errcode::prelude::{ensure, Result};
+use errcode::{
+    bail,
+    prelude::{ensure, Result},
+};
 use log::{error, info, trace, LevelFilter};
 use simplelog::{
     ColorChoice, CombinedLogger, ConfigBuilder, SharedLogger, TermLogger, TerminalMode,
@@ -14,7 +17,6 @@ use std::{
     ptr::null_mut,
     sync::atomic::{AtomicPtr, Ordering},
 };
-use errcode::bail;
 
 /// The context for a particular load of the binary.
 #[derive(Clone, Debug)]
@@ -59,7 +61,9 @@ pub enum MppatchFeature {
 fn early_setup() {
     // force enable backtraces
     if std::env::var("RUST_BACKTRACE").is_err() {
-        std::env::set_var("RUST_BACKTRACE", "1")
+        unsafe {
+            std::env::set_var("RUST_BACKTRACE", "1");
+        }
     }
 }
 
@@ -114,10 +118,7 @@ fn create_ctx() -> Result<MppatchCtx> {
             });
         }
 
-        MppatchConfig {
-            bin_sha256: sha256.to_string(),
-            features: packages,
-        }
+        MppatchConfig { bin_sha256: sha256.to_string(), features: packages }
     };
 
     #[cfg(unix)]

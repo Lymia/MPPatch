@@ -1,12 +1,12 @@
 use crate::{
     rt_init,
     rt_init::MppatchCtx,
-    rt_patch::{replace_function, stub_function, PatchedFunction},
     versions::{CegPatches, ProxySource, SymbolInfo},
 };
 use dlopen::raw::Library;
 use errcode::prelude::Result;
 use log::{debug, info};
+use mpp_common::offset::{Offset, PatchedFunction, RelocatedOffset};
 use std::{
     any::type_name,
     ffi::c_void,
@@ -70,16 +70,17 @@ impl<T: Copy> PatcherContext<T> {
 
     unsafe fn patch_offset(
         &mut self,
-        (offset, size): (usize, usize),
+        offset: Offset,
+        size: usize,
         name: &str,
         target: T,
     ) -> Result<()> {
-        let offset = adjust_offset(offset);
-        let patch =
-            PatchedFunction::create(offset as *mut c_void, runtime_transmute(target), size, name);
+        let offset = offset.relocate();
+        let patch = offset.patch_function(runtime_transmute(target), size, name);
         self.patch_info = Some(PatchTarget::PatchedFunction(patch));
         Ok(())
     }
+
     pub unsafe fn patch(&mut self, sym_info: SymbolInfo, target: T) -> Result<()> {
         unsafe {
             // remove an old patch if one existed
@@ -99,16 +100,13 @@ impl<T: Copy> PatcherContext<T> {
                 }
                 SymbolInfo::PublicNamed(sym, sym_size) => {
                     let dylib_civ = Library::open_self()?;
-                    let patch = PatchedFunction::create(
-                        dylib_civ.symbol(sym)?,
-                        runtime_transmute(target),
-                        sym_size,
-                        sym,
-                    );
+                    let patch_addr = RelocatedOffset::from_ptr(dylib_civ.symbol(sym)?);
+                    let target_addr = RelocatedOffset::from_ptr(runtime_transmute(target));
+                    let patch = patch_addr.patch_function(target_addr, sym_size, sym);
                     self.patch_info = Some(PatchTarget::PatchedFunction(patch));
                 }
                 SymbolInfo::Offset(name, offset, length) => {
-                    self.patch_offset((offset, length), name, target)?
+                    self.patch_offset(offset, length, name, target)?
                 }
             }
         }
@@ -122,10 +120,7 @@ impl<T: Copy> PatcherContext<T> {
             None => match sym_info {
                 SymbolInfo::DllProxy(_, _) => unimplemented!("DllProxy fallback"),
                 SymbolInfo::PublicNamed(_, _) => unimplemented!("PublicNamed fallback"),
-                SymbolInfo::Offset(_, offset, _) => {
-                    let offset = adjust_offset(offset);
-                    runtime_transmute(offset)
-                }
+                SymbolInfo::Offset(_, offset, _) => runtime_transmute(offset.relocate()),
             },
         }
     }
@@ -141,18 +136,16 @@ impl<T: Copy> PatcherContext<T> {
 
 static BINARY_BASE: AtomicUsize = AtomicUsize::new(0);
 
-fn adjust_offset(offset: usize) -> usize {
-    let ctx = rt_init::get_ctx();
-    (offset - ctx.version_info.binary_base) + BINARY_BASE.load(Ordering::Relaxed)
-}
-
-pub fn init(_: &MppatchCtx) -> Result<()> {
+pub fn init(ctx: &MppatchCtx) -> Result<()> {
     // find the main executable base address
-    #[cfg(windows)]
-    let base_offset = unsafe { winapi::um::libloaderapi::GetModuleHandleA(ptr::null()) as usize };
-    #[cfg(unix)]
-    let base_offset = 0; // we don't use this mechanism on unix
-    BINARY_BASE.store(base_offset, Ordering::Relaxed);
+    unsafe {
+        #[cfg(windows)]
+        let base_offset = winapi::um::libloaderapi::GetModuleHandleA(ptr::null()) as usize;
+        #[cfg(unix)]
+        let base_offset = 0; // we don't use this mechanism on unix
+
+        mpp_common::offset::set_relocation_info(ctx.version_info.binary_base, base_offset);
+    }
 
     // print information and return
     debug!("Binary offset: 0x{:08x}", BINARY_BASE.load(Ordering::Relaxed));
@@ -163,16 +156,13 @@ pub unsafe fn apply_noceg(patches: &'static Option<CegPatches>) {
     if let Some(patches) = patches {
         info!("Disabling CEG integrity checks...");
         for (offset, ret_v) in patches.static_functions {
-            let target: *mut c_void = runtime_transmute(adjust_offset(*offset));
-            replace_function(target, *ret_v);
+            offset.relocate().stub_function_value(*ret_v)
         }
         for (offset, ret_v) in patches.relative_functions {
-            let target: *mut c_void = runtime_transmute(adjust_offset(*offset));
-            replace_function(target, adjust_offset(*ret_v) as u32);
+            offset.relocate().stub_function_offset(ret_v.relocate())
         }
         for offset in patches.stub_functions {
-            let target: *mut c_void = runtime_transmute(adjust_offset(*offset));
-            stub_function(target);
+            offset.relocate().stub_function_true()
         }
     }
 }

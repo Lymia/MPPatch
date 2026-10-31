@@ -9,8 +9,6 @@ mod hook_proxy;
 mod rt_cpplist;
 mod rt_init;
 mod rt_linking;
-mod rt_patch;
-mod rt_platform;
 mod versions;
 
 unsafe fn ctor_impl() -> errcode::prelude::Result<()> {

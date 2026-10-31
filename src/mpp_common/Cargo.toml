@@ -1,0 +1,13 @@
+[package]
+name = "mpp_common"
+version = "0.0.0"
+authors = ["Rimi Kanokawa <rimi@rimin.moe>"]
+edition = "2024"
+
+[dependencies]
+errcode = { version = "0.1", features = ["repr_full"] }
+libc = "0.2"
+log = { version = "0.4", features = ["std"] }
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "errhandlingapi", "std"] }

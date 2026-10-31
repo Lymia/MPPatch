@@ -1,8 +1,8 @@
-use crate::{rt_init::MppatchCtx, rt_patch::patch_jmp_instruction};
+use crate::rt_init::MppatchCtx;
 use dlopen::raw::Library;
 use errcode::prelude::{bail, Result};
 use log::info;
-use std::ffi::c_void;
+use mpp_common::offset::RelocatedOffset;
 
 const LUAJIT_SYMBOLS: &[&str] = &[
     "lua_atpanic",
@@ -179,9 +179,9 @@ pub fn init(ctx: &MppatchCtx) -> Result<()> {
 
     unsafe {
         for sym in LUAJIT_SYMBOLS {
-            if let Ok(target) = dylib_civ.symbol::<*mut c_void>(sym) {
-                let patch = dylib_luajit.symbol::<*const c_void>(sym)?;
-                patch_jmp_instruction(target, patch, sym);
+            if let Ok(target) = dylib_civ.symbol(sym) {
+                let patch = dylib_luajit.symbol(sym)?;
+                RelocatedOffset::from_ptr(target).write_jmp(RelocatedOffset::from_ptr(patch), sym);
             }
         }
     }

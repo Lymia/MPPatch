@@ -27,7 +27,7 @@ import shutil
 import sys
 
 source_path = "res/noceg"
-target_path = "src/native-patch/src/data"
+target_path = "src/mpp_hooklib/src/data"
 
 if os.path.exists(target_path):
     shutil.rmtree(target_path)
@@ -69,15 +69,15 @@ for ceg_file in glob.glob(f"{source_path}/*.json"):
     string += "CegPatches {\n"
     string += "  static_functions: &[\n"
     for stub in sorted(static_functions):
-        string += f"    ({hex(stub[0])}, {hex(stub[1])}),\n"
+        string += f"    (Offset({hex(stub[0])}), {hex(stub[1])}),\n"
     string += "  ],\n"
     string += "  relative_functions: &[\n"
     for stub in sorted(relative_functions):
-        string += f"    ({hex(stub[0])}, {hex(stub[1])}),\n"
+        string += f"    (Offset({hex(stub[0])}), Offset({hex(stub[1])})),\n"
     string += "  ],\n"
     string += "  stub_functions: &[\n"
     for stub in sorted(stub_functions):
-        string += f"    {hex(stub)},\n"
+        string += f"    Offset({hex(stub)}),\n"
     string += "  ],\n"
     string += "}\n"
 

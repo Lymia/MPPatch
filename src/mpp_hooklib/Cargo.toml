@@ -1,7 +1,7 @@
 [package]
 name = "mpp_hooklib"
 version = "0.0.0"
-authors = ["Lymia Kanokawa <lymia@lymia.moe>"]
+authors = ["Rimi Kanokawa <rimi@rimin.moe>"]
 edition = "2021"
 
 [lib]
@@ -17,7 +17,9 @@ log = { version = "0.4", features = ["std"] }
 mlua = { version = "0.12", features = ["lua51", "module", "error-send"] }
 simplelog = { version = "0.12", features = ["paris"] }
 
+mpp_common = { workspace = true }
+
 [target.'cfg(windows)'.dependencies]
 pe-parser = "0.7.0"
 sha2 = "0.11.1"
-winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "std"] }
+winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "errhandlingapi", "std"] }

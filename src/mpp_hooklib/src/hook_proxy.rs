@@ -1,14 +1,15 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
-use crate::{rt_init::MppatchCtx, rt_patch};
+use crate::rt_init::MppatchCtx;
 use dlopen::raw::Library;
 use errcode::prelude::{bail, Result};
 use log::info;
+use mpp_common::offset::RelocatedOffset;
 use std::{ffi::c_void, sync::Mutex};
 
 pub trait ProxyLibrary {
-    unsafe fn patch(&self, sym: &str, target: *const c_void) -> Result<*const c_void>;
+    unsafe fn patch(&self, sym: &str, target: *mut c_void) -> Result<*const c_void>;
     unsafe fn unpatch(&self, sym: &str) -> Result<()>;
 }
 
@@ -43,11 +44,9 @@ macro_rules! make_proxy {
             let lib = Library::open(lib_path)?;
             unsafe {
                 $(
-                    rt_patch::patch_jmp_instruction(
-                        $sym as unsafe extern "C" fn(usize) -> usize as *mut c_void,
-                        lib.symbol($target)?,
-                        $target,
-                    );
+                    let proxy_fn = $sym as unsafe extern "C" fn(usize) -> usize as *mut c_void;
+                    let proxy_fn = RelocatedOffset::from_ptr(proxy_fn);
+                    proxy_fn.write_jmp(RelocatedOffset::from_ptr(lib.symbol($target)?), $target);
                 )*
             }
             *$lib_cache_sym.lock().unwrap() = Some(lib);
@@ -58,16 +57,14 @@ macro_rules! make_proxy {
         #[derive(Copy, Clone, Debug)]
         pub struct $lib_sym;
         impl ProxyLibrary for $lib_sym {
-            unsafe fn patch(&self, sym: &str, target: *const c_void) -> Result<*const c_void> {
+            unsafe fn patch(&self, sym: &str, target: *mut c_void) -> Result<*const c_void> {
                 let lib = $lib_cache_sym.lock().unwrap();
                 let lib = lib.as_ref().unwrap();
                 match sym {
                     $($target => {
-                        rt_patch::patch_jmp_instruction(
-                            $sym as unsafe extern "C" fn(usize) -> usize as *mut c_void,
-                            target,
-                            $target,
-                        );
+                        let proxy_fn = $sym as unsafe extern "C" fn(usize) -> usize as *mut c_void;
+                        let proxy_fn = RelocatedOffset::from_ptr(proxy_fn);
+                        proxy_fn.write_jmp(RelocatedOffset::from_ptr(target), $target);
                         Ok(lib.symbol($target)?)
                     })*
                     _ => bail!("Unknown proxy symbol {sym}"),
@@ -79,11 +76,9 @@ macro_rules! make_proxy {
                 match sym {
                     $($target => {
                         let target = lib.symbol($target)?;
-                        rt_patch::patch_jmp_instruction(
-                            $sym as unsafe extern "C" fn(usize) -> usize as *mut c_void,
-                            target,
-                            $target,
-                        );
+                        let proxy_fn = $sym as unsafe extern "C" fn(usize) -> usize as *mut c_void;
+                        let proxy_fn = RelocatedOffset::from_ptr(proxy_fn);
+                        proxy_fn.write_jmp(RelocatedOffset::from_ptr(target), $target);
                     })*
                     _ => bail!("Unknown proxy symbol {sym}"),
                 }
