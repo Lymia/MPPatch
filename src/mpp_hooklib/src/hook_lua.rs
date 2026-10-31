@@ -7,7 +7,7 @@ use crate::{
     rt_init::{MppatchCtx, MppatchFeature},
     rt_linking::PatcherContext,
 };
-use anyhow::Result;
+use errcode::prelude::Result;
 use libc::c_int;
 use log::{debug, trace};
 use mlua::{

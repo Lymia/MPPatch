@@ -13,7 +13,7 @@ mod rt_patch;
 mod rt_platform;
 mod versions;
 
-unsafe fn ctor_impl() -> anyhow::Result<()> {
+unsafe fn ctor_impl() -> errcode::prelude::Result<()> {
     let ctx = rt_init::run()?;
     rt_linking::init(ctx)?;
     rt_linking::apply_noceg(&ctx.version_info.ceg_patches);

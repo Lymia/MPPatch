@@ -6,8 +6,8 @@ use crate::{
     rt_init::MppatchCtx,
     rt_linking::PatcherContext,
 };
-use anyhow::Result;
 use enumset::*;
+use errcode::prelude::Result;
 use libc::c_int;
 use log::debug;
 use std::{

@@ -8,9 +8,9 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-anyhow = "1.0"
 dlopen = "0.1"
 enumset = { version = "1.1", features = ["serde"] }
+errcode = { version = "0.1", features = ["repr_full"] }
 libc = "0.2"
 linktime = "0.19"
 log = { version = "0.4", features = ["std"] }

@@ -1,6 +1,6 @@
 use crate::versions::{find_info, Platform, VersionInfo};
-use anyhow::{ensure, Result};
 use enumset::*;
+use errcode::prelude::{ensure, Result};
 use log::{error, info, trace, LevelFilter};
 use serde::*;
 use simplelog::{
@@ -201,7 +201,6 @@ pub fn check_error<T>(err: Result<T>) -> T {
         Ok(v) => v,
         Err(e) => {
             error!("Error occurred: {e}");
-            dump_backtrace(e.backtrace());
             fatal_error(&format!("Internal error: {e}"));
         }
     }

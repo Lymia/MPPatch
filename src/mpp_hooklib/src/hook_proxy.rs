@@ -2,8 +2,8 @@
 #![allow(non_camel_case_types)]
 
 use crate::{rt_init::MppatchCtx, rt_patch};
-use anyhow::{bail, Result};
 use dlopen::raw::Library;
+use errcode::prelude::{bail, Result};
 use log::info;
 use std::{ffi::c_void, sync::Mutex};
 

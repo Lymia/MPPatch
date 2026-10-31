@@ -4,8 +4,8 @@ use crate::{
     rt_patch::{replace_function, stub_function, PatchedFunction},
     versions::{CegPatches, ProxySource, SymbolInfo},
 };
-use anyhow::Result;
 use dlopen::raw::Library;
+use errcode::prelude::Result;
 use log::{debug, info};
 use std::{
     any::type_name,

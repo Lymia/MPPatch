@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use anyhow::*;
+use errcode::prelude::*;
 use std::fmt::{Debug, Formatter};
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
