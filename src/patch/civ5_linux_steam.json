@@ -22,7 +22,7 @@
         {"from": "native/mpp_hooklib.so", "to": "mpp_hooklib.so", "exec": true}
       ],
       "writeConfig": [
-        "mppatch_config.toml"
+        "mppatch_config.cfg"
       ]
     },
     "multiplayer": {

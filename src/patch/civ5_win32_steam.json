@@ -21,7 +21,7 @@
         {"from": "native/mpp_hooklib.dll", "to": "mpp_hooklib.dll"}
       ],
       "writeConfig": [
-        "mppatch_config.toml"
+        "mppatch_config.cfg"
       ],
       "writeDlc": [
         {"from": "ui/mppatch.xml", "to": "DLC/MPPatch", "textData": "Gameplay/XML/NewText/MPPatch_TextData"}

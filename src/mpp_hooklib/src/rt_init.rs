@@ -2,7 +2,6 @@ use crate::versions::{find_info, Platform, VersionInfo};
 use enumset::*;
 use errcode::prelude::{ensure, Result};
 use log::{error, info, trace, LevelFilter};
-use serde::*;
 use simplelog::{
     ColorChoice, CombinedLogger, ConfigBuilder, SharedLogger, TermLogger, TerminalMode,
     ThreadLogMode, WriteLogger,
@@ -15,6 +14,7 @@ use std::{
     ptr::null_mut,
     sync::atomic::{AtomicPtr, Ordering},
 };
+use errcode::bail;
 
 /// The context for a particular load of the binary.
 #[derive(Clone, Debug)]
@@ -42,14 +42,13 @@ impl MppatchCtx {
 }
 
 /// The configuration file for MPPatch
-#[derive(Deserialize, Clone, Debug)]
+#[derive(Clone, Debug)]
 struct MppatchConfig {
     bin_sha256: String,
     features: EnumSet<MppatchFeature>,
 }
 
-#[derive(EnumSetType, Serialize, Deserialize, Debug)]
-#[enumset(serialize_repr = "list")]
+#[derive(EnumSetType, Debug)]
 pub enum MppatchFeature {
     Multiplayer,
     LuaJit,
@@ -95,10 +94,31 @@ fn create_ctx() -> Result<MppatchCtx> {
     exe_dir.pop();
 
     let mut config_file = exe_dir.clone();
-    config_file.push("mppatch_config.toml");
-    ensure!(config_file.exists(), "mppatch_config.toml is missing!");
+    config_file.push("mppatch_config.cfg");
+    ensure!(config_file.exists(), "mppatch_config.cfg is missing!");
     let config = std::io::read_to_string(File::open(config_file)?)?;
-    let config = toml::from_str::<MppatchConfig>(&config)?;
+    let config = {
+        assert!(config.contains("\n"));
+        let mut split = config.split("\n");
+        let sha256 = split.next().unwrap();
+        let packages_str = split.next().unwrap();
+
+        let mut packages = EnumSet::new();
+        for package in packages_str.split(",") {
+            packages.insert(match package {
+                "Multiplayer" => MppatchFeature::Multiplayer,
+                "LuaJit" => MppatchFeature::LuaJit,
+                "Logging" => MppatchFeature::Logging,
+                "Debug" => MppatchFeature::Debug,
+                _ => bail!("Unknown package: {package}"),
+            });
+        }
+
+        MppatchConfig {
+            bin_sha256: sha256.to_string(),
+            features: packages,
+        }
+    };
 
     #[cfg(unix)]
     let text_hash = String::new();
