@@ -10,7 +10,6 @@ use simplelog::{
     ThreadLogMode, WriteLogger,
 };
 use std::{
-    backtrace::Backtrace,
     fs::File,
     panic,
     path::{Path, PathBuf},
@@ -56,15 +55,6 @@ pub enum MppatchFeature {
     LuaJit,
     Logging,
     Debug,
-}
-
-fn early_setup() {
-    // force enable backtraces
-    if std::env::var("RUST_BACKTRACE").is_err() {
-        unsafe {
-            std::env::set_var("RUST_BACKTRACE", "1");
-        }
-    }
 }
 
 #[cfg(windows)]
@@ -167,7 +157,6 @@ fn setup_logging(ctx: &MppatchCtx) {
 static CTX: AtomicPtr<MppatchCtx> = AtomicPtr::new(null_mut());
 
 pub fn run() -> Result<&'static MppatchCtx> {
-    early_setup();
     let ctx = create_ctx()?;
     setup_logging(&ctx);
     register_panic_hook();
@@ -212,7 +201,6 @@ fn register_panic_hook() {
             "(no message found)".to_string()
         };
         error!("{str}");
-        dump_backtrace(&Backtrace::force_capture());
         fatal_error(&format!("Internal error: {str}"));
     }));
 }
@@ -224,25 +212,6 @@ pub fn check_error<T>(err: Result<T>) -> T {
             error!("Error occurred: {e}");
             fatal_error(&format!("Internal error: {e}"));
         }
-    }
-}
-
-fn dump_backtrace(backtrace: &Backtrace) {
-    error!("Backtrace:");
-    let backtrace_str = format!("{backtrace}");
-
-    let mut counter = 0;
-    for line in backtrace_str.split('\n') {
-        if line.contains("<unknown>") {
-            counter += 1;
-            if counter == 3 {
-                error!("(further lines skipped)");
-                break;
-            }
-        } else {
-            counter = 0;
-        }
-        error!("{line}");
     }
 }
 
