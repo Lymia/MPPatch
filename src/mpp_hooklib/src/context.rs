@@ -1,14 +1,13 @@
 use enumset::*;
 use errcode::prelude::*;
-use log::{error, info, trace, LevelFilter};
-use mpp_common::logging::LoggerOptions;
+use log::{debug, info, trace, LevelFilter};
+use mpp_common::logging::{check_error, LoggerOptions};
 use mpp_version::{Platform, VersionInfo};
 use std::{
     fs::File,
     panic,
     path::{Path, PathBuf},
-    ptr::null_mut,
-    sync::atomic::{AtomicPtr, Ordering},
+    sync::{Arc, RwLock},
 };
 
 /// The context for a particular load of the binary.
@@ -115,9 +114,15 @@ fn create_ctx() -> Result<MppatchCtx> {
     Ok(MppatchCtx { exe_dir, config, version_info })
 }
 
-static CTX: AtomicPtr<MppatchCtx> = AtomicPtr::new(null_mut());
+static CTX: RwLock<Option<Arc<MppatchCtx>>> = RwLock::new(None);
 
-pub fn run() -> Result<&'static MppatchCtx> {
+#[linktime::ctor(unsafe, priority = early)]
+fn init() {
+    check_error(init_impl())
+}
+
+fn init_impl() -> Result<()> {
+    // construct the MPPatch context
     let ctx = create_ctx()?;
     mpp_common::logging::register_logger(LoggerOptions {
         log_file_name: "mppatch_debug.log",
@@ -128,53 +133,45 @@ pub fn run() -> Result<&'static MppatchCtx> {
             LevelFilter::Info
         },
     });
-    register_panic_hook();
     if ctx.version_info.platform != Platform::CURRENT {
         panic!("Specified Civilization version is not compatible with this patch.");
     }
 
+    // log information about the loaded MPPatch version
     info!("mpp_hooklib v{} loaded", ctx.version());
     info!("Game version: {}", ctx.version_info.name);
     info!("");
     trace!("build-id: {}", ctx.build_id());
     trace!("ctx: {ctx:#?}");
 
-    assert!(CTX
-        .swap(Box::leak(Box::new(ctx)), Ordering::SeqCst)
-        .is_null());
+    // find the main executable base address
+    unsafe {
+        #[cfg(windows)]
+        let base_offset = winapi::um::libloaderapi::GetModuleHandleA(std::ptr::null()) as usize;
+        #[cfg(unix)]
+        let base_offset = 0; // we don't use this mechanism on unix
 
-    Ok(get_ctx())
+        debug!("Relocated binary offset: 0x{:08x}", base_offset);
+        mpp_common::offset::set_relocation_info(ctx.version_info.binary_base, base_offset);
+    }
+
+    // add the context to memory
+    *CTX.write()? = Some(Arc::new(ctx));
+
+    Ok(())
 }
 
-pub fn get_ctx() -> &'static MppatchCtx {
-    let ptr = CTX.load(Ordering::SeqCst);
-    assert!(!ptr.is_null());
-    unsafe { &*ptr }
+pub fn get_ctx() -> Arc<MppatchCtx> {
+    if let Some(x) = check_error(CTX.read().map_err(Into::into)).as_ref() {
+        x.clone()
+    } else {
+        panic!("get_ctx after MppatchCtx has been destroyed!")
+    }
 }
 
 #[linktime::dtor(unsafe)]
 fn destroy_ctx() {
-    let ptr = CTX.swap(null_mut(), Ordering::SeqCst);
-    if !ptr.is_null() {
-        unsafe { drop(Box::from_raw(ptr)) }
+    if let Ok(mut ctx) = CTX.write() {
+        drop(ctx.take());
     }
-}
-
-fn register_panic_hook() {
-    panic::set_hook(Box::new(move |info| {
-        let str = if let Some(str) = info.payload().downcast_ref::<&'static str>() {
-            (*str).to_owned()
-        } else if let Some(str) = info.payload().downcast_ref::<String>() {
-            str.clone()
-        } else {
-            "(no message found)".to_string()
-        };
-        error!("{str}");
-        fatal_error(&format!("Internal error: {str}"));
-    }));
-}
-
-fn fatal_error(_: &str) -> ! {
-    // TODO: Show a msgbox
-    std::process::abort()
 }

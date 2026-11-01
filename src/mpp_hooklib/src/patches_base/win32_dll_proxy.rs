@@ -1,7 +1,9 @@
+//! This function handles initializing the DLL proxy that is used on Windows to hook the game.
+
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
-use crate::rt_init::MppatchCtx;
+use crate::context::MppatchCtx;
 use dlopen::raw::Library;
 use errcode::prelude::{bail, Result};
 use log::info;
@@ -229,8 +231,14 @@ make_proxy! {
     (proxy_CvGameDatabase_0086 "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z")
 }
 
-pub fn init(ctx: &MppatchCtx) -> Result<()> {
+#[linktime::ctor(unsafe)]
+fn init() {
+    mpp_common::logging::check_error(init_impl())
+}
+
+fn init_impl() -> Result<()> {
+    let ctx = crate::context::get_ctx();
     info!("Creating proxy definitions...");
-    load_CvGameDatabase(ctx)?;
+    load_CvGameDatabase(&ctx)?;
     Ok(())
 }

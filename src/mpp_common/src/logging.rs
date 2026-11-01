@@ -5,6 +5,7 @@ use std::{
     fmt::{Arguments, Display, Formatter},
     fs::{File, OpenOptions},
     io::{BufWriter, Write},
+    panic,
     sync::Mutex,
     time::Instant,
 };
@@ -17,12 +18,12 @@ pub struct LoggerOptions {
 }
 
 pub fn register_logger(options: LoggerOptions) {
-    if let Err(e) = register_logger_(options) {
+    if let Err(e) = register_logger_impl(options) {
         fatal_logging(&format!("Could not initialize logging: {e}"));
     }
 }
 
-fn register_logger_(options: LoggerOptions) -> Result<()> {
+fn register_logger_impl(options: LoggerOptions) -> Result<()> {
     let file = {
         let mut path = std::env::current_exe()?.canonicalize()?;
         path.pop();
@@ -42,7 +43,21 @@ fn register_logger_(options: LoggerOptions) -> Result<()> {
         log_file: Mutex::new(file),
         log_level: options.log_level,
     }))?;
+    register_panic_hook();
     Ok(())
+}
+
+fn register_panic_hook() {
+    panic::set_hook(Box::new(move |info| {
+        let str = if let Some(str) = info.payload().downcast_ref::<&'static str>() {
+            (*str).to_owned()
+        } else if let Some(str) = info.payload().downcast_ref::<String>() {
+            str.clone()
+        } else {
+            "(no message found)".to_string()
+        };
+        fatal_error(&format!("Panicked: {str}"));
+    }));
 }
 
 pub fn check_error<T>(r: Result<T>) -> T {

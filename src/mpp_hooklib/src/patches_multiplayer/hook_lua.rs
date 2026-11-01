@@ -1,11 +1,10 @@
 #![allow(non_snake_case)]
 
 use crate::{
-    hook_netpatch,
-    hook_netpatch::OverrideType,
-    rt_init,
-    rt_init::{MppatchCtx, MppatchFeature},
-    rt_linking::PatcherContext,
+    context,
+    context::MppatchFeature,
+    patcher::PatcherContext,
+    patches_multiplayer::{hook_netpatch, hook_netpatch::OverrideType},
 };
 use errcode::prelude::Result;
 use libc::c_int;
@@ -31,13 +30,22 @@ unsafe fn lGetMemoryUsage(lua: *mut lua_State) -> c_int {
     func(lua)
 }
 
-pub fn init(ctx: &MppatchCtx) -> Result<()> {
-    log::info!("Applying lGetMemoryUsage patch...");
-    unsafe {
-        GET_MEMORY_USAGE
-            .lock()
-            .unwrap()
-            .patch(ctx.version_info.sym_lGetMemoryUsage, lGetMemoryUsageProxy)?;
+#[linktime::ctor(unsafe, priority = late)]
+fn init() {
+    check_error(init_impl())
+}
+
+fn init_impl() -> Result<()> {
+    let ctx = crate::context::get_ctx();
+    // TODO: This shouldn't check Multiplayer, but rather some more sane feature.
+    if ctx.has_feature(MppatchFeature::Multiplayer) {
+        log::info!("Applying lGetMemoryUsage patch...");
+        unsafe {
+            GET_MEMORY_USAGE
+                .lock()
+                .unwrap()
+                .patch(ctx.version_info.sym_lGetMemoryUsage, lGetMemoryUsageProxy)?;
+        }
     }
     Ok(())
 }
@@ -66,7 +74,7 @@ const LUA_FUNC_GET_GLOBALS_C: &CStr =
 fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
     trace!("Building MPPatch function table...");
 
-    let ctx = rt_init::get_ctx();
+    let ctx = context::get_ctx();
 
     let patch_table = lua.create_table()?;
     patch_table.set("__mppatch_marker", 1)?;

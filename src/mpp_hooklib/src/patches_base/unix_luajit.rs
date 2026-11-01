@@ -1,4 +1,9 @@
-use crate::rt_init::MppatchCtx;
+//! Lua is statically linked into the Civilization V binary on Linux and macOS.
+//!
+//! This module handles patching all Lua-related symbols to instead direct to the LuaJIT binary
+//! provided as part of MPPatch.
+
+use crate::context::MppatchFeature;
 use dlopen::raw::Library;
 use errcode::prelude::{bail, Result};
 use log::info;
@@ -161,32 +166,39 @@ const LUAJIT_SYMBOLS: &[&str] = &[
     "recff_thread_exdata2",
 ];
 
-pub fn init(ctx: &MppatchCtx) -> Result<()> {
-    info!("Applying LuaJIT patch...");
+#[linktime::ctor(unsafe, priority = late)]
+fn init() {
+    mpp_common::logging::check_error(init_impl());
+}
 
-    let dylib_civ = Library::open_self()?;
+fn init_impl() -> Result<()> {
+    let ctx = crate::context::get_ctx();
+    if ctx.has_feature(MppatchFeature::LuaJit) {
+        info!("Applying LuaJIT patch...");
+        let dylib_civ = Library::open_self()?;
 
-    let mut luajit_path = ctx.exe_dir().to_owned();
-    #[cfg(target_os = "linux")]
-    luajit_path.push("mppatch_luajit.so");
-    #[cfg(target_os = "macos")]
-    luajit_path.push("mppatch_luajit.dylib");
-    if !luajit_path.exists() {
-        bail!("mppatch_luajit library not found!");
-    }
+        let mut luajit_path = ctx.exe_dir().to_owned();
+        #[cfg(target_os = "linux")]
+        luajit_path.push("mppatch_luajit.so");
+        #[cfg(target_os = "macos")]
+        luajit_path.push("mppatch_luajit.dylib");
+        if !luajit_path.exists() {
+            bail!("mppatch_luajit library not found!");
+        }
 
-    let dylib_luajit = Library::open(luajit_path)?;
+        let dylib_luajit = Library::open(luajit_path)?;
 
-    unsafe {
-        for sym in LUAJIT_SYMBOLS {
-            if let Ok(target) = dylib_civ.symbol(sym) {
-                let patch = dylib_luajit.symbol(sym)?;
-                RelocatedOffset::from_ptr(target).write_jmp(RelocatedOffset::from_ptr(patch), sym);
+        unsafe {
+            for sym in LUAJIT_SYMBOLS {
+                if let Ok(target) = dylib_civ.symbol(sym) {
+                    let patch = dylib_luajit.symbol(sym)?;
+                    RelocatedOffset::from_ptr(target)
+                        .write_jmp(RelocatedOffset::from_ptr(patch), sym);
+                }
             }
         }
+
+        std::mem::forget(dylib_luajit); // we don't want to drop this ever
     }
-
-    std::mem::forget(dylib_luajit); // we don't want to drop this ever
-
     Ok(())
 }

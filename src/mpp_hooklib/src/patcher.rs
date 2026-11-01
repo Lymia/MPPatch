@@ -1,17 +1,8 @@
-use crate::rt_init::MppatchCtx;
 use dlopen::raw::Library;
 use errcode::prelude::Result;
-use log::{debug, info};
 use mpp_common::offset::{Offset, PatchedFunction, RelocatedOffset};
-use mpp_version::{CegPatches, ProxySource, SymbolInfo};
-use std::{
-    any::type_name,
-    ffi::c_void,
-    marker::PhantomData,
-    mem::size_of,
-    ptr,
-    sync::atomic::{AtomicUsize, Ordering},
-};
+use mpp_version::{ProxySource, SymbolInfo};
+use std::{any::type_name, ffi::c_void, marker::PhantomData, mem::size_of, ptr};
 
 unsafe fn runtime_transmute<T: Copy, V: Copy>(t: T) -> V {
     if size_of::<T>() == size_of::<V>() {
@@ -22,9 +13,11 @@ unsafe fn runtime_transmute<T: Copy, V: Copy>(t: T) -> V {
 }
 
 #[cfg(windows)]
-fn lib_for_source(source: ProxySource) -> &'static dyn crate::hook_proxy::ProxyLibrary {
+fn lib_for_source(
+    source: ProxySource,
+) -> &'static dyn crate::patches_base::win32_dll_proxy::ProxyLibrary {
     match source {
-        ProxySource::CvGameDatabase => &crate::hook_proxy::Proxy_CvGameDatabase,
+        ProxySource::CvGameDatabase => &crate::patches_base::win32_dll_proxy::Proxy_CvGameDatabase,
     }
 }
 
@@ -89,7 +82,7 @@ impl<T: Copy> PatcherContext<T> {
                 SymbolInfo::DllProxy(source, sym) => {
                     let orig = lib_for_source(source).patch(sym, runtime_transmute(target))?;
                     self.patch_info = Some(PatchTarget::ProxyTarget(source, sym, orig));
-                    debug!("Original function pointer ({sym}) = {orig:?}");
+                    log::debug!("Original function pointer ({sym}) = {orig:?}");
                 }
                 #[cfg(unix)]
                 SymbolInfo::DllProxy(source, name) => {
@@ -128,38 +121,5 @@ impl<T: Copy> PatcherContext<T> {
 
     pub fn unpatch(&mut self) {
         self.patch_info.take();
-    }
-}
-
-static BINARY_BASE: AtomicUsize = AtomicUsize::new(0);
-
-pub fn init(ctx: &MppatchCtx) -> Result<()> {
-    // find the main executable base address
-    unsafe {
-        #[cfg(windows)]
-        let base_offset = winapi::um::libloaderapi::GetModuleHandleA(ptr::null()) as usize;
-        #[cfg(unix)]
-        let base_offset = 0; // we don't use this mechanism on unix
-
-        mpp_common::offset::set_relocation_info(ctx.version_info.binary_base, base_offset);
-    }
-
-    // print information and return
-    debug!("Binary offset: 0x{:08x}", BINARY_BASE.load(Ordering::Relaxed));
-    Ok(())
-}
-
-pub unsafe fn apply_noceg(patches: &'static Option<CegPatches>) {
-    if let Some(patches) = patches {
-        info!("Disabling CEG integrity checks...");
-        for (offset, ret_v) in patches.static_functions {
-            offset.relocate().stub_function_value(*ret_v)
-        }
-        for (offset, ret_v) in patches.relative_functions {
-            offset.relocate().stub_function_offset(ret_v.relocate())
-        }
-        for offset in patches.stub_functions {
-            offset.relocate().stub_function_true()
-        }
     }
 }

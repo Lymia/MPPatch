@@ -1,10 +1,10 @@
 #![allow(non_snake_case)]
 
 use crate::{
-    rt_cpplist::{CppList, CppListRaw},
-    rt_init,
-    rt_init::MppatchCtx,
-    rt_linking::PatcherContext,
+    context,
+    context::MppatchFeature,
+    cpplist::{CppList, CppListRaw},
+    patcher::PatcherContext,
 };
 use enumset::*;
 use errcode::prelude::Result;
@@ -45,7 +45,7 @@ pub unsafe fn SetActiveDLCAndMods(
     reload_dlc: bool,
     reload_mods: bool,
 ) -> c_int {
-    let ctx = rt_init::get_ctx();
+    let ctx = context::get_ctx();
     let func = SET_ACTIVE_DLC_AND_MODS
         .lock()
         .unwrap()
@@ -53,16 +53,23 @@ pub unsafe fn SetActiveDLCAndMods(
     func(this, dlc_list, mod_list, reload_dlc, reload_mods)
 }
 
-pub fn init(_: &MppatchCtx) -> Result<()> {
-    let ctx = rt_init::get_ctx();
-    log::info!("Applying SetActiveDLCAndMods patch...");
-    unsafe {
-        check_error(
-            SET_ACTIVE_DLC_AND_MODS
-                .lock()
-                .unwrap()
-                .patch(ctx.version_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy),
-        );
+#[linktime::ctor(unsafe, priority = late)]
+fn init() {
+    check_error(init_impl())
+}
+
+fn init_impl() -> Result<()> {
+    let ctx = context::get_ctx();
+    if ctx.has_feature(MppatchFeature::Multiplayer) {
+        log::info!("Applying SetActiveDLCAndMods patch...");
+        unsafe {
+            check_error(
+                SET_ACTIVE_DLC_AND_MODS
+                    .lock()
+                    .unwrap()
+                    .patch(ctx.version_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy),
+            );
+        }
     }
     Ok(())
 }
