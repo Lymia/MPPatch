@@ -1,5 +1,3 @@
-use crate::rt_init::MppatchFeature;
-
 mod hook_lua;
 #[cfg(unix)]
 mod hook_luajit;
@@ -15,14 +13,14 @@ unsafe fn ctor_impl() -> errcode::prelude::Result<()> {
     let ctx = rt_init::run()?;
     rt_linking::init(ctx)?;
     rt_linking::apply_noceg(&ctx.version_info.ceg_patches);
-    if ctx.has_feature(MppatchFeature::Multiplayer) {
+    if ctx.has_feature(crate::rt_init::MppatchFeature::Multiplayer) {
         #[cfg(windows)]
         hook_proxy::init(ctx)?;
         hook_lua::init(&ctx)?;
         hook_netpatch::init(&ctx)?;
     }
     #[cfg(unix)]
-    if ctx.has_feature(MppatchFeature::LuaJit) {
+    if ctx.has_feature(crate::rt_init::MppatchFeature::LuaJit) {
         hook_luajit::init(&ctx)?;
     }
     Ok(())
@@ -30,5 +28,5 @@ unsafe fn ctor_impl() -> errcode::prelude::Result<()> {
 
 #[linktime::ctor(unsafe)]
 unsafe fn ctor() {
-    rt_init::check_error(ctor_impl());
+    mpp_common::logging::check_error(ctor_impl());
 }

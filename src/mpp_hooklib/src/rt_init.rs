@@ -1,9 +1,6 @@
 use crate::versions::{find_info, Platform, VersionInfo};
 use enumset::*;
-use errcode::{
-    bail,
-    prelude::{ensure, Result},
-};
+use errcode::prelude::*;
 use log::{error, info, trace, LevelFilter};
 use mpp_common::logging::LoggerOptions;
 use std::{
@@ -55,13 +52,11 @@ pub enum MppatchFeature {
 }
 
 #[cfg(windows)]
-fn win32_text_hash(path: &Path) -> String {
+fn win32_text_hash(path: &Path) -> Result<String> {
     use sha2::{Digest, Sha256};
 
-    let data = std::fs::read(path)
-        .ok()
-        .expect("Could not read Civilization V binary.");
-    let pe = pe_parser::pe::parse_portable_executable(&data).expect("Could not parse PE file.");
+    let data = std::fs::read(path)?;
+    let pe = pe_parser::pe::parse_portable_executable(&data)?;
     for section in pe.section_table {
         if section.name == *b".text\0\0\0" {
             let start = section.pointer_to_raw_data as usize;
@@ -73,10 +68,10 @@ fn win32_text_hash(path: &Path) -> String {
                 out.push_str(&format!("{byte:02x}"));
             }
             log::debug!(".text hash: {out}");
-            return out;
+            return Ok(out);
         }
     }
-    panic!("Could not find .text section!")
+    bail!("Could not find .text section!")
 }
 
 fn create_ctx() -> Result<MppatchCtx> {
@@ -112,7 +107,8 @@ fn create_ctx() -> Result<MppatchCtx> {
     let text_hash = String::new();
 
     #[cfg(windows)]
-    let text_hash = win32_text_hash(&exe_path);
+    let text_hash =
+        win32_text_hash(&exe_path).with_context(error_info!("Parsing hash for the main binary"))?;
 
     let version_info = find_info(&config.bin_sha256, &text_hash)?;
 
@@ -176,16 +172,6 @@ fn register_panic_hook() {
         error!("{str}");
         fatal_error(&format!("Internal error: {str}"));
     }));
-}
-
-pub fn check_error<T>(err: Result<T>) -> T {
-    match err {
-        Ok(v) => v,
-        Err(e) => {
-            error!("Error occurred: {e}");
-            fatal_error(&format!("Internal error: {e}"));
-        }
-    }
 }
 
 fn fatal_error(_: &str) -> ! {

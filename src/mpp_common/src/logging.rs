@@ -1,7 +1,8 @@
 use anstyle::{AnsiColor, Color, Style};
-use errcode::prelude::Result;
+use errcode::{error, prelude::Result};
 use log::{Level, LevelFilter, Log, Metadata, Record};
 use std::{
+    backtrace::Backtrace,
     fmt::{Arguments, Display, Formatter},
     fs::{File, OpenOptions},
     io::{BufWriter, Write},
@@ -18,7 +19,7 @@ pub struct LoggerOptions {
 
 pub fn register_logger(options: LoggerOptions) {
     if let Err(e) = register_logger_(options) {
-        logging_fatal(&format!("Could not initialize logging: {e}"));
+        fatal_logging(&format!("Could not initialize logging: {e}"));
     }
 }
 
@@ -45,9 +46,24 @@ fn register_logger_(options: LoggerOptions) -> Result<()> {
     Ok(())
 }
 
-fn logging_fatal(str: &str) -> ! {
+pub fn check_error<T>(r: Result<T>) -> T {
+    match r {
+        Ok(v) => v,
+        Err(e) => {
+            fatal_error(&format!("{e}"));
+        }
+    }
+}
+
+fn fatal_error(str: &str) -> ! {
     println!("Fatal error: {str}");
-    std::process::exit(0xDEAD)
+    error!("Fatal error: {str}");
+    std::process::abort()
+}
+
+fn fatal_logging(str: &str) -> ! {
+    println!("Fatal error: {str}");
+    std::process::abort()
 }
 
 struct LogHandler {
@@ -63,10 +79,10 @@ impl LogHandler {
         record.is_terminal = false;
         let mut out_file = match self.log_file.lock() {
             Ok(o) => o,
-            Err(_) => logging_fatal("Could not lock log mutex"),
+            Err(_) => fatal_logging("Could not lock log mutex"),
         };
         if let Err(e) = writeln!(out_file, "{record}") {
-            logging_fatal(&format!("Could not write log: {e}"))
+            fatal_logging(&format!("Could not write log: {e}"))
         }
     }
 }

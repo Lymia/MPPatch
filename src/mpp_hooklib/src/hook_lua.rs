@@ -19,6 +19,7 @@ use mlua::{
     prelude::{LuaFunction, LuaString},
     Lua, Table,
 };
+use mpp_common::logging::check_error;
 use std::{ffi::CStr, sync::Mutex};
 
 type FnType = unsafe extern "C-unwind" fn(*mut lua_State) -> c_int;
@@ -209,7 +210,7 @@ pub unsafe extern "C-unwind" fn lGetMemoryUsageProxy(lua_c: *mut lua_State) -> c
             lua_pop(lua_c, 1);
 
             let lua = Lua::get_or_init_from_ptr(lua_c);
-            rt_init::check_error(create_mppatch_table(lua_c, &lua));
+            check_error(create_mppatch_table(lua_c, &lua));
         } else {
             lua_pop(lua_c, 1);
         }

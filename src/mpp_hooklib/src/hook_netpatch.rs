@@ -10,6 +10,7 @@ use enumset::*;
 use errcode::prelude::Result;
 use libc::c_int;
 use log::debug;
+use mpp_common::logging::check_error;
 use std::{
     ffi::{c_void, CStr},
     fmt::{Debug, Formatter},
@@ -56,7 +57,7 @@ pub fn init(_: &MppatchCtx) -> Result<()> {
     let ctx = rt_init::get_ctx();
     log::info!("Applying SetActiveDLCAndMods patch...");
     unsafe {
-        rt_init::check_error(
+        check_error(
             SET_ACTIVE_DLC_AND_MODS
                 .lock()
                 .unwrap()

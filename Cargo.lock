@@ -458,7 +458,6 @@ dependencies = [
  "errcode",
  "libc",
  "log",
- "time-format",
  "winapi",
 ]
 
@@ -686,12 +685,6 @@ dependencies = [
  "quote 1.0.47",
  "unicode-ident",
 ]
-
-[[package]]
-name = "time-format"
-version = "1.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c21b401b09485cb2403a336b3c6f9d53bd8a7273463f71b71d4f6325f7f74f6c"
 
 [[package]]
 name = "typenum"

@@ -1,5 +1,4 @@
 use crate::{
-    rt_init,
     rt_init::MppatchCtx,
     versions::{CegPatches, ProxySource, SymbolInfo},
 };
@@ -53,7 +52,7 @@ impl Drop for PatchTarget {
         match self {
             PatchTarget::PatchedFunction(_) => {}
             PatchTarget::ProxyTarget(source, sym, _) => unsafe {
-                rt_init::check_error(lib_for_source(*source).unpatch(sym))
+                mpp_common::logging::check_error(lib_for_source(*source).unpatch(sym))
             },
         }
     }
