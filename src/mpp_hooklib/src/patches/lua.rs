@@ -4,7 +4,7 @@ use crate::{
     context,
     context::MppatchFeature,
     patcher::PatcherContext,
-    patches_multiplayer::{hook_netpatch, hook_netpatch::OverrideType},
+    patches::{netpatch, netpatch::OverrideType},
 };
 use errcode::prelude::Result;
 use libc::c_int;
@@ -140,14 +140,14 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
         net_patch_table.set(
             "pushMod",
             lua.create_function(|_, (name, ver): (String, i32)| {
-                hook_netpatch::add_mod(&name, ver);
+                netpatch::add_mod(&name, ver);
                 Ok(())
             })?,
         )?;
         net_patch_table.set(
             "pushDLC",
             lua.create_function(|_, guid: String| {
-                hook_netpatch::add_dlc(&guid);
+                netpatch::add_dlc(&guid);
                 Ok(())
             })?,
         )?;
@@ -155,35 +155,35 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
         net_patch_table.set(
             "overrideReloadMods",
             lua.create_function(|_, _: ()| {
-                hook_netpatch::add_override(OverrideType::ForceReloadMods);
+                netpatch::add_override(OverrideType::ForceReloadMods);
                 Ok(())
             })?,
         )?;
         net_patch_table.set(
             "overrideReloadDLC",
             lua.create_function(|_, _: ()| {
-                hook_netpatch::add_override(OverrideType::ForceReloadDlcs);
+                netpatch::add_override(OverrideType::ForceReloadDlcs);
                 Ok(())
             })?,
         )?;
         net_patch_table.set(
             "overrideModList",
             lua.create_function(|_, _: ()| {
-                hook_netpatch::add_override(OverrideType::OverrideMods);
+                netpatch::add_override(OverrideType::OverrideMods);
                 Ok(())
             })?,
         )?;
         net_patch_table.set(
             "overrideDLCList",
             lua.create_function(|_, _: ()| {
-                hook_netpatch::add_override(OverrideType::OverrideDlcs);
+                netpatch::add_override(OverrideType::OverrideDlcs);
                 Ok(())
             })?,
         )?;
         net_patch_table.set(
             "reset",
             lua.create_function(|_, _: ()| {
-                hook_netpatch::reset();
+                netpatch::reset();
                 Ok(())
             })?,
         )?;
