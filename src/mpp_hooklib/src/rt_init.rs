@@ -1,8 +1,8 @@
-use crate::versions::{find_info, Platform, VersionInfo};
 use enumset::*;
 use errcode::prelude::*;
 use log::{error, info, trace, LevelFilter};
 use mpp_common::logging::LoggerOptions;
+use mpp_version::{Platform, VersionInfo};
 use std::{
     fs::File,
     panic,
@@ -110,7 +110,7 @@ fn create_ctx() -> Result<MppatchCtx> {
     let text_hash =
         win32_text_hash(&exe_path).with_context(error_info!("Parsing hash for the main binary"))?;
 
-    let version_info = find_info(&config.bin_sha256, &text_hash)?;
+    let version_info = mpp_version::find_info(&config.bin_sha256, &text_hash)?;
 
     Ok(MppatchCtx { exe_dir, config, version_info })
 }

@@ -5,6 +5,7 @@ resolver = "3"
 members = [
     "src/mpp_common",
     "src/mpp_hooklib",
+    "src/mpp_version",
 ]
 
 [profile.dev]
@@ -20,4 +21,7 @@ debug = "none"
 panic = "immediate-abort"
 
 [workspace.dependencies]
+errcode = { version = "0.1", features = ["repr_full"] }
+
 mpp_common = { version = "*", path = "src/mpp_common" }
+mpp_version = { version = "*", path = "src/mpp_version" }

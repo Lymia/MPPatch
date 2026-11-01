@@ -473,9 +473,18 @@ dependencies = [
  "log",
  "mlua",
  "mpp_common",
+ "mpp_version",
  "pe-parser",
  "sha2",
  "winapi",
+]
+
+[[package]]
+name = "mpp_version"
+version = "0.0.0"
+dependencies = [
+ "errcode",
+ "mpp_common",
 ]
 
 [[package]]

@@ -1,11 +1,9 @@
-use crate::{
-    rt_init::MppatchCtx,
-    versions::{CegPatches, ProxySource, SymbolInfo},
-};
+use crate::rt_init::MppatchCtx;
 use dlopen::raw::Library;
 use errcode::prelude::Result;
 use log::{debug, info};
 use mpp_common::offset::{Offset, PatchedFunction, RelocatedOffset};
+use mpp_version::{CegPatches, ProxySource, SymbolInfo};
 use std::{
     any::type_name,
     ffi::c_void,

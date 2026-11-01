@@ -1,0 +1,10 @@
+[package]
+name = "mpp_version"
+version = "0.0.0"
+authors = ["Rimi Kanokawa <rimi@rimin.moe>"]
+edition = "2024"
+
+[dependencies]
+errcode = { workspace = true }
+
+mpp_common = { workspace = true }

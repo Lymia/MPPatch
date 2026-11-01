@@ -6,7 +6,7 @@ edition = "2024"
 
 [dependencies]
 anstyle = "1.0"
-errcode = { version = "0.1", features = ["repr_full"] }
+errcode = { workspace = true }
 libc = "0.2"
 log = { version = "0.4", features = ["std"] }
 
