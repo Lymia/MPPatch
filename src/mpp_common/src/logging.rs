@@ -2,7 +2,6 @@ use anstyle::{AnsiColor, Color, Style};
 use errcode::{error, prelude::Result};
 use log::{Level, LevelFilter, Log, Metadata, Record};
 use std::{
-    backtrace::Backtrace,
     fmt::{Arguments, Display, Formatter},
     fs::{File, OpenOptions},
     io::{BufWriter, Write},
