@@ -98,6 +98,9 @@ impl LogHandler {
         if let Err(e) = writeln!(out_file, "{record}") {
             fatal_logging(&format!("Could not write log: {e}"))
         }
+        if let Err(e) = out_file.flush() {
+            fatal_logging(&format!("Could not flush log: {e}"))
+        }
     }
 }
 impl Log for LogHandler {
