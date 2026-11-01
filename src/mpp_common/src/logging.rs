@@ -32,7 +32,7 @@ fn register_logger_impl(options: LoggerOptions) -> Result<()> {
         let file = if options.log_append {
             OpenOptions::new().append(true).create(true).open(path)?
         } else {
-            OpenOptions::new().create(true).open(path)?
+            OpenOptions::new().write(true).create(true).open(path)?
         };
         BufWriter::new(file)
     };
