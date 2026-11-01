@@ -23,7 +23,7 @@ use std::ffi::CStr;
 
 make_proxy_ty! {
     proxy, lGetMemoryUsage, lGetMemoryUsageProxy, sym_lGetMemoryUsage, None,
-    (linux_repr: "C-unwind", win_repr: "C-unwind"),
+    (posix_repr: "C-unwind", win_repr: "C-unwind"),
     (lua: *mut lua_State) -> c_int
 }
 
@@ -192,6 +192,7 @@ pub unsafe extern "C-unwind" fn lGetMemoryUsageProxy(lua_c: *mut lua_State) -> c
             let lua = Lua::get_or_init_from_ptr(lua_c);
             check_error(create_mppatch_table(lua_c, &lua));
         } else {
+            trace!("(Using cached table...)");
             lua_pop(lua_c, 1);
         }
 

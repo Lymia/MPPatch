@@ -2,7 +2,7 @@
 macro_rules! make_proxy_ty {
     (
         $mod_name:ident, $old_func:ident, $new_func:ident, $sym_ident:ident, $feature:expr,
-        (linux_repr: $posix_repr:literal, win_repr: $win_repr:literal $(,)?),
+        (posix_repr: $posix_repr:literal, win_repr: $win_repr:literal $(,)?),
         ($($arg_name:ident: $arg_ty:ty),* $(,)?) -> $ret_ty:ty
         $(,)?
     ) => {

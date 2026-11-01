@@ -18,7 +18,7 @@ use std::{
 
 make_proxy_ty! {
     proxy, SetActiveDLCAndMods, SetActiveDLCAndModsProxy_impl, sym_SetActiveDLCAndMods,
-    Some(MppatchFeature::Multiplayer), (linux_repr: "thiscall-unwind", win_repr: "C-unwind"),
+    Some(MppatchFeature::Multiplayer), (posix_repr: "C-unwind", win_repr: "thiscall-unwind"),
     (
         this: *mut c_void,
         dlc_list: *mut CppListRaw<Guid>,
