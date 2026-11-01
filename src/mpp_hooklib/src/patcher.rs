@@ -104,17 +104,6 @@ impl<T: Copy> PatcherContext<T> {
         Ok(())
     }
 
-    pub unsafe fn as_func_fallback(&self, sym_info: SymbolInfo) -> T {
-        match self.patch_info.as_ref() {
-            Some(x) => x.as_func(),
-            None => match sym_info {
-                SymbolInfo::DllProxy(_, _) => unimplemented!("DllProxy fallback"),
-                SymbolInfo::PublicNamed(_, _) => unimplemented!("PublicNamed fallback"),
-                SymbolInfo::Offset(_, offset, _) => runtime_transmute(offset.relocate()),
-            },
-        }
-    }
-
     pub unsafe fn as_func(&self) -> T {
         self.patch_info.as_ref().unwrap().as_func()
     }

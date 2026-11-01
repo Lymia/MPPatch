@@ -1,13 +1,11 @@
 #![allow(non_snake_case)]
 
 use crate::{
-    context,
     context::MppatchFeature,
     cpplist::{CppList, CppListRaw},
     patcher::PatcherContext,
 };
 use enumset::*;
-use errcode::prelude::Result;
 use libc::c_int;
 use log::debug;
 use mpp_common::logging::check_error;
@@ -18,65 +16,16 @@ use std::{
     sync::Mutex,
 };
 
-#[cfg(windows)]
-type FnType = unsafe extern "thiscall-unwind" fn(
-    *mut c_void,
-    *mut CppListRaw<Guid>,
-    *mut CppListRaw<ModInfo>,
-    bool,
-    bool,
-) -> c_int;
-
-#[cfg(unix)]
-type FnType = unsafe extern "C-unwind" fn(
-    *mut c_void,
-    *mut CppListRaw<Guid>,
-    *mut CppListRaw<ModInfo>,
-    bool,
-    bool,
-) -> c_int;
-
-static SET_ACTIVE_DLC_AND_MODS: Mutex<PatcherContext<FnType>> = Mutex::new(PatcherContext::new());
-
-pub unsafe fn SetActiveDLCAndMods(
-    this: *mut c_void,
-    dlc_list: *mut CppListRaw<Guid>,
-    mod_list: *mut CppListRaw<ModInfo>,
-    reload_dlc: bool,
-    reload_mods: bool,
-) -> c_int {
-    let ctx = context::get_ctx();
-    let func = SET_ACTIVE_DLC_AND_MODS
-        .lock()
-        .unwrap()
-        .as_func_fallback(ctx.version_info.sym_SetActiveDLCAndMods);
-    func(this, dlc_list, mod_list, reload_dlc, reload_mods)
-}
-
-#[linktime::ctor(unsafe, priority = late)]
-fn init() {
-    check_error(init_impl())
-}
-
-fn init_impl() -> Result<()> {
-    let ctx = context::get_ctx();
-    if ctx.has_feature(MppatchFeature::Multiplayer) {
-        log::info!("Applying SetActiveDLCAndMods patch...");
-        unsafe {
-            check_error(
-                SET_ACTIVE_DLC_AND_MODS
-                    .lock()
-                    .unwrap()
-                    .patch(ctx.version_info.sym_SetActiveDLCAndMods, SetActiveDLCAndModsProxy),
-            );
-        }
-    }
-    Ok(())
-}
-
-#[linktime::dtor(unsafe)]
-fn destroy_set_dlc() {
-    SET_ACTIVE_DLC_AND_MODS.lock().unwrap().unpatch();
+make_proxy_ty! {
+    proxy, SetActiveDLCAndMods, SetActiveDLCAndModsProxy_impl, sym_SetActiveDLCAndMods,
+    Some(MppatchFeature::Multiplayer), (linux_repr: "thiscall-unwind", win_repr: "C-unwind"),
+    (
+        this: *mut c_void,
+        dlc_list: *mut CppListRaw<Guid>,
+        mod_list: *mut CppListRaw<ModInfo>,
+        reload_dlc: bool,
+        reload_mods: bool,
+    ) -> c_int
 }
 
 #[derive(Debug)]
@@ -212,26 +161,4 @@ unsafe fn SetActiveDLCAndModsProxy_impl(
     debug!("[SetActiveDLCAndModsProxy call end]");
 
     result
-}
-
-#[cfg(windows)]
-pub unsafe extern "thiscall-unwind" fn SetActiveDLCAndModsProxy(
-    this: *mut c_void,
-    dlc_list: *mut CppListRaw<Guid>,
-    mod_list: *mut CppListRaw<ModInfo>,
-    reload_dlc: bool,
-    reload_mods: bool,
-) -> c_int {
-    SetActiveDLCAndModsProxy_impl(this, dlc_list, mod_list, reload_dlc, reload_mods)
-}
-
-#[cfg(unix)]
-pub unsafe extern "C-unwind" fn SetActiveDLCAndModsProxy(
-    this: *mut c_void,
-    dlc_list: *mut CppListRaw<Guid>,
-    mod_list: *mut CppListRaw<ModInfo>,
-    reload_dlc: bool,
-    reload_mods: bool,
-) -> c_int {
-    SetActiveDLCAndModsProxy_impl(this, dlc_list, mod_list, reload_dlc, reload_mods)
 }

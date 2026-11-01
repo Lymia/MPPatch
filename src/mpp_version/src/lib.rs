@@ -36,6 +36,7 @@ pub struct VersionInfo {
     pub platform: Platform,
     pub sym_lGetMemoryUsage: SymbolInfo,
     pub sym_SetActiveDLCAndMods: SymbolInfo,
+    pub sym_LuaContext_Initialize: SymbolInfo,
     pub binary_base: usize,
     pub ceg_patches: Option<CegPatches>,
 }
@@ -83,6 +84,7 @@ pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
                     Offset(0x006CD160),
                     6,
                 ),
+                sym_LuaContext_Initialize: SymbolInfo::Offset("", Offset(0), 0),
                 binary_base: 0x00400000,
                 ceg_patches: Some(include!("v1.0.3.279_win32_dx9_ceg.inc")),
             },
@@ -96,6 +98,11 @@ pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
                 sym_SetActiveDLCAndMods: SymbolInfo::Offset(
                     "SetActiveDLCAndMods",
                     Offset(0x006B8E50),
+                    6,
+                ),
+                sym_LuaContext_Initialize: SymbolInfo::Offset(
+                    "LuaContext::Initialize",
+                    Offset(0x004CC270),
                     6,
                 ),
                 binary_base: 0x00400000,
@@ -113,6 +120,7 @@ pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
                     Offset(0x0065DC10),
                     6,
                 ),
+                sym_LuaContext_Initialize: SymbolInfo::Offset("", Offset(0), 0),
                 binary_base: 0x00400000,
                 ceg_patches: Some(include!("v1.0.3.279_win32_tablet_ceg.inc")),
             },
@@ -129,6 +137,7 @@ pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
                 "_ZN25CvModdingFrameworkAppSide19SetActiveDLCandModsERK22cvContentPackageIDListRKNSt3__14listIN15ModAssociations7ModInfoENS3_9allocatorIS6_EEEEbb",
                 10,
             ),
+            sym_LuaContext_Initialize: SymbolInfo::PublicNamed("_ZN10LuaContext10InitializeEv", 10),
             binary_base: 0x08048000,
             ceg_patches: None,
         },

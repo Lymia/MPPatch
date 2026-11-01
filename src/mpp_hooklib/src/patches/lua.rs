@@ -19,40 +19,12 @@ use mlua::{
     Lua, Table,
 };
 use mpp_common::logging::check_error;
-use std::{ffi::CStr, sync::Mutex};
+use std::ffi::CStr;
 
-type FnType = unsafe extern "C-unwind" fn(*mut lua_State) -> c_int;
-
-static GET_MEMORY_USAGE: Mutex<PatcherContext<FnType>> = Mutex::new(PatcherContext::new());
-
-unsafe fn lGetMemoryUsage(lua: *mut lua_State) -> c_int {
-    let func = GET_MEMORY_USAGE.lock().unwrap().as_func();
-    func(lua)
-}
-
-#[linktime::ctor(unsafe, priority = late)]
-fn init() {
-    check_error(init_impl())
-}
-
-fn init_impl() -> Result<()> {
-    let ctx = crate::context::get_ctx();
-    // TODO: This shouldn't check Multiplayer, but rather some more sane feature.
-    if ctx.has_feature(MppatchFeature::Multiplayer) {
-        log::info!("Applying lGetMemoryUsage patch...");
-        unsafe {
-            GET_MEMORY_USAGE
-                .lock()
-                .unwrap()
-                .patch(ctx.version_info.sym_lGetMemoryUsage, lGetMemoryUsageProxy)?;
-        }
-    }
-    Ok(())
-}
-
-#[linktime::dtor(unsafe)]
-fn destroy_usage() {
-    GET_MEMORY_USAGE.lock().unwrap().unpatch();
+make_proxy_ty! {
+    proxy, lGetMemoryUsage, lGetMemoryUsageProxy, sym_lGetMemoryUsage, None,
+    (linux_repr: "C-unwind", win_repr: "C-unwind"),
+    (lua: *mut lua_State) -> c_int
 }
 
 const LUA_SENTINEL: &str = "216f0090-85dd-4061-8371-3d8ba2099a70";
