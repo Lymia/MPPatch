@@ -5,10 +5,7 @@ use errcode::{
     prelude::{ensure, Result},
 };
 use log::{error, info, trace, LevelFilter};
-use simplelog::{
-    ColorChoice, CombinedLogger, ConfigBuilder, SharedLogger, TermLogger, TerminalMode,
-    ThreadLogMode, WriteLogger,
-};
+use mpp_common::logging::LoggerOptions;
 use std::{
     fs::File,
     panic,
@@ -122,43 +119,19 @@ fn create_ctx() -> Result<MppatchCtx> {
     Ok(MppatchCtx { exe_dir, config, version_info })
 }
 
-fn setup_logging(ctx: &MppatchCtx) {
-    let mut log_file = ctx.exe_dir.clone();
-    log_file.push("mppatch_debug.log");
-
-    let mut loggers: Vec<Box<dyn SharedLogger>> = Vec::new();
-    loggers.push(TermLogger::new(
-        LevelFilter::Trace,
-        ConfigBuilder::default()
-            .set_thread_level(LevelFilter::Error)
-            .set_thread_mode(ThreadLogMode::Both)
-            .set_target_level(LevelFilter::Error)
-            .set_location_level(LevelFilter::Off)
-            .build(),
-        TerminalMode::Stderr,
-        ColorChoice::Auto,
-    ));
-    if ctx.has_feature(MppatchFeature::Logging) {
-        loggers.push(WriteLogger::new(
-            LevelFilter::Trace,
-            ConfigBuilder::default()
-                .set_thread_level(LevelFilter::Error)
-                .set_thread_mode(ThreadLogMode::Both)
-                .set_target_level(LevelFilter::Off)
-                .set_location_level(LevelFilter::Error)
-                .set_time_format_rfc2822()
-                .build(),
-            File::create(log_file).expect("Cannot open log file."),
-        ));
-    }
-    CombinedLogger::init(loggers).unwrap();
-}
-
 static CTX: AtomicPtr<MppatchCtx> = AtomicPtr::new(null_mut());
 
 pub fn run() -> Result<&'static MppatchCtx> {
     let ctx = create_ctx()?;
-    setup_logging(&ctx);
+    mpp_common::logging::register_logger(LoggerOptions {
+        log_file_name: "mppatch_debug.log",
+        log_append: false,
+        log_level: if ctx.has_feature(MppatchFeature::Debug) {
+            LevelFilter::Trace
+        } else {
+            LevelFilter::Info
+        },
+    });
     register_panic_hook();
     if ctx.version_info.platform != Platform::CURRENT {
         panic!("Specified Civilization version is not compatible with this patch.");

@@ -5,9 +5,11 @@ authors = ["Rimi Kanokawa <rimi@rimin.moe>"]
 edition = "2024"
 
 [dependencies]
+anstyle = "1.0"
 errcode = { version = "0.1", features = ["repr_full"] }
 libc = "0.2"
 log = { version = "0.4", features = ["std"] }
+time-format = "1.2"
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "errhandlingapi", "std"] }
