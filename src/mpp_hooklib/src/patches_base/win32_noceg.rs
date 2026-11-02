@@ -2,7 +2,7 @@
 
 use log::info;
 
-#[linktime::ctor(unsafe)]
+#[linktime::ctor(unsafe, priority = default)]
 fn apply_noceg() {
     let ctx = crate::context::get_ctx();
     unsafe {

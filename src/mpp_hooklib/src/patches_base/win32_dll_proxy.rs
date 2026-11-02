@@ -231,7 +231,7 @@ make_proxy! {
     (proxy_CvGameDatabase_0086 "?lGetMemoryUsage@Lua@Scripting@Database@@SAHPAUlua_State@@@Z")
 }
 
-#[linktime::ctor(unsafe)]
+#[linktime::ctor(unsafe, priority = default)]
 fn init() {
     mpp_common::logging::check_error(init_impl())
 }

@@ -14,7 +14,7 @@ errcode = { workspace = true }
 libc = "0.2"
 linktime = "0.19"
 log = { version = "0.4", features = ["std"] }
-mlua = { version = "0.12", features = ["lua51", "module", "error-send"] }
+mlua = { version = "0.12", features = ["lua51", "module"] }
 
 mpp_common = { workspace = true }
 mpp_version = { workspace = true }

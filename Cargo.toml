@@ -19,7 +19,7 @@ panic = "abort"
 opt-level = "s"
 lto = true
 debug = "none"
-panic = "immediate-abort"
+panic = "abort"
 
 [workspace.dependencies]
 errcode = { version = "0.1", features = ["repr_full"] }
