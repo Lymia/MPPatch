@@ -4,6 +4,7 @@ use log::{debug, info, trace, LevelFilter};
 use mpp_common::logging::{check_error, LoggerOptions};
 use mpp_version::{Platform, VersionInfo};
 use std::{
+    ffi::c_char,
     fs::File,
     panic,
     path::{Path, PathBuf},
@@ -73,34 +74,10 @@ fn win32_text_hash(path: &Path) -> Result<String> {
     bail!("Could not find .text section!")
 }
 
-fn create_ctx() -> Result<MppatchCtx> {
-    let exe_path = std::env::current_exe()?;
-    let mut exe_dir = exe_path.canonicalize()?;
+fn create_ctx(config: MppatchConfig) -> Result<MppatchCtx> {
+    let exe_path = std::env::current_exe().unwrap();
+    let mut exe_dir = exe_path.canonicalize().unwrap();
     exe_dir.pop();
-
-    let mut config_file = exe_dir.clone();
-    config_file.push("mppatch_config.cfg");
-    ensure!(config_file.exists(), "mppatch_config.cfg is missing!");
-    let config = std::io::read_to_string(File::open(config_file)?)?;
-    let config = {
-        assert!(config.contains("\n"));
-        let mut split = config.split("\n");
-        let sha256 = split.next().unwrap();
-        let packages_str = split.next().unwrap();
-
-        let mut packages = EnumSet::new();
-        for package in packages_str.split(",") {
-            packages.insert(match package {
-                "Multiplayer" => MppatchFeature::Multiplayer,
-                "LuaJit" => MppatchFeature::LuaJit,
-                "Logging" => MppatchFeature::Logging,
-                "Debug" => MppatchFeature::Debug,
-                _ => bail!("Unknown package: {package}"),
-            });
-        }
-
-        MppatchConfig { bin_sha256: sha256.to_string(), features: packages }
-    };
 
     #[cfg(unix)]
     let text_hash = String::new();
@@ -121,18 +98,53 @@ fn init() {
     check_error(init_impl())
 }
 
+fn read_config() -> MppatchConfig {
+    let exe_path = std::env::current_exe().unwrap();
+    let mut exe_dir = exe_path.canonicalize().unwrap();
+    exe_dir.pop();
+
+    let mut config_file = exe_dir.clone();
+    config_file.push("mppatch_config.cfg");
+    if !config_file.exists() {
+        MppatchConfig {
+            bin_sha256: "<unknown>".to_string(),
+            features: MppatchFeature::Debug.into(),
+        }
+    } else {
+        let config = std::io::read_to_string(File::open(config_file).unwrap()).unwrap();
+        assert!(config.contains("\n"));
+        let mut split = config.split("\n");
+        let sha256 = split.next().unwrap();
+        let packages_str = split.next().unwrap();
+
+        let mut packages = EnumSet::new();
+        for package in packages_str.split(",") {
+            packages.insert(match package {
+                "Multiplayer" => MppatchFeature::Multiplayer,
+                "LuaJit" => MppatchFeature::LuaJit,
+                "Logging" => MppatchFeature::Logging,
+                "Debug" => MppatchFeature::Debug,
+                _ => panic!("Unknown package: {package}"),
+            });
+        }
+
+        MppatchConfig { bin_sha256: sha256.to_string(), features: packages }
+    }
+}
+
 fn init_impl() -> Result<()> {
     // construct the MPPatch context
-    let ctx = create_ctx()?;
+    let config = read_config();
     mpp_common::logging::register_logger(LoggerOptions {
         log_file_name: "mppatch_debug.log",
         log_append: false,
-        log_level: if ctx.has_feature(MppatchFeature::Debug) {
+        log_level: if config.features.contains(MppatchFeature::Debug) {
             LevelFilter::Trace
         } else {
             LevelFilter::Info
         },
     });
+    let ctx = create_ctx(config)?;
     if ctx.version_info.platform != Platform::CURRENT {
         panic!("Specified Civilization version is not compatible with this patch.");
     }

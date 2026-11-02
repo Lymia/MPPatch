@@ -24,6 +24,7 @@ pub fn register_logger(options: LoggerOptions) {
 }
 
 fn register_logger_impl(options: LoggerOptions) -> Result<()> {
+    register_panic_hook();
     let file = {
         let mut path = std::env::current_exe()?.canonicalize()?;
         path.pop();
@@ -47,7 +48,6 @@ fn register_logger_impl(options: LoggerOptions) -> Result<()> {
         log_file: Mutex::new(file),
         log_level: options.log_level,
     }))?;
-    register_panic_hook();
     Ok(())
 }
 

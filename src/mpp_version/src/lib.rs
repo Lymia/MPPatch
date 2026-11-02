@@ -93,8 +93,16 @@ pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
                     Offset(0x006B8E50),
                     const { &PatchInfo::simple(6) },
                 ),
-                sym_cvLuaPathLibrary_Register: SymbolInfo::NotAvailable,
-                sym_cvLuaUtils_ExposeLibraryToThread: SymbolInfo::NotAvailable,
+                sym_cvLuaPathLibrary_Register: SymbolInfo::Offset(
+                    "cvLuaPathLibrary::Register",
+                    Offset(0x007301B0),
+                    const { &PatchInfo::simple(8) },
+                ),
+                sym_cvLuaUtils_ExposeLibraryToThread: SymbolInfo::Offset(
+                    "cvLuaUtils::ExposeLibraryToThread",
+                    Offset(0x005292A0),
+                    PatchInfo::NONE,
+                ),
                 binary_base: 0x00400000,
                 ceg_patches: Some(include!("v1.0.3.279_win32_dx11_ceg.inc")),
             },
