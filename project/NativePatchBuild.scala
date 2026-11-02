@@ -63,18 +63,10 @@ object NativePatchBuild {
         PatchFile(outName, baseDirectory.value / "target" / rustTarget / "release" / targetName, buildId.toString)
       }
     },
-    Keys.win32Wrapper := {
-      if (PlatformType.currentPlatform.shouldBuildNative(PlatformType.Win32)) {
-        val __ = Keys.nativeVersions.value // make an artifical dependency
-        runProcess(Seq("scripts/ci/build-win32-wrapper.sh"))
-        Some(baseDirectory.value / "target" / "i686-win7-windows-gnu" / "release" / "mpp_hooklib_wrapper.dll")
-      } else None
-    }
   )
 
   case class PatchFile(name: String, file: File, buildId: String)
   object Keys {
     val nativeVersions = TaskKey[Seq[PatchFile]]("mppatch-native-versions")
-    val win32Wrapper   = TaskKey[Option[File]]("mppatch-native-win32-wrapper")
   }
 }

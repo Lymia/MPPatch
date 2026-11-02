@@ -4,7 +4,6 @@ use log::{debug, info, trace, LevelFilter};
 use mpp_common::logging::{check_error, LoggerOptions};
 use mpp_version::{Platform, VersionInfo};
 use std::{
-    ffi::c_char,
     fs::File,
     panic,
     path::{Path, PathBuf},

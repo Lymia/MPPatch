@@ -14,11 +14,10 @@
   "packages": {
     "multiplayer": {
       "renameFile": [
-        {"from": "CvGameDatabaseWin32Final Release.dll", "to": "CvGameDatabase_Original.dll"}
+        {"from": "zlib1.dll", "to": "zlib1.dll.bak"}
       ],
       "writeFile": [
-        {"from": "native/mpp_hooklib_wrapper.dll", "to": "CvGameDatabaseWin32Final Release.dll"},
-        {"from": "native/mpp_hooklib.dll", "to": "mpp_hooklib.dll"}
+        {"from": "native/mpp_hooklib.dll", "to": "zlib1.dll"}
       ],
       "writeConfig": [
         "mppatch_config.cfg"
@@ -47,12 +46,12 @@
 
   "cleanup": {
     "renames": [
-      {"from": "CvGameDatabase_Original.dll", "to": "CvGameDatabaseWin32Final Release.dll"},
+      {"from": "zlib1.dll.bak", "to": "zlib1.dll"},
       {"from": "lua51_Win32.dll.bak", "to": "lua51_Win32.dll"}
     ],
     "checkFile": [
       "lua51_Win32.dll.bak",
-      "CvGameDatabase_Original.dll",
+      "zlib1.dll.bak",
       "mppatch_config.ini",
       "steamassets/assets/DLC/MPPatch",
       "steamassets/assets/Gameplay/XML/NewText/MPPatch_TextData"
