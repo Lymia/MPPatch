@@ -1,8 +1,8 @@
 use dlopen::raw::Library;
-use errcode::prelude::Result;
-use mpp_common::offset::{Offset, PatchedFunction, RelocatedOffset};
-use mpp_version::{ProxySource, SymbolInfo};
-use std::{any::type_name, ffi::c_void, marker::PhantomData, mem::size_of, ptr};
+use errcode::{bail, prelude::Result};
+use mpp_common::offset::{PatchedFunction, RelocatedOffset};
+use mpp_version::SymbolInfo;
+use std::{any::type_name, marker::PhantomData, mem::size_of, ptr};
 
 unsafe fn runtime_transmute<T: Copy, V: Copy>(t: T) -> V {
     if size_of::<T>() == size_of::<V>() {
@@ -12,63 +12,13 @@ unsafe fn runtime_transmute<T: Copy, V: Copy>(t: T) -> V {
     }
 }
 
-#[cfg(windows)]
-fn lib_for_source(
-    source: ProxySource,
-) -> &'static dyn crate::patches_base::win32_dll_proxy::ProxyLibrary {
-    match source {
-        ProxySource::CvGameDatabase => &crate::patches_base::win32_dll_proxy::Proxy_CvGameDatabase,
-    }
-}
-
-enum PatchTarget {
-    PatchedFunction(PatchedFunction),
-    #[cfg_attr(unix, allow(dead_code))]
-    ProxyTarget(ProxySource, &'static str, *const c_void),
-}
-impl PatchTarget {
-    unsafe fn as_func<T: Copy>(&self) -> T {
-        let ptr = match self {
-            PatchTarget::PatchedFunction(ptr) => ptr.old_function(),
-            PatchTarget::ProxyTarget(_, _, ptr) => *ptr,
-        };
-        runtime_transmute(ptr)
-    }
-}
-unsafe impl Sync for PatchTarget {}
-unsafe impl Send for PatchTarget {}
-#[cfg(windows)]
-impl Drop for PatchTarget {
-    fn drop(&mut self) {
-        match self {
-            PatchTarget::PatchedFunction(_) => {}
-            PatchTarget::ProxyTarget(source, sym, _) => unsafe {
-                mpp_common::logging::check_error(lib_for_source(*source).unpatch(sym))
-            },
-        }
-    }
-}
-
 pub struct PatcherContext<T: Copy> {
-    patch_info: Option<PatchTarget>,
+    patch_info: Option<PatchedFunction>,
     _phantom: PhantomData<T>,
 }
 impl<T: Copy> PatcherContext<T> {
     pub const fn new() -> Self {
         PatcherContext { patch_info: None, _phantom: PhantomData }
-    }
-
-    unsafe fn patch_offset(
-        &mut self,
-        offset: Offset,
-        size: usize,
-        name: &str,
-        target: T,
-    ) -> Result<()> {
-        let offset = offset.relocate();
-        let patch = offset.patch_function(runtime_transmute(target), size, name);
-        self.patch_info = Some(PatchTarget::PatchedFunction(patch));
-        Ok(())
     }
 
     pub unsafe fn patch(&mut self, sym_info: SymbolInfo, target: T) -> Result<()> {
@@ -78,26 +28,19 @@ impl<T: Copy> PatcherContext<T> {
 
             // patch the target location
             match sym_info {
-                #[cfg(windows)]
-                SymbolInfo::DllProxy(source, sym) => {
-                    let orig = lib_for_source(source).patch(sym, runtime_transmute(target))?;
-                    self.patch_info = Some(PatchTarget::ProxyTarget(source, sym, orig));
-                    log::debug!("Original function pointer ({sym}) = {orig:?}");
-                }
-                #[cfg(unix)]
-                SymbolInfo::DllProxy(source, name) => {
-                    panic!("DllProxy does not exist on Unix: {source:?} / {name:?}")
-                }
-                SymbolInfo::PublicNamed(sym, sym_size) => {
+                SymbolInfo::PublicNamed(sym, info) => {
                     let dylib_civ = Library::open_self()?;
                     let patch_addr = RelocatedOffset::from_ptr(dylib_civ.symbol(sym)?);
                     let target_addr = RelocatedOffset::from_ptr(runtime_transmute(target));
-                    let patch = patch_addr.patch_function(target_addr, sym_size, sym);
-                    self.patch_info = Some(PatchTarget::PatchedFunction(patch));
+                    let patch = patch_addr.patch_function(target_addr, info, sym);
+                    self.patch_info = Some(patch);
                 }
-                SymbolInfo::Offset(name, offset, length) => {
-                    self.patch_offset(offset, length, name, target)?
+                SymbolInfo::Offset(name, offset, info) => {
+                    let offset = offset.relocate();
+                    let patch = offset.patch_function(runtime_transmute(target), info, name);
+                    self.patch_info = Some(patch);
                 }
+                SymbolInfo::NotAvailable => bail!("Symbol not available in this version."),
             }
         }
 
@@ -105,10 +48,25 @@ impl<T: Copy> PatcherContext<T> {
     }
 
     pub unsafe fn as_func(&self) -> T {
-        self.patch_info.as_ref().unwrap().as_func()
+        runtime_transmute(self.patch_info.as_ref().unwrap().old_function())
     }
 
     pub fn unpatch(&mut self) {
         self.patch_info.take();
+    }
+}
+
+pub unsafe fn get_symbol<T: Copy>(sym_info: SymbolInfo) -> Result<T> {
+    match sym_info {
+        SymbolInfo::PublicNamed(sym, _) => {
+            let dylib_civ = Library::open_self()?;
+            let sym_addr = RelocatedOffset::from_ptr(dylib_civ.symbol(sym)?);
+            Ok(runtime_transmute(sym_addr))
+        }
+        SymbolInfo::Offset(_, offset, _) => {
+            let sym_addr = offset.relocate();
+            Ok(runtime_transmute(sym_addr))
+        }
+        SymbolInfo::NotAvailable => bail!("Symbol not available in this version."),
     }
 }

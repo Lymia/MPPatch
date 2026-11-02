@@ -149,7 +149,7 @@ fn init_impl() -> Result<()> {
         #[cfg(windows)]
         let base_offset = winapi::um::libloaderapi::GetModuleHandleA(std::ptr::null()) as usize;
         #[cfg(unix)]
-        let base_offset = 0; // we don't use this mechanism on unix
+        let base_offset = ctx.version_info.binary_base; // compiled with PIE off
 
         debug!("Relocated binary offset: 0x{:08x}", base_offset);
         mpp_common::offset::set_relocation_info(ctx.version_info.binary_base, base_offset);

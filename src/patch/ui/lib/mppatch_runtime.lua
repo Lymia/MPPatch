@@ -51,8 +51,11 @@ local function loadFailed(errorStr, statusMarker)
 end
 
 -- Retrieve the binary patch API, if it is installed
-local patch = DB.GetMemoryUsage("216f0090-85dd-4061-8371-3d8ba2099a70")
-if not patch.__mppatch_marker then
+local patch = _MPPatch_Core
+print(Profiler)
+print(_MPPatch_Core)
+print(_MPPatch_Core.__mppatch_marker)
+if not patch or not patch.__mppatch_marker then
     loadFailed("Could not load binary patch.", "binaryLoadFailed")
     return
 end

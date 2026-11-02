@@ -10,42 +10,65 @@ use errcode::prelude::Result;
 use libc::c_int;
 use log::{debug, trace};
 use mlua::{
-    ffi::{
-        luaL_checkstring, lua_getfenv, lua_gettable, lua_gettop, lua_insert, lua_isnil, lua_pop,
-        lua_pushcfunction, lua_pushstring, lua_settable, lua_type, LUA_REGISTRYINDEX, LUA_TSTRING,
-    },
+    ffi::{lua_CFunction, lua_getglobal},
     lua_State,
     prelude::{LuaFunction, LuaString},
-    Lua, Table,
+    Lua, MultiValue, Table,
 };
 use mpp_common::logging::check_error;
-use std::ffi::CStr;
+use std::ffi::c_char;
 
-make_proxy_ty! {
-    proxy, lGetMemoryUsage, lGetMemoryUsageProxy, sym_lGetMemoryUsage, None,
+make_func_overwrite! {
+    f0, cvLuaPathLibrary_Register, cvLuaPathLibrary_Register_Hook,
+    sym_cvLuaPathLibrary_Register, None,
     (posix_repr: "C-unwind", win_repr: "C-unwind"),
-    (lua: *mut lua_State) -> c_int
+    (lua_c: *mut lua_State, lua_thread_c: *mut lua_State) -> c_int
 }
 
-const LUA_SENTINEL: &str = "216f0090-85dd-4061-8371-3d8ba2099a70";
+make_func_proxy! {
+    f1, cvLuaUtils_ExposeLibraryToThread, sym_cvLuaUtils_ExposeLibraryToThread,
+    (posix_repr: "C-unwind", win_repr: "C-unwind"),
+    (
+        lua_c: *mut lua_State,
+        lua_thread_c: *mut lua_State,
+        lib_name: *const c_char,
+        callback: lua_CFunction,
+    ) -> c_int
+}
 
-const LUA_TABLE_INDEX: &str = "4f9ef697-7746-45d3-9c2d-f2121464a359";
-const LUA_TABLE_INDEX_C: &CStr =
-    match CStr::from_bytes_with_nul("4f9ef697-7746-45d3-9c2d-f2121464a359\0".as_bytes()) {
-        Ok(x) => x,
-        Err(_) => panic!("???"),
-    };
+unsafe fn cvLuaPathLibrary_Register_Hook(
+    lua_c: *mut lua_State,
+    lua_thread_c: *mut lua_State,
+) -> c_int {
+    unsafe {
+        let ret = cvLuaPathLibrary_Register(lua_c, lua_thread_c);
+        cvLuaUtils_ExposeLibraryToThread(
+            lua_c,
+            lua_thread_c,
+            "_MPPatch_Core\0".as_ptr() as *const c_char,
+            install_mppatch_table,
+        );
+        ret
+    }
+}
 
-const LUA_FUNC_GET_GLOBALS: &str = "7fe157f7-909f-4cbc-9257-8156d1d84a29";
-const LUA_FUNC_GET_GLOBALS_C: &CStr =
-    match CStr::from_bytes_with_nul("7fe157f7-909f-4cbc-9257-8156d1d84a29\0".as_bytes()) {
-        Ok(x) => x,
-        Err(_) => panic!("???"),
-    };
+unsafe extern "C-unwind" fn install_mppatch_table(lua_c: *mut lua_State) -> c_int {
+    check_error(install_mppatch_table_impl(lua_c));
+    lua_getglobal(lua_c, "_MPPatch_Core_\0".as_ptr() as *const c_char);
+    1
+}
 
-fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
+unsafe fn install_mppatch_table_impl(lua_c: *mut lua_State) -> Result<()> {
+    unsafe {
+        let lua = Lua::get_or_init_from_ptr(lua_c);
+        lua.globals()
+            .set("_MPPatch_Core_", create_mppatch_table(lua)?)?;
+        Ok(())
+    }
+}
+
+unsafe fn create_mppatch_table(lua: &Lua) -> Result<Table> {
     trace!("Building MPPatch function table...");
-
     let ctx = context::get_ctx();
 
     let patch_table = lua.create_table()?;
@@ -71,7 +94,7 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
         version_table.set("platform", ctx.version_info.platform.name())?;
         version_table.set("sha256", ctx.sha256())?;
         version_table.set("buildId", ctx.build_id())?;
-        patch_table.set("version", version_table)?;
+        patch_table.set("version", lock_table(lua, &version_table)?)?;
     }
 
     // config table
@@ -81,32 +104,23 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
         config_table.set("enableDebug", ctx.has_feature(MppatchFeature::Debug))?;
         config_table.set("enableMultiplayerPatch", ctx.has_feature(MppatchFeature::Multiplayer))?;
         config_table.set("enableLuaJIT", ctx.has_feature(MppatchFeature::LuaJit))?;
-        patch_table.set("config", config_table)?;
+        patch_table.set("config", lock_table(lua, &config_table)?)?;
     }
 
-    // find actual globals table
-    let globals = {
-        unsafe {
-            lua_pushstring(lua_c, LUA_FUNC_GET_GLOBALS_C.as_ptr());
-            lua_pushcfunction(lua_c, get_globals_table);
-            lua_settable(lua_c, LUA_REGISTRYINDEX);
-        }
-
-        let get_globals: LuaFunction = lua.named_registry_value(LUA_FUNC_GET_GLOBALS)?;
-        let table: Table = get_globals.call(())?;
-        table
-    };
+    // get actual globals table
+    // in this context, this is the actual globals table
+    let globals = lua.globals();
 
     // globals table
     {
         let globals_table = lua.create_table()?;
         globals_table.set("rawget", globals.get::<LuaFunction>("rawget")?)?;
         globals_table.set("rawset", globals.get::<LuaFunction>("rawset")?)?;
-        patch_table.set("globals", globals_table)?;
+        patch_table.set("globals", lock_table(lua, &globals_table)?)?;
     }
 
     // NetPatch table
-    {
+    if ctx.has_feature(MppatchFeature::Multiplayer) {
         let net_patch_table = lua.create_table()?;
 
         net_patch_table.set(
@@ -159,47 +173,25 @@ fn create_mppatch_table(lua_c: *mut lua_State, lua: &Lua) -> Result<()> {
                 Ok(())
             })?,
         )?;
-
-        patch_table.set("NetPatch", net_patch_table)?;
+        patch_table.set("NetPatch", lock_table(lua, &net_patch_table)?)?;
     }
 
-    lua.set_named_registry_value(LUA_TABLE_INDEX, patch_table)?;
-    Ok(())
+    Ok(patch_table)
 }
 
-/// this can't be done entire in mlua, unfortunately
-unsafe extern "C-unwind" fn get_globals_table(lua_c: *mut lua_State) -> c_int {
-    lua_pushstring(lua_c, CStr::from_bytes_with_nul(b"\0").unwrap().as_ptr()); // S
-    lua_pushstring(lua_c, CStr::from_bytes_with_nul(b"gsub\0").unwrap().as_ptr()); // S S
-    lua_gettable(lua_c, -2);
-    lua_getfenv(lua_c, -1);
-    lua_insert(lua_c, -3);
-    lua_pop(lua_c, 2);
-    1
-}
+fn lock_table(lua: &Lua, table: &Table) -> Result<Table> {
+    let new_table = lua.create_table()?;
+    let metatable = lua.create_table()?;
 
-pub unsafe extern "C-unwind" fn lGetMemoryUsageProxy(lua_c: *mut lua_State) -> c_int {
-    if lua_type(lua_c, 1) == LUA_TSTRING
-        && CStr::from_ptr(luaL_checkstring(lua_c, 1)).to_string_lossy() == LUA_SENTINEL
-    {
-        trace!("Found sentinel value, returning MPPatch function table.");
+    metatable.set("__metatable", false)?;
+    metatable.set("__index", table)?;
+    metatable.set(
+        "__newindex",
+        lua.create_function(|_, _: MultiValue| -> mlua::Result<()> {
+            Err(mlua::error::Error::runtime("Attempt to modify read-only table"))
+        })?,
+    )?;
 
-        lua_pushstring(lua_c, LUA_TABLE_INDEX_C.as_ptr());
-        lua_gettable(lua_c, LUA_REGISTRYINDEX);
-        if lua_isnil(lua_c, lua_gettop(lua_c)) != 0 {
-            lua_pop(lua_c, 1);
-
-            let lua = Lua::get_or_init_from_ptr(lua_c);
-            check_error(create_mppatch_table(lua_c, &lua));
-        } else {
-            trace!("(Using cached table...)");
-            lua_pop(lua_c, 1);
-        }
-
-        lua_pushstring(lua_c, LUA_TABLE_INDEX_C.as_ptr());
-        lua_gettable(lua_c, LUA_REGISTRYINDEX);
-        1
-    } else {
-        lGetMemoryUsage(lua_c)
-    }
+    new_table.set_metatable(Some(metatable))?;
+    Ok(new_table)
 }

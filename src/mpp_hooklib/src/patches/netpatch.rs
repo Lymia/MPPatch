@@ -16,8 +16,8 @@ use std::{
     sync::Mutex,
 };
 
-make_proxy_ty! {
-    proxy, SetActiveDLCAndMods, SetActiveDLCAndModsProxy_impl, sym_SetActiveDLCAndMods,
+make_func_overwrite! {
+    proxy, SetActiveDLCAndMods, SetActiveDLCAndModsProxy, sym_SetActiveDLCAndMods,
     Some(MppatchFeature::Multiplayer), (posix_repr: "C-unwind", win_repr: "thiscall-unwind"),
     (
         this: *mut c_void,
@@ -115,7 +115,7 @@ pub fn reset() {
     lock.reset();
 }
 
-unsafe fn SetActiveDLCAndModsProxy_impl(
+unsafe fn SetActiveDLCAndModsProxy(
     this: *mut c_void,
     dlc_list: *mut CppListRaw<Guid>,
     mod_list: *mut CppListRaw<ModInfo>,
