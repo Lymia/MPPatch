@@ -62,8 +62,6 @@ for ceg_file in glob.glob(f"{source_path}/*.json"):
         stub_functions.append(int(offset, 16))
     if "Terminate" in ceg_json:
         stub_functions.append(int(ceg_json["Terminate"], 16))
-    for offset in ceg_json["TestSecret"]:
-        stub_functions.append(int(offset, 16))
 
     string = ""
     string += "CegPatches {\n"
