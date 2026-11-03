@@ -22,9 +22,12 @@
 
 package moe.lymia.mppatch.core
 
-import moe.lymia.mppatch.util.LuaUtils
+import moe.lymia.mppatch.util.{EncodingUtils, LuaUtils}
 import moe.lymia.mppatch.util.io.*
 import moe.lymia.mppatch.util.io.XMLUtils.*
+import toml.Codec
+import toml.Value
+import toml.derivation.auto.*
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
@@ -57,47 +60,93 @@ case class UIPatch(
 )
 
 object UIPatch {
-  def loadFilename(node: Node) = getAttribute(node, "Filename")
-
-  def readDLCManifest(node: Node) =
-    DLCManifest(
-      UUID.fromString(getAttribute(node, "UUID")),
-      getAttribute(node, "Version").toInt,
-      getAttribute(node, "Priority").toInt,
-      getAttribute(node, "ShortName"),
-      getAttribute(node, "Name")
-    )
-
-  def loadInject(node: Node) = LuaOverrideInject(loadSource(node), getBoolAttribute(node, "Inline"))
-
-  def loadLuaOverride(node: Node) =
-    LuaOverride(
-      loadFilename(node),
-      (node \ "Include").map(loadFilename),
-      (node \ "InjectBefore").map(loadInject),
-      (node \ "InjectAfter").map(loadInject)
-    )
-
-  def loadLuaSoftHook(node: Node) =
-    LuaSoftHook(getAttribute(node, "ScreenID"), (node \ "Include").map(loadFilename), (node \ "Inject").map(loadSource))
-
-  def loadInclude(node: Node) = FileWithSource(loadFilename(node), getAttribute(node, "Source"))
-
-  def loadScreen(node: Node) = FileWithSource(getAttribute(node, "Name"), getAttribute(node, "Source"))
-
-  def loadSoftHookInfo(node: Node) =
-    SoftHookInfo(getAttribute(node, "Namespace"), getAttribute(node, "Filename"), getAttribute(node, "PatchPrefix"))
-
-  def loadFromXML(xml: Node) =
+  def parseUiPatch(source: String) = {
+    val info = EncodingUtils.unwrapToml(toml.Toml.parseAs[TomlDlcInfo](source))
     UIPatch(
-      readDLCManifest((xml \ "Info").head),
-      loadSoftHookInfo((xml \ "SoftHookInfo").head),
-      (xml \ "Hook").map(loadLuaOverride),
-      (xml \ "SoftHook").map(loadLuaSoftHook),
-      (xml \ "Include").map(loadInclude),
-      (xml \ "Screen").map(loadScreen),
-      (xml \ "TextData").map(loadSource)
+      dlcManifest = DLCManifest(
+        UUID.fromString(info.metadata.uuid),
+        info.metadata.version,
+        info.metadata.priority,
+        info.metadata.short_name,
+        info.metadata.name,
+      ),
+      softHookInfo = SoftHookInfo(
+        namespace = info.paths.soft_hook_namespace,
+        infoTarget = info.paths.soft_hook_filename,
+        patchPrefix = info.paths.patch_prefix,
+      ),
+      luaPatches = info.hook.map((name, hook) => LuaOverride(
+        name,
+        hook.includes,
+        hook.inject.map(parseTomlInjection),
+        hook.inject_after.map(parseTomlInjection),
+      )).toSeq,
+      luaSoftHooks = info.softhook.map((name, softhook) =>
+        LuaSoftHook(name, softhook.inject, softhook.inject_after)
+      ).toSeq,
+      libraryFiles = info.include.map((key, value) => FileWithSource(key, value)).toSeq,
+      newScreenFileNames = info.screen.map((key, screen) => FileWithSource(key, screen.source)).toSeq,
+      textFileNames = info.paths.text_data,
     )
+  }
+
+  def parseTomlInjection(name: toml.Value) = name match {
+    case Value.Str(value) => LuaOverrideInject(value, false)
+    case Value.Tbl(values) =>
+      // TODO: This is a bad parser, but IDC, since this is temporary.
+      val source = values("source") match {
+        case Value.Str(value) => value
+        case _ => ???
+      }
+      val inline = values("inline") match {
+        case Value.Bool(value) => value
+        case _ => ???
+      }
+      LuaOverrideInject(source, inline)
+    case _ => ???
+  }
+
+  case class TomlMetadata(
+    uuid: String,
+    version: Int,
+    priority: Int,
+    name: String,
+    short_name: String,
+  )
+
+  case class TomlPaths(
+    soft_hook_namespace: String,
+    soft_hook_filename: String,
+    patch_prefix: String,
+    text_data: List[String],
+  )
+
+  case class TomlHook(
+    includes: List[String],
+    inject: List[toml.Value],
+    inject_after: List[toml.Value],
+  )
+
+  case class TomlSoftHook(
+    includes: List[String],
+    inject: List[String],
+    inject_after: List[String],
+  )
+
+  case class TomlScreen(
+    source: String,
+  )
+
+  case class TomlDlcInfo(
+    metadata: TomlMetadata,
+    paths: TomlPaths,
+    include: Map[String, String],
+    hook: Map[String, TomlHook],
+    softhook: Map[String, TomlSoftHook],
+    screen: Map[String, TomlScreen],
+  )
+
+  implicit val rawValueCodec: Codec[Value] = Codec { (value, _, _) => Right(value) }
 }
 
 class CivDlcBuilder(source: DataSource, patch: UIPatch) {

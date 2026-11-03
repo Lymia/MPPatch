@@ -21,7 +21,7 @@ write_config = [
   "mppatch_config.cfg",
 ]
 write_dlc = [
-  { from = "ui/mppatch.xml", to = "DLC/MPPatch", text_data = "Gameplay/XML/NewText/MPPatch_TextData" },
+  { from = "ui/mppatch.toml", to = "DLC/MPPatch", text_data = "Gameplay/XML/NewText/MPPatch_TextData" },
 ]
 enable_feature = ["Multiplayer"]
 

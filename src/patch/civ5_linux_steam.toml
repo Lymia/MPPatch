@@ -27,7 +27,7 @@ write_config = [
 [packages.multiplayer]
 depends = ["core"]
 write_dlc = [
-  { from = "ui/mppatch.xml", to = "dlc/mppatch", text_data = "gameplay/xml/newtext/mppatch_textdata" },
+  { from = "ui/mppatch.toml", to = "dlc/mppatch", text_data = "gameplay/xml/newtext/mppatch_textdata" },
 ]
 enable_feature = ["Multiplayer"]
 

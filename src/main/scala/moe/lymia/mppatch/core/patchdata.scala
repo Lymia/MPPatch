@@ -119,7 +119,7 @@ class PatchPackage(val source: DataSource) {
   }
 
   /** Loads a UI patch from the package. */
-  def loadUIPatch(x: String) = UIPatch.loadFromXML(source.loadXML(x))
+  def loadUIPatch(x: String) = UIPatch.parseUiPatch(source.loadResource(x))
 }
 
 /** A specific installation script for a specific version of Civilization. */
