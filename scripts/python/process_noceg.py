@@ -23,15 +23,15 @@
 import glob
 import json
 import os
-import shutil
 import sys
 
 source_path = "res/noceg"
 target_path = "src/mpp_version/src"
 
-if os.path.exists(target_path):
-    shutil.rmtree(target_path)
+if not os.path.exists(target_path):
     os.makedirs(target_path)
+for inc_file in glob.glob(f"{target_path}/*_ceg.inc"):
+    os.remove(inc_file)
 
 for ceg_file in glob.glob(f"{source_path}/*.json"):
     print(f"Processing {ceg_file}...")
