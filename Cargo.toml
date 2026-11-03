@@ -4,7 +4,7 @@ cargo-features = ["panic-immediate-abort"]
 resolver = "3"
 members = [
     "src/mpp_common",
-    "src/mpp_defs",
+    "src/mpp_hooklib_defs",
     "src/mpp_hooklib",
     "src/mpp_version",
 ]
@@ -26,5 +26,5 @@ errcode = { version = "0.1", features = ["repr_full"] }
 libc = "0.2"
 
 mpp_common = { version = "*", path = "src/mpp_common" }
-mpp_defs = { version = "*", path = "src/mpp_defs" }
+mpp_hooklib_defs = { version = "*", path = "src/mpp_hooklib_defs" }
 mpp_version = { version = "*", path = "src/mpp_version" }

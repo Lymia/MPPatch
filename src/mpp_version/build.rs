@@ -1,8 +1,5 @@
-use std::collections::HashMap;
-use std::fs;
-use std::path::PathBuf;
 use serde::{Deserialize, Serialize};
-use std::fmt::Write;
+use std::{collections::HashMap, fmt::Write, fs, path::PathBuf};
 
 fn main() {
     println!("cargo::rerun-if-changed=noceg");

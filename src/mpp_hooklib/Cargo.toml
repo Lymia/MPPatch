@@ -18,7 +18,7 @@ log = { version = "0.4", features = ["std"] }
 mlua = { version = "0.12", features = ["lua51", "module"] }
 
 mpp_common = { workspace = true }
-mpp_defs = { workspace = true }
+mpp_hooklib_defs = { workspace = true }
 mpp_version = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]

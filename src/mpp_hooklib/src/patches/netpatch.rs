@@ -5,7 +5,7 @@ use enumset::*;
 use libc::c_int;
 use log::debug;
 use mpp_common::logging::check_error;
-use mpp_defs::cpplist::{CppList, CppListRaw};
+use mpp_hooklib_defs::cpplist::{CppList, CppListRaw};
 use std::{
     ffi::{CStr, c_void},
     fmt::{Debug, Formatter},
