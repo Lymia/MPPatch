@@ -193,12 +193,12 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
     log.info("Checking patch status...")
 
     def body() = {
-      val leftoverFiles = install.cleanup.checkFile.filter(x => Files.exists(basePath.resolve(x)))
+      val leftoverFiles = install.cleanup.check_file.filter(x => Files.exists(basePath.resolve(x)))
 
       if (!Files.exists(patchStatePath)) {
-        if (!Files.exists(basePath.resolve(install.script.metadata.hashFrom))) PatchStatus.NeedsValidation
+        if (!Files.exists(basePath.resolve(install.script.metadata.hash_from))) PatchStatus.NeedsValidation
         else if (leftoverFiles.nonEmpty) PatchStatus.NeedsCleanup
-        else PatchStatus.NotInstalled(isVersionKnown(install.script.metadata.hashFrom))
+        else PatchStatus.NotInstalled(isVersionKnown(install.script.metadata.hash_from))
       } else
         loadPatchState() match {
           case Some(patchState) =>
@@ -241,7 +241,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   private def installPatch(packages: Set[String]) = {
     log.info("Installing patch...")
 
-    val targetVersion = EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(install.script.metadata.hashFrom)))
+    val targetVersion = EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(install.script.metadata.hash_from)))
     log.info(s"- Target version: $targetVersion")
 
     val newFileSet = install.makeFileSet(packages, targetVersion)
@@ -279,7 +279,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
 
     log.info("- Writing patch state")
     val state = PatchState(
-      install.script.metadata.hashFrom,
+      install.script.metadata.hash_from,
       targetVersion,
       packages,
       renameData,
@@ -347,7 +347,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
         Files.move(basePath.resolve(from), basePath.resolve(to))
       }
     }
-    for (file <- install.cleanup.checkFile) {
+    for (file <- install.cleanup.check_file) {
       log.info(s"- Deleting $file...")
       IOUtils.deleteDirectory(basePath.resolve(file))
     }

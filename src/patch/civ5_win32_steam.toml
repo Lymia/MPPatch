@@ -1,51 +1,51 @@
 [metadata]
 game = "civ5"
 platform = "win32"
-steamId = 8930
-assetsPath = "Assets"
+steam_id = 8930
+assets_path = "Assets"
 
-checkFor = ["CivilizationV.exe", "CvGameDatabaseWin32Final Release.dll", "steam_api.dll"]
-hashFrom = "CvGameDatabaseWin32Final Release.dll"
-supportedHashes = [
+check_for = ["CivilizationV.exe", "CvGameDatabaseWin32Final Release.dll", "steam_api.dll"]
+hash_from = "CvGameDatabaseWin32Final Release.dll"
+supported_hashes = [
   "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563",
 ]
 
 [packages.multiplayer]
-renameFile = [
+rename_file = [
   { from = "zlib1.dll", to = "zlib1.dll.bak" },
 ]
-writeFile = [
+write_file = [
   { from = "native/mpp_hooklib.dll", to = "zlib1.dll" },
 ]
-writeConfig = [
+write_config = [
   "mppatch_config.cfg",
 ]
-writeDlc = [
-  { from = "ui/mppatch.xml", to = "DLC/MPPatch", textData = "Gameplay/XML/NewText/MPPatch_TextData" },
+write_dlc = [
+  { from = "ui/mppatch.xml", to = "DLC/MPPatch", text_data = "Gameplay/XML/NewText/MPPatch_TextData" },
 ]
-enableFeature = ["Multiplayer"]
+enable_feature = ["Multiplayer"]
 
 [packages.luajit]
-renameFile = [
+rename_file = [
   { from = "lua51_Win32.dll", to = "lua51_Win32.dll.bak" },
 ]
-writeFile = [
+write_file = [
   { from = "native/luajit_win32.dll", to = "lua51_Win32.dll" },
 ]
-enableFeature = ["LuaJit"]
+enable_feature = ["LuaJit"]
 
 [packages.logging]
-enableFeature = ["Logging"]
+enable_feature = ["Logging"]
 
 [packages.debug]
-enableFeature = ["Debug"]
+enable_feature = ["Debug"]
 
 [cleanup]
 renames = [
   { from = "zlib1.dll.bak", to = "zlib1.dll" },
   { from = "lua51_Win32.dll.bak", to = "lua51_Win32.dll" },
 ]
-checkFile = [
+check_file = [
   "lua51_Win32.dll.bak",
   "zlib1.dll.bak",
   "mppatch_config.ini",

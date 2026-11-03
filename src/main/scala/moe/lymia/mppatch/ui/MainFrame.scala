@@ -125,7 +125,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
     val ret = JOptionPane.showConfirmDialog(frame, i18n("validate.confirm"), titleString, JOptionPane.YES_NO_OPTION)
     if (ret == JOptionPane.OK_OPTION) {
       getInstallerUnsafe.cleanupPatch()
-      Steam.validateGameFiles(getInstallerUnsafe.install.script.metadata.steamId)
+      Steam.validateGameFiles(getInstallerUnsafe.install.script.metadata.steam_id)
       JOptionPane.showMessageDialog(frame, i18n("validate.wait"), titleString, JOptionPane.INFORMATION_MESSAGE)
       reloadInstaller()
     }

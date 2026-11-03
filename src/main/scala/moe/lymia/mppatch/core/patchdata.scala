@@ -40,24 +40,24 @@ case class JsonInstallScript(
 case class JsonMetadata(
   game: String,
   platform: String,
-  steamId: Int,
-  assetsPath: String,
-  checkFor: List[String],
-  hashFrom: String,
-  supportedHashes: List[String],
+  steam_id: Int,
+  assets_path: String,
+  check_for: List[String],
+  hash_from: String,
+  supported_hashes: List[String],
 )
-case class JsonCleanup(renames: List[JsonRename], checkFile: List[String])
+case class JsonCleanup(renames: List[JsonRename], check_file: List[String])
 case class JsonPackage(
   depends: Option[List[String]],
-  renameFile: Option[List[JsonRename]],
-  writeFile: Option[List[JsonWriteFile]],
-  writeConfig: Option[List[String]],
-  writeDlc: Option[List[JsonWriteDLC]],
-  enableFeature: Option[List[String]],
+  rename_file: Option[List[JsonRename]],
+  write_file: Option[List[JsonWriteFile]],
+  write_config: Option[List[String]],
+  write_dlc: Option[List[JsonWriteDLC]],
+  enable_feature: Option[List[String]],
 )
 case class JsonRename(from: String, to: String)
 case class JsonWriteFile(from: String, to: String, exec: Option[Boolean])
-case class JsonWriteDLC(from: String, to: String, textData: String)
+case class JsonWriteDLC(from: String, to: String, text_data: String)
 
 private object PackageUtils {
   def loadPackage(script: JsonInstallScript, name: String) =
@@ -106,7 +106,7 @@ class PatchPackage(val source: DataSource) {
   def detectInstallationPlatform(root: Path): Option[InstallScript] = {
     val possible = for (
       script <- scripts;
-      if script.metadata.checkFor.forall(x => Files.exists(root.resolve(x)))
+      if script.metadata.check_for.forall(x => Files.exists(root.resolve(x)))
     ) yield new InstallScript(this, script)
     possible.headOption
   }
@@ -125,31 +125,31 @@ class InstallScript private[core] (val pkg: PatchPackage, val script: JsonInstal
 
   def makeFileSet(packages: Set[String], sha256: String) =
     InstallFileSet(this, sha256, PackageUtils.loadPackages(script, packages))
-  def supportedHash(hash: String) = script.metadata.supportedHashes.contains(hash)
+  def supportedHash(hash: String) = script.metadata.supported_hashes.contains(hash)
 }
 
 /** A set of files which to be added to a Civilization directory. */
 case class InstallFileSet private[core] (script: InstallScript, sha256: String, packages: Seq[JsonPackage]) {
-  lazy val renames = packages.flatMap(_.renameFile.getOrElse(Seq()))
+  lazy val renames = packages.flatMap(_.rename_file.getOrElse(Seq()))
   def getFiles(basePath: Path, versionName: String): Seq[OutputFile] = {
-    val packagesStr = packages.flatMap(_.enableFeature.getOrElse(Set())).distinct.sorted.mkString(",")
+    val packagesStr = packages.flatMap(_.enable_feature.getOrElse(Set())).distinct.sorted.mkString(",")
     val configFileBody = f"$sha256\n$packagesStr"
 
     val configFiles = packages
-      .flatMap(_.writeConfig.getOrElse(Seq()))
+      .flatMap(_.write_config.getOrElse(Seq()))
       .map(x => OutputFile(x, configFileBody.getBytes(StandardCharsets.UTF_8)))
     val additionalFiles = packages
-      .flatMap(_.writeFile.getOrElse(Seq()))
+      .flatMap(_.write_file.getOrElse(Seq()))
       .map(x => OutputFile(x.to, script.source.loadBinaryResource(x.from), x.exec.getOrElse(false)))
 
-    val assetPath = script.script.metadata.assetsPath
+    val assetPath = script.script.metadata.assets_path
     val assets    = script.platform.resolve(basePath, assetPath)
-    val dlcFiles = packages.flatMap(_.writeDlc.getOrElse(Seq())).flatMap { x =>
+    val dlcFiles = packages.flatMap(_.write_dlc.getOrElse(Seq())).flatMap { x =>
       val uiPatch = script.pkg.loadUIPatch(x.from)
       val dlc     = new CivDlcBuilder(script.source, uiPatch).generateBaseDLC(assets, script.platform)
       val dlcMap = DLCDataWriter.writeDLC(
         s"$assetPath/${script.platform.mapPath(x.to)}",
-        Some(s"$assetPath/${script.platform.mapPath(x.textData)}"),
+        Some(s"$assetPath/${script.platform.mapPath(x.text_data)}"),
         dlc,
         script.platform
       )
