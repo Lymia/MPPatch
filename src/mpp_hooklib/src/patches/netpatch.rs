@@ -1,16 +1,13 @@
 #![allow(non_snake_case)]
 
-use crate::{
-    context::MppatchFeature,
-    cpplist::{CppList, CppListRaw},
-    patcher::PatcherContext,
-};
+use crate::{context::MppatchFeature, patcher::PatcherContext};
 use enumset::*;
 use libc::c_int;
 use log::debug;
 use mpp_common::logging::check_error;
+use mpp_defs::cpplist::{CppList, CppListRaw};
 use std::{
-    ffi::{c_void, CStr},
+    ffi::{CStr, c_void},
     fmt::{Debug, Formatter},
     mem,
     sync::Mutex,
@@ -127,9 +124,12 @@ unsafe fn SetActiveDLCAndModsProxy(
         lock.take()
     };
 
+    let dlc_list = unsafe { CppList::from_raw(dlc_list) };
+    let mod_list = unsafe { CppList::from_raw(mod_list) };
+
     debug!("[SetActiveDLCAndModsProxy call begin]");
-    debug!("dlc_list = {:#?}", CppList::from_raw(dlc_list));
-    debug!("mod_list = {:#?}", CppList::from_raw(mod_list));
+    debug!("dlc_list = {dlc_list:#?}");
+    debug!("mod_list = {mod_list:#?}");
     debug!("reload_dlc = {}", reload_dlc);
     debug!("reload_mods = {}", reload_mods);
     debug!("state = {:#?}", state);
@@ -141,7 +141,7 @@ unsafe fn SetActiveDLCAndModsProxy(
         }
         list
     } else {
-        CppList::from_raw(dlc_list)
+        dlc_list
     };
     let mod_list = if state.overrides.contains(OverrideType::OverrideMods) {
         let mut list = CppList::new();
@@ -150,13 +150,14 @@ unsafe fn SetActiveDLCAndModsProxy(
         }
         list
     } else {
-        CppList::from_raw(mod_list)
+        mod_list
     };
     let reload_dlc = reload_dlc | state.overrides.contains(OverrideType::ForceReloadDlcs);
     let reload_mods = reload_mods | state.overrides.contains(OverrideType::ForceReloadMods);
 
-    let result =
-        SetActiveDLCAndMods(this, dlc_list.as_raw(), mod_list.as_raw(), reload_dlc, reload_mods);
+    let result = unsafe {
+        SetActiveDLCAndMods(this, dlc_list.as_raw(), mod_list.as_raw(), reload_dlc, reload_mods)
+    };
 
     debug!("[SetActiveDLCAndModsProxy call end]");
 

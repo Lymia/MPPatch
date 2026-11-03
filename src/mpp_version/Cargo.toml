@@ -6,5 +6,4 @@ edition = "2024"
 
 [dependencies]
 errcode = { workspace = true }
-
 mpp_common = { workspace = true }

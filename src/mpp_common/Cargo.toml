@@ -7,7 +7,7 @@ edition = "2024"
 [dependencies]
 anstyle = "1.0"
 errcode = { workspace = true }
-libc = "0.2"
+libc = { workspace = true }
 log = { version = "0.4", features = ["std"] }
 
 [target.'cfg(windows)'.dependencies]

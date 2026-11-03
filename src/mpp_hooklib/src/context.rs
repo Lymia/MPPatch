@@ -1,7 +1,7 @@
 use enumset::*;
 use errcode::prelude::*;
-use log::{debug, info, trace, LevelFilter};
-use mpp_common::logging::{check_error, LoggerOptions};
+use log::{LevelFilter, debug, info, trace};
+use mpp_common::logging::{LoggerOptions, check_error};
 use mpp_version::{Platform, VersionInfo};
 use std::{
     fs::File,

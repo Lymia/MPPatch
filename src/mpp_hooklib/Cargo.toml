@@ -2,7 +2,7 @@
 name = "mpp_hooklib"
 version = "0.0.0"
 authors = ["Rimi Kanokawa <rimi@rimin.moe>"]
-edition = "2021"
+edition = "2024"
 
 [lib]
 crate-type = ["cdylib"]
@@ -11,12 +11,13 @@ crate-type = ["cdylib"]
 dlopen = "0.1"
 enumset = "1.1"
 errcode = { workspace = true }
-libc = "0.2"
+libc = { workspace = true }
 linktime = "0.19"
 log = { version = "0.4", features = ["std"] }
 mlua = { version = "0.12", features = ["lua51", "module"] }
 
 mpp_common = { workspace = true }
+mpp_defs = { workspace = true }
 mpp_version = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]

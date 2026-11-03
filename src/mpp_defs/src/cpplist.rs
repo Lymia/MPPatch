@@ -23,41 +23,49 @@ struct CppListLink {
 
 impl CppListLink {
     unsafe fn new<T>(t: T) -> *mut Self {
-        let list = libc::malloc(mem::size_of::<Self>() + mem::size_of::<T>()) as *mut Self;
-        (*list).prev = list;
-        (*list).next = list;
-        std::ptr::write(&mut (*list).data as *mut _ as *mut T, t);
-        list
+        unsafe {
+            let list = libc::malloc(mem::size_of::<Self>() + mem::size_of::<T>()) as *mut Self;
+            (*list).prev = list;
+            (*list).next = list;
+            std::ptr::write(&mut (*list).data as *mut _ as *mut T, t);
+            list
+        }
     }
 
     unsafe fn data<T>(this: *mut Self) -> *mut T {
-        &mut (*this).data as *mut _ as *mut T
+        unsafe { &mut (*this).data as *mut _ as *mut T }
     }
 
     // originally: CppListLink_newLink
     unsafe fn append_before_link(this: *mut Self, list: *mut Self) {
-        (*this).prev = (*list).prev;
-        (*this).next = list;
+        unsafe {
+            (*this).prev = (*list).prev;
+            (*this).next = list;
 
-        (*(*list).prev).next = this;
-        (*list).prev = this;
+            (*(*list).prev).next = this;
+            (*list).prev = this;
+        }
     }
 
     unsafe fn clear(this: *mut Self) {
-        let mut link = (*this).next;
-        while link != this {
-            let next_link = (*link).next;
-            libc::free(link as *mut c_void);
-            link = next_link;
-        }
+        unsafe {
+            let mut link = (*this).next;
+            while link != this {
+                let next_link = (*link).next;
+                libc::free(link as *mut c_void);
+                link = next_link;
+            }
 
-        (*this).prev = this;
-        (*this).next = this;
+            (*this).prev = this;
+            (*this).next = this;
+        }
     }
 
     unsafe fn free(this: *mut Self) {
-        Self::clear(this);
-        libc::free(this as *mut c_void);
+        unsafe {
+            Self::clear(this);
+            libc::free(this as *mut c_void);
+        }
     }
 }
 
@@ -77,60 +85,70 @@ pub struct CppListRaw<T>(CppListLink, PhantomData<T>);
 impl<T> CppListRaw<T> {
     #[cfg(windows)]
     unsafe fn len_ptr(this: *mut Self) -> *mut c_int {
-        &mut (*this).length
+        unsafe { &mut (*this).length }
     }
 
     #[cfg(unix)]
     unsafe fn len_ptr(this: *mut Self) -> *mut c_int {
-        CppListLink::data(&mut (*this).0)
+        unsafe { CppListLink::data(&mut (*this).0) }
     }
 
     #[cfg(windows)]
     unsafe fn root(this: *mut Self) -> *mut CppListLink {
-        (*this).head
+        unsafe { (*this).head }
     }
 
     #[cfg(unix)]
     unsafe fn root(this: *mut Self) -> *mut CppListLink {
-        mem::transmute(this)
+        unsafe { mem::transmute(this) }
     }
 
     #[cfg(windows)]
     unsafe fn alloc() -> *mut Self {
-        let alloc: *mut Self = mem::transmute(libc::malloc(mem::size_of::<Self>()));
-        (*alloc).unk0 = 0;
-        (*alloc).head = CppListLink::new::<()>(());
-        (*alloc).length = 0;
-        alloc
+        unsafe {
+            let alloc: *mut Self = mem::transmute(libc::malloc(mem::size_of::<Self>()));
+            (*alloc).unk0 = 0;
+            (*alloc).head = CppListLink::new::<()>(());
+            (*alloc).length = 0;
+            alloc
+        }
     }
 
     #[cfg(unix)]
     unsafe fn alloc() -> *mut Self {
-        let alloc: *mut Self = mem::transmute(CppListLink::new::<c_int>(0));
-        *Self::len_ptr(alloc) = 0;
-        alloc
+        unsafe {
+            let alloc: *mut Self = mem::transmute(CppListLink::new::<c_int>(0));
+            *Self::len_ptr(alloc) = 0;
+            alloc
+        }
     }
 
     #[cfg(windows)]
     unsafe fn free(this: *mut Self) {
-        CppListLink::free((*this).head);
-        libc::free(mem::transmute(this));
+        unsafe {
+            CppListLink::free((*this).head);
+            libc::free(mem::transmute(this));
+        }
     }
 
     #[cfg(unix)]
     unsafe fn free(this: *mut Self) {
-        CppListLink::free(mem::transmute(this));
+        unsafe {
+            CppListLink::free(mem::transmute(this));
+        }
     }
 
     unsafe fn begin(this: *mut Self) -> *mut CppListLink {
-        (*Self::root(this)).next
+        unsafe { (*Self::root(this)).next }
     }
     unsafe fn end(this: *mut Self) -> *mut CppListLink {
-        (*Self::root(this)).prev
+        unsafe { (*Self::root(this)).prev }
     }
     unsafe fn push(this: *mut Self, t: T) {
-        *Self::len_ptr(this) += 1;
-        CppListLink::append_before_link(CppListLink::new(t), Self::root(this))
+        unsafe {
+            *Self::len_ptr(this) += 1;
+            CppListLink::append_before_link(CppListLink::new(t), Self::root(this))
+        }
     }
 }
 

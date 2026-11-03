@@ -5,7 +5,7 @@
 
 use crate::context::MppatchFeature;
 use dlopen::raw::Library;
-use errcode::prelude::{bail, Result};
+use errcode::prelude::{Result, bail};
 use log::info;
 use mpp_common::offset::RelocatedOffset;
 

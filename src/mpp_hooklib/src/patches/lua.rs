@@ -10,10 +10,10 @@ use errcode::prelude::Result;
 use libc::c_int;
 use log::{debug, trace};
 use mlua::{
+    Lua, MultiValue, Table,
     ffi::{lua_CFunction, lua_getglobal},
     lua_State,
     prelude::{LuaFunction, LuaString},
-    Lua, MultiValue, Table,
 };
 use mpp_common::logging::check_error;
 use std::ffi::c_char;
@@ -53,9 +53,11 @@ unsafe fn cvLuaPathLibrary_Register_Hook(
 }
 
 unsafe extern "C-unwind" fn install_mppatch_table(lua_c: *mut lua_State) -> c_int {
-    check_error(install_mppatch_table_impl(lua_c));
-    lua_getglobal(lua_c, "_MPPatch_Core_\0".as_ptr() as *const c_char);
-    1
+    unsafe {
+        check_error(install_mppatch_table_impl(lua_c));
+        lua_getglobal(lua_c, "_MPPatch_Core_\0".as_ptr() as *const c_char);
+        1
+    }
 }
 
 unsafe fn install_mppatch_table_impl(lua_c: *mut lua_State) -> Result<()> {

@@ -23,6 +23,7 @@ panic = "abort"
 
 [workspace.dependencies]
 errcode = { version = "0.1", features = ["repr_full"] }
+libc = "0.2"
 
 mpp_common = { version = "*", path = "src/mpp_common" }
 mpp_defs = { version = "*", path = "src/mpp_defs" }

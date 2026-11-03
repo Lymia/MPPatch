@@ -473,6 +473,9 @@ dependencies = [
 [[package]]
 name = "mpp_defs"
 version = "0.0.0"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "mpp_hooklib"
@@ -487,6 +490,7 @@ dependencies = [
  "log",
  "mlua",
  "mpp_common",
+ "mpp_defs",
  "mpp_version",
  "pe-parser",
  "sha2",

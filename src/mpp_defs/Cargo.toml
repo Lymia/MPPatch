@@ -3,3 +3,6 @@ name = "mpp_defs"
 version = "0.0.0"
 authors = ["Rimi Kanokawa <rimi@rimin.moe>"]
 edition = "2024"
+
+[dependencies]
+libc = { workspace = true }
