@@ -196,9 +196,9 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
       val leftoverFiles = install.cleanup.checkFile.filter(x => Files.exists(basePath.resolve(x)))
 
       if (!Files.exists(patchStatePath)) {
-        if (!Files.exists(basePath.resolve(install.script.hashFrom))) PatchStatus.NeedsValidation
+        if (!Files.exists(basePath.resolve(install.script.metadata.hashFrom))) PatchStatus.NeedsValidation
         else if (leftoverFiles.nonEmpty) PatchStatus.NeedsCleanup
-        else PatchStatus.NotInstalled(isVersionKnown(install.script.hashFrom))
+        else PatchStatus.NotInstalled(isVersionKnown(install.script.metadata.hashFrom))
       } else
         loadPatchState() match {
           case Some(patchState) =>
@@ -241,7 +241,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   private def installPatch(packages: Set[String]) = {
     log.info("Installing patch...")
 
-    val targetVersion = EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(install.script.hashFrom)))
+    val targetVersion = EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(install.script.metadata.hashFrom)))
     log.info(s"- Target version: $targetVersion")
 
     val newFileSet = install.makeFileSet(packages, targetVersion)
@@ -279,7 +279,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
 
     log.info("- Writing patch state")
     val state = PatchState(
-      install.script.hashFrom,
+      install.script.metadata.hashFrom,
       targetVersion,
       packages,
       renameData,

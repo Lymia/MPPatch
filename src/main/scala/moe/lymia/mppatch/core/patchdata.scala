@@ -33,25 +33,27 @@ import scala.xml.Node
 
 case class JsonPatchManifest(installScripts: List[String])
 case class JsonInstallScript(
-    game: String,
-    gameType: String,
-    platform: String,
-    steamId: Int,
-    assetsPath: String,
-    checkFor: List[String],
-    hashFrom: String,
-    supportedHashes: Map[String, String],
-    packages: Map[String, JsonPackage],
-    cleanup: JsonCleanup
+  metadata: JsonMetadata,
+  packages: Map[String, JsonPackage],
+  cleanup: JsonCleanup,
+)
+case class JsonMetadata(
+  game: String,
+  platform: String,
+  steamId: Int,
+  assetsPath: String,
+  checkFor: List[String],
+  hashFrom: String,
+  supportedHashes: List[String],
 )
 case class JsonCleanup(renames: List[JsonRename], checkFile: List[String])
 case class JsonPackage(
-    depends: Option[List[String]],
-    renameFile: Option[List[JsonRename]],
-    writeFile: Option[List[JsonWriteFile]],
-    writeConfig: Option[List[String]],
-    writeDlc: Option[List[JsonWriteDLC]],
-    enableFeature: Option[List[String]]
+  depends: Option[List[String]],
+  renameFile: Option[List[JsonRename]],
+  writeFile: Option[List[JsonWriteFile]],
+  writeConfig: Option[List[String]],
+  writeDlc: Option[List[JsonWriteDLC]],
+  enableFeature: Option[List[String]],
 )
 case class JsonRename(from: String, to: String)
 case class JsonWriteFile(from: String, to: String, exec: Option[Boolean])
@@ -104,7 +106,7 @@ class PatchPackage(val source: DataSource) {
   def detectInstallationPlatform(root: Path): Option[InstallScript] = {
     val possible = for (
       script <- scripts;
-      if script.checkFor.forall(x => Files.exists(root.resolve(x)))
+      if script.metadata.checkFor.forall(x => Files.exists(root.resolve(x)))
     ) yield new InstallScript(this, script)
     possible.headOption
   }
@@ -115,7 +117,7 @@ class PatchPackage(val source: DataSource) {
 
 /** A specific installation script for a specific version of Civilization. */
 class InstallScript private[core] (val pkg: PatchPackage, val script: JsonInstallScript) {
-  val platform = Platform.forName(script.platform).get
+  val platform = Platform.forName(script.metadata.platform).get
 
   lazy val source      = pkg.source
   lazy val versionInfo = pkg.versionInfo
@@ -123,7 +125,7 @@ class InstallScript private[core] (val pkg: PatchPackage, val script: JsonInstal
 
   def makeFileSet(packages: Set[String], sha256: String) =
     InstallFileSet(this, sha256, PackageUtils.loadPackages(script, packages))
-  def supportedHash(hash: String) = script.supportedHashes.contains(hash)
+  def supportedHash(hash: String) = script.metadata.supportedHashes.contains(hash)
 }
 
 /** A set of files which to be added to a Civilization directory. */
@@ -140,7 +142,7 @@ case class InstallFileSet private[core] (script: InstallScript, sha256: String, 
       .flatMap(_.writeFile.getOrElse(Seq()))
       .map(x => OutputFile(x.to, script.source.loadBinaryResource(x.from), x.exec.getOrElse(false)))
 
-    val assetPath = script.script.assetsPath
+    val assetPath = script.script.metadata.assetsPath
     val assets    = script.platform.resolve(basePath, assetPath)
     val dlcFiles = packages.flatMap(_.writeDlc.getOrElse(Seq())).flatMap { x =>
       val uiPatch = script.pkg.loadUIPatch(x.from)

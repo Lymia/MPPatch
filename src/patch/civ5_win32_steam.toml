@@ -1,12 +1,14 @@
+[metadata]
 game = "civ5"
-gameType = "steam"
 platform = "win32"
 steamId = 8930
 assetsPath = "Assets"
 
 checkFor = ["CivilizationV.exe", "CvGameDatabaseWin32Final Release.dll", "steam_api.dll"]
 hashFrom = "CvGameDatabaseWin32Final Release.dll"
-supportedHashes = { "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563" = "1.0.3.279" }
+supportedHashes = [
+  "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563",
+]
 
 [packages.multiplayer]
 renameFile = [

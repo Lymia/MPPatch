@@ -1,12 +1,14 @@
+[metadata]
 game = "civ5"
-gameType = "steam"
 platform = "linux"
 steamId = 8930
 assetsPath = "steamassets/assets"
 
 checkFor = ["Civ5XP", "steamclient.so", "libCvGameCoreDLL.so"]
 hashFrom = "Civ5XP"
-supportedHashes = { "cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca" = "1.0.3.279" }
+supportedHashes = [
+  "cc06b647821ec5e7cca3c397f6b0d4726f0106cdd67bcf074d494bea2607a8ca",
+]
 
 [packages.core]
 renameFile = [
