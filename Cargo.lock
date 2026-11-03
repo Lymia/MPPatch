@@ -504,6 +504,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "mpp_installer"
+version = "0.2.0-alpha.2"
+
+[[package]]
+name = "mpp_installer_core"
+version = "0.2.0-alpha.2"
+
+[[package]]
 name = "mpp_version"
 version = "0.0.0"
 dependencies = [

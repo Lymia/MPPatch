@@ -25,48 +25,37 @@ package moe.lymia.mppatch.core
 import moe.lymia.mppatch.util.io.*
 import moe.lymia.mppatch.util.io.XMLUtils.*
 import moe.lymia.mppatch.util.{EncodingUtils, PropertiesSource, VersionInfo}
-import play.api.libs.json.{Json, OFormat}
+import toml.derivation.auto._
 
 import java.nio.charset.StandardCharsets
 import java.nio.file.{Files, Path}
 import scala.xml.Node
 
-case class JsonPatchManifest(installScripts: Seq[String])
+case class JsonPatchManifest(installScripts: List[String])
 case class JsonInstallScript(
     game: String,
     gameType: String,
     platform: String,
     steamId: Int,
     assetsPath: String,
-    checkFor: Set[String],
+    checkFor: List[String],
     hashFrom: String,
     supportedHashes: Map[String, String],
     packages: Map[String, JsonPackage],
     cleanup: JsonCleanup
 )
-case class JsonCleanup(renames: Seq[JsonRename], checkFile: Seq[String])
+case class JsonCleanup(renames: List[JsonRename], checkFile: List[String])
 case class JsonPackage(
-    depends: Option[Set[String]],
-    renameFile: Option[Seq[JsonRename]],
-    writeFile: Option[Seq[JsonWriteFile]],
-    writeConfig: Option[Seq[String]],
-    writeDlc: Option[Seq[JsonWriteDLC]],
-    enableFeature: Option[Set[String]]
+    depends: Option[List[String]],
+    renameFile: Option[List[JsonRename]],
+    writeFile: Option[List[JsonWriteFile]],
+    writeConfig: Option[List[String]],
+    writeDlc: Option[List[JsonWriteDLC]],
+    enableFeature: Option[List[String]]
 )
 case class JsonRename(from: String, to: String)
 case class JsonWriteFile(from: String, to: String, exec: Option[Boolean])
 case class JsonWriteDLC(from: String, to: String, textData: String)
-
-object JsonFormats {
-  implicit lazy val PatchManifest: OFormat[JsonPatchManifest] = Json.format[JsonPatchManifest]
-  implicit lazy val InstallScript: OFormat[JsonInstallScript] = Json.format[JsonInstallScript]
-  implicit lazy val Cleanup: OFormat[JsonCleanup]             = Json.format[JsonCleanup]
-  implicit lazy val Package: OFormat[JsonPackage]             = Json.format[JsonPackage]
-  implicit lazy val Rename: OFormat[JsonRename]               = Json.format[JsonRename]
-  implicit lazy val WriteFile: OFormat[JsonWriteFile]         = Json.format[JsonWriteFile]
-  implicit lazy val WriteDLC: OFormat[JsonWriteDLC]           = Json.format[JsonWriteDLC]
-}
-import JsonFormats.*
 
 private object PackageUtils {
   def loadPackage(script: JsonInstallScript, name: String) =
@@ -94,13 +83,13 @@ private object PackageUtils {
   */
 class PatchPackage(val source: DataSource) {
   source.loadResource("manifest_version.txt").strip() match {
-    case "1.0" => // ok
+    case "2.0" => // ok
     case unk   => sys.error(f"Unknown .mppatch-pkg version: $unk")
   }
 
   /** The manifest for this patch. */
   lazy val patchManifest =
-    EncodingUtils.unwrapJson(Json.fromJson[JsonPatchManifest](Json.parse(source.loadResource("manifest.json"))))
+    EncodingUtils.unwrapToml(toml.Toml.parseAs[JsonPatchManifest](source.loadResource("manifest.toml")))
 
   /** The version information stored in this patch. */
   lazy val versionInfo = new VersionInfo(new PropertiesSource(source.loadResource("version.properties")))
@@ -108,7 +97,7 @@ class PatchPackage(val source: DataSource) {
   /** The list of install scripts available in this package. */
   lazy val scripts =
     patchManifest.installScripts.map(x =>
-      EncodingUtils.unwrapJson(Json.fromJson[JsonInstallScript](Json.parse(source.loadResource(x))))
+      EncodingUtils.unwrapToml(toml.Toml.parseAs[JsonInstallScript](source.loadResource(x)))
     )
 
   /** Detects the platform a Civilization installation directory is for. */

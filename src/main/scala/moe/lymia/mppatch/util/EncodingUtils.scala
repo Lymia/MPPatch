@@ -22,8 +22,6 @@
 
 package moe.lymia.mppatch.util
 
-import play.api.libs.json.{JsError, JsResult, JsSuccess}
-
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import java.util.Base64
@@ -54,11 +52,10 @@ object EncodingUtils {
   def sha256(data: Array[Byte]) = digest("SHA-256", data)
   def sha512(data: Array[Byte]) = digest("SHA-512", data)
 
-  def unwrapJson[T](json: JsResult[T]) = json match {
-    case JsSuccess(value, _) => value
-    case JsError(errors) => {
-      SimpleLogger.error(s"JSON error encountered: $errors")
-      sys.error("JSON error encountered")
-    }
+  def unwrapToml[T](src: Either[toml.Parse.Error, T]) = src match {
+    case Right(value) => value
+    case Left(error) =>
+      SimpleLogger.error(s"TOML error encountered: $error")
+      sys.error("TOML error encountered")
   }
 }
