@@ -77,26 +77,16 @@ private object PatchState {
 
   def serializeRenameData(renameData: RenameData) =
     <RenameData>
-      <ReplacedFile>
-        {serializePatchFile(renameData.replacedFile)}
-      </ReplacedFile>
-      <OriginalFile>
-        {serializePatchFile(renameData.originalFile)}
-      </OriginalFile>
+      <ReplacedFile>{serializePatchFile(renameData.replacedFile)}</ReplacedFile>
+      <OriginalFile>{serializePatchFile(renameData.originalFile)}</OriginalFile>
     </RenameData>
 
   def serialize(state: PatchState) =
     <PatchState version={formatVersion}>
-      <VersionFrom>
-        {state.versionFrom}
-      </VersionFrom>
-      <Sha256>
-        {state.sha256}
-      </Sha256>
+      <VersionFrom>{state.versionFrom}</VersionFrom>
+      <Sha256>{state.sha256}</Sha256>
       <Packages>
-        {state.packages.map(x => <Package>
-        {x}
-      </Package>)}
+        {state.packages.map(x => <Package>{x}</Package>)}
       </Packages>
       <Renames>
         {state.renames.map(serializeRenameData)}
@@ -105,16 +95,10 @@ private object PatchState {
         {state.additionalFiles.map(serializePatchFile)}
       </AdditionalFiles>
       <AdditionalDirectories>
-        {state.additionalDirectories.map(x => <Directory>
-        {x}
-      </Directory>)}
+        {state.additionalDirectories.map(x => <Directory>{x}</Directory>)}
       </AdditionalDirectories>
-      <InstalledVersion>
-        {state.installedVersion}
-      </InstalledVersion>
-      <InstalledTimestamp>
-        {state.installedTimestamp}
-      </InstalledTimestamp>
+      <InstalledVersion>{state.installedVersion}</InstalledVersion>
+      <InstalledTimestamp>{state.installedTimestamp}</InstalledTimestamp>
     </PatchState>
 
   def unserializePatchFile(node: Node) =

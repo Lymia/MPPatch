@@ -58,35 +58,27 @@ object DLCDataWriter {
     val newFiles = Map(
       s"$dlcBasePath/${platform.mapPath(s"$nameString.Civ5Pkg")}" -> IOUtils.writeXMLBytes(
         <Civ5Package>
-          <GUID>
-            {s"{${dlcData.manifest.uuid}}"}
-          </GUID>
-          <Version>
-            {dlcData.manifest.version.toString}
-          </Version>
-          <Name>
-            {languageValues(nameString)}
-          </Name>
-          <Description>
-            {languageValues(dlcData.manifest.name)}
-          </Description>
-          <Priority>
-            {dlcData.manifest.priority.toString}
-          </Priority>
+          <GUID>{s"{${dlcData.manifest.uuid}}"}</GUID>
+          <Version>{dlcData.manifest.version.toString}</Version>
+          <Name>{languageValues(nameString)}</Name>
+          <Description>{languageValues(dlcData.manifest.name)}</Description>
+          <Priority>{dlcData.manifest.priority.toString}</Priority>
 
           <SteamApp>99999</SteamApp>
           <Ownership>FREE</Ownership>
           <PTags>
             <Tag>Version</Tag>
             <Tag>Ownership</Tag>
-          </PTags>{for (DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins)
-          yield <UISkin name={name} set={set} platform={skinPlatform}>
-            <Skin>
-              {dlcData.data.uiFiles.filter(_._2.nonEmpty).map(x => <Directory>
-              {x._1}
-            </Directory>)}
-            </Skin>
-          </UISkin>}
+          </PTags>
+          
+          {
+            for (DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins)
+              yield <UISkin name={name} set={set} platform={skinPlatform}>
+                <Skin>
+                  {dlcData.data.uiFiles.filter(_._2.nonEmpty).map(x => <Directory>{x._1}</Directory>)}
+                </Skin>
+              </UISkin>
+          }
         </Civ5Package>
       )
     )
