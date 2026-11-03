@@ -69,6 +69,12 @@ impl Debug for CegPatches {
     }
 }
 
+macro_rules! include_out {
+    ($frag:literal) => {
+        include!(concat!(env!("OUT_DIR"), "/", $frag))
+    };
+}
+
 pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
     Ok(match sha256 {
         "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563" => match text_hash {
@@ -91,7 +97,7 @@ pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
                     PatchInfo::NONE,
                 ),
                 binary_base: 0x00400000,
-                ceg_patches: Some(include!("v1.0.3.279_win32_dx9_ceg.inc")),
+                ceg_patches: Some(include_out!("v1.0.3.279_win32_dx9_ceg.inc")),
             },
             "7c3ee1cabdfaf5242f74521bff3ead1faf72cc4769fcea0267113ed2621e7bca" => VersionInfo {
                 name: "Civilization V / 1.0.3.279 / Win32 (DX11) + Steam",
@@ -112,7 +118,7 @@ pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
                     PatchInfo::NONE,
                 ),
                 binary_base: 0x00400000,
-                ceg_patches: Some(include!("v1.0.3.279_win32_dx11_ceg.inc")),
+                ceg_patches: Some(include_out!("v1.0.3.279_win32_dx11_ceg.inc")),
             },
             "191653e9d79ee22fe293f2d8a73f3ff918e713845ef8a9269cbff995e599a3b7" => VersionInfo {
                 name: "Civilization V / 1.0.3.279 / Win32 (Tablet) + Steam",
@@ -133,7 +139,7 @@ pub fn find_info(sha256: &str, text_hash: &str) -> Result<VersionInfo> {
                     PatchInfo::NONE,
                 ),
                 binary_base: 0x00400000,
-                ceg_patches: Some(include!("v1.0.3.279_win32_tablet_ceg.inc")),
+                ceg_patches: Some(include_out!("v1.0.3.279_win32_tablet_ceg.inc")),
             },
             _ => bail!("Unknown .text hash for {sha256}: {text_hash}"),
         },
