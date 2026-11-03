@@ -22,16 +22,16 @@
 
 package moe.lymia.mppatch.ui
 
-import java.awt.event.ActionEvent
-import java.awt.*
-import java.util.Locale
-import javax.swing.*
-import moe.lymia.mppatch.util.{SimpleLogger, VersionInfo}
 import moe.lymia.mppatch.util.io.IOUtils
+import moe.lymia.mppatch.util.{SimpleLogger, VersionInfo}
 
+import java.awt.*
+import java.awt.event.ActionEvent
+import java.util.Locale
 import javax.imageio.ImageIO
-import scala.language.implicitConversions
+import javax.swing.*
 import scala.jdk.CollectionConverters.*
+import scala.language.implicitConversions
 
 object FrameUtils {
   lazy val symbolFont = Font.createFont(Font.TRUETYPE_FONT, IOUtils.getResource("text/Symbola_hint_subset.ttf"))
@@ -40,7 +40,7 @@ object FrameUtils {
     for (sizes <- Seq(8, 16, 22, 24, 32, 48, 64, 256, 512))
       yield ImageIO.read(IOUtils.getResource(f"ui/mppatch-installer-$sizes.png"))
 }
-import FrameUtils._
+import moe.lymia.mppatch.ui.FrameUtils.*
 
 trait HasLogger {
   def log = SimpleLogger
@@ -48,24 +48,26 @@ trait HasLogger {
 
 trait I18NTrait {
   protected def locale: Locale
+
   protected lazy val i18n = I18N(locale)
 }
 
 trait FrameUtils {
   protected def insets(top: Int = 0, left: Int = 0, bottom: Int = 0, right: Int = 0) =
     new Insets(top, left, bottom, right)
+
   protected def constraints(
-      gridx: Int = GridBagConstraints.RELATIVE,
-      gridy: Int = GridBagConstraints.RELATIVE,
-      gridwidth: Int = 1,
-      gridheight: Int = 1,
-      weightx: Double = 0,
-      weighty: Double = 0,
-      anchor: Int = GridBagConstraints.CENTER,
-      fill: Int = GridBagConstraints.NONE,
-      insets: Insets = this.insets(),
-      ipadx: Int = 0,
-      ipady: Int = 0
+    gridx: Int = GridBagConstraints.RELATIVE,
+    gridy: Int = GridBagConstraints.RELATIVE,
+    gridwidth: Int = 1,
+    gridheight: Int = 1,
+    weightx: Double = 0,
+    weighty: Double = 0,
+    anchor: Int = GridBagConstraints.CENTER,
+    fill: Int = GridBagConstraints.NONE,
+    insets: Insets = this.insets(),
+    ipadx: Int = 0,
+    ipady: Int = 0
   ) =
     new GridBagConstraints(gridx, gridy, gridwidth, gridheight, weightx, weighty, anchor, fill, insets, ipadx, ipady)
 
@@ -89,6 +91,7 @@ trait FrameUtils {
 
     button
   }
+
   protected def sizeButtons(component: JComponent*) = {
     val maxWidth = component.map(_.getMinimumSize.getWidth).max.toInt + 20
     for (c <- component) {
@@ -120,6 +123,7 @@ trait I18NFrameUtils extends FrameUtils with I18NTrait {
         constraints(gridy = row, insets = insets(left = 3, right = 6), anchor = GridBagConstraints.LINE_START)
       )
     }
+
     def gridTextField(row: Int, width: Int = 2) = {
       val textField = new JTextField()
       textField.setEditable(false)
@@ -130,12 +134,14 @@ trait I18NFrameUtils extends FrameUtils with I18NTrait {
       )
       textField
     }
+
     def gridCheckBox(row: Int, labelStr: String) = {
       val checkBox = new JCheckBox()
       checkBox.setToolTipText(i18n(s"tooltip.$labelStr"))
       c.add(checkBox, constraints(gridx = 1, gridy = row, anchor = GridBagConstraints.LINE_START))
       checkBox
     }
+
     def iconButton(col: Int, row: Int, str: String)(f: => Unit) = {
       val button = new JButton()
       button.setAction(action(e => f))
@@ -149,10 +155,12 @@ trait I18NFrameUtils extends FrameUtils with I18NTrait {
       gridLabel(row, labelStr)
       gridTextField(row)
     }
+
     def gridCheckRow(row: Int, labelStr: String) = {
       gridLabel(row, labelStr)
       gridCheckBox(row, labelStr)
     }
+
     def gridButtonTextRow(row: Int, labelStr: String, icon: String)(f: => Unit) = {
       gridLabel(row, labelStr)
       val field = gridTextField(row, 1)
@@ -163,8 +171,10 @@ trait I18NFrameUtils extends FrameUtils with I18NTrait {
 }
 
 final class InstallerException(str: String, ex: Throwable) extends RuntimeException(str, ex)
+
 trait FrameError[F <: Window] extends HasLogger {
   protected def frame: F
+
   protected def i18n: I18N
 
   protected def titleString = i18n("title", VersionInfo.versionString)
@@ -172,7 +182,7 @@ trait FrameError[F <: Window] extends HasLogger {
   private def getFrameParam = if (frame != null && frame.isVisible) frame else null
 
   private def confirmDialog0(format: String, data: Seq[Any]) = {
-    val string = i18n(format, data*)
+    val string = i18n(format, data *)
     val result = JOptionPane.showConfirmDialog(
       getFrameParam,
       string,
@@ -182,17 +192,19 @@ trait FrameError[F <: Window] extends HasLogger {
     )
     result == JOptionPane.YES_OPTION
   }
+
   protected def confirmDialog(string: String, data: Any*) = confirmDialog0(string, data)
 
   private def warn0(format: String, needPrint: Boolean, data: Seq[Any]) = {
-    val string = i18n(format, data*)
+    val string = i18n(format, data *)
     if (needPrint) log.warn(string)
     JOptionPane.showMessageDialog(getFrameParam, string, titleString, JOptionPane.ERROR_MESSAGE)
   }
+
   protected def warn(string: String, data: Any*) = warn0(string, true, data)
 
   private def error0[T](format: String, ex: Option[Throwable], data: Seq[Any]): T = {
-    val string = i18n(format, data*)
+    val string = i18n(format, data *)
     warn0(format, false, data)
     if (frame != null) {
       frame.setVisible(false)
@@ -200,10 +212,11 @@ trait FrameError[F <: Window] extends HasLogger {
     }
     ex match {
       case Some(t) => log.error(string, t)
-      case None    => log.error(string)
+      case None => log.error(string)
     }
     throw new InstallerException(string, ex.orNull)
   }
+
   protected def error[T](string: String, data: Any*) = error0(string, None, data)
 
   protected def reportException[T](errorString: String, e: Exception, exArgs: Object*): T =
@@ -211,7 +224,8 @@ trait FrameError[F <: Window] extends HasLogger {
 }
 
 trait LaunchFrameError extends FrameError[JFrame] with I18NTrait {
-  protected def locale                 = Locale.getDefault
+  protected def locale = Locale.getDefault
+
   override protected def frame: JFrame = null
 }
 
@@ -219,7 +233,8 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
   protected val neverShowMessage = false
 
   protected var frame: F = scala.compiletime.uninitialized
-  def getFrame           = frame
+
+  def getFrame = frame
 
   protected def buildForm(): Unit
 
@@ -234,6 +249,7 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
     frame.setVisible(true)
     while (frame.isVisible) Thread.sleep(100) // wait for frame to exit
   }
+
   def forceClose(): Unit = {
     frame.setVisible(false)
     frame.dispose()
@@ -241,7 +257,7 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
 
   protected class ActionButton(showCompleteMessage: Boolean = true) extends JButton {
     var action: () => Boolean = () => error("no action registered")
-    var text: String          = "<no action>"
+    var text: String = "<no action>"
 
     setAction(FrameBase.this.action { e =>
       try {
@@ -267,10 +283,14 @@ trait FrameBase[F <: Window] extends FrameError[F] with I18NFrameUtils with HasL
       setText(i18n(name))
       if (i18n.hasKey(name + ".tooltip")) setToolTipText(i18n(name + ".tooltip"))
     }
+
     def setAction(name: String, action: () => Unit): Unit = {
-      this.action = () => { action(); true }
+      this.action = () => {
+        action(); true
+      }
       setActionText(name)
     }
+
     def setStatusAction(name: String, action: () => Boolean): Unit = {
       this.action = action
       setActionText(name)

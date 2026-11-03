@@ -26,11 +26,11 @@ object LuaUtils {
   def quote(s: String) = {
     val buffer = new StringBuilder
     for (c <- s) c match {
-      case '\n'             => buffer.append("\\n")
-      case '\r'             => buffer.append("\\r")
-      case '"'              => buffer.append("\\\"")
+      case '\n' => buffer.append("\\n")
+      case '\r' => buffer.append("\\r")
+      case '"' => buffer.append("\\\"")
       case _ if c.isControl => buffer.append("\\%03d".format(c.toInt))
-      case _                => buffer.append(c)
+      case _ => buffer.append(c)
     }
     s"'${buffer.toString()}'"
   }

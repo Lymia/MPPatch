@@ -31,12 +31,13 @@ import scala.annotation.tailrec
 enum PlatformType {
   case Win32, MacOS, Linux, Other
 }
+
 object PlatformType {
   def forName(name: String) = name match {
     case "win32" => PlatformType.Win32
     case "macos" => PlatformType.MacOS
     case "linux" => PlatformType.Linux
-    case _       => PlatformType.Other
+    case _ => PlatformType.Other
   }
 
   lazy val currentPlatform = {
@@ -45,7 +46,7 @@ object PlatformType {
     else if (os.contains("linux")) Linux
     else if (
       os.contains("mac") ||
-      os.contains("darwin")
+        os.contains("darwin")
     ) MacOS
     else Other
   }
@@ -55,12 +56,14 @@ trait Platform {
   val platformName: String
 
   def defaultSystemPaths: Seq[Path]
+
   def mapPath(name: String): String = name
 
   @tailrec final def resolve(path: Path, name: String*): Path =
     if (name.length == 1) path.resolve(mapPath(name.head))
-    else resolve(path.resolve(mapPath(name.head)), name.tail*)
+    else resolve(path.resolve(mapPath(name.head)), name.tail *)
 }
+
 object Platform {
   def forName(name: String) = Platform(PlatformType.forName(name))
 
@@ -68,7 +71,7 @@ object Platform {
     case PlatformType.Win32 => Some(Win32Platform)
     case PlatformType.MacOS => Some(MacOSPlatform)
     case PlatformType.Linux => Some(LinuxPlatform)
-    case _                  => None
+    case _ => None
   }
 
   lazy val currentPlatform = apply(PlatformType.currentPlatform)
@@ -102,6 +105,7 @@ object MacOSPlatform extends Platform {
   override val platformName = "macos"
 
   private val home = Paths.get(System.getProperty("user.home"))
+
   override def defaultSystemPaths: Seq[Path] =
     Steam
       .loadLibraryFolders(home.resolve("Library/Application Support/Steam"))
@@ -112,7 +116,9 @@ object LinuxPlatform extends Platform {
   override val platformName = "linux"
 
   private val home = Paths.get(System.getProperty("user.home"))
+
   override def defaultSystemPaths: Seq[Path] =
     Steam.loadLibraryFolders(home.resolve(".steam/steam")).map(_.resolve("steamapps/common/Sid Meier's Civilization V"))
+
   override def mapPath(name: String): String = name.replace("\\", "/").toLowerCase(Locale.ENGLISH)
 }

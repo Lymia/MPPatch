@@ -22,48 +22,52 @@
 
 package moe.lymia.mppatch.ui
 
-import java.awt.{GridBagConstraints, GridBagLayout}
-import java.nio.file.{Files, Path, Paths}
-import java.util.Locale
-import javax.swing.*
 import moe.lymia.mppatch.core.*
 import moe.lymia.mppatch.util.Steam
 import moe.lymia.mppatch.util.io.{DataSource, ResourceDataSource}
 
+import java.awt.{GridBagConstraints, GridBagLayout}
+import java.nio.file.{Files, Path, Paths}
+import java.util.Locale
+import javax.swing.*
+
 class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
-  protected var installButton: ActionButton   = scala.compiletime.uninitialized
+  protected var installButton: ActionButton = scala.compiletime.uninitialized
   protected var uninstallButton: ActionButton = scala.compiletime.uninitialized
-  protected var currentVersion: JTextField    = scala.compiletime.uninitialized
-  protected var targetVersion: JTextField     = scala.compiletime.uninitialized
-  protected var currentStatus: JTextField     = scala.compiletime.uninitialized
+  protected var currentVersion: JTextField = scala.compiletime.uninitialized
+  protected var targetVersion: JTextField = scala.compiletime.uninitialized
+  protected var currentStatus: JTextField = scala.compiletime.uninitialized
 
   private def packages = {
-    val logging     = if (Preferences.enableLogging.value) Set("logging") else Set[String]()
+    val logging = if (Preferences.enableLogging.value) Set("logging") else Set[String]()
     val multiplayer = if (Preferences.enableMultiplayerPatch.value) Set("multiplayer") else Set[String]()
-    val luajit      = if (Preferences.enableLuaJIT.value) Set("luajit") else Set[String]()
-    val debug       = if (Preferences.enableDebug.value) Set("debug") else Set[String]()
+    val luajit = if (Preferences.enableLuaJIT.value) Set("luajit") else Set[String]()
+    val debug = if (Preferences.enableDebug.value) Set("debug") else Set[String]()
     debug ++ multiplayer ++ luajit ++ logging
   }
 
   private def checkPath(path: Path) =
     Files.exists(path) && Files.isDirectory(path) &&
       patchPackage.detectInstallationPlatform(path).isDefined
+
   private def resolvePaths(paths: Seq[Path]) = paths.find(checkPath)
 
-  private val syncLock                          = new Object
-  private var patchPackage: PatchPackage        = scala.compiletime.uninitialized
-  private var isUserChange                      = false
-  private var isValid                           = false
+  private val syncLock = new Object
+  private var patchPackage: PatchPackage = scala.compiletime.uninitialized
+  private var isUserChange = false
+  private var isValid = false
   private var installer: Option[PatchInstaller] = None
 
   private def getInstallerUnsafe = installer.getOrElse(sys.error("installer does not exist"))
 
-  def getPatch     = patchPackage
+  def getPatch = patchPackage
+
   def getInstaller = installer
+
   def changeInstaller(path: Path, changeByUser: Boolean = true): Unit = syncLock synchronized {
     log.info(s"Changing installer path to ${path.toString}")
     val installPlatform = patchPackage.detectInstallationPlatform(path).get
-    val instance        = new PatchInstaller(path, installPlatform, MPPatchInstaller.platform)
+    val instance = new PatchInstaller(path, installPlatform, MPPatchInstaller.platform)
     isUserChange = changeByUser
     if (Files.exists(path)) {
       isValid = checkPath(path)
@@ -78,9 +82,11 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
       installer = None
     }
   }
+
   def reloadInstaller() = syncLock synchronized {
     installer.foreach(i => changeInstaller(i.basePath))
   }
+
   def changePatchPackage(pack: DataSource) = syncLock synchronized {
     log.info("Changing patch package...")
     patchPackage = new PatchPackage(pack)
@@ -91,8 +97,9 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
 
   private def pathFromRegistry() = resolvePaths(MPPatchInstaller.platform.defaultSystemPaths) match {
     case Some(x) => changeInstaller(x, false)
-    case None    =>
+    case None =>
   }
+
   if (Preferences.installationDirectory.hasValue) {
     val configPath = Paths.get(Preferences.installationDirectory.value)
     if (checkPath(configPath)) changeInstaller(configPath, false)
@@ -103,14 +110,16 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   } else pathFromRegistry()
 
   private var lastPatchStatus: Option[PatchStatus] = scala.compiletime.uninitialized
+
   private def checkPatchStatus() = {
     val flag = lastPatchStatus match {
       case Some(x) => installer.fold(false)(_.checkPatchStatus(packages) == x)
-      case None    => false
+      case None => false
     }
     if (!flag) warn("error.statuschanged")
     flag
   }
+
   private val actionUpdate = () =>
     if (checkPatchStatus()) {
       getInstallerUnsafe.safeUpdate(packages)
@@ -121,6 +130,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
       getInstallerUnsafe.safeUninstall()
       true
     } else false
+
   private def actionValidate0() = {
     val ret = JOptionPane.showConfirmDialog(frame, i18n("validate.confirm"), titleString, JOptionPane.YES_NO_OPTION)
     if (ret == JOptionPane.OK_OPTION) {
@@ -130,6 +140,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
       reloadInstaller()
     }
   }
+
   private val actionValidate = () =>
     if (checkPatchStatus()) {
       actionValidate0()
@@ -171,6 +182,7 @@ class MainFrame(val locale: Locale) extends FrameBase[JFrame] {
   }
 
   private def setStatus(text: String) = currentStatus.setText(i18n(text))
+
   override def update() = {
     installButton.setEnabled(false)
     installButton.setStatusAction("action.install", actionUpdate)

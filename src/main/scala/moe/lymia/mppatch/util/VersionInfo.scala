@@ -22,14 +22,15 @@
 
 package moe.lymia.mppatch.util
 
-import java.util.{Date, Properties}
 import moe.lymia.mppatch.util.io.IOUtils
 
 import java.io.StringReader
+import java.util.{Date, Properties}
 
 trait VersionInfoSource {
   def apply(key: String, default: String): String
 }
+
 object VersionInfoSource {
   def getPropertySource(resource: String) = {
     val stream = IOUtils.getResource(resource)
@@ -45,12 +46,14 @@ object VersionInfoSource {
 object NullSource extends VersionInfoSource {
   def apply(key: String, default: String) = default
 }
+
 case class PropertiesSource(prop: Properties) extends VersionInfoSource {
   def this(str: String) = this({
-      val prop = new Properties()
-      prop.load(new StringReader(str))
-      prop
+    val prop = new Properties()
+    prop.load(new StringReader(str))
+    prop
   })
+
   def apply(key: String, default: String) = {
     val p = prop.getProperty(key)
     if (p == null || p.trim.isEmpty) default else p
@@ -60,16 +63,17 @@ case class PropertiesSource(prop: Properties) extends VersionInfoSource {
 class VersionInfo(properties: VersionInfoSource) {
   def this(resource: String) = this(VersionInfoSource.getPropertySource(resource))
 
-  lazy val commit        = properties("mppatch.version.commit", "<unknown>")
+  lazy val commit = properties("mppatch.version.commit", "<unknown>")
   lazy val versionString = properties("mppatch.version.string", "<unknown>")
-  lazy val isDirty       = properties("mppatch.version.clean", "false") == "false"
+  lazy val isDirty = properties("mppatch.version.clean", "false") == "false"
 
-  lazy val buildID       = properties("build.id", "<unknown>")
-  lazy val buildDate     = new Date(properties("build.time", "0").toLong)
-  lazy val buildUser     = properties("build.user", "<unknown>")
+  lazy val buildID = properties("build.id", "<unknown>")
+  lazy val buildDate = new Date(properties("build.time", "0").toLong)
+  lazy val buildUser = properties("build.user", "<unknown>")
   lazy val buildHostname = properties("build.hostname", "<unknown>")
-  lazy val isCi          = properties("build.ci", "false") != "false"
+  lazy val isCi = properties("build.ci", "false") != "false"
 }
+
 object VersionInfo extends VersionInfo("version.properties") {
   def loadFromResource(resource: String) = new VersionInfo(VersionInfoSource.getPropertySource(resource))
 }

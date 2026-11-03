@@ -22,22 +22,25 @@
 
 package moe.lymia.mppatch.ui
 
+import moe.lymia.mppatch.util.io.IOUtils
+
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import java.text.MessageFormat
 import java.util.{Locale, Properties, ResourceBundle}
-import moe.lymia.mppatch.util.io.IOUtils
-
 import scala.jdk.CollectionConverters.*
 
 case class I18N(bundle: ResourceBundle) {
   private val messageFormatCache = new collection.mutable.HashMap[String, Option[MessageFormat]]
+
   def getFormat(key: String) =
     messageFormatCache.getOrElseUpdate(
       key,
       Option(bundle.getString(key)).map(s => new MessageFormat(s, bundle.getLocale))
     )
+
   def hasKey(key: String) = bundle.containsKey(key)
+
   def apply(key: String, args: Any*) =
     getFormat(key).map(format => format.format(args.toArray)).getOrElse("<" + key + ">")
 }

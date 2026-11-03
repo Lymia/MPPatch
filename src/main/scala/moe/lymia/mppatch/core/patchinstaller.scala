@@ -32,7 +32,7 @@ import scala.xml.Node
 
 private object PathNames {
   val patchStateFilename = "mppatch_install_state.xml"
-  val patchLockFilename  = ".mppatch_installer_lock"
+  val patchLockFilename = ".mppatch_installer_lock"
 }
 
 enum PatchStatus {
@@ -50,51 +50,82 @@ enum PatchStatus {
 }
 
 private case class PatchFile(path: String, expectedSha256: String)
+
 private case class RenameData(replacedFile: PatchFile, originalFile: PatchFile)
+
 private case class PatchState(
-    versionFrom: String,
-    sha256: String,
-    packages: Set[String],
-    renames: Seq[RenameData],
-    additionalFiles: Seq[PatchFile],
-    additionalDirectories: Seq[String],
-    installedVersion: String,
-    installedTimestamp: Long
+  versionFrom: String,
+  sha256: String,
+  packages: Set[String],
+  renames: Seq[RenameData],
+  additionalFiles: Seq[PatchFile],
+  additionalDirectories: Seq[String],
+  installedVersion: String,
+  installedTimestamp: Long
 ) {
   lazy val expectedPaths =
     (additionalFiles.map(_.path) ++ renames.map(_.replacedFile.path) ++ renames.map(_.originalFile.path) ++
       additionalDirectories).toSet
-  lazy val replacementTargets  = renames.map(_.replacedFile.path).toSet
+  lazy val replacementTargets = renames.map(_.replacedFile.path).toSet
   lazy val nonreplacementFiles = additionalFiles.filter(x => !replacementTargets.contains(x.path))
 }
+
 private object PatchState {
   private val formatVersion = "0"
 
   def serializePatchFile(file: PatchFile) = <PatchFile path={file.path} expectedSha256={file.expectedSha256}/>
+
   def serializeRenameData(renameData: RenameData) =
     <RenameData>
-      <ReplacedFile>{serializePatchFile(renameData.replacedFile)}</ReplacedFile>
-      <OriginalFile>{serializePatchFile(renameData.originalFile)}</OriginalFile>
+      <ReplacedFile>
+        {serializePatchFile(renameData.replacedFile)}
+      </ReplacedFile>
+      <OriginalFile>
+        {serializePatchFile(renameData.originalFile)}
+      </OriginalFile>
     </RenameData>
+
   def serialize(state: PatchState) =
     <PatchState version={formatVersion}>
-      <VersionFrom>{state.versionFrom}</VersionFrom>
-      <Sha256>{state.sha256}</Sha256>
-      <Packages>{state.packages.map(x => <Package>{x}</Package>)}</Packages>
-      <Renames>{state.renames.map(serializeRenameData)}</Renames>
-      <AdditionalFiles>{state.additionalFiles.map(serializePatchFile)}</AdditionalFiles>
-      <AdditionalDirectories>{state.additionalDirectories.map(x => <Directory>{x}</Directory>)}</AdditionalDirectories>
-      <InstalledVersion>{state.installedVersion}</InstalledVersion>
-      <InstalledTimestamp>{state.installedTimestamp}</InstalledTimestamp>
+      <VersionFrom>
+        {state.versionFrom}
+      </VersionFrom>
+      <Sha256>
+        {state.sha256}
+      </Sha256>
+      <Packages>
+        {state.packages.map(x => <Package>
+        {x}
+      </Package>)}
+      </Packages>
+      <Renames>
+        {state.renames.map(serializeRenameData)}
+      </Renames>
+      <AdditionalFiles>
+        {state.additionalFiles.map(serializePatchFile)}
+      </AdditionalFiles>
+      <AdditionalDirectories>
+        {state.additionalDirectories.map(x => <Directory>
+        {x}
+      </Directory>)}
+      </AdditionalDirectories>
+      <InstalledVersion>
+        {state.installedVersion}
+      </InstalledVersion>
+      <InstalledTimestamp>
+        {state.installedTimestamp}
+      </InstalledTimestamp>
     </PatchState>
 
   def unserializePatchFile(node: Node) =
     PatchFile(XMLUtils.getAttribute(node, "path"), XMLUtils.getAttribute(node, "expectedSha256"))
+
   def unserializeRenameData(node: Node) =
     RenameData(
       unserializePatchFile((node \ "ReplacedFile" \ "PatchFile").head),
       unserializePatchFile((node \ "OriginalFile" \ "PatchFile").head)
     )
+
   def unserialize(xml: Node) =
     if (XMLUtils.getAttribute(xml, "version") != formatVersion) None
     else
@@ -113,16 +144,18 @@ private object PatchState {
 }
 
 class PatchInstaller(val basePath: Path, val install: InstallScript, platform: Platform, log: Logger = SimpleLogger) {
+
   import PathNames.*
 
   private val patchStatePath = basePath.resolve(patchStateFilename)
-  private val patchLockPath  = basePath.resolve(patchLockFilename)
+  private val patchLockPath = basePath.resolve(patchLockFilename)
 
-  private val syncLock                   = new Object
+  private val syncLock = new Object
   private var fileLock: Option[FileLock] = None
-  private var manualLock                 = false
+  private var manualLock = false
 
   def isLockAcquired = syncLock `synchronized` fileLock.isDefined
+
   def acquireLock(manualLock: Boolean = true) = syncLock synchronized {
     fileLock match {
       case Some(_) =>
@@ -139,6 +172,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
         }
     }
   }
+
   def releaseLock() = syncLock synchronized {
     fileLock.foreach { lock =>
       lock.release()
@@ -146,6 +180,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
       manualLock = false
     }
   }
+
   private def lock[T](f: => T) = syncLock synchronized {
     if (!acquireLock(false)) sys.error("Could not acquire lock.")
     val out = f
@@ -172,10 +207,12 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
       }
     }
   }
+
   private def validatePatchFile(file: PatchFile): Boolean = validatePatchFile(file.path, file.expectedSha256)
 
   private def isVersionKnown(path: String) =
     install.supportedHash(EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
+
   private def loadPatchState() = try
     if (Files.exists(patchStatePath))
       PatchState.unserialize(IOUtils.readXML(patchStatePath))
@@ -187,7 +224,8 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   }
 
   def installedVersion = loadPatchState().map(_.installedVersion)
-  def isDowngrade      = loadPatchState().fold(0L)(_.installedTimestamp) > install.versionInfo.buildDate.getTime
+
+  def isDowngrade = loadPatchState().fold(0L)(_.installedTimestamp) > install.versionInfo.buildDate.getTime
 
   private def intCheckPatchStatus(packages: Set[String]) = {
     log.info("Checking patch status...")
@@ -210,8 +248,8 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
               val originalFilesOK = patchState.renames.map(_.originalFile).forall(validatePatchFile)
               if (
                 !patchState.renames.map(_.replacedFile).forall(x => Files.exists(basePath.resolve(x.path))) ||
-                !originalFilesOK ||
-                !patchState.nonreplacementFiles.forall(validatePatchFile)
+                  !originalFilesOK ||
+                  !patchState.nonreplacementFiles.forall(validatePatchFile)
               ) {
                 if (originalFilesOK) PatchStatus.FilesCorrupted else PatchStatus.NeedsValidation
               } else if (!patchState.renames.map(_.replacedFile).forall(validatePatchFile)) {
@@ -221,7 +259,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
               } else if (install.supportedHash(patchState.sha256)) {
                 if (
                   patchState.installedTimestamp != install.versionInfo.buildDate.getTime ||
-                  patchState.installedVersion != install.versionInfo.versionString
+                    patchState.installedVersion != install.versionInfo.versionString
                 ) PatchStatus.NeedsUpdate
                 else if (patchState.packages != packages) PatchStatus.PackageChange
                 else PatchStatus.Installed
@@ -245,7 +283,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
     log.info(s"- Target version: $targetVersion")
 
     val newFileSet = install.makeFileSet(packages, targetVersion)
-    val newFiles   = newFileSet.getFiles(basePath, targetVersion)
+    val newFiles = newFileSet.getFiles(basePath, targetVersion)
 
     for (rename <- newFileSet.renames) {
       log.info(s"- Renaming ${rename.from} -> ${rename.to}")
@@ -273,6 +311,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
 
     def patchFileFromPath(path: String) =
       PatchFile(path, EncodingUtils.sha256_hex(Files.readAllBytes(basePath.resolve(path))))
+
     val renameData =
       for (rename <- newFileSet.renames)
         yield RenameData(patchFileFromPath(rename.from), patchFileFromPath(rename.to))
@@ -299,8 +338,8 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
         for (RenameData(replacement, original) <- patchState.renames)
           if (
             validatePatchFile(original) && !validatePatchFile(replacement) &&
-            Files.exists(basePath.resolve(replacement.path)) &&
-            Files.isRegularFile(basePath.resolve(replacement.path))
+              Files.exists(basePath.resolve(replacement.path)) &&
+              Files.isRegularFile(basePath.resolve(replacement.path))
           ) {
             log.info(s"- Target $original updated, renaming $replacement -> $original")
             Files.delete(basePath.resolve(original.path))
@@ -311,7 +350,7 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
           IOUtils.deleteDirectory(basePath.resolve(name))
         } else log.warn(s"- File $name is missing.")
         for (RenameData(replacement, original) <- patchState.renames) {
-          val originalPath    = basePath.resolve(original.path)
+          val originalPath = basePath.resolve(original.path)
           val replacementPath = basePath.resolve(replacement.path)
 
           if (Files.exists(replacementPath)) {
@@ -334,9 +373,10 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
   }
 
   def checkPatchStatus(packages: Set[String]) = lock(intCheckPatchStatus(packages))
+
   def cleanupPatch() = lock {
     loadPatchState() match {
-      case None    =>
+      case None =>
       case Some(_) => uninstallPatch()
     }
     log.info("Cleaning up remaining files...")
@@ -354,10 +394,11 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
     log.info("- Cleaning up patch state file")
     IOUtils.deleteDirectory(patchStatePath)
   }
+
   def safeUpdate(packages: Set[String]) = lock {
     intCheckPatchStatus(packages) match {
       case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate | PatchStatus.FilesCorrupted |
-          PatchStatus.TargetUpdated | PatchStatus.FilesValidated =>
+           PatchStatus.TargetUpdated | PatchStatus.FilesValidated =>
         uninstallPatch()
         installPatch(packages)
       case PatchStatus.NotInstalled(true) =>
@@ -365,13 +406,14 @@ class PatchInstaller(val basePath: Path, val install: InstallScript, platform: P
       case _ => sys.error("cannot safely update")
     }
   }
+
   def safeUninstall() = lock {
     intCheckPatchStatus(Set()) match {
       case PatchStatus.NotInstalled(_) =>
       // do nothing
       case PatchStatus.Installed | PatchStatus.PackageChange | PatchStatus.NeedsUpdate | PatchStatus.CanUninstall |
-          PatchStatus.UnknownUpdate | PatchStatus.FilesCorrupted | PatchStatus.TargetUpdated |
-          PatchStatus.FilesValidated =>
+           PatchStatus.UnknownUpdate | PatchStatus.FilesCorrupted | PatchStatus.TargetUpdated |
+           PatchStatus.FilesValidated =>
         uninstallPatch()
       case _ => sys.error("cannot safely uninstall")
     }

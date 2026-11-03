@@ -28,19 +28,25 @@ import java.util.UUID
 import scala.xml.Node
 
 case class DLCUISkin(name: String, set: String, platform: String)
+
 case class DLCManifest(uuid: UUID, version: Int, priority: Int, shortName: String, name: String)
+
 case class DLCGameplay(
-    textData: Map[String, Node] = Map(),
-    uiFiles: Map[String, Map[String, Array[Byte]]] = Map(),
-    uiSkins: Seq[DLCUISkin] = Nil
+  textData: Map[String, Node] = Map(),
+  uiFiles: Map[String, Map[String, Array[Byte]]] = Map(),
+  uiSkins: Seq[DLCUISkin] = Nil
 )
+
 case class DLCData(manifest: DLCManifest, data: DLCGameplay)
 
 object DLCDataWriter {
   private val languageList =
     Seq("en_US", "fr_FR", "de_DE", "es_ES", "it_IT", "ru_RU", "ja_JP", "pl_PL", "ko_KR", "zh_Hant_HK")
+
   private def languageValues(string: String) = languageList.map { x =>
-    <Value language={x}>{string}</Value>
+    <Value language={x}>
+      {string}
+    </Value>
   }
 
   def writeDLC(dlcBasePath: String, languageDirPath: Option[String], dlcData: DLCData, platform: Platform) = {
@@ -52,27 +58,36 @@ object DLCDataWriter {
     val newFiles = Map(
       s"$dlcBasePath/${platform.mapPath(s"$nameString.Civ5Pkg")}" -> IOUtils.writeXMLBytes(
         <Civ5Package>
-        <GUID>{s"{${dlcData.manifest.uuid}}"}</GUID>
-        <Version>{dlcData.manifest.version.toString}</Version>
-        <Name>{languageValues(nameString)}</Name>
-        <Description>{languageValues(dlcData.manifest.name)}</Description>
-        <Priority>{dlcData.manifest.priority.toString}</Priority>
+          <GUID>
+            {s"{${dlcData.manifest.uuid}}"}
+          </GUID>
+          <Version>
+            {dlcData.manifest.version.toString}
+          </Version>
+          <Name>
+            {languageValues(nameString)}
+          </Name>
+          <Description>
+            {languageValues(dlcData.manifest.name)}
+          </Description>
+          <Priority>
+            {dlcData.manifest.priority.toString}
+          </Priority>
 
-        <SteamApp>99999</SteamApp>
-        <Ownership>FREE</Ownership>
-        <PTags>
-          <Tag>Version</Tag>
-          <Tag>Ownership</Tag>
-        </PTags>
-        {
-          for (DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins)
-            yield <UISkin name={name} set={set} platform={skinPlatform}>
-              <Skin>
-                {dlcData.data.uiFiles.filter(_._2.nonEmpty).map(x => <Directory>{x._1}</Directory>)}
-              </Skin>
-            </UISkin>
-        }
-      </Civ5Package>
+          <SteamApp>99999</SteamApp>
+          <Ownership>FREE</Ownership>
+          <PTags>
+            <Tag>Version</Tag>
+            <Tag>Ownership</Tag>
+          </PTags>{for (DLCUISkin(name, set, skinPlatform) <- dlcData.data.uiSkins)
+          yield <UISkin name={name} set={set} platform={skinPlatform}>
+            <Skin>
+              {dlcData.data.uiFiles.filter(_._2.nonEmpty).map(x => <Directory>
+              {x._1}
+            </Directory>)}
+            </Skin>
+          </UISkin>}
+        </Civ5Package>
       )
     )
     val languageFiles = languageDirPath.fold(Map[String, Array[Byte]]()) { languagePath =>

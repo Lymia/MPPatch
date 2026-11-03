@@ -51,10 +51,10 @@ object MPPatchInstaller extends LaunchFrameError {
   }
 
   private lazy val appImageFileLocation = fileForEnv(isAppImage, "APPIMAGE")
-  private lazy val appImageContents     = fileForEnv(isAppImage, "APPDIR")
+  private lazy val appImageContents = fileForEnv(isAppImage, "APPDIR")
 
   private lazy val nsisFileLocation = fileForEnv(isNsis, "NSIS_LAUNCH_EXE")
-  private lazy val nsisContents     = fileForEnv(isNsis, "NSIS_LAUNCH_TEMPDIR")
+  private lazy val nsisContents = fileForEnv(isNsis, "NSIS_LAUNCH_TEMPDIR")
 
   private lazy val baseDirectory = if (isAppImage) {
     appImageFileLocation.get.getParentFile
@@ -98,13 +98,13 @@ object MPPatchInstaller extends LaunchFrameError {
       log.logRaw("")
 
       val versionData = Seq(
-        "Build ID"    -> VersionInfo.buildID,
-        "Build Date"  -> Logger.dateFormat.format(VersionInfo.buildDate),
-        "Revision"    -> VersionInfo.commit,
+        "Build ID" -> VersionInfo.buildID,
+        "Build Date" -> Logger.dateFormat.format(VersionInfo.buildDate),
+        "Revision" -> VersionInfo.commit,
       )
       val headerLength = versionData.map(_._1.length).max
-      val indent       = Seq.fill(headerLength + 2)(" ").mkString("")
-      val formatStr    = s"%-${headerLength}s: %s"
+      val indent = Seq.fill(headerLength + 2)(" ").mkString("")
+      val formatStr = s"%-${headerLength}s: %s"
       for ((k, v) <- versionData) {
         val lines = v.split("\n")
         log.logRaw(formatStr.format(k, lines.head))
@@ -162,6 +162,6 @@ object MPPatchInstaller extends LaunchFrameError {
     case PlatformType.Win32 => Platform(PlatformType.Win32).get
     case PlatformType.MacOS => error("error.macos_support")
     case PlatformType.Linux => Platform(PlatformType.Linux).get
-    case _                  => error("error.unknown_platform")
+    case _ => error("error.unknown_platform")
   }
 }

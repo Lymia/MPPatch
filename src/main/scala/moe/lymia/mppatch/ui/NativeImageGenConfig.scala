@@ -21,6 +21,7 @@
  */
 
 package moe.lymia.mppatch.ui
+
 import java.awt.Desktop
 import java.util.Locale
 import javax.swing.{JFileChooser, JOptionPane}
@@ -31,6 +32,7 @@ object NativeImageGenConfig {
   private def forLocale(locale: Locale): Unit = {
     class TestFrame(locale: Locale) extends MainFrame(locale) {
       override protected val neverShowMessage: Boolean = true
+
       def doInstallUninstall(): Unit = {
         if (uninstallButton.isEnabled) uninstallButton.doClick()
         Thread.sleep(sleepDur)

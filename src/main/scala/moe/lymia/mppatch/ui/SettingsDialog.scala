@@ -26,15 +26,15 @@ import java.awt.{Desktop, GridBagConstraints, GridBagLayout}
 import java.io.File
 import java.nio.file.Paths
 import java.util.Locale
-import javax.swing._
+import javax.swing.*
 
 class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
   private var installPath: JTextField = scala.compiletime.uninitialized
 
-  private var enableDebug: JCheckBox            = scala.compiletime.uninitialized
-  private var enableLogging: JCheckBox          = scala.compiletime.uninitialized
+  private var enableDebug: JCheckBox = scala.compiletime.uninitialized
+  private var enableLogging: JCheckBox = scala.compiletime.uninitialized
   private var enableMultiplayerPatch: JCheckBox = scala.compiletime.uninitialized
-  private var enableLuaJIT: JCheckBox           = scala.compiletime.uninitialized
+  private var enableLuaJIT: JCheckBox = scala.compiletime.uninitialized
 
   private val desktop = Desktop.getDesktop
 
@@ -43,6 +43,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       warn("error.nothingenabled")
       false
     } else true
+
   private def applySettings(): Unit = {
     main.changeInstaller(Paths.get(installPath.getText))
 
@@ -53,6 +54,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
 
     main.update()
   }
+
   private def closeWindow() = {
     frame.setVisible(false)
     frame.dispose()
@@ -65,7 +67,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
 
     frame.subFrame(constraints(fill = GridBagConstraints.BOTH)) { options =>
       installPath = options.gridButtonTextRow(0, "path", "browse") {
-        val chooser         = new JFileChooser()
+        val chooser = new JFileChooser()
         val installPathFile = new File(installPath.getText)
         if (installPath.getText.trim.nonEmpty && installPathFile.exists) chooser.setCurrentDirectory(installPathFile)
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
@@ -74,7 +76,7 @@ class SettingsDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDia
       }
       installPath.setEditable(true)
       main.getInstaller match {
-        case None            => installPath.setText("")
+        case None => installPath.setText("")
         case Some(installer) => installPath.setText(installer.basePath.toString)
       }
 

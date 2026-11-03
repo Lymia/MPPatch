@@ -33,58 +33,74 @@ object Logger {
 }
 
 trait Logger {
-  protected def dateFormat   = Logger.dateFormat
+  protected def dateFormat = Logger.dateFormat
+
   protected def formatString = "[%s/%5s] %s"
 
   def logRaw(s: String): Unit
+
   def logException(t: Throwable): Unit
+
   def flush(): Unit
 
   def log(format: String, level: String, vals: Any*): Unit =
-    logRaw(formatString.format(dateFormat.format(new Date()), level, format.format(vals*)))
+    logRaw(formatString.format(dateFormat.format(new Date()), level, format.format(vals *)))
 
-  def info(format: String, vals: Any*): Unit  = log(format, "INFO", vals*)
-  def warn(format: String, vals: Any*): Unit  = log(format, "WARN", vals*)
-  def error(format: String, vals: Any*): Unit = log(format, "ERROR", vals*)
+  def info(format: String, vals: Any*): Unit = log(format, "INFO", vals *)
 
-  def info(str: String): Unit  = info("%s", str)
-  def warn(str: String): Unit  = warn("%s", str)
+  def warn(format: String, vals: Any*): Unit = log(format, "WARN", vals *)
+
+  def error(format: String, vals: Any*): Unit = log(format, "ERROR", vals *)
+
+  def info(str: String): Unit = info("%s", str)
+
+  def warn(str: String): Unit = warn("%s", str)
+
   def error(str: String): Unit = error("%s", str)
 
   def info(format: String, t: Throwable, vals: Any*): Unit = {
-    info(format, vals*)
-    logException(t)
-  }
-  def warn(format: String, t: Throwable, vals: Any*): Unit = {
-    warn(format, vals*)
-    logException(t)
-  }
-  def error(format: String, t: Throwable, vals: Any*): Unit = {
-    error(format, vals*)
+    info(format, vals *)
     logException(t)
   }
 
-  def info(str: String, t: Throwable): Unit  = info("%s", t, str)
-  def warn(str: String, t: Throwable): Unit  = warn("%s", t, str)
+  def warn(format: String, t: Throwable, vals: Any*): Unit = {
+    warn(format, vals *)
+    logException(t)
+  }
+
+  def error(format: String, t: Throwable, vals: Any*): Unit = {
+    error(format, vals *)
+    logException(t)
+  }
+
+  def info(str: String, t: Throwable): Unit = info("%s", t, str)
+
+  def warn(str: String, t: Throwable): Unit = warn("%s", t, str)
+
   def error(str: String, t: Throwable): Unit = error("%s", t, str)
 }
 
 class SimpleLogger(writers: Writer*) extends Logger {
   private val loggers = new scala.collection.mutable.ArrayBuffer[PrintWriter]()
+
   def addLogger(w: Writer) = loggers.append(w match {
     case p: PrintWriter => p
-    case _              => new PrintWriter(w)
+    case _ => new PrintWriter(w)
   })
+
   writers.foreach(addLogger)
 
   def flush() = loggers.foreach(_.flush())
+
   def logRaw(s: String) = {
     loggers.foreach(_.println(s))
     flush()
   }
+
   def logException(t: Throwable) = {
     loggers.foreach(t.printStackTrace)
     flush()
   }
 }
+
 object SimpleLogger extends SimpleLogger(new OutputStreamWriter(System.out, StandardCharsets.UTF_8))

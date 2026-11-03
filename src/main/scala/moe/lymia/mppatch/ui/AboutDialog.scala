@@ -22,19 +22,20 @@
 
 package moe.lymia.mppatch.ui
 
-import java.awt._
-import java.text.DateFormat
-import java.util.Locale
-import javax.swing.text.html.HTMLEditorKit
-import javax.swing._
-import javax.swing.event.HyperlinkEvent
-
 import moe.lymia.mppatch.util.VersionInfo
 import moe.lymia.mppatch.util.io.IOUtils
 
+import java.awt.*
+import java.text.DateFormat
+import java.util.Locale
+import javax.swing.*
+import javax.swing.event.HyperlinkEvent
+import javax.swing.text.html.HTMLEditorKit
+
 class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog] {
   private val dateFormat = DateFormat.getDateInstance(DateFormat.MEDIUM, locale)
-  private val desktop    = Desktop.getDesktop
+  private val desktop = Desktop.getDesktop
+
   override protected def buildForm(): Unit = {
     frame = new JDialog(main.getFrame, i18n("title.about"), true)
     frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
@@ -52,11 +53,12 @@ class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog
     val systemFont = new JLabel().getFont
     val stylesheet = htmlEditor.getStyleSheet
     stylesheet.addRule(IOUtils.loadResource("text/style.css"))
-    stylesheet.addRule(s"""
-                          |p, li, h1, h2, h3, h4, h5, h6 {
-                          |  font-family: ${systemFont.getFontName},sans-serif;
-                          |  font-size: ${systemFont.getSize};
-                          |}
+    stylesheet.addRule(
+      s"""
+         |p, li, h1, h2, h3, h4, h5, h6 {
+         |  font-family: ${systemFont.getFontName},sans-serif;
+         |  font-size: ${systemFont.getSize};
+         |}
        """.stripMargin)
 
     val document = htmlEditor.createDefaultDocument()
@@ -67,6 +69,7 @@ class AboutDialog(val locale: Locale, main: MainFrame) extends FrameBase[JDialog
       editor.setText(IOUtils.loadResource(page))
       editor.setCaretPosition(0)
     }
+
     setPage("text/about.html")
 
     editor.addHyperlinkListener((e: HyperlinkEvent) =>

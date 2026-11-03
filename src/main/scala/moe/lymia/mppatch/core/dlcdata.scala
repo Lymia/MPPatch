@@ -32,26 +32,33 @@ import java.util.{Locale, UUID}
 import scala.xml.{Node, XML}
 
 case class LuaSoftHook(id: String, includes: Seq[String], inject: Seq[String])
+
 case class LuaOverrideInject(source: String, inline: Boolean)
+
 case class LuaOverride(
-    filename: String,
-    includes: Seq[String],
-    injectBefore: Seq[LuaOverrideInject] = Seq(),
-    injectAfter: Seq[LuaOverrideInject] = Seq()
+  filename: String,
+  includes: Seq[String],
+  injectBefore: Seq[LuaOverrideInject] = Seq(),
+  injectAfter: Seq[LuaOverrideInject] = Seq()
 )
+
 case class FileWithSource(filename: String, source: String)
+
 case class SoftHookInfo(namespace: String, infoTarget: String, patchPrefix: String)
+
 case class UIPatch(
-    dlcManifest: DLCManifest,
-    softHookInfo: SoftHookInfo,
-    luaPatches: Seq[LuaOverride],
-    luaSoftHooks: Seq[LuaSoftHook],
-    libraryFiles: Seq[FileWithSource],
-    newScreenFileNames: Seq[FileWithSource],
-    textFileNames: Seq[String]
+  dlcManifest: DLCManifest,
+  softHookInfo: SoftHookInfo,
+  luaPatches: Seq[LuaOverride],
+  luaSoftHooks: Seq[LuaSoftHook],
+  libraryFiles: Seq[FileWithSource],
+  newScreenFileNames: Seq[FileWithSource],
+  textFileNames: Seq[String]
 )
+
 object UIPatch {
   def loadFilename(node: Node) = getAttribute(node, "Filename")
+
   def readDLCManifest(node: Node) =
     DLCManifest(
       UUID.fromString(getAttribute(node, "UUID")),
@@ -60,7 +67,9 @@ object UIPatch {
       getAttribute(node, "ShortName"),
       getAttribute(node, "Name")
     )
+
   def loadInject(node: Node) = LuaOverrideInject(loadSource(node), getBoolAttribute(node, "Inline"))
+
   def loadLuaOverride(node: Node) =
     LuaOverride(
       loadFilename(node),
@@ -68,12 +77,17 @@ object UIPatch {
       (node \ "InjectBefore").map(loadInject),
       (node \ "InjectAfter").map(loadInject)
     )
+
   def loadLuaSoftHook(node: Node) =
     LuaSoftHook(getAttribute(node, "ScreenID"), (node \ "Include").map(loadFilename), (node \ "Inject").map(loadSource))
+
   def loadInclude(node: Node) = FileWithSource(loadFilename(node), getAttribute(node, "Source"))
-  def loadScreen(node: Node)  = FileWithSource(getAttribute(node, "Name"), getAttribute(node, "Source"))
+
+  def loadScreen(node: Node) = FileWithSource(getAttribute(node, "Name"), getAttribute(node, "Source"))
+
   def loadSoftHookInfo(node: Node) =
     SoftHookInfo(getAttribute(node, "Namespace"), getAttribute(node, "Filename"), getAttribute(node, "PatchPrefix"))
+
   def loadFromXML(xml: Node) =
     UIPatch(
       readDLCManifest((xml \ "Info").head),
@@ -134,6 +148,7 @@ class CivDlcBuilder(source: DataSource, patch: UIPatch) {
         str.mkString("\n") +
         "\n--- END INJECTED MPPATCH CODE ---" + sf
     }
+
   private def getLuaFragment(inject: LuaOverrideInject) =
     if (!inject.inline) {
       s"include ${LuaUtils.quote(patchFileMap(inject.source))}\n"
@@ -143,15 +158,16 @@ class CivDlcBuilder(source: DataSource, patch: UIPatch) {
         code + (if (!code.endsWith("\n")) "\n" else "") +
         s"\n-- end source file: ${inject.source} --\n"
     }
+
   private def patchFile(path: Path) = {
     val fileName = path.getFileName.toString
     luaPatchList.get(fileName.toLowerCase(Locale.ENGLISH)) match {
       case Some(patchData) =>
-        val runtime      = s"${patchData.includes.map(x => s"include [[$x]]").mkString("\n")}\n"
+        val runtime = s"${patchData.includes.map(x => s"include [[$x]]").mkString("\n")}\n"
         val injectBefore = runtime +: patchData.injectBefore.map(getLuaFragment)
-        val contents     = IOUtils.readFileAsString(path)
-        val injectAfter  = patchData.injectAfter.map(getLuaFragment)
-        val finalFile    = loadWrapper(injectBefore, sf = "\n\n") + contents + loadWrapper(injectAfter, pf = "\n\n")
+        val contents = IOUtils.readFileAsString(path)
+        val injectAfter = patchData.injectAfter.map(getLuaFragment)
+        val finalFile = loadWrapper(injectBefore, sf = "\n\n") + contents + loadWrapper(injectAfter, pf = "\n\n")
         Some(finalFile)
       case None =>
         None
@@ -166,10 +182,13 @@ class CivDlcBuilder(source: DataSource, patch: UIPatch) {
         else patchFile(file).fold(Seq[(String, String)]())(x => Seq(file.getFileName.toString -> x))
       }
       .toMap
+
   private def prepareList(map: Map[String, String]) =
     map.view.mapValues(_.getBytes(StandardCharsets.UTF_8)).toMap
+
   private def findPathTargets(assetsPath: Path, platform: Platform, path: String*) =
-    findPatchTargets(platform.resolve(assetsPath, path*))
+    findPatchTargets(platform.resolve(assetsPath, path *))
+
   def generateBaseDLC(assetsPath: Path, platform: Platform) =
     DLCData(
       patch.dlcManifest,
@@ -177,9 +196,9 @@ class CivDlcBuilder(source: DataSource, patch: UIPatch) {
         textData = textFiles,
         uiFiles = Map(
           "LuaOverrides" -> prepareList(findPathTargets(assetsPath, platform, "UI")),
-          "Runtime"      -> prepareList(libraryFiles),
-          "Patches"      -> prepareList(softHookFiles),
-          "Screens"      -> prepareList(newScreenFiles)
+          "Runtime" -> prepareList(libraryFiles),
+          "Patches" -> prepareList(softHookFiles),
+          "Screens" -> prepareList(newScreenFiles)
         ),
         uiSkins = Seq(DLCUISkin("MPPatch", "BaseGame", "Common"))
       )
