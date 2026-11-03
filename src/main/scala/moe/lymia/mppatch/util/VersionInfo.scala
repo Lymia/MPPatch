@@ -61,7 +61,6 @@ class VersionInfo(properties: VersionInfoSource) {
   def this(resource: String) = this(VersionInfoSource.getPropertySource(resource))
 
   lazy val commit        = properties("mppatch.version.commit", "<unknown>")
-  lazy val treeStatus    = properties("build.treestatus", "<clean>")
   lazy val versionString = properties("mppatch.version.string", "<unknown>")
   lazy val isDirty       = properties("mppatch.version.clean", "false") == "false"
 

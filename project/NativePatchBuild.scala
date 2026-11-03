@@ -43,29 +43,25 @@ object NativePatchBuild {
           )
           case PlatformType.Linux => (
             "i686-unknown-linux-gnu", "mpp_hooklib.so", "libmpp_hooklib.so",
-            Map()
+            Map[String, String]()
           )
-          case _                  => ???
+          case _ => ???
         }
 
         // run Cargo
-        val buildId = UUID.randomUUID()
         runProcess(
           Seq("cargo", "build", "--target", rustTarget, "--release", "-p", "mpp_hooklib"),
           baseDirectory.value,
-          Map(
-            "MPPATCH_VERSION" -> version.value,
-            "MPPATCH_BUILDID" -> buildId.toString
-          ) ++ extraEnv
+          extraEnv
         )
 
         // make the patches list
-        PatchFile(outName, baseDirectory.value / "target" / rustTarget / "release" / targetName, buildId.toString)
+        PatchFile(outName, baseDirectory.value / "target" / rustTarget / "release" / targetName)
       }
     },
   )
 
-  case class PatchFile(name: String, file: File, buildId: String)
+  case class PatchFile(name: String, file: File)
   object Keys {
     val nativeVersions = TaskKey[Seq[PatchFile]]("mppatch-native-versions")
   }

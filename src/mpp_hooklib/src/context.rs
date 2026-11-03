@@ -1,6 +1,6 @@
 use enumset::*;
 use errcode::prelude::*;
-use log::{LevelFilter, debug, info, trace};
+use log::{LevelFilter, debug, info};
 use mpp_common::logging::{LoggerOptions, check_error};
 use mpp_version::{Platform, VersionInfo};
 use std::{
@@ -21,14 +21,11 @@ impl MppatchCtx {
     pub fn exe_dir(&self) -> &Path {
         &self.exe_dir
     }
-    pub fn sha256(&self) -> &str {
+    pub fn bin_sha256(&self) -> &str {
         &self.config.bin_sha256
     }
     pub fn version(&self) -> &'static str {
-        option_env!("MPPATCH_VERSION").unwrap_or_else(|| "<unknown>")
-    }
-    pub fn build_id(&self) -> &'static str {
-        option_env!("MPPATCH_BUILDID").unwrap_or_else(|| "00000000-0000-0000-0000-000000000000")
+        env!("CARGO_PKG_VERSION")
     }
     pub fn has_feature(&self, feature: MppatchFeature) -> bool {
         self.config.features.contains(feature)
@@ -149,11 +146,9 @@ fn init_impl() -> Result<()> {
     }
 
     // log information about the loaded MPPatch version
-    info!("mpp_hooklib v{} loaded", ctx.version());
+    info!("{} v{} loaded", env!("CARGO_PKG_NAME"), ctx.version());
     info!("Game version: {}", ctx.version_info.name);
-    info!("");
-    trace!("build-id: {}", ctx.build_id());
-    trace!("ctx: {ctx:#?}");
+    info!("ctx: {ctx:#?}");
 
     // find the main executable base address
     unsafe {

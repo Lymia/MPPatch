@@ -1,8 +1,9 @@
 [package]
 name = "mpp_hooklib"
-version = "0.0.0"
+version = "0.2.0-alpha.2"
 authors = ["Rimi Kanokawa <rimi@rimin.moe>"]
 edition = "2024"
+publish = false
 
 [lib]
 crate-type = ["cdylib"]

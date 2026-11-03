@@ -52,9 +52,6 @@ end
 
 -- Retrieve the binary patch API, if it is installed
 local patch = _MPPatch_Core
-print(Profiler)
-print(_MPPatch_Core)
-print(_MPPatch_Core.__mppatch_marker)
 if not patch or not patch.__mppatch_marker then
     loadFailed("Could not load binary patch.", "binaryLoadFailed")
     return
@@ -69,17 +66,16 @@ do
         loadFailed("Could not load version information.")
         return
     end
-    local expectedBuildId = _mpPatch.version.buildId[patch.version.platform]
-    if not expectedBuildId or expectedBuildId ~= patch.version.buildId then
-        expectedBuildId = tostring(expectedBuildId)
-        local format = "BuildID mismatch. (platform: %s, got: %s, expected: %s)"
+    local expectedVersion = "0.2.0-alpha.2"
+    if expectedVersion ~= patch.version.versionString then
+        local format = "Version mismatch. (platform: %s, got: %s, expected: %s)"
         loadFailed(format:format(patch.version.platform, patch.version.buildId, expectedBuildId))
         return
     end
 end
 
 -- Load the actual _mpPatch runtime contents
-_mpPatch.versionString = patch.version.versionString
+_mpPatch.versionString = _mpPatch.version.info["mppatch.version.string"] or "<unknown version>"
 _mpPatch.context = "<init>"
 _mpPatch.loaded = true
 _mpPatch.debug = patch.config.enableDebug

@@ -44,13 +44,10 @@ object InstallerResourceBuild {
         "mppatch.version.clean"  -> (!git.gitUncommittedChanges.value).toString,
         "mppatch.website"        -> homepage.value.fold("<unknown>")(_.toString),
         "build.id"               -> UUID.randomUUID().toString,
-        "build.os"               -> tryProperty(System.getProperty("os.name")),
         "build.user"             -> tryProperty(System.getProperty("user.name")),
         "build.hostname"         -> tryProperty(InetAddress.getLocalHost.getHostName),
         "build.time"             -> new java.util.Date().getTime.toString,
         "build.timestr"          -> dateFormat.format(new java.util.Date()),
-        "build.path"             -> baseDirectory.value.getAbsolutePath,
-        "build.treestatus"       -> propertyFromProcess("git", "status", "--porcelain"),
         "build.ci"               -> (System.getenv("CI") != null && System.getenv("GITHUB_ACTIONS") != null).toString
       )
     },

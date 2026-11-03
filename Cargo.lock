@@ -485,7 +485,7 @@ dependencies = [
 
 [[package]]
 name = "mpp_hooklib"
-version = "0.0.0"
+version = "0.2.0-alpha.2"
 dependencies = [
  "dlopen",
  "enumset",

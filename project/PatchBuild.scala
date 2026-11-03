@@ -44,7 +44,6 @@ object PatchBuild {
       for (nativeBin <- NativePatchBuild.Keys.nativeVersions.value) {
         log.log(Level.Info, s"Copying $nativeBin to output directory.")
         IO.copyFile(nativeBin.file, dir / nativeBin.name)
-        IO.write(dir / s"${nativeBin.name}.build-id", nativeBin.buildId)
       }
 
       // return directory
@@ -60,7 +59,7 @@ object PatchBuild {
       val nativeDirFiles = Keys.nativesDir.value.listFiles()
       if (nativeDirFiles == null) sys.error("native-bin does not exist!")
       val patchFiles =
-        for (binary <- nativeDirFiles if !binary.getName.endsWith(".build-id")) yield {
+        for (binary <- nativeDirFiles) yield {
           log.info(s"Found native binary file: $binary")
           PatchFile(s"native/${binary.getName}", IO.readBytes(binary))
         }
@@ -68,29 +67,12 @@ object PatchBuild {
       val versionDataInfo = InstallerResourceBuild.Keys.versionData.value.toSeq.sorted
         .map(x => s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}")
         .mkString("\n")
-      val buildIdInfo = nativeDirFiles
-        .filter(x => x.getName.endsWith(".build-id"))
-        .sorted
-        .map { x =>
-          val platform = x.getName match {
-            case "mpp_hooklib.dll.build-id"   => "win32"
-            case "mpp_hooklib.dylib.build-id" => "macos"
-            case "mpp_hooklib.so.build-id"    => "linux"
-          }
-          s"_mpPatch.version.buildId[${LuaUtils.quote(platform)}] = ${LuaUtils.quote(IO.read(x))}"
-        }
-        .mkString("\n")
       val versionInfo = PatchFile(
         "ui/lib/mppatch_version.lua",
         s"""-- Generated from PatchBuild.scala
            |_mpPatch.version = {}
-           |
-           |_mpPatch.version.buildId = {}
-           |$buildIdInfo
-           |
            |_mpPatch.version.info = {}
            |$versionDataInfo
-           |
            |_mpPatch.version.loaded = true
         """.stripMargin.trim
       )

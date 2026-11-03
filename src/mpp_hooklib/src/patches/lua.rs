@@ -94,8 +94,7 @@ unsafe fn create_mppatch_table(lua: &Lua) -> Result<Table> {
         let version_table = lua.create_table()?;
         version_table.set("versionString", ctx.version())?;
         version_table.set("platform", ctx.version_info.platform.name())?;
-        version_table.set("sha256", ctx.sha256())?;
-        version_table.set("buildId", ctx.build_id())?;
+        version_table.set("bin_sha256", ctx.bin_sha256())?;
         patch_table.set("version", lock_table(lua, &version_table)?)?;
     }
 

@@ -101,7 +101,6 @@ object MPPatchInstaller extends LaunchFrameError {
         "Build ID"    -> VersionInfo.buildID,
         "Build Date"  -> Logger.dateFormat.format(VersionInfo.buildDate),
         "Revision"    -> VersionInfo.commit,
-        "Tree Status" -> VersionInfo.treeStatus
       )
       val headerLength = versionData.map(_._1.length).max
       val indent       = Seq.fill(headerLength + 2)(" ").mkString("")
