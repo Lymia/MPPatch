@@ -1,0 +1,6 @@
+[package]
+name = "mpp_installer_core"
+version = "0.2.0-alpha.2"
+authors = ["Rimi Kanokawa <rimi@rimin.moe>"]
+edition = "2024"
+publish = false

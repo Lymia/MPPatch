@@ -4,8 +4,10 @@ cargo-features = ["panic-immediate-abort"]
 resolver = "3"
 members = [
     "src/mpp_common",
-    "src/mpp_hooklib_defs",
     "src/mpp_hooklib",
+    "src/mpp_hooklib_defs",
+    "src/mpp_installer",
+    "src/mpp_installer_core",
     "src/mpp_version",
 ]
 
