@@ -98,7 +98,7 @@ class PatchPackage(val source: DataSource) {
 
   /** The manifest for this patch. */
   lazy val patchManifest =
-    EncodingUtils.unwrapToml(toml.Toml.parseAs[JsonPatchManifest](source.loadResource("manifest.toml")))
+    EncodingUtils.unwrapToml(toml.Toml.parseAs[JsonPatchManifest](source.loadResource("meta/manifest.toml")))
 
   /** The version information stored in this patch. */
   lazy val versionInfo = new VersionInfo(new PropertiesSource(source.loadResource("version.properties")))

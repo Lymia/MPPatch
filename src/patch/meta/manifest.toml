@@ -1,0 +1,4 @@
+installScripts = [
+  "meta/civ5_linux_steam.toml",
+  "meta/civ5_win32_steam.toml",
+]

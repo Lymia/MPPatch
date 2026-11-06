@@ -1,4 +1,0 @@
-installScripts = [
-  "civ5_linux_steam.toml",
-  "civ5_win32_steam.toml",
-]
