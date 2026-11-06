@@ -34,7 +34,7 @@ object PatchBuild {
 
       def loadFromDir(dir: File) =
         Path.allSubpaths(dir).filter(_._1.isFile).map(x => PatchFile(x._2, IO.readBytes(x._1))).toSeq
-      val copiedFiles = loadFromDir(baseDirectory.value / "src" / "patch")
+      val copiedFiles = loadFromDir(baseDirectory.value / "src" / "patch_data")
 
       val nativePlatforms = Keys.nativesDir.value.listFiles()
       if (nativePlatforms == null) sys.error("native-bin does not exist!")
