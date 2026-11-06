@@ -3,6 +3,7 @@ cargo-features = ["panic-immediate-abort"]
 [workspace]
 resolver = "3"
 members = [
+    "src/build_scripts",
     "src/mpp_common",
     "src/mpp_hooklib",
     "src/mpp_hooklib_defs",
