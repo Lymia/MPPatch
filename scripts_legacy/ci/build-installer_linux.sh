@@ -24,7 +24,7 @@
 
 set -eu
 
-. scripts/ci/install-deps.sh
+. scripts_legacy/ci/install-deps.sh
 
 echo "Gathering facts from SBT..."
 sbt "print scalaVersion" # get project files cached, required to wrangle CI

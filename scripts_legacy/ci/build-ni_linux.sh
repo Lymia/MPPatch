@@ -24,7 +24,7 @@
 
 set -eu
 
-. scripts/ci/install-deps.sh
+. scripts_legacy/ci/install-deps.sh
 
 echo "Extracting native tarballs..."
 rm -rfv target/native-bin

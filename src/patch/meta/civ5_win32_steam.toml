@@ -15,7 +15,7 @@ rename_file = [
   { from = "zlib1.dll", to = "zlib1.dll.bak" },
 ]
 write_file = [
-  { from = "native/mpp_hooklib.dll", to = "zlib1.dll" },
+  { from = "plaf_win32/mpp_hooklib.dll", to = "zlib1.dll" },
 ]
 write_config = [
   "mppatch_config.cfg",
@@ -30,7 +30,7 @@ rename_file = [
   { from = "lua51_Win32.dll", to = "lua51_Win32.dll.bak" },
 ]
 write_file = [
-  { from = "native/luajit_win32.dll", to = "lua51_Win32.dll" },
+  { from = "plaf_win32/lua51.dll", to = "lua51_Win32.dll" },
 ]
 enable_feature = ["LuaJit"]
 

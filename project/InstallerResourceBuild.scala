@@ -20,7 +20,6 @@
  * THE SOFTWARE.
  */
 
-import Config.*
 import Utils.*
 import com.github.rjeschke.txtmark.Processor
 import com.github.sbt.git.SbtGit.*
@@ -34,7 +33,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.sys.process.*
 
 object InstallerResourceBuild {
-  val settings = PatchBuild.settings ++ NativePatchBuild.settings ++ LuaJITBuild.settings ++ Seq(
+  val settings = PatchBuild.settings ++ Seq(
     Keys.versionData := {
       val VersionRegex(major, minor, _, patch, _, suffix) = version.value
       val dateFormat                                      = DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.US)

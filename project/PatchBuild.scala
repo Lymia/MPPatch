@@ -29,26 +29,6 @@ import scala.xml.*
 object PatchBuild {
   val settings = Seq(
     Keys.nativesDir := crossTarget.value / "native-bin",
-    Keys.buildDylibDir := {
-      // create the native-patch directory
-      val dir = Keys.nativesDir.value
-      IO.delete(dir)
-      IO.createDirectory(dir)
-
-      // copy native-patch files to the directory
-      val log = streams.value.log
-      for (luajitBin <- LuaJITBuild.Keys.luajitFiles.value) {
-        log.log(Level.Info, s"Copying $luajitBin to output directory.")
-        IO.copyFile(luajitBin.file, dir / luajitBin.file.getName)
-      }
-      for (nativeBin <- NativePatchBuild.Keys.nativeVersions.value) {
-        log.log(Level.Info, s"Copying $nativeBin to output directory.")
-        IO.copyFile(nativeBin.file, dir / nativeBin.name)
-      }
-
-      // return directory
-      dir
-    },
     Keys.patchFiles := {
       val log = streams.value.log
 
@@ -56,12 +36,12 @@ object PatchBuild {
         Path.allSubpaths(dir).filter(_._1.isFile).map(x => PatchFile(x._2, IO.readBytes(x._1))).toSeq
       val copiedFiles = loadFromDir(baseDirectory.value / "src" / "patch")
 
-      val nativeDirFiles = Keys.nativesDir.value.listFiles()
-      if (nativeDirFiles == null) sys.error("native-bin does not exist!")
+      val nativePlatforms = Keys.nativesDir.value.listFiles()
+      if (nativePlatforms == null) sys.error("native-bin does not exist!")
       val patchFiles =
-        for (binary <- nativeDirFiles) yield {
+        for (platform <- nativePlatforms; binary <- platform.listFiles()) yield {
           log.info(s"Found native binary file: $binary")
-          PatchFile(s"native/${binary.getName}", IO.readBytes(binary))
+          PatchFile(s"${platform.getName}/${binary.getName}", IO.readBytes(binary))
         }
 
       val versionDataInfo = InstallerResourceBuild.Keys.versionData.value.toSeq.sorted

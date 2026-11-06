@@ -23,7 +23,7 @@
 $ErrorActionPreference = "Stop"
 
 # Install graalvm
-scripts/ci/install-deps.ps1
+scripts_legacy/ci/install-deps.ps1
 
 # Find the current version
 $VERSION = "$( sbt "print version" --error )".Trim()

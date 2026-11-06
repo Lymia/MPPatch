@@ -23,7 +23,7 @@
 $ErrorActionPreference = "Stop"
 
 # Install graalvm
-scripts/ci/install-deps.ps1
+scripts_legacy/ci/install-deps.ps1
 
 # Extract native tarballs
 echo "Extracting native tarballs..."
