@@ -26,7 +26,7 @@ jobs:
       - name: Build native binaries
         run: |
           . "$HOME/.cargo/env"
-          scripts/ci/build-natives.sh
+          scripts/ci/build_natives.sh
 
       # Upload artifacts
       - uses: actions/upload-artifact@v7
