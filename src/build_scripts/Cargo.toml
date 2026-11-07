@@ -6,3 +6,14 @@ edition = "2024"
 publish = false
 
 [dependencies]
+git2 = "0.21"
+whoami = "2.0"
+
+errcode = { workspace = true }
+log = { workspace = true }
+serde = { workspace = true }
+toml = { workspace = true }
+uuid = { workspace = true }
+
+mpp_common = { workspace = true }
+mpp_installer_core = { workspace = true }

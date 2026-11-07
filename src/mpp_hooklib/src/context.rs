@@ -132,7 +132,7 @@ fn init_impl() -> Result<()> {
     // construct the MPPatch context
     let config = read_config();
     mpp_common::logging::register_logger(LoggerOptions {
-        log_file_name: "mppatch_debug.log",
+        log_file_name: Some("mppatch_debug.log"),
         log_append: false,
         log_level: if config.features.contains(MppatchFeature::Debug) {
             LevelFilter::Trace

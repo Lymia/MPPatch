@@ -41,7 +41,6 @@ object InstallerResourceBuild {
         "mppatch.version.string" -> version.value,
         "mppatch.version.commit" -> git.gitHeadCommit.value.getOrElse("<unknown>"),
         "mppatch.version.clean"  -> (!git.gitUncommittedChanges.value).toString,
-        "mppatch.website"        -> homepage.value.fold("<unknown>")(_.toString),
         "build.id"               -> UUID.randomUUID().toString,
         "build.user"             -> tryProperty(System.getProperty("user.name")),
         "build.hostname"         -> tryProperty(InetAddress.getLocalHost.getHostName),

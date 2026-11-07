@@ -3,3 +3,6 @@ build-std = ["core", "alloc", "std", "panic_abort"]
 
 [target.i686-unknown-linux-gnu]
 linker = "clang"
+
+[env]
+CARGO_WORKSPACE_DIR = { value = "", relative = true }

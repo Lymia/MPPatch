@@ -10,7 +10,7 @@ if _mpPatch and _mpPatch.loaded then
                                    or  "TXT_KEY_MPPATCH_JOIN_WARNING_1_STAGING"
     end
 
-    local website = _mpPatch.version.info["mppatch.website"] or "<unknown>"
+    local WEBSITE_URI = "https://github.com/Lymia/MPPatch"
     local function getHeader(playerId)
         local header = ""
         if getPlayerName then
@@ -38,7 +38,7 @@ if _mpPatch and _mpPatch.loaded then
             Network.SendChat(header..Locale.Lookup("TXT_KEY_MPPATCH_JOIN_WARNING_1_NOT_INSTALLED").." "..
                              joinWarning1Ending)
         end
-        Network.SendChat(header..Locale.ConvertTextKey("TXT_KEY_MPPATCH_JOIN_WARNING_2", website))
+        Network.SendChat(header..Locale.ConvertTextKey("TXT_KEY_MPPATCH_JOIN_WARNING_2", WEBSITE_URI))
     end
 
     function _mpPatch.hooks.protocol_kickunpached_installHooks()

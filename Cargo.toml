@@ -27,7 +27,12 @@ panic = "abort"
 [workspace.dependencies]
 errcode = { version = "0.1", features = ["repr_full"] }
 libc = "0.2"
+log = { version = "0.4", features = ["std"] }
+serde = { version = "1.0", features = ["derive"] }
+toml = "1.2"
+uuid = { version = "1.0", features = ["v4"] }
 
 mpp_common = { version = "*", path = "src/mpp_common" }
 mpp_hooklib_defs = { version = "*", path = "src/mpp_hooklib_defs" }
+mpp_installer_core = { version = "*", path = "src/mpp_installer_core" }
 mpp_version = { version = "*", path = "src/mpp_version" }

@@ -12,7 +12,7 @@ use std::{
 
 #[derive(Debug, Copy, Clone)]
 pub struct LoggerOptions {
-    pub log_file_name: &'static str,
+    pub log_file_name: Option<&'static str>,
     pub log_append: bool,
     pub log_level: LevelFilter,
 }
@@ -25,10 +25,10 @@ pub fn register_logger(options: LoggerOptions) {
 
 fn register_logger_impl(options: LoggerOptions) -> Result<()> {
     register_panic_hook();
-    let file = {
+    let file = if let Some(log_file_name) = options.log_file_name {
         let mut path = std::env::current_exe()?.canonicalize()?;
         path.pop();
-        path.push(options.log_file_name);
+        path.push(log_file_name);
 
         let file = if options.log_append {
             OpenOptions::new().append(true).create(true).open(path)?
@@ -39,13 +39,15 @@ fn register_logger_impl(options: LoggerOptions) -> Result<()> {
                 .create(true)
                 .open(path)?
         };
-        BufWriter::new(file)
+        Some(BufWriter::new(file))
+    } else {
+        None
     };
 
     log::set_max_level(options.log_level);
     log::set_boxed_logger(Box::new(LogHandler {
         log_start: Instant::now(),
-        log_file: Mutex::new(file),
+        log_file: file.map(Mutex::new),
         log_level: options.log_level,
     }))?;
     Ok(())
@@ -86,7 +88,7 @@ fn fatal_logging(str: &str) -> ! {
 
 struct LogHandler {
     log_start: Instant,
-    log_file: Mutex<BufWriter<File>>,
+    log_file: Option<Mutex<BufWriter<File>>>,
     log_level: LevelFilter,
 }
 impl LogHandler {
@@ -94,16 +96,18 @@ impl LogHandler {
         record.is_terminal = true;
         println!("{record}");
 
-        record.is_terminal = false;
-        let mut out_file = match self.log_file.lock() {
-            Ok(o) => o,
-            Err(_) => fatal_logging("Could not lock log mutex"),
-        };
-        if let Err(e) = writeln!(out_file, "{record}") {
-            fatal_logging(&format!("Could not write log: {e}"))
-        }
-        if let Err(e) = out_file.flush() {
-            fatal_logging(&format!("Could not flush log: {e}"))
+        if let Some(log_file) = self.log_file.as_ref() {
+            record.is_terminal = false;
+            let mut out_file = match log_file.lock() {
+                Ok(o) => o,
+                Err(_) => fatal_logging("Could not lock log mutex"),
+            };
+            if let Err(e) = writeln!(out_file, "{record}") {
+                fatal_logging(&format!("Could not write log: {e}"))
+            }
+            if let Err(e) = out_file.flush() {
+                fatal_logging(&format!("Could not flush log: {e}"))
+            }
         }
     }
 }

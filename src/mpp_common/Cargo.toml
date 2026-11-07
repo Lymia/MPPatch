@@ -7,9 +7,10 @@ publish = false
 
 [dependencies]
 anstyle = "1.0"
+
 errcode = { workspace = true }
 libc = { workspace = true }
-log = { version = "0.4", features = ["std"] }
+log = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "errhandlingapi", "std"] }

@@ -11,11 +11,12 @@ crate-type = ["cdylib"]
 [dependencies]
 dlopen = "0.1"
 enumset = "1.1"
+linktime = "0.19"
+mlua = { version = "0.12", features = ["lua51", "module"] }
+
 errcode = { workspace = true }
 libc = { workspace = true }
-linktime = "0.19"
-log = { version = "0.4", features = ["std"] }
-mlua = { version = "0.12", features = ["lua51", "module"] }
+log = { workspace = true }
 
 mpp_common = { workspace = true }
 mpp_hooklib_defs = { workspace = true }
