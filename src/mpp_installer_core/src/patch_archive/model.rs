@@ -1,6 +1,11 @@
 use rkyv::{Archive, Deserialize, Serialize};
 use std::collections::HashMap;
 
+pub const MAGIC_HEADER: [u8; 12] = *b"\x89MppDatPk\x0D\x0A\x0A";
+
+pub const MAJOR_VERSION: u16 = 1;
+pub const MINOR_VERSION: u16 = 0;
+
 #[derive(Debug, Clone)]
 #[derive(Archive, Serialize, Deserialize)]
 pub struct DataSlice {
@@ -12,9 +17,9 @@ pub struct DataSlice {
 #[derive(Archive, Serialize, Deserialize)]
 pub struct ArchiveMetadataSection {
     pub signature: String,
-    pub major_version: u32,
-    pub minor_version: u32,
+    pub manifest_version: u32,
     pub metadata: BuildMetadata,
+    pub archive_info: DataSlice,
 }
 
 #[derive(Debug, Clone)]

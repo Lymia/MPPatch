@@ -48,11 +48,28 @@ fn build_metadata() -> Result<BuildMetadata> {
     })
 }
 
+fn find_files(prefix: &str) -> Result<Vec<(String, Vec<u8>)>> {
+    let mut files = Vec::new();
+    for file in glob::glob(&format!("{prefix}/**/*"))? {
+        let file = file?;
+        if file.is_file() {
+            let name = file.to_string_lossy().to_string();
+            let name = name[prefix.len() + 1..].to_string();
+            files.push((name, std::fs::read(file)?));
+        }
+    }
+    Ok(files)
+}
+
 pub fn build_patch() -> Result<Vec<u8>> {
     let metadata = build_metadata()?;
     let data = mpp_installer_core::patch_archive::encode_archive(
-        WriterOptions { enable_compression: false, solid_directory_prefixes: vec![], metadata },
-        Vec::new(),
+        WriterOptions {
+            enable_compression: true,
+            solid_directory_prefixes: vec![String::from("ui/"), String::from("meta/")],
+            metadata,
+        },
+        find_files("src/patch_data")?,
     )?;
     Ok(data)
 }

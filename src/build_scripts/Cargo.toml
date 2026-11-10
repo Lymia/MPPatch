@@ -7,6 +7,7 @@ publish = false
 
 [dependencies]
 git2 = "0.21"
+glob = "0.3"
 whoami = "2.0"
 
 errcode = { workspace = true }
