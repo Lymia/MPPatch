@@ -66,7 +66,8 @@ pub fn build_patch() -> Result<Vec<u8>> {
     let data = mpp_installer_core::patch_archive::encode_archive(
         WriterOptions {
             enable_compression: true,
-            solid_directory_prefixes: vec![String::from("ui/"), String::from("meta/")],
+            solid_directory_prefixes: vec![(String::from("ui/"), 0), (String::from("meta/"), 0)],
+            num_prefixes: 1,
             metadata,
         },
         find_files("src/patch_data")?,

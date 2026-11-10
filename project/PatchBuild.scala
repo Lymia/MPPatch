@@ -41,14 +41,14 @@ object PatchBuild {
       val patchFiles =
         for (platform <- nativePlatforms; binary <- platform.listFiles()) yield {
           log.info(s"Found native binary file: $binary")
-          PatchFile(s"${platform.getName}/${binary.getName}", IO.readBytes(binary))
+          PatchFile(s"data/${platform.getName}/${binary.getName}", IO.readBytes(binary))
         }
 
       val versionDataInfo = InstallerResourceBuild.Keys.versionData.value.toSeq.sorted
         .map(x => s"_mpPatch.version.info[${LuaUtils.quote(x._1)}] = ${LuaUtils.quote(x._2)}")
         .mkString("\n")
       val versionInfo = PatchFile(
-        "ui/lib/mppatch_version.lua",
+        "data/ui/lib/mppatch_version.lua",
         s"""-- Generated from PatchBuild.scala
            |_mpPatch.version = {}
            |_mpPatch.version.info = {}

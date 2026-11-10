@@ -151,17 +151,17 @@ object UIPatch {
 
 class CivDlcBuilder(source: DataSource, patch: UIPatch) {
   private lazy val luaPatchList = patch.luaPatches.map(x => x.filename.toLowerCase(Locale.ENGLISH) -> x).toMap
-  private lazy val libraryFiles = patch.libraryFiles.map(x => x.filename -> source.loadResource(x.source)).toMap
+  private lazy val libraryFiles = patch.libraryFiles.map(x => x.filename -> source.loadResource(f"data/${x.source}")).toMap
   private lazy val newScreenFiles = patch.newScreenFileNames
     .flatMap(x =>
       Seq(
-        s"${x.filename}.lua" -> source.loadResource(s"${x.source}.lua"),
-        s"${x.filename}.xml" -> source.loadResource(s"${x.source}.xml")
+        s"${x.filename}.lua" -> source.loadResource(s"data/${x.source}.lua"),
+        s"${x.filename}.xml" -> source.loadResource(s"data/${x.source}.xml")
       )
     )
     .toMap
   private lazy val textFiles =
-    patch.textFileNames.map(x => x.replace("/", "_") -> XML.loadString(source.loadResource(x))).toMap
+    patch.textFileNames.map(x => x.replace("/", "_") -> XML.loadString(source.loadResource(f"data/$x"))).toMap
 
   private lazy val patchFileList =
     (patch.luaSoftHooks.flatMap(_.inject) ++
@@ -186,7 +186,7 @@ class CivDlcBuilder(source: DataSource, patch: UIPatch) {
        |end
      """.stripMargin
   }
-  private lazy val softHookFiles = patchFileMap.map(x => x._2 -> source.loadResource(x._1)) ++ Map(
+  private lazy val softHookFiles = patchFileMap.map(x => x._2 -> source.loadResource(f"data/${x._1}")) ++ Map(
     patch.softHookInfo.infoTarget -> softHookInfo
   )
 
@@ -202,7 +202,7 @@ class CivDlcBuilder(source: DataSource, patch: UIPatch) {
     if (!inject.inline) {
       s"include ${LuaUtils.quote(patchFileMap(inject.source))}\n"
     } else {
-      val code = source.loadResource(inject.source)
+      val code = source.loadResource(f"data/${inject.source}")
       s"-- source file: ${inject.source} --\n\n" +
         code + (if (!code.endsWith("\n")) "\n" else "") +
         s"\n-- end source file: ${inject.source} --\n"

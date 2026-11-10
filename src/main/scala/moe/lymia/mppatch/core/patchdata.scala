@@ -91,11 +91,6 @@ private object PackageUtils {
  * Where to load patch from.
  */
 class PatchPackage(val source: DataSource) {
-  source.loadResource("manifest_version.txt").strip() match {
-    case "2.0" => // ok
-    case unk => sys.error(f"Unknown .mppatch-pkg version: $unk")
-  }
-
   /** The manifest for this patch. */
   lazy val patchManifest =
     EncodingUtils.unwrapToml(toml.Toml.parseAs[JsonPatchManifest](source.loadResource("meta/manifest.toml")))
@@ -106,7 +101,7 @@ class PatchPackage(val source: DataSource) {
   /** The list of install scripts available in this package. */
   lazy val scripts =
     patchManifest.installScripts.map(x =>
-      EncodingUtils.unwrapToml(toml.Toml.parseAs[JsonInstallScript](source.loadResource(x)))
+      EncodingUtils.unwrapToml(toml.Toml.parseAs[JsonInstallScript](source.loadResource(f"meta/$x")))
     )
 
   /** Detects the platform a Civilization installation directory is for. */
@@ -149,12 +144,12 @@ case class InstallFileSet private[core](script: InstallScript, sha256: String, p
       .map(x => OutputFile(x, configFileBody.getBytes(StandardCharsets.UTF_8)))
     val additionalFiles = packages
       .flatMap(_.write_file.getOrElse(Seq()))
-      .map(x => OutputFile(x.to, script.source.loadBinaryResource(x.from), x.exec.getOrElse(false)))
+      .map(x => OutputFile(x.to, script.source.loadBinaryResource(f"data/${x.from}"), x.exec.getOrElse(false)))
 
     val assetPath = script.script.metadata.assets_path
     val assets = script.platform.resolve(basePath, assetPath)
     val dlcFiles = packages.flatMap(_.write_dlc.getOrElse(Seq())).flatMap { x =>
-      val uiPatch = script.pkg.loadUIPatch(x.from)
+      val uiPatch = script.pkg.loadUIPatch(f"meta/${x.from}")
       val dlc = new CivDlcBuilder(script.source, uiPatch).generateBaseDLC(assets, script.platform)
       val dlcMap = DLCDataWriter.writeDLC(
         s"$assetPath/${script.platform.mapPath(x.to)}",

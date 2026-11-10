@@ -13,7 +13,8 @@ use std::{collections::HashMap, io::Cursor};
 #[derive(Debug, Clone)]
 pub struct WriterOptions {
     pub enable_compression: bool,
-    pub solid_directory_prefixes: Vec<String>,
+    pub solid_directory_prefixes: Vec<(String, usize)>,
+    pub num_prefixes: usize,
     pub metadata: BuildMetadata,
 }
 
@@ -116,12 +117,16 @@ impl SolidPrefixBuilder {
     }
 }
 
-pub fn encode_archive(options: WriterOptions, files: Vec<(String, Vec<u8>)>) -> Result<Vec<u8>> {
+pub fn encode_archive(
+    options: WriterOptions,
+    mut files: Vec<(String, Vec<u8>)>,
+) -> Result<Vec<u8>> {
     info!("Encoding patch archive with {} files.", files.len());
     trace!("Options: {options:?}");
 
     ensure!(u32::try_from(files.len()).is_ok());
-    ensure!(u32::try_from(options.solid_directory_prefixes.len()).is_ok());
+    ensure!(u32::try_from(options.num_prefixes).is_ok());
+    files.sort_by_cached_key(|x| x.0.clone());
 
     let mut writer = RawWriter {
         enable_compression: options.enable_compression,
@@ -133,14 +138,14 @@ pub fn encode_archive(options: WriterOptions, files: Vec<(String, Vec<u8>)>) -> 
 
     'outer: for (name, data) in files {
         ensure!(!index.files.contains_key(&name));
-        for (prefix_idx, prefix) in options.solid_directory_prefixes.iter().enumerate() {
+        for (prefix, prefix_idx) in &options.solid_directory_prefixes {
             if name.starts_with(prefix) {
                 debug!("Adding {name} to solid archive {prefix}... ({} bytes)", data.len());
-                let file_idx = prefixes.prefixes[prefix_idx].len() as u32;
-                prefixes.prefixes[prefix_idx].push(data);
+                let file_idx = prefixes.prefixes[*prefix_idx].len() as u32;
+                prefixes.prefixes[*prefix_idx].push(data);
                 index
                     .files
-                    .insert(name, ArchiveFileInfo::CompressedBlock(prefix_idx as u32, file_idx));
+                    .insert(name, ArchiveFileInfo::CompressedBlock(*prefix_idx as u32, file_idx));
                 continue 'outer;
             }
         }
@@ -166,7 +171,7 @@ pub fn encode_archive(options: WriterOptions, files: Vec<(String, Vec<u8>)>) -> 
 
     debug!("Writing header...");
     writer.align(4);
-    let back_len: u32 = writer
+    let start_len: u32 = writer
         .buffer
         .len()
         .try_into()
@@ -176,7 +181,7 @@ pub fn encode_archive(options: WriterOptions, files: Vec<(String, Vec<u8>)>) -> 
         b.extend_from_slice(&MAGIC_HEADER);
         b.extend_from_slice(&MAJOR_VERSION.to_le_bytes());
         b.extend_from_slice(&MINOR_VERSION.to_le_bytes());
-        b.extend_from_slice(&back_len.to_le_bytes());
+        b.extend_from_slice(&start_len.to_le_bytes());
         b.extend_from_slice(&metadata_index.offset.to_le_bytes());
         b.extend_from_slice(&metadata_index.len.to_le_bytes());
     }
