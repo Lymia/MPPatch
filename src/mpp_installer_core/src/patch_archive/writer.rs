@@ -140,7 +140,7 @@ pub fn encode_archive(
         ensure!(!index.files.contains_key(&name));
         for (prefix, prefix_idx) in &options.solid_directory_prefixes {
             if name.starts_with(prefix) {
-                debug!("Adding {name} to solid archive {prefix}... ({} bytes)", data.len());
+                debug!("Adding {name} to solid archive #{prefix_idx}... ({} bytes)", data.len());
                 let file_idx = prefixes.prefixes[*prefix_idx].len() as u32;
                 prefixes.prefixes[*prefix_idx].push(data);
                 index

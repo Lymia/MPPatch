@@ -63,14 +63,21 @@ fn find_files(prefix: &str) -> Result<Vec<(String, Vec<u8>)>> {
 
 pub fn build_patch() -> Result<Vec<u8>> {
     let metadata = build_metadata()?;
+    let mut files = Vec::new();
+    files.extend(find_files("src/patch_data")?);
+    files.extend(find_files("target/native-bin")?);
+
     let data = mpp_installer_core::patch_archive::encode_archive(
         WriterOptions {
             enable_compression: true,
-            solid_directory_prefixes: vec![(String::from("ui/"), 0), (String::from("meta/"), 0)],
+            solid_directory_prefixes: vec![
+                (String::from("data/ui/"), 0),
+                (String::from("data/plaf/"), 0),
+            ],
             num_prefixes: 1,
             metadata,
         },
-        find_files("src/patch_data")?,
+        files,
     )?;
     Ok(data)
 }
