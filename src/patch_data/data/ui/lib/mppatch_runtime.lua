@@ -46,10 +46,10 @@ do
         loadFailed("Could not load version information.")
         return
     end
-    local expectedVersion = "0.2.0-alpha.2"
+    local expectedVersion = "0.2.0-alpha.3"
     if expectedVersion ~= patch.version.versionString then
         local format = "Version mismatch. (platform: %s, got: %s, expected: %s)"
-        loadFailed(format:format(patch.version.platform, patch.version.buildId, expectedBuildId))
+        loadFailed(format:format(patch.version.platform, patch.version.versionString, expectedVersion))
         return
     end
 end
