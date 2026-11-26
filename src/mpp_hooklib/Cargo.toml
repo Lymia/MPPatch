@@ -23,7 +23,5 @@ mpp_hooklib_defs = { workspace = true }
 mpp_version = { workspace = true }
 
 [target.'cfg(windows)'.dependencies]
-pe-parser = "0.7.0"
-sha2 = "0.11.1"
 winapi = { version = "0.3", features = ["memoryapi", "libloaderapi", "errhandlingapi", "std"] }
 libz-rs-sys = { version = "0.6.8", default-features = false, features = ["c-allocator", "std", "export-symbols"] }

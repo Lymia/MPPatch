@@ -2,7 +2,7 @@ use enumset::*;
 use errcode::prelude::*;
 use log::{LevelFilter, debug, info};
 use mpp_common::logging::{LoggerOptions, check_error};
-use mpp_version::{Platform, VersionInfo};
+use mpp_version::{ExeHash, Platform, VersionInfo};
 use std::{
     fs::File,
     panic,
@@ -15,7 +15,7 @@ use std::{
 pub struct MppatchCtx {
     exe_dir: PathBuf,
     config: MppatchConfig,
-    pub version_info: VersionInfo,
+    pub version_info: &'static VersionInfo,
 }
 impl MppatchCtx {
     pub fn exe_dir(&self) -> &Path {
@@ -47,42 +47,13 @@ pub enum MppatchFeature {
     Debug,
 }
 
-#[cfg(windows)]
-fn win32_text_hash(path: &Path) -> Result<String> {
-    use sha2::{Digest, Sha256};
-
-    let data = std::fs::read(path)?;
-    let pe = pe_parser::pe::parse_portable_executable(&data)?;
-    for section in pe.section_table {
-        if section.name == *b".text\0\0\0" {
-            let start = section.pointer_to_raw_data as usize;
-            let len = section.size_of_raw_data.min(section.virtual_size) as usize;
-            let segment = &data[start..start + len];
-
-            let mut out = String::new();
-            for byte in Sha256::digest(segment) {
-                out.push_str(&format!("{byte:02x}"));
-            }
-            log::debug!(".text hash: {out}");
-            return Ok(out);
-        }
-    }
-    bail!("Could not find .text section!")
-}
-
 fn create_ctx(config: MppatchConfig) -> Result<MppatchCtx> {
-    let exe_path = std::env::current_exe().unwrap();
-    let mut exe_dir = exe_path.canonicalize().unwrap();
+    let exe_path = std::env::current_exe()?;
+    let mut exe_dir = exe_path.canonicalize()?;
     exe_dir.pop();
 
-    #[cfg(unix)]
-    let text_hash = String::new();
-
-    #[cfg(windows)]
-    let text_hash =
-        win32_text_hash(&exe_path).with_context(error_info!("Parsing hash for the main binary"))?;
-
-    let version_info = mpp_version::find_info(&config.bin_sha256, &text_hash)?;
+    let exe_hash = ExeHash::hash(&exe_path)?;
+    let version_info = mpp_version::find_info(&config.bin_sha256, &exe_hash)?;
 
     Ok(MppatchCtx { exe_dir, config, version_info })
 }

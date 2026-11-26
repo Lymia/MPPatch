@@ -17,6 +17,8 @@ fn apply_noceg() {
             for offset in patches.stub_functions {
                 offset.relocate().stub_function_true()
             }
+        } else {
+            info!("Skipping noceg: CEG is not enabled for this version.");
         }
     }
 }

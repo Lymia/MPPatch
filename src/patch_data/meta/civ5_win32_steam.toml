@@ -8,6 +8,7 @@ check_for = ["CivilizationV.exe", "CvGameDatabaseWin32Final Release.dll", "steam
 hash_from = "CvGameDatabaseWin32Final Release.dll"
 supported_hashes = [
   "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563",
+  "e0ed78f7cfd64fbcca179ce1be4006900bddbceec3fd6a2cab059ef8004f178e",
 ]
 
 [packages.multiplayer]
