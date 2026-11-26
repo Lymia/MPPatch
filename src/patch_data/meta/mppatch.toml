@@ -51,12 +51,10 @@ inject_after = ["ui/hooks/frontend/mainmenu/contentswitch_debug.lua"]
 [softhook."ModsBrowser"]
 includes = ["mppatch_runtime.lua"]
 inject = ["ui/hooks/frontend/modsmenu/modsbrowser_forcereload.lua"]
-inject_after = []
 
 [softhook."ModsMenu"]
 includes = ["mppatch_runtime.lua"]
 inject = ["ui/hooks/frontend/modsmenu/modsmenu_enablempmenu.lua"]
-inject_after = []
 
 [hook."MultiplayerSelect.lua"]
 includes = ["mppatch_runtime.lua"]
@@ -66,13 +64,11 @@ inject_after = ["ui/hooks/frontend/modsmenu/multiplayerselect_keepmods.lua"]
 [softhook."LobbyScreen"]
 includes = ["mppatch_runtime.lua"]
 inject = ["ui/hooks/frontend/modsmenu/lobby_skip.lua"]
-inject_after = []
 
 # Multiplayer lobby modifications
 [softhook."MPGameSetupScreen"]
 includes = ["mppatch_runtime.lua"]
 inject = ["ui/hooks/frontend/staging/mpgamesetupscreen_settitle.lua"]
-inject_after = []
 
 [hook."MPGameOptions.lua"]
 includes = ["mppatch_runtime.lua"]
@@ -119,7 +115,6 @@ inject = [
     "ui/hooks/ingame/ingame_chatcommands.lua",
     "ui/hooks/common/eventsdebug.lua",
 ]
-inject_after = []
 
 [softhook."DiploCorner"]
 includes = ["mppatch_runtime.lua"]
@@ -127,4 +122,3 @@ inject = [
     "ui/hooks/common/protocol_chathandler.lua",
     "ui/hooks/ingame/diplocorner_suppresscommands.lua",
 ]
-inject_after = []

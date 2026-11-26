@@ -82,7 +82,7 @@ object UIPatch {
         hook.inject_after.map(parseTomlInjection),
       )).toSeq,
       luaSoftHooks = info.softhook.map((name, softhook) =>
-        LuaSoftHook(name, softhook.inject, softhook.inject_after)
+        LuaSoftHook(name, softhook.includes, softhook.inject)
       ).toSeq,
       libraryFiles = info.include.map((key, value) => FileWithSource(key, value)).toSeq,
       newScreenFileNames = info.screen.map((key, screen) => FileWithSource(key, screen.source)).toSeq,
@@ -130,7 +130,6 @@ object UIPatch {
   case class TomlSoftHook(
     includes: List[String],
     inject: List[String],
-    inject_after: List[String],
   )
 
   case class TomlScreen(
