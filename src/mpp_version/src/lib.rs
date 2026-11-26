@@ -129,83 +129,71 @@ enum HashInfoType {
     CegSubversions(&'static [(&'static str, VersionInfo)]),
 }
 
+struct WindowsOffsets {
+    hash: &'static str,
+    name: &'static str,
+    sym_SetActiveDLCAndMods: usize,
+    sym_cvLuaPathLibrary_Register: usize,
+    sym_cvLuaUtils_ExposeLibraryToThread: usize,
+    binary_base: usize,
+    ceg_patches: Option<CegPatches>,
+}
+const fn win32_1_0_3_279(offsets: WindowsOffsets) -> (&'static str, VersionInfo) {
+    (offsets.hash, VersionInfo {
+        name: offsets.name,
+        platform: Platform::Win32,
+        sym_SetActiveDLCAndMods: SymbolInfo::Offset(
+            "SetActiveDLCAndMods",
+            Offset(offsets.sym_SetActiveDLCAndMods),
+            const { &PatchInfo::simple(6) },
+        ),
+        sym_cvLuaPathLibrary_Register: SymbolInfo::Offset(
+            "cvLuaPathLibrary::Register",
+            Offset(offsets.sym_cvLuaPathLibrary_Register),
+            const { &PatchInfo::simple(8) },
+        ),
+        sym_cvLuaUtils_ExposeLibraryToThread: SymbolInfo::Offset(
+            "cvLuaUtils::ExposeLibraryToThread",
+            Offset(offsets.sym_cvLuaUtils_ExposeLibraryToThread),
+            PatchInfo::NONE,
+        ),
+        binary_base: offsets.binary_base,
+        ceg_patches: offsets.ceg_patches,
+    })
+}
+
 static VERSION_DATA: &'static [HashInfo] = &[
     // Civilization V / 1.0.3.279 / Win32 + Steam
     HashInfo {
         bin_hash: "f95637398ce10012c785b0dc952686db82613f702a8511bbc7ac822896949563",
         bin_type: HashInfoType::CegSubversions(&[
-            (
-                "612537ceaf20715e1ca2968b3ac9433db8789214e198c714ad6ec6d28928be0f",
-                VersionInfo {
-                    name: "Civilization V / 1.0.3.279 / Win32 (DX9) + Steam",
-                    platform: Platform::Win32,
-                    sym_SetActiveDLCAndMods: SymbolInfo::Offset(
-                        "SetActiveDLCAndMods",
-                        Offset(0x006CD160),
-                        const { &PatchInfo::simple(6) },
-                    ),
-                    sym_cvLuaPathLibrary_Register: SymbolInfo::Offset(
-                        "cvLuaPathLibrary::Register",
-                        Offset(0x004f73c0),
-                        const { &PatchInfo::simple(8) },
-                    ),
-                    sym_cvLuaUtils_ExposeLibraryToThread: SymbolInfo::Offset(
-                        "cvLuaUtils::ExposeLibraryToThread",
-                        Offset(0x006dfb60),
-                        PatchInfo::NONE,
-                    ),
-                    binary_base: 0x00400000,
-                    ceg_patches: Some(include_out!("v1.0.3.279_win32_dx9_ceg.inc")),
-                },
-            ),
-            (
-                "7c3ee1cabdfaf5242f74521bff3ead1faf72cc4769fcea0267113ed2621e7bca",
-                VersionInfo {
-                    name: "Civilization V / 1.0.3.279 / Win32 (DX11) + Steam",
-                    platform: Platform::Win32,
-                    sym_SetActiveDLCAndMods: SymbolInfo::Offset(
-                        "SetActiveDLCAndMods",
-                        Offset(0x006B8E50),
-                        const { &PatchInfo::simple(6) },
-                    ),
-                    sym_cvLuaPathLibrary_Register: SymbolInfo::Offset(
-                        "cvLuaPathLibrary::Register",
-                        Offset(0x007301B0),
-                        const { &PatchInfo::simple(8) },
-                    ),
-                    sym_cvLuaUtils_ExposeLibraryToThread: SymbolInfo::Offset(
-                        "cvLuaUtils::ExposeLibraryToThread",
-                        Offset(0x005292A0),
-                        PatchInfo::NONE,
-                    ),
-                    binary_base: 0x00400000,
-                    ceg_patches: Some(include_out!("v1.0.3.279_win32_dx11_ceg.inc")),
-                },
-            ),
-            (
-                "191653e9d79ee22fe293f2d8a73f3ff918e713845ef8a9269cbff995e599a3b7",
-                VersionInfo {
-                    name: "Civilization V / 1.0.3.279 / Win32 (Tablet) + Steam",
-                    platform: Platform::Win32,
-                    sym_SetActiveDLCAndMods: SymbolInfo::Offset(
-                        "SetActiveDLCAndMods",
-                        Offset(0x0065DC10),
-                        const { &PatchInfo::simple(6) },
-                    ),
-                    sym_cvLuaPathLibrary_Register: SymbolInfo::Offset(
-                        "cvLuaPathLibrary::Register",
-                        Offset(0x006df4e0),
-                        const { &PatchInfo::simple(8) },
-                    ),
-                    sym_cvLuaUtils_ExposeLibraryToThread: SymbolInfo::Offset(
-                        "cvLuaUtils::ExposeLibraryToThread",
-                        Offset(0x00463150),
-                        PatchInfo::NONE,
-                    ),
-                    binary_base: 0x00400000,
-                    ceg_patches: Some(include_out!("v1.0.3.279_win32_tablet_ceg.inc")),
-                },
-            ),
+            win32_1_0_3_279(WindowsOffsets {
+                hash: "612537ceaf20715e1ca2968b3ac9433db8789214e198c714ad6ec6d28928be0f",
+                name: "Civilization V / 1.0.3.279 / Win32 (DX9) + Steam",
+                sym_SetActiveDLCAndMods: 0x006CD160,
+                sym_cvLuaPathLibrary_Register: 0x004f73c0,
+                sym_cvLuaUtils_ExposeLibraryToThread: 0x006dfb60,
+                binary_base: 0x00400000,
+                ceg_patches: Some(include_out!("v1.0.3.279_win32_dx9_ceg.inc")),
+            }),
+            win32_1_0_3_279(WindowsOffsets {
+                hash: "7c3ee1cabdfaf5242f74521bff3ead1faf72cc4769fcea0267113ed2621e7bca",
+                name: "Civilization V / 1.0.3.279 / Win32 (DX11) + Steam",
+                sym_SetActiveDLCAndMods: 0x006B8E50,
+                sym_cvLuaPathLibrary_Register: 0x007301B0,
+                sym_cvLuaUtils_ExposeLibraryToThread: 0x005292A0,
+                binary_base: 0x00400000,
+                ceg_patches: Some(include_out!("v1.0.3.279_win32_dx11_ceg.inc")),
+            }),
+            win32_1_0_3_279(WindowsOffsets {
+                hash: "191653e9d79ee22fe293f2d8a73f3ff918e713845ef8a9269cbff995e599a3b7",
+                name: "Civilization V / 1.0.3.279 / Win32 (Tablet) + Steam",
+                sym_SetActiveDLCAndMods: 0x0065DC10,
+                sym_cvLuaPathLibrary_Register: 0x006df4e0,
+                sym_cvLuaUtils_ExposeLibraryToThread: 0x00463150,
+                binary_base: 0x00400000,
+                ceg_patches: Some(include_out!("v1.0.3.279_win32_tablet_ceg.inc")),
+            }),
         ]),
     },
     // Civilization V / 1.0.3.279 / Linux + Steam
@@ -234,34 +222,37 @@ static VERSION_DATA: &'static [HashInfo] = &[
             ceg_patches: None,
         }),
     },
-    // Civilization V / 1.0.3.279 (November 2026 Hotfix) / Win32 + Steam
+    // Civilization V / 1.0.3.279 (Nov 2026 Hotfix) / Win32 + Steam
     HashInfo {
         bin_hash: "e0ed78f7cfd64fbcca179ce1be4006900bddbceec3fd6a2cab059ef8004f178e",
         bin_type: HashInfoType::Subversions(&[
-            (
-                "2b9444c88477717a19b3ce91db679869ebb52d1529f00a6849179b3ea90d8be0",
-                VersionInfo {
-                    name: "Civilization V / 1.0.3.279 (Nov 2026 Hotfix) / Win32 (DX9) + Steam",
-                    platform: Platform::Win32,
-                    sym_SetActiveDLCAndMods: SymbolInfo::Offset(
-                        "SetActiveDLCAndMods",
-                        Offset(0x007e3630),
-                        const { &PatchInfo::simple(6) },
-                    ),
-                    sym_cvLuaPathLibrary_Register: SymbolInfo::Offset(
-                        "cvLuaPathLibrary::Register",
-                        Offset(0x007a0650),
-                        const { &PatchInfo::simple(8) },
-                    ),
-                    sym_cvLuaUtils_ExposeLibraryToThread: SymbolInfo::Offset(
-                        "cvLuaUtils::ExposeLibraryToThread",
-                        Offset(0x007abe30),
-                        PatchInfo::NONE,
-                    ),
-                    binary_base: 0x00400000,
-                    ceg_patches: None,
-                },
-            ),
+            win32_1_0_3_279(WindowsOffsets {
+                hash: "2b9444c88477717a19b3ce91db679869ebb52d1529f00a6849179b3ea90d8be0",
+                name: "Civilization V / 1.0.3.279 (Nov 2026 Hotfix) / Win32 (DX9) + Steam",
+                sym_SetActiveDLCAndMods: 0x007e3630,
+                sym_cvLuaPathLibrary_Register: 0x007a0650,
+                sym_cvLuaUtils_ExposeLibraryToThread: 0x007abe30,
+                binary_base: 0x00400000,
+                ceg_patches: None,
+            }),
+            win32_1_0_3_279(WindowsOffsets {
+                hash: "a7b4f52048bb5890b1f316852f1c0e12bbd6e5e9685d20b167fbd352196bd586",
+                name: "Civilization V / 1.0.3.279 (Nov 2026 Hotfix) / Win32 (DX11) + Steam",
+                sym_SetActiveDLCAndMods: 0x007b47c0,
+                sym_cvLuaPathLibrary_Register: 0x00771830,
+                sym_cvLuaUtils_ExposeLibraryToThread: 0x0077cb70,
+                binary_base: 0x00400000,
+                ceg_patches: None,
+            }),
+            win32_1_0_3_279(WindowsOffsets {
+                hash: "67e14681d1ec8c2aca49f0f48b54f8d3ed49e0ff7417a08092f0eed126c648a7",
+                name: "Civilization V / 1.0.3.279 (Nov 2026 Hotfix) / Win32 (Tablet) + Steam",
+                sym_SetActiveDLCAndMods: 0x007b64a0,
+                sym_cvLuaPathLibrary_Register: 0x00773150,
+                sym_cvLuaUtils_ExposeLibraryToThread: 0x0077e850,
+                binary_base: 0x00400000,
+                ceg_patches: None,
+            }),
         ]),
     },
 ];

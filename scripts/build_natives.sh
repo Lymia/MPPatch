@@ -10,7 +10,7 @@ mkdir -pv target/native-bin target/native-bin/natives_{linux,win32}
 
 # Build the Rust native hook
 cargo build --target i686-unknown-linux-gnu --release -p mpp_hooklib
-cargo build --target i686-win7-windows-gnu --release -p mpp_hooklib
+LUA_LIB="src/mpp_hooklib/stub" LUA_LIB_NAME="lua51_Win32" cargo build --target i686-win7-windows-gnu --release -p mpp_hooklib
 cp -v target/i686-unknown-linux-gnu/release/libmpp_hooklib.so target/native-bin/natives_linux/
 cp -v target/i686-win7-windows-gnu/release/mpp_hooklib.dll target/native-bin/natives_win32/
 
