@@ -1,7 +1,6 @@
 if _mpPatch and _mpPatch.loaded and not _mpPatch.patch.shared.printVersionRan then
     _mpPatch.patch.shared.printVersionRan = true
 
-    local tostring = _mpPatch.patch.globals.tostring
     _mpPatch.debugPrint("MPPatch version ".._mpPatch.versionString)
 
     local shortRev  = _mpPatch.version.get("mppatch.version.commit"):sub(0, 8)

@@ -1,10 +1,8 @@
 > # Maintance Warning
 > 
-> The current version of MPPatch has not been properly maintained since early 2020, as I moved into a different living arrangement and lost access to my desktop. I currently (as of September 2026) have access to a second computer again, so I can continue work on this project. Expect a properly working version again within one to two months.
->
-> Note that I still lack access to a Mac, and will likely drop Mac support for the foreseeable future. If you have access to a mac, and have the proper skills to work on a project like this, please email me! I'd appreciate the help.
+> The current stable version of MPPatch has not been worked on since 2020, as I moved into a different living arrangement and lost access to my desktop. I have access to a desktop again, and am now continuing work on MPPatch.
 > 
-> **Update (2026-Oct-28):** I've released an updated alpha version of MPPatch that should support current versions of Steam and Civilzation V. You can download it here: https://github.com/Lymia/MPPatch/releases/tag/v0.2.0-alpha.2
+> **Update (2026-Nov-26):** I've released an updated alpha version of MPPatch that should support current versions of Steam and Civilzation V, as well as add compatibility with the new hotfix released for Windows. You can download it here: https://github.com/Lymia/MPPatch/releases/tag/v0.2.0-alpha.3
 > 
 > From here, I intend to fix any remaining bugs in the native patch or Lua patch, and work on a new installer written in Rust (like the current native patch) for easier maintenance.
 
