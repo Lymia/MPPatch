@@ -678,7 +678,7 @@ dependencies = [
 
 [[package]]
 name = "mpp_hooklib"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 dependencies = [
  "dlopen",
  "enumset",
@@ -703,7 +703,7 @@ dependencies = [
 
 [[package]]
 name = "mpp_installer"
-version = "0.2.0-alpha.2"
+version = "0.2.0-alpha.3"
 
 [[package]]
 name = "mpp_installer_core"
